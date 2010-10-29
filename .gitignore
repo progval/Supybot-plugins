@@ -1,0 +1,8 @@
+backup
+build
+test-data
+test-conf
+test-logs
+*.pyc
+docs/_build
+docs/plugins
