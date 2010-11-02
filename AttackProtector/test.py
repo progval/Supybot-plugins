@@ -28,10 +28,37 @@
 
 ###
 
+import time
 from supybot.test import *
 
-class AttackProtectorTestCase(PluginTestCase):
+class AttackProtectorTestCase(ChannelPluginTestCase):
     plugins = ('AttackProtector',)
+    def _getIfBanned(self):
+        m = self.irc.takeMsg()
+        while m is not None:
+            if m == ircmsgs.ban(self.channel, self.prefix):
+                return True
+            m = self.irc.takeMsg()
+        return False
+        
+    
+    def testPunishJoinFlood(self):
+        for i in range(1, 5):
+            self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
+        self.failIf(self._getIfBanned() == False, 'No reaction to join flood.')
+        
+    def testPunishNotNoJoinFlood(self):
+        for i in range(1,4):
+            self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
+        self.failIf(self._getIfBanned(), 'Reaction to no join flood.')
+    
+    def testCleansCollection(self):
+        for i in range(1, 4):
+            self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
+        time.sleep(6)
+        self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
+        self.failIf(self._getIfBanned(), 'Doesn\'t clean the join collection.')
+        
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

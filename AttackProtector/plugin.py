@@ -28,16 +28,110 @@
 
 ###
 
+import re
+import time
+
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
+import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 
+try:
+    from supybot.i18n import PluginInternationalization
+    from supybot.i18n import internationalizeDocstring
+    _ = PluginInternationalization('AttackProtector')
+except:
+    # This are useless functions that's allow to run the plugin on a bot
+    # without the i18n plugin
+    _ = lambda x:x
+    internationalizeDocstring = lambda x:x
+    
+filterParser=re.compile('(?P<number>[0-9]+)p(?P<seconds>[0-9]+)')
 
+class AttackProtectorDatabaseItem:
+    def __init__(self, kind, prefix, channel, protector, irc):
+        self.kind = kind
+        self.prefix = prefix
+        self.channel = channel
+        self.time = time.time()
+        self.protector = protector
+        value = protector.registryValue('%s.detection' % kind, channel)
+        self.irc = irc
+        parsed = filterParser.match(value)
+        self.expire = self.time + int(parsed.group('seconds'))
+
+class AttackProtectorDatabase:
+    def __init__(self):
+        self._collections = {}
+    
+    def add(self, item):
+        if not self._collections.has_key(item.kind):
+            self._collections.update({item.kind: []})
+        self._collections[item.kind].append(item)
+        self.refresh()
+        self.detectAttack(item)
+    
+    def refresh(self):
+        currentTime = time.time() # Caching
+        for kind in self._collections:
+            collection = self._collections[kind]
+            for item in collection:
+                if item.expire < currentTime:
+                    collection.remove(item)
+    
+    def detectAttack(self, lastItem):
+        collection = self._collections[lastItem.kind]
+        prefix = lastItem.prefix
+        channel = lastItem.channel
+        protector = lastItem.protector
+        kind = lastItem.kind
+        count = 0
+        
+        for item in collection:
+            if item.prefix == prefix and item.channel == channel:
+                count += 1
+        if count >= int(filterParser.match(protector.registryValue(kind + '.detection', channel)).group('number')):
+            protector._slot(lastItem)
+
+@internationalizeDocstring
 class AttackProtector(callbacks.Plugin):
     """This plugin protects channels against spam and flood"""
-    pass    
+    def __init__(self, irc):
+        self.__parent = super(AttackProtector, self)
+        self.__parent.__init__(irc)
+        self._enableOn = time.time() + self.registryValue('delay')
+        self._database = AttackProtectorDatabase()
+        
+    def doJoin(self, irc, msg):
+        channel = msg.args[0]
+        if self.registryValue('join.detection', channel) == '0p0':
+            return
+        item = AttackProtectorDatabaseItem('join', msg.prefix,
+                                           channel, self, irc)
+        self._database.add(item)
+    
+    def _slot(self, lastItem):
+        irc = lastItem.irc
+        channel = lastItem.channel
+        prefix = lastItem.prefix
+        nick = prefix.split('!')[0]
+        kind = lastItem.kind
+        punishment = self.registryValue('%s.punishment' % kind, channel)
+        reason = _('%s flood detected') % kind
+        if punishment == 'kick':
+            msg = ircmsgs.kick(channel, nick, reason)
+            irc.queueMsg(msg)
+        elif punishment == 'ban':
+            msg = ircmsgs.ban(channel, prefix)
+            irc.queueMsg(msg)
+        elif punishment == 'kban':
+            msg = ircmsgs.kick(channel, nick, reason)
+            irc.queueMsg(msg)
+            msg = ircmsgs.ban(channel, prefix)
+            irc.queueMsg(msg)
+        
 
 
 Class = AttackProtector

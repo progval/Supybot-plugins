@@ -28,8 +28,19 @@
 
 ###
 
+import re
 import supybot.conf as conf
 import supybot.registry as registry
+
+try:
+    from supybot.i18n import PluginInternationalization
+    from supybot.i18n import internationalizeDocstring
+    _ = PluginInternationalization('AttackProtector')
+except:
+    # This are useless functions that's allow to run the plugin on a bot
+    # without the i18n plugin
+    _ = lambda x:x
+    internationalizeDocstring = lambda x:x
 
 def configure(advanced):
     # This will be called by supybot to configure this module.  advanced is
@@ -39,11 +50,35 @@ def configure(advanced):
     from supybot.questions import expect, anything, something, yn
     conf.registerPlugin('AttackProtector', True)
 
+@internationalizeDocstring
+class XpY(registry.String):
+    """Value must be in the format <number>p<seconds>."""
+    _re = re.compile('(?P<number>[0-9]+)p(?P<seconds>[0-9]+)')
+    def setValue(self, v):
+        if self._re.match(v):
+            registry.String.setValue(self, v)
+        else:
+            self.error()
+
+@internationalizeDocstring
+class Punishment(registry.OnlySomeStrings):
+    validStrings = ('ban', 'kick', 'kban')
 
 AttackProtector = conf.registerPlugin('AttackProtector')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(AttackProtector, 'someConfigVariableName',
 #     registry.Boolean(False, """Help for someConfigVariableName."""))
 
+conf.registerGlobalValue(AttackProtector, 'delay',
+    registry.Integer(10, _("""Determines how long (in seconds) the plugin will
+    wait before being enabled. A too low value makes the bot believe that
+    its incoming messages 'flood' on connection is an attack.""")))
+
+conf.registerGroup(AttackProtector, 'join')
+conf.registerChannelValue(AttackProtector.join, 'detection',
+    XpY('5p5', _("""In the format XpY, where X is the number of join in
+    Y seconds.""")))
+conf.registerChannelValue(AttackProtector.join, 'punishment',
+    Punishment('ban', _("""Determines the pushiment applyed.""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

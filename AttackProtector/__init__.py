@@ -38,9 +38,12 @@ import supybot.world as world
 
 # Use this for the version of this plugin.  You may wish to put a CVS keyword
 # in here if you're keeping the plugin in CVS or some similar system.
-__version__ = ""
+__version__ = "0.1"
 
 # XXX Replace this with an appropriate author or supybot.Author instance.
+if not hasattr(supybot.authors, 'progval'):
+    supybot.authors.progval =supybot.Author('Valentin Lorentz', 'ProgVal',
+                                            'progval@gmail.com')
 __author__ = supybot.authors.progval
 
 # This is a dictionary mapping supybot.Author instances to lists of
@@ -48,7 +51,8 @@ __author__ = supybot.authors.progval
 __contributors__ = {}
 
 # This is a url where the most recent plugin package can be downloaded.
-__url__ = '' # 'http://supybot.com/Members/yourname/AttackProtector/download'
+__url__ = 'http://supybot-fr.tk/AttackProtector'
+# 'http://supybot.com/Members/yourname/AttackProtector/download'
 
 import config
 import plugin
