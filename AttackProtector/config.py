@@ -74,14 +74,16 @@ conf.registerGlobalValue(AttackProtector, 'delay',
     wait before being enabled. A too low value makes the bot believe that
     its incoming messages 'flood' on connection is an attack.""")))
 
-kinds = {'join': ['5p5', 'ban']}
+kinds = {'join': ['5p5', 'ban'],
+         'part': ['4p5', 'ban'],
+         'nick': ['7p300', 'ban']}
 for kind in kinds:
     data = kinds[kind]
     conf.registerGroup(AttackProtector, kind)
-    conf.registerChannelValue(AttackProtector.join, 'detection',
+    conf.registerChannelValue(getattr(AttackProtector, kind), 'detection',
         XpY(data[0], _("""In the format XpY, where X is the number of %s in
         Y seconds that triggers the punishment.""" % kind)))
-    conf.registerChannelValue(AttackProtector.join, 'punishment',
+    conf.registerChannelValue(getattr(AttackProtector, kind), 'punishment',
         Punishment(data[1], _("""Determines the pushiment applyed when a
         %s flood is detected.""" % kind)))
 

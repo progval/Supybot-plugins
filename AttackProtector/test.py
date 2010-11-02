@@ -29,28 +29,59 @@
 ###
 
 import time
+import random
 from supybot.test import *
 
 class AttackProtectorTestCase(ChannelPluginTestCase):
     plugins = ('AttackProtector',)
-    def _getIfBanned(self):
+    def _getIfBanned(self, banmask=None):
+        if banmask is None:
+            banmask = self.prefix
         m = self.irc.takeMsg()
         while m is not None:
-            if m == ircmsgs.ban(self.channel, self.prefix):
+            if m == ircmsgs.ban(self.channel, banmask):
                 return True
             m = self.irc.takeMsg()
         return False
-        
-    
+
+
     def testPunishJoinFlood(self):
         for i in range(1, 5):
-            self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
+            msg = ircmsgs.join(self.channel, prefix=self.prefix)
+            self.irc.feedMsg(msg)
         self.failIf(self._getIfBanned() == False, 'No reaction to join flood.')
-
     def testPunishNotNoJoinFlood(self):
-        for i in range(1,4):
-            self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
+        for i in range(1, 4):
+            msg = ircmsgs.join(self.channel, prefix=self.prefix)
+            self.irc.feedMsg(msg)
         self.failIf(self._getIfBanned(), 'Reaction to no join flood.')
+
+    def testPunishPartFlood(self):
+        for i in range(1, 5):
+            msg = ircmsgs.part(self.channel, prefix=self.prefix)
+            self.irc.feedMsg(msg)
+        self.failIf(self._getIfBanned() == False, 'No reaction to part flood.')
+    def testPunishNotNoPartFlood(self):
+        for i in range(1, 4):
+            msg = ircmsgs.part(self.channel, prefix=self.prefix)
+            self.irc.feedMsg(msg)
+        self.failIf(self._getIfBanned(), 'Reaction to no part flood.')
+
+    def testPunishNickFlood(self):
+        for nick in 'ABCDEFG':
+            msg = ircmsgs.nick(nick, prefix=self.prefix)
+            self.irc.feedMsg(msg)
+            self.prefix = nick + '!' + self.prefix.split('!')[1]
+        banmask = '*!' + self.prefix.split('!')[1]
+        self.failIf(self._getIfBanned(banmask) == False,
+                    'No reaction to nick flood.')
+    def testPunishNotNoNickFlood(self):
+        for nick in 'ABCDEF':
+            msg = ircmsgs.nick(nick, prefix=self.prefix)
+            self.irc.feedMsg(msg)
+            self.prefix = nick + '!' + self.prefix.split('!')[1]
+        banmask = '*!' + self.prefix.split('!')[1]
+        self.failIf(self._getIfBanned(banmask), 'Reaction to no nick flood.')
 
     def testCleanCollection(self):
         for i in range(1, 4):
@@ -66,7 +97,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
         self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
         self.failIf(self._getIfBanned() == False, 'Cleans the collection '
                                          'before it should be cleaned')
-        
+
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

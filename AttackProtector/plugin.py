@@ -106,15 +106,29 @@ class AttackProtector(callbacks.Plugin):
         self._database = AttackProtectorDatabase()
 
     def _eventCatcher(self, irc, msg, kind):
-        channel = msg.args[0]
-        if self.registryValue('%s.detection' % kind, channel) == '0p0':
-            return
-        item = AttackProtectorDatabaseItem(kind, msg.prefix,
-                                           channel, self, irc)
-        self._database.add(item)
+        if kind in ['part', 'join']:
+            channels = [msg.args[0]]
+            prefix = msg.prefix
+        elif kind in ['nick']:
+            newNick = msg.args[0]
+            channels = []
+            for (channel, c) in irc.state.channels.iteritems():
+                if newNick in c.users:
+                    channels.append(channel)
+            prefix = '*!' + msg.prefix.split('!')[1]
+        for channel in channels:
+            if self.registryValue('%s.detection' % kind, channel) == '0p0':
+                continue
+            item = AttackProtectorDatabaseItem(kind, prefix,
+                                               channel, self, irc)
+            self._database.add(item)
 
     def doJoin(self, irc, msg):
         self._eventCatcher(irc, msg, 'join')
+    def doPart(self, irc, msg):
+        self._eventCatcher(irc, msg, 'part')
+    def doNick(self, irc, msg):
+        self._eventCatcher(irc, msg, 'nick')
 
     def _slot(self, lastItem):
         irc = lastItem.irc
