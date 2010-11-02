@@ -92,7 +92,8 @@ class AttackProtectorDatabase:
         for item in collection:
             if item.prefix == prefix and item.channel == channel:
                 count += 1
-        if count >= int(filterParser.match(protector.registryValue(kind + '.detection', channel)).group('number')):
+        detection = protector.registryValue(kind + '.detection', channel)
+        if count >= int(filterParser.match(detection).group('number')):
             protector._slot(lastItem)
 
 @internationalizeDocstring
@@ -103,15 +104,18 @@ class AttackProtector(callbacks.Plugin):
         self.__parent.__init__(irc)
         self._enableOn = time.time() + self.registryValue('delay')
         self._database = AttackProtectorDatabase()
-        
-    def doJoin(self, irc, msg):
+
+    def _eventCatcher(self, irc, msg, kind):
         channel = msg.args[0]
-        if self.registryValue('join.detection', channel) == '0p0':
+        if self.registryValue('%s.detection' % kind, channel) == '0p0':
             return
-        item = AttackProtectorDatabaseItem('join', msg.prefix,
+        item = AttackProtectorDatabaseItem(kind, msg.prefix,
                                            channel, self, irc)
         self._database.add(item)
-    
+
+    def doJoin(self, irc, msg):
+        self._eventCatcher(irc, msg, 'join')
+
     def _slot(self, lastItem):
         irc = lastItem.irc
         channel = lastItem.channel
