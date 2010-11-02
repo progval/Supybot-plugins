@@ -27,37 +27,28 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ###
 
-"""
-Provides commands and snarfers for the various different Geekquote-based sites
-out there
-"""
+import supybot.conf as conf
+import supybot.registry as registry
 
-import supybot
-import supybot.world as world
+def configure(advanced):
+    # This will be called by supybot to configure this module.  advanced is
+    # a bool that specifies whether the user identified himself as an advanced
+    # user or not.  You should effect your configuration by manipulating the
+    # registry as appropriate.
+    from supybot.questions import output, expect, anything, something, yn
+    conf.registerPlugin('GeekQuote', True)
+    output("""The GeekQuote plugin has the ability to watch for geekquote
+              (bash.org / qdb.us) URLs and respond to them as though the user
+              had asked for the geekquote by ID""")
+    if yn('Do you want the GeekQuote snarfer enabled by default?'):
+        conf.supybot.plugins.GeekQuote.geekSnarfer.setValue(True)
 
-# Use this for the version of this plugin.  You may wish to put a CVS keyword
-# in here if you're keeping the plugin in CVS or some similar system.
-__version__ = ""
 
-__author__ = supybot.authors.skorobeus
 
-# This is a dictionary mapping supybot.Author instances to lists of
-# contributions.
-__contributors__ = {
-    supybot.authors.skorobeus: ['geekquote snarfer', 'qdb'],
-    }
-
-import config
-import plugin
-reload(plugin) # In case we're being reloaded.
-# Add more reloads here if you add third-party modules and want them to be
-# reloaded when this plugin is reloaded.  Don't forget to import them as well!
-
-if world.testing:
-    import test
-
-Class = plugin.Class
-configure = config.configure
+GeekQuote = conf.registerPlugin('GeekQuote')
+conf.registerChannelValue(GeekQuote, 'geekSnarfer',
+    registry.Boolean(False, """Determines whether the bot will automatically
+    'snarf' GeekQuote URLs and print information about them."""))
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

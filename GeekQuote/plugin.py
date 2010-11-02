@@ -1,6 +1,7 @@
 ###
 # Copyright (c) 2004-2005, Kevin Murphy
 # Copyright (c) 2008-2009, Benoit Boissinot
+# Copyright (c) 2010, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -40,22 +41,22 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 
 
-class Geekquote(callbacks.PluginRegexp):
+class GeekQuote(callbacks.PluginRegexp):
     threaded = True
     callBefore = ['Web']
     regexps = ['geekSnarfer']
 
     def __init__(self, irc):
-        self.__parent = super(Geekquote, self)
+        self.__parent = super(GeekQuote, self)
         self.__parent.__init__(irc)
         self.maxqdbPages = 403
         self.lastqdbRandomTime = 0
         self.randomData = {'qdb.us':[],
-                            'bash.org':[],
-                            'viedemerde.fr':[],
-                            'fmylife.com':[],
-                            'mylifeisaverage.com':[],
-                            'textsfromlastnight.com':[],
+                           'bash.org':[],
+                           'viedemerde.fr':[],
+                           'fmylife.com':[],
+                           'mylifeisaverage.com':[],
+                           'textsfromlastnight.com':[],
                             }
 
     def callCommand(self, method, irc, msg, *L, **kwargs):
@@ -263,7 +264,7 @@ class Geekquote(callbacks.PluginRegexp):
         self._gkBackend(irc, msg, site, id)
     mlia = wrap(mlia, [additional(('id', 'tfln'))])
 
-Class = Geekquote
+Class = GeekQuote
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

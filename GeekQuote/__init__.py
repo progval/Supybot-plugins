@@ -27,42 +27,37 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ###
 
-from supybot.test import *
+"""
+Provides commands and snarfers for the various different GeekQuote-based sites
+out there
+"""
 
-class GeekquoteTestCase(ChannelPluginTestCase):
-    plugins = ('Geekquote',)
-    config = {'supybot.plugins.Geekquote.geekSnarfer': False,
-              'supybot.snarfThrottle': 0}
-    if network:
-        def testGeekquote(self):
-            self.assertNotError('geekquote')
-            self.assertNotError('geekquote 4848')
-            # It's not an error, it just truncates at the first non-number
-            #self.assertError('geekquote 48a8')
-            self.assertError('geekquote asdf')
+import supybot
+import supybot.world as world
 
-        def testQdb(self):
-            # Run twice just to make sure it handles multiple randoms
-            self.assertNotError('qdb')
-            self.assertNotError('qdb')
-            self.assertNotError('qdb 13600')
-            self.assertError('qdb qwerty')
+# Use this for the version of this plugin.  You may wish to put a CVS keyword
+# in here if you're keeping the plugin in CVS or some similar system.
+__version__ = ""
 
-        def testSnarfer(self):
-            try:
-                orig = conf.supybot.plugins.Geekquote.geekSnarfer()
-                conf.supybot.plugins.Geekquote.geekSnarfer.setValue(True)
-                self.assertSnarfRegexp('http://www.bash.org/?1033',
-                                       r'\<Guilty\>')
-                self.assertSnarfRegexp('http://bash.org/?2820',
-                                       r'\[Duckarse\]')
-                self.assertSnarfRegexp('http://www.qdb.us/?33080',
-                                       r'\<@Noggie\>')
-                self.assertSnarfRegexp('http://qdb.us/?22280',
-                                       r'\<MegamanX2K\>')
-            finally:
-                conf.supybot.plugins.Geekquote.geekSnarfer.setValue(orig)
-            self.assertSnarfNoResponse('http://www.bash.org/?4848')
+__author__ = supybot.authors.skorobeus
+
+# This is a dictionary mapping supybot.Author instances to lists of
+# contributions.
+__contributors__ = {
+    supybot.authors.skorobeus: ['geekquote snarfer', 'qdb'],
+    }
+
+import config
+import plugin
+reload(plugin) # In case we're being reloaded.
+# Add more reloads here if you add third-party modules and want them to be
+# reloaded when this plugin is reloaded.  Don't forget to import them as well!
+
+if world.testing:
+    import test
+
+Class = plugin.Class
+configure = config.configure
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

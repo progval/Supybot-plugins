@@ -27,28 +27,42 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ###
 
-import supybot.conf as conf
-import supybot.registry as registry
+from supybot.test import *
 
-def configure(advanced):
-    # This will be called by supybot to configure this module.  advanced is
-    # a bool that specifies whether the user identified himself as an advanced
-    # user or not.  You should effect your configuration by manipulating the
-    # registry as appropriate.
-    from supybot.questions import output, expect, anything, something, yn
-    conf.registerPlugin('Geekquote', True)
-    output("""The Geekquote plugin has the ability to watch for geekquote
-              (bash.org / qdb.us) URLs and respond to them as though the user
-              had asked for the geekquote by ID""")
-    if yn('Do you want the Geekquote snarfer enabled by default?'):
-        conf.supybot.plugins.Geekquote.geekSnarfer.setValue(True)
+class GeekQuoteTestCase(ChannelPluginTestCase):
+    plugins = ('GeekQuote',)
+    config = {'supybot.plugins.GeekQuote.geekSnarfer': False,
+              'supybot.snarfThrottle': 0}
+    if network:
+        def testGeekQuote(self):
+            self.assertNotError('geekquote')
+            self.assertNotError('geekquote 4848')
+            # It's not an error, it just truncates at the first non-number
+            #self.assertError('geekquote 48a8')
+            self.assertError('geekquote asdf')
 
+        def testQdb(self):
+            # Run twice just to make sure it handles multiple randoms
+            self.assertNotError('qdb')
+            self.assertNotError('qdb')
+            self.assertNotError('qdb 13600')
+            self.assertError('qdb qwerty')
 
-
-Geekquote = conf.registerPlugin('Geekquote')
-conf.registerChannelValue(Geekquote, 'geekSnarfer',
-    registry.Boolean(False, """Determines whether the bot will automatically
-    'snarf' Geekquote URLs and print information about them."""))
+        def testSnarfer(self):
+            try:
+                orig = conf.supybot.plugins.GeekQuote.geekSnarfer()
+                conf.supybot.plugins.GeekQuote.geekSnarfer.setValue(True)
+                self.assertSnarfRegexp('http://www.bash.org/?1033',
+                                       r'\<Guilty\>')
+                self.assertSnarfRegexp('http://bash.org/?2820',
+                                       r'\[Duckarse\]')
+                self.assertSnarfRegexp('http://www.qdb.us/?33080',
+                                       r'\<@Noggie\>')
+                self.assertSnarfRegexp('http://qdb.us/?22280',
+                                       r'\<MegamanX2K\>')
+            finally:
+                conf.supybot.plugins.GeekQuote.geekSnarfer.setValue(orig)
+            self.assertSnarfNoResponse('http://www.bash.org/?4848')
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
