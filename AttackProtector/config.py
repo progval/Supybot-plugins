@@ -83,9 +83,9 @@ for kind in kinds:
     conf.registerGroup(AttackProtector, kind)
     conf.registerChannelValue(getattr(AttackProtector, kind), 'detection',
         XpY(data[0], _("""In the format XpY, where X is the number of %s per
-        Y seconds that triggers the punishment.""" % kind)))
+        Y seconds that triggers the punishment.""") % kind))
     conf.registerChannelValue(getattr(AttackProtector, kind), 'punishment',
         Punishment(data[1], _("""Determines the pushiment applyed when a
-        %s flood is detected.""" % kind)))
+        %s flood is detected.""") % kind))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
