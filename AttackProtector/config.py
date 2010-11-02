@@ -74,11 +74,15 @@ conf.registerGlobalValue(AttackProtector, 'delay',
     wait before being enabled. A too low value makes the bot believe that
     its incoming messages 'flood' on connection is an attack.""")))
 
-conf.registerGroup(AttackProtector, 'join')
-conf.registerChannelValue(AttackProtector.join, 'detection',
-    XpY('5p5', _("""In the format XpY, where X is the number of join in
-    Y seconds.""")))
-conf.registerChannelValue(AttackProtector.join, 'punishment',
-    Punishment('ban', _("""Determines the pushiment applyed.""")))
+kinds = {'join': ['5p5', 'ban']}
+for kind in kinds:
+    data = kinds[kind]
+    conf.registerGroup(AttackProtector, kind)
+    conf.registerChannelValue(AttackProtector.join, 'detection',
+        XpY(data[0], _("""In the format XpY, where X is the number of %s in
+        Y seconds that triggers the punishment.""" % kind)))
+    conf.registerChannelValue(AttackProtector.join, 'punishment',
+        Punishment(data[1], _("""Determines the pushiment applyed when a
+        %s flood is detected.""" % kind)))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
