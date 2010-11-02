@@ -91,16 +91,24 @@ class SupyMLParser:
             if childNode.__class__ == minidom.Element:
                 self._processNode(childNode, False)
                 
-    def _processNode(self, node, proxify=None):
+    def _processNode(self, node, proxify=True):
+        if node.nodeName == 'loop':
+            return self._processLoop(node, proxify)
+        elif node.nodeName == 'if':
+            return self._processId(node, proxify)
         output = node.nodeName + ' '
         for childNode in node.childNodes:
             if childNode.__class__ == minidom.Text:
                 output += childNode.data
             elif childNode.__class__ == minidom.Element:
-                output += self._processNode(childNode, True)
+                output += self._processNode(childNode)
         value = self._run(str(output), proxify)
-        if proxify:
-            return value
+        return value
+    
+    def _processLoop(self, node):
+        raise NotImplemented
+    def _processIf(self, node):
+        raise NotImplemented
 
 class SupyML(callbacks.Plugin):
     """SupyML is a plugin that read SupyML scripts.
