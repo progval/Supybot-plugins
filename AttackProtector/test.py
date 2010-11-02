@@ -34,17 +34,27 @@ from supybot.test import *
 
 class AttackProtectorTestCase(ChannelPluginTestCase):
     plugins = ('AttackProtector',)
-    def _getIfBanned(self, banmask=None):
-        if banmask is None:
-            banmask = self.prefix
+
+    #################################
+    # Utilities
+    def _getIfSomething(self, msg):
         m = self.irc.takeMsg()
         while m is not None:
-            if m == ircmsgs.ban(self.channel, banmask):
+            if repr(m) == repr(msg):
                 return True
             m = self.irc.takeMsg()
         return False
+    def _getIfBanned(self, banmask=None):
+        if banmask is None:
+            banmask = self.prefix
+        return self._getIfSomething(ircmsgs.ban(self.channel, banmask))
+    def _getIfKicked(self, kind):
+        reason = '%s flood detected' % kind
+        return self._getIfSomething(ircmsgs.kick(self.channel, self.nick,
+                                                 reason))
 
-
+    #################################
+    # Join tests
     def testPunishJoinFlood(self):
         for i in range(1, 5):
             msg = ircmsgs.join(self.channel, prefix=self.prefix)
@@ -56,6 +66,8 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             self.irc.feedMsg(msg)
         self.failIf(self._getIfBanned(), 'Reaction to no join flood.')
 
+    #################################
+    # Part tests
     def testPunishPartFlood(self):
         for i in range(1, 5):
             msg = ircmsgs.part(self.channel, prefix=self.prefix)
@@ -67,6 +79,8 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             self.irc.feedMsg(msg)
         self.failIf(self._getIfBanned(), 'Reaction to no part flood.')
 
+    #################################
+    # Nick tests
     def testPunishNickFlood(self):
         for nick in 'ABCDEFG':
             msg = ircmsgs.nick(nick, prefix=self.prefix)
@@ -83,6 +97,49 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
         banmask = '*!' + self.prefix.split('!')[1]
         self.failIf(self._getIfBanned(banmask), 'Reaction to no nick flood.')
 
+    #################################
+    # Message tests
+    def testPunishMessageFlood(self):
+        for i in range(1, 11):
+            msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
+                                  prefix=self.prefix)
+            self.irc.feedMsg(msg)
+        self.failIf(self._getIfKicked('message') == False,
+                    'No reaction to privmsg flood.')
+    def testPunishNoticeFlood(self):
+        for i in range(1, 11):
+            msg = ircmsgs.notice(self.channel, 'Hi, this is a flood',
+                                  prefix=self.prefix)
+            self.irc.feedMsg(msg)
+        self.failIf(self._getIfKicked('message') == False,
+                    'No reaction to notice flood.')
+    def testPunishNotNoMessageFlood(self):
+        for i in range(1, 10):
+            msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
+                                  prefix=self.prefix)
+            self.irc.feedMsg(msg)
+        self.failIf(self._getIfKicked('message'),
+                   'Reaction to no privmsg flood.')
+    def testPunishNotNoNoticeFlood(self):
+        for i in range(1, 10):
+            msg = ircmsgs.notice(self.channel, 'Hi, this is a flood',
+                                  prefix=self.prefix)
+            self.irc.feedMsg(msg)
+        self.failIf(self._getIfKicked('message'),
+                   'Reaction to no notice flood.')
+    def testPunishNoticeFlood(self):
+        for i in range(1, 6):
+            msg = ircmsgs.notice(self.channel, 'Hi, this is a flood',
+                                  prefix=self.prefix)
+            self.irc.feedMsg(msg)
+            msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
+                                  prefix=self.prefix)
+            self.irc.feedMsg(msg)
+        self.failIf(self._getIfKicked('message') == False,
+                    'No reaction to both notice and privmsg flood.')
+
+    #################################
+    # Global tests
     def testCleanCollection(self):
         for i in range(1, 4):
             self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))

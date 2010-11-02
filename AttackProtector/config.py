@@ -76,12 +76,13 @@ conf.registerGlobalValue(AttackProtector, 'delay',
 
 kinds = {'join': ['5p5', 'ban'],
          'part': ['4p5', 'ban'],
-         'nick': ['7p300', 'ban']}
+         'nick': ['7p300', 'ban'],
+         'message': ['10p10', 'kick']}
 for kind in kinds:
     data = kinds[kind]
     conf.registerGroup(AttackProtector, kind)
     conf.registerChannelValue(getattr(AttackProtector, kind), 'detection',
-        XpY(data[0], _("""In the format XpY, where X is the number of %s in
+        XpY(data[0], _("""In the format XpY, where X is the number of %s per
         Y seconds that triggers the punishment.""" % kind)))
     conf.registerChannelValue(getattr(AttackProtector, kind), 'punishment',
         Punishment(data[1], _("""Determines the pushiment applyed when a

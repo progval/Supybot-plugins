@@ -106,7 +106,7 @@ class AttackProtector(callbacks.Plugin):
         self._database = AttackProtectorDatabase()
 
     def _eventCatcher(self, irc, msg, kind):
-        if kind in ['part', 'join']:
+        if kind in ['part', 'join', 'message']:
             channels = [msg.args[0]]
             prefix = msg.prefix
         elif kind in ['nick']:
@@ -129,6 +129,10 @@ class AttackProtector(callbacks.Plugin):
         self._eventCatcher(irc, msg, 'part')
     def doNick(self, irc, msg):
         self._eventCatcher(irc, msg, 'nick')
+    def doPrivmsg(self, irc, msg):
+        self._eventCatcher(irc, msg, 'message')
+    def doNotice(self, irc, msg):
+        self._eventCatcher(irc, msg, 'message')
 
     def _slot(self, lastItem):
         irc = lastItem.irc
