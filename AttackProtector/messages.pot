@@ -1,0 +1,50 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2010-11-02 11:32+CET\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: config.py:54
+#, docstring
+msgid "Value must be in the format <number>p<seconds>."
+msgstr ""
+
+#: config.py:73
+msgid ""
+"Determines how long (in seconds) the plugin will\n"
+"    wait before being enabled. A too low value makes the bot believe that\n"
+"    its incoming messages 'flood' on connection is an attack."
+msgstr ""
+
+#: config.py:85
+msgid ""
+"In the format XpY, where X is the number of %s per\n"
+"        Y seconds that triggers the punishment."
+msgstr ""
+
+#: config.py:88
+msgid ""
+"Determines the pushiment applyed when a\n"
+"        %s flood is detected."
+msgstr ""
+
+#: plugin.py:100
+#, docstring
+msgid "This plugin protects channels against spam and flood"
+msgstr ""
+
+#: plugin.py:143
+msgid "%s flood detected"
+msgstr ""
+

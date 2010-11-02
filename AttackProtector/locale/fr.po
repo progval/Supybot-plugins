@@ -1,0 +1,46 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Supybot-fr\n"
+"POT-Creation-Date: 2010-11-02 11:32+CET\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Valentin Lorentz <progval@gmail.com>\n"
+"Language-Team: ProgVal <progval@gmail.com>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Français\n"
+"X-Poedit-Country: France\n"
+"X-Poedit-SourceCharset: ASCII\n"
+
+#: config.py:54
+msgid "Value must be in the format <number>p<seconds>."
+msgstr "La valeur doit être dans le format <nombre>p<secondes>"
+
+#: config.py:73
+msgid ""
+"Determines how long (in seconds) the plugin will\n"
+"    wait before being enabled. A too low value makes the bot believe that\n"
+"    its incoming messages 'flood' on connection is an attack."
+msgstr "Détermine combien de temps le plugin attendra avant d'être activé. Une valeur trop petite fera croire au bot que l'arrivée massive de messages lorsqu'il se connecte est une attaque."
+
+#: config.py:85
+msgid ""
+"In the format XpY, where X is the number of %s per\n"
+"        Y seconds that triggers the punishment."
+msgstr "Dans le format XpY, où X est le nombre de %s en Y secondes qui déclenche la contre-attaque."
+
+#: config.py:88
+msgid ""
+"Determines the pushiment applyed when a\n"
+"        %s flood is detected."
+msgstr "Détermine la contre-attaque appliquée lorsqu'un flood de %s est détecté."
+
+#: plugin.py:100
+msgid "This plugin protects channels against spam and flood"
+msgstr "Ce plugin protège les canaux contre le spam et le flood"
+
+#: plugin.py:143
+msgid "%s flood detected"
+msgstr "flood de %ss détecté"
+
