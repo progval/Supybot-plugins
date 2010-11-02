@@ -50,7 +50,6 @@ def configure(advanced):
     from supybot.questions import expect, anything, something, yn
     conf.registerPlugin('AttackProtector', True)
 
-@internationalizeDocstring
 class XpY(registry.String):
     """Value must be in the format <number>p<seconds>."""
     _re = re.compile('(?P<number>[0-9]+)p(?P<seconds>[0-9]+)')
@@ -59,10 +58,11 @@ class XpY(registry.String):
             registry.String.setValue(self, v)
         else:
             self.error()
+XpY = internationalizeDocstring(XpY)
 
-@internationalizeDocstring
 class Punishment(registry.OnlySomeStrings):
     validStrings = ('ban', 'kick', 'kban')
+Punishment = internationalizeDocstring(Punishment)
 
 AttackProtector = conf.registerPlugin('AttackProtector')
 # This is where your configuration variables (if any) should go.  For example:

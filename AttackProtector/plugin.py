@@ -96,7 +96,6 @@ class AttackProtectorDatabase:
         if count >= int(filterParser.match(detection).group('number')):
             protector._slot(lastItem)
 
-@internationalizeDocstring
 class AttackProtector(callbacks.Plugin):
     """This plugin protects channels against spam and flood"""
     def __init__(self, irc):
@@ -153,7 +152,7 @@ class AttackProtector(callbacks.Plugin):
             irc.queueMsg(msg)
             msg = ircmsgs.ban(channel, prefix)
             irc.queueMsg(msg)
-        
+AttackProtector = internationalizeDocstring(AttackProtector)
 
 
 Class = AttackProtector
