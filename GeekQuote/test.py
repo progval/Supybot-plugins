@@ -63,6 +63,31 @@ class GeekQuoteTestCase(ChannelPluginTestCase):
             finally:
                 conf.supybot.plugins.GeekQuote.geekSnarfer.setValue(orig)
             self.assertSnarfNoResponse('http://www.bash.org/?4848')
+        
+        def testVdm(self):
+            self.assertNotError('vdm')
+            self.assertNotError('vdm')
+            self.assertNotError('vdm 120')
+            self.assertError('vdm azerty')
+            
+        def testFml(self):
+            self.assertNotError('fml')
+            self.assertNotError('fml')
+            self.assertNotError('fml 120')
+            self.assertError('fml azerty')
+        
+        def testTfln(self):
+            self.assertNotError('tfln')
+            self.assertNotError('tfln')
+            self.assertNotError('tfln 120')
+            self.assertError('tfln azerty')
+            
+        def testMlia(self):
+            self.assertNotError('mlia')
+            self.assertNotError('mlia')
+            self.assertNotError('fml 120')
+            self.assertError('mlia azerty')
+            
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
