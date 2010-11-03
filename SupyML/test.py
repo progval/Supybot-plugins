@@ -34,7 +34,7 @@ class SupyMLTestCase(ChannelPluginTestCase):
     plugins = ('SupyML', 'Utilities')
     #################################
     # Utilities
-    def _getIfSomething(self, msg):
+    def _getIfAnswerIsEqual(self, msg):
         m = self.irc.takeMsg()
         while m is not None:
             if repr(m) == repr(msg):
@@ -52,7 +52,7 @@ class SupyMLTestCase(ChannelPluginTestCase):
         self.irc.feedMsg(msg)
         answer = ircmsgs.IrcMsg(prefix="", command="PRIVMSG",
                         args=('ProgVal', 'test wants me to tell you: foo'))
-        self.failIf(self._getIfSomething(answer) == False)
+        self.failIf(self._getIfAnswerIsEqual(answer) == False)
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

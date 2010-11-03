@@ -36,20 +36,20 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
 
     #################################
     # Utilities
-    def _getIfSomething(self, msg):
+    def _getIfAnswerIsEqual(self, msg):
         m = self.irc.takeMsg()
         while m is not None:
             if repr(m) == repr(msg):
                 return True
             m = self.irc.takeMsg()
         return False
-    def _getIfBanned(self, banmask=None):
+    def _getIfAnswerIsThisBan(self, banmask=None):
         if banmask is None:
             banmask = self.prefix
-        return self._getIfSomething(ircmsgs.ban(self.channel, banmask))
-    def _getIfKicked(self, kind):
+        return self._getIfAnswerIsEqual(ircmsgs.ban(self.channel, banmask))
+    def _getIfAnswerIsThisKick(self, kind):
         reason = '%s flood detected' % kind
-        return self._getIfSomething(ircmsgs.kick(self.channel, self.nick,
+        return self._getIfAnswerIsEqual(ircmsgs.kick(self.channel, self.nick,
                                                  reason))
 
     #################################
@@ -58,12 +58,14 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
         for i in range(1, 5):
             msg = ircmsgs.join(self.channel, prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.failIf(self._getIfBanned() == False, 'No reaction to join flood.')
+        self.failIf(self._getIfAnswerIsThisBan() == False,
+                    'No reaction to join flood.')
     def testPunishNotNoJoinFlood(self):
         for i in range(1, 4):
             msg = ircmsgs.join(self.channel, prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.failIf(self._getIfBanned(), 'Reaction to no join flood.')
+        self.failIf(self._getIfAnswerIsThisBan(),
+                    'Reaction to no join flood.')
 
     #################################
     # Part tests
@@ -71,12 +73,14 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
         for i in range(1, 5):
             msg = ircmsgs.part(self.channel, prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.failIf(self._getIfBanned() == False, 'No reaction to part flood.')
+        self.failIf(self._getIfAnswerIsThisBan() == False,
+                    'No reaction to part flood.')
     def testPunishNotNoPartFlood(self):
         for i in range(1, 4):
             msg = ircmsgs.part(self.channel, prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.failIf(self._getIfBanned(), 'Reaction to no part flood.')
+        self.failIf(self._getIfAnswerIsThisBan(),
+                    'Reaction to no part flood.')
 
     #################################
     # Nick tests
@@ -86,7 +90,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             self.irc.feedMsg(msg)
             self.prefix = nick + '!' + self.prefix.split('!')[1]
         banmask = '*!' + self.prefix.split('!')[1]
-        self.failIf(self._getIfBanned(banmask) == False,
+        self.failIf(self._getIfAnswerIsThisBan(banmask) == False,
                     'No reaction to nick flood.')
     def testPunishNotNoNickFlood(self):
         for nick in 'ABCDEF':
@@ -94,7 +98,8 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             self.irc.feedMsg(msg)
             self.prefix = nick + '!' + self.prefix.split('!')[1]
         banmask = '*!' + self.prefix.split('!')[1]
-        self.failIf(self._getIfBanned(banmask), 'Reaction to no nick flood.')
+        self.failIf(self._getIfAnswerIsThisBan(banmask),
+                    'Reaction to no nick flood.')
 
     #################################
     # Message tests
@@ -103,28 +108,28 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
                                   prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.failIf(self._getIfKicked('message') == False,
+        self.failIf(self._getIfAnswerIsThisKick('message') == False,
                     'No reaction to privmsg flood.')
     def testPunishNoticeFlood(self):
         for i in range(1, 11):
             msg = ircmsgs.notice(self.channel, 'Hi, this is a flood',
                                   prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.failIf(self._getIfKicked('message') == False,
+        self.failIf(self._getIfAnswerIsThisKick('message') == False,
                     'No reaction to notice flood.')
     def testPunishNotNoMessageFlood(self):
         for i in range(1, 10):
             msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
                                   prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.failIf(self._getIfKicked('message'),
+        self.failIf(self._getIfAnswerIsThisKick('message'),
                    'Reaction to no privmsg flood.')
     def testPunishNotNoNoticeFlood(self):
         for i in range(1, 10):
             msg = ircmsgs.notice(self.channel, 'Hi, this is a flood',
                                   prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.failIf(self._getIfKicked('message'),
+        self.failIf(self._getIfAnswerIsThisKick('message'),
                    'Reaction to no notice flood.')
     def testPunishNoticeFlood(self):
         for i in range(1, 6):
@@ -134,7 +139,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
                                   prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.failIf(self._getIfKicked('message') == False,
+        self.failIf(self._getIfAnswerIsThisKick('message') == False,
                     'No reaction to both notice and privmsg flood.')
 
     #################################
@@ -144,15 +149,16 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
         time.sleep(6)
         self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
-        self.failIf(self._getIfBanned(), 'Doesn\'t clean the join collection.')
+        self.failIf(self._getIfAnswerIsThisBan(),
+                    'Doesn\'t clean the join collection.')
 
     def testDontCleanCollectionToEarly(self):
         for i in range(1, 4):
             self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
         time.sleep(2)
         self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
-        self.failIf(self._getIfBanned() == False, 'Cleans the collection '
-                                         'before it should be cleaned')
+        self.failIf(self._getIfAnswerIsThisBan() == False,
+                    'Cleans the collection before it should be cleaned')
 
 
 
