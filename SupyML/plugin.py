@@ -28,7 +28,10 @@
 
 ###
 
+import re
+import copy
 import Queue
+import supybot.world as world
 from xml.dom import minidom
 import supybot.utils as utils
 from supybot.commands import *
@@ -70,9 +73,11 @@ class SupyMLParser:
         self._irc = irc
         self._msg = msg
         self._code = code
+        self.warnings = []
         self._parse()
         
     def _run(self, code, proxify):
+        """Runs the command using Supybot engine"""
         tokens = callbacks.tokenize(str(code))
         if proxify:
             fakeIrc = FakeIrc(self._irc)
@@ -83,47 +88,88 @@ class SupyMLParser:
             return fakeIrc._data
     
     def _parse(self):
+        """Returns a dom object from self._code."""
         dom = minidom.parseString(self._code)
         return self._processDocument(dom)
-    
+
     def _processDocument(self, dom):
+        """Handles the root node and call child nodes"""
         for childNode in dom.childNodes:
-            if childNode.__class__ == minidom.Element:
-                self._processNode(childNode, False)
-                
-    def _processNode(self, node, proxify=True):
-        if node.nodeName == 'loop':
-            return self._processLoop(node, proxify)
-        elif node.nodeName == 'if':
-            return self._processId(node, proxify)
-        elif node.nodeName == 'var':
-            return self._processVar(node, proxify)
+            if isinstance(childNode, minidom.Element):
+                self._processNode(childNode, {}, False)
+
+    def _processNode(self, node, variables, proxifyIrc=True):
+        """Returns the value of an internapreted node.
+        
+        Takes an optional attribute, passed to self._run() that mean if the
+        Irc object should be proxified. If it is not, the real Irc object is
+        used, datas are sent to IRC, and this function will return None."""
+        if isinstance(node, minidom.Text):
+            return node.data
         output = node.nodeName + ' '
+        newVariables = copy.deepcopy(variables)
         for childNode in node.childNodes:
-            if childNode.__class__ == minidom.Text:
-                output += childNode.data
-            elif childNode.__class__ == minidom.Element:
-                output += self._processNode(childNode)
-        value = self._run(str(output), proxify)
+            if not repr(node) == repr(childNode.parentNode):
+                print "CONTINUING"
+                continue
+            if childNode.nodeName == 'loop':
+                output += self._processLoop(childNode, newVariables)
+            elif childNode.nodeName == 'if':
+                output += self._processId(childNode, newVariables)
+            elif childNode.nodeName == 'var':
+                output += self._processVar(childNode, newVariables)
+            elif childNode.nodeName == 'set':
+                output += self._processSet(childNode, newVariables)
+            else:
+                output += self._processNode(childNode, newVariables) or ''
+        for key in variables:
+            variables[key] = newVariables[key]
+        value = self._run(output, proxifyIrc)
         return value
-    
-    def _processLoop(self, node, proxify=True):
-        raise NotImplemented
-    def _processIf(self, node, proxify=True):
-        raise NotImplemented
-    def _processVar(self, node, proxify=True):
-        raise NotImplemented
+
+    # Don't proxify variables
+    def _processSet(self, node, variables):
+        """Handles the <set> tag"""
+        variableName = str(node.attributes['name'].value)
+        value = ''
+        for childNode in node.childNodes:
+            value += self._processNode(childNode, variables)
+        variables.update({variableName: value})
+        return ''
+
+    def _processVar(self, node, variables):
+        """Handles the <var /> tag"""
+        variableName = node.attributes['name'].value
+        try:
+            return variables[variableName]
+        except KeyError:
+            self.warnings.append('Access to non-existing variable: %s' % 
+                                 variableName)
+            return ''
+
+    def _processLoop(self, node, variables):
+        """Handles the <loop> tag"""
+        return '<NOT IMPLEMENTED>'
+
+    def _checkVariableName(self, variableName):
+        if len(variableName) == 0:
+            self.warnings.append('Empty variable name')
+        if re.match('\W+', variableName):
+            self.warnings.append('Variable name shouldn\'t contain '
+                                 'special chars (%s)' % variableName)
 
 class SupyML(callbacks.Plugin):
     """SupyML is a plugin that read SupyML scripts.
     This scripts (Supybot Markup Language) are script written in a XML-based
     language."""
-    threaded = True
+    #threaded = True
     def eval(self, irc, msg, args, code):
         """<SupyML script>
         
         Executes the <SupyML script>"""
         parser = SupyMLParser(self, irc, msg, code)
+        if world.testing and len(parser.warnings) != 0:
+            print parser.warnings
         
     eval=wrap(eval, ['text'])
 SupyML = internationalizeDocstring(SupyML)

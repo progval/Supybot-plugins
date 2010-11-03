@@ -36,7 +36,7 @@ class SupyMLTestCase(ChannelPluginTestCase):
     #################################
     # Utilities
     def _getIfAnswerIsEqual(self, msg):
-        time.sleep(0.5)
+        time.sleep(0.2)
         m = self.irc.takeMsg()
         while m is not None:
             if repr(m) == repr(msg):
@@ -57,20 +57,61 @@ class SupyMLTestCase(ChannelPluginTestCase):
         self.failIf(self._getIfAnswerIsEqual(answer) == False)
 
     def testNoMoreThanOneAnswer(self):
-        self.assertResponse('SupyML eval <echo><echo>foo</echo>'
-                            '<echo>bar</echo></echo>',
+        self.assertResponse('SupyML eval '
+                            '<echo>'
+                                '<echo>foo</echo>'
+                                '<echo>bar</echo>'
+                            '</echo>',
                             'foobar')
 
     def testVar(self):
-        self.assertResponse('SupyML eval <echo><var>foo<set>bar</set></var>'
-                            '<echo><var>foo</var></echo></echo>',
+        self.assertResponse('SupyML eval '
+                            '<echo>'
+                                '<set name="foo">bar</set>'
+                                '<echo>'
+                                    '<var name="foo" />'
+                                '</echo>'
+                            '</echo>',
+                            'bar')
+
+    def testVarLifetime(self):
+        self.assertResponse('SupyML eval '
+                            '<echo>'
+                                '<set name="foo">bar</set>'
+                                '<echo>'
+                                    '<var name="foo" />'
+                                    'baz'
+                                '</echo>'
+                            '</echo>',
+                            'barbaz')
+        self.assertResponse('SupyML eval '
+                            '<echo>'
+                                '<set name="foo">bar</set>'
+                                '<echo>'
+                                    '<set name="foo">bar</set>'
+                                    '<var name="foo" />'
+                                '</echo>'
+                                '<echo>'
+                                    '<var name="foo" />'
+                                '</echo>'
+                            '</echo>',
                             'bar')
 
     def testWhile(self):
-        self.assertResponse('SupyML eval <echo>'
-                            '<var>foo<set>1</set></var>'
-                            '<loop><while><nne><var>foo</var> 5</nne></while>'
-                            '<echo>bar</echo></loop></echo>',
+        self.assertResponse('SupyML eval '
+                            '<echo>'
+                                '<set name="foo">bar</set>'
+                                '<loop>'
+                                    '<while>'
+                                        '<nne>'
+                                            '<var name="foo" /> 5'
+                                        '</nne>'
+                                    '</while>'
+                                    '<echo>'
+                                        'bar'
+                                    '</echo>'
+                                '</loop>'
+                            '</echo>',
                             'bar'*5)
 
 
