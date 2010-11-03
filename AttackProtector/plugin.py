@@ -140,7 +140,7 @@ class AttackProtector(callbacks.Plugin):
         nick = prefix.split('!')[0]
         kind = lastItem.kind
         punishment = self.registryValue('%s.punishment' % kind, channel)
-        reason = _('%s flood detected') % kind
+        reason = _('%ss flood detected') % kind
         if punishment == 'kick':
             msg = ircmsgs.kick(channel, nick, reason)
             irc.queueMsg(msg)

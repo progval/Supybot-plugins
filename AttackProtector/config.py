@@ -77,7 +77,7 @@ conf.registerGlobalValue(AttackProtector, 'delay',
 kinds = {'join': ['5p5', 'ban'],
          'part': ['4p5', 'ban'],
          'nick': ['7p300', 'ban'],
-         'message': ['10p10', 'kick']}
+         'message': ['5p10', 'kick']}
 for kind in kinds:
     data = kinds[kind]
     conf.registerGroup(AttackProtector, kind)
