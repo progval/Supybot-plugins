@@ -29,7 +29,6 @@
 ###
 
 import time
-import random
 from supybot.test import *
 
 class AttackProtectorTestCase(ChannelPluginTestCase):
