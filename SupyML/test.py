@@ -28,6 +28,7 @@
 
 ###
 
+import time
 from supybot.test import *
 
 class SupyMLTestCase(ChannelPluginTestCase):
@@ -35,6 +36,7 @@ class SupyMLTestCase(ChannelPluginTestCase):
     #################################
     # Utilities
     def _getIfAnswerIsEqual(self, msg):
+        time.sleep(0.5)
         m = self.irc.takeMsg()
         while m is not None:
             if repr(m) == repr(msg):
