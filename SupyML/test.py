@@ -32,7 +32,7 @@ import time
 from supybot.test import *
 
 class SupyMLTestCase(ChannelPluginTestCase):
-    plugins = ('SupyML', 'Utilities')
+    plugins = ('SupyML', 'Utilities', 'Conditional')
     #################################
     # Utilities
     def _getIfAnswerIsEqual(self, msg):
@@ -44,17 +44,34 @@ class SupyMLTestCase(ChannelPluginTestCase):
             m = self.irc.takeMsg()
         return False
 
-    _tell = '<tell><echo>ProgVal</echo> <echo>foo</echo></tell>'
 
     def testBasic(self):
         self.assertError('SupyML eval')
         self.assertResponse('SupyML eval <echo>foo</echo>', 'foo')
-        msg = ircmsgs.privmsg(self.channel, '@SupyML eval %s' % self._tell,
+        msg = ircmsgs.privmsg(self.channel, '@SupyML eval ' \
+            '<tell><echo>ProgVal</echo> <echo>foo</echo></tell>',
                                   prefix=self.prefix)
         self.irc.feedMsg(msg)
         answer = ircmsgs.IrcMsg(prefix="", command="PRIVMSG",
                         args=('ProgVal', 'test wants me to tell you: foo'))
         self.failIf(self._getIfAnswerIsEqual(answer) == False)
+
+    def testNoMoreThanOneAnswer(self):
+        self.assertResponse('SupyML eval <echo><echo>foo</echo>'
+                            '<echo>bar</echo></echo>',
+                            'foobar')
+
+    def testVar(self):
+        self.assertResponse('SupyML eval <echo><var>foo<set>bar</set></var>'
+                            '<echo><var>foo</var></echo></echo>',
+                            'bar')
+
+    def testWhile(self):
+        self.assertResponse('SupyML eval <echo>'
+                            '<var>foo<set>1</set></var>'
+                            '<loop><while><nne><var>foo</var> 5</nne></while>'
+                            '<echo>bar</echo></loop></echo>',
+                            'bar'*5)
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

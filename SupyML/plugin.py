@@ -96,6 +96,8 @@ class SupyMLParser:
             return self._processLoop(node, proxify)
         elif node.nodeName == 'if':
             return self._processId(node, proxify)
+        elif node.nodeName == 'var':
+            return self._processVar(node, proxify)
         output = node.nodeName + ' '
         for childNode in node.childNodes:
             if childNode.__class__ == minidom.Text:
@@ -105,9 +107,11 @@ class SupyMLParser:
         value = self._run(str(output), proxify)
         return value
     
-    def _processLoop(self, node):
+    def _processLoop(self, node, proxify=True):
         raise NotImplemented
-    def _processIf(self, node):
+    def _processIf(self, node, proxify=True):
+        raise NotImplemented
+    def _processVar(self, node, proxify=True):
         raise NotImplemented
 
 class SupyML(callbacks.Plugin):
