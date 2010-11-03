@@ -30,8 +30,29 @@
 
 from supybot.test import *
 
-class SupyMLTestCase(PluginTestCase):
-    plugins = ('SupyML',)
+class SupyMLTestCase(ChannelPluginTestCase):
+    plugins = ('SupyML', 'Utilities')
+    #################################
+    # Utilities
+    def _getIfSomething(self, msg):
+        m = self.irc.takeMsg()
+        while m is not None:
+            if repr(m) == repr(msg):
+                return True
+            m = self.irc.takeMsg()
+        return False
+
+    _tell = '<tell><echo>ProgVal</echo> <echo>foo</echo></tell>'
+
+    def testBasic(self):
+        self.assertError('SupyML eval')
+        self.assertResponse('SupyML eval <echo>foo</echo>', 'foo')
+        msg = ircmsgs.privmsg(self.channel, '@SupyML eval %s' % self._tell,
+                                  prefix=self.prefix)
+        self.irc.feedMsg(msg)
+        answer = ircmsgs.IrcMsg(prefix="", command="PRIVMSG",
+                        args=('ProgVal', 'test wants me to tell you: foo'))
+        self.failIf(self._getIfSomething(answer) == False)
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
