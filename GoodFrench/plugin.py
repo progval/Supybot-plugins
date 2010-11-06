@@ -78,9 +78,10 @@ class SpellChecker:
             displayedMask = mask
         raise_ = False
         text = self._text
-        nickRemover = re.match('[^ :]: (?P<text>.*)', text)
+        nickRemover = re.match('[^ ]*: (?P<text>.*)', text)
+        print repr(text)
         if nickRemover is not None:
-            text = nickRemover.group(text)
+            text = nickRemover.group('text')
         text = '%s%s%s' % (wizard, text, wizard)
         AntislashDoubleYou = '[^a-zA-Z0-9éèàùâêûôîäëüïö]'
         if mode == 'single' and re.match('.*%s%s%s.*' % (AntislashDoubleYou,
@@ -207,19 +208,15 @@ class GoodFrench(callbacks.Plugin):
         nick = prefix.split('!')[0]
         text = msg.args[1]
         
-        print self.registryValue('level', channel)
         checker = SpellChecker(text, self.registryValue('level', channel))
         errors = checker.getErrors()
-        print errors
         if len(errors) == 0:
             return
         elif len(errors) == 1:
             reason = 'Erreur : %s' % errors[0]
         else:
             reason = 'Erreurs : %s' % ' | '.join(errors)
-        print 'titi'
         msg = ircmsgs.kick(channel, nick, reason)
-        print 'toto'
         irc.queueMsg(msg)
     
     detect = wrap(detect, ['text'])
