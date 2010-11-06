@@ -160,11 +160,11 @@ class SpellChecker:
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation simple n'est jamais "
                      "précédé d'un espace",
-                     mask=" [.,]", wizard='_')
+                     mask=" ,", wizard='_')
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation simple est toujours "
                      "suivi d'un espace",
-                     mask="[.,][^ _]", wizard='_')
+                     mask=",[^ _]", wizard='_')
     
     def getErrors(self):
         return self._errors
@@ -192,15 +192,19 @@ class GoodFrench(callbacks.Plugin):
         nick = prefix.split('!')[0]
         text = msg.args[1]
         
+        print self.registryValue('level', channel)
         checker = SpellChecker(text, self.registryValue('level', channel))
         errors = checker.getErrors()
+        print errors
         if len(errors) == 0:
             return
         elif len(errors) == 1:
             reason = 'Erreur : %s' % errors[0]
         else:
             reason = 'Erreurs : %s' % ' | '.join(errors)
+        print 'titi'
         msg = ircmsgs.kick(channel, nick, reason)
+        print 'toto'
         irc.queueMsg(msg)
     
     detect = wrap(detect, ['text'])
