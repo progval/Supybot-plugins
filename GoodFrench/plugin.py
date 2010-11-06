@@ -77,11 +77,12 @@ class SpellChecker:
         if displayedMask is None:
             displayedMask = mask
         raise_ = False
+        text = self._text
+        nickRemover = re.match('[^ :]: (?P<text>.*)', text)
         if nickRemover is not None:
             text = nickRemover.group(text)
-        text = '%s%s%s' % (wizard, self._text, wizard)
+        text = '%s%s%s' % (wizard, text, wizard)
         AntislashDoubleYou = '[^a-zA-Z0-9éèàùâêûôîäëüïö]'
-        nickRemover = re.match('[^ :]: (?P<text>.*)', text)
         if mode == 'single' and re.match('.*%s%s%s.*' % (AntislashDoubleYou,
                                                         mask,
                                                         AntislashDoubleYou),
