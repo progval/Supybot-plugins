@@ -78,8 +78,11 @@ class SpellChecker:
             displayedMask = mask
         raise_ = False
         text = '%s%s%s' % (wizard, self._text, wizard)
-        if mode == 'single' and re.match('.*\W%s\W.*' % mask, text,
-                                         re.IGNORECASE) is not None:
+        AntislashDoubleYou = '[^a-zA-Z0-9éèàùâêûôîäëüïö]'
+        if mode == 'single' and re.match('.*%s%s%s.*' % (AntislashDoubleYou,
+                                                        mask,
+                                                        AntislashDoubleYou),
+                                         text, re.IGNORECASE) is not None:
             raise_ = True
         elif mode == 'regexp' and re.match('.*%s.*' % mask, text):
             raise_ = True
