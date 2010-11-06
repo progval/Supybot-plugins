@@ -142,10 +142,18 @@ class SpellChecker:
         self._detect(mode='regexp', correct=['quels', 'quelles'],
                      mask='quelle [^ ]+ les',
                      displayedMask='quelle')
-        self._detect(mode='regexp',
+        self._detect(mode='single',
                      correct=['quel', 'quels', 'quelle', 'quelles'],
-                     mask='kel(le)?s?',
-                     displayedMask=['kel', 'kels', 'kelle', 'kelles'])
+                     mask='kel')
+        self._detect(mode='single',
+                     correct=['quel', 'quels', 'quelle', 'quelles'],
+                     mask='kelle')
+        self._detect(mode='single',
+                     correct=['quel', 'quels', 'quelle', 'quelles'],
+                     mask='kels')
+        self._detect(mode='single',
+                     correct=['quel', 'quels', 'quelle', 'quelles'],
+                     mask='kelles')
     def checkAbbreviation(self):
         pass
     def checkLol(self):
