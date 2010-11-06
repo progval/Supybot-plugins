@@ -135,7 +135,8 @@ class SpellChecker:
         self._detect(mode='regexp', correct=firstPerson, mask="j'[^ ]*t")
         self._detect(mode='regexp', correct=firstPerson,mask="je( ne)? [^ ]*t")
         self._detect(mode='regexp', correct=notAS,
-                     mask="(il|elle|on)( ne | n'| )[^ ]+s\W")
+                     mask="(il|elle|on)( ne | n'| )[^ ]+[^u]s\W")
+                     # [^u] is added in order to not detect 'je [vn]ous...'
     def checkSpelling(self):
         self._detect(mode='regexp', correct='quelle', mask='quel [^ ]+ la',
                      displayedMask='quel')
