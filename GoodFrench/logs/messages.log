@@ -1,0 +1,6 @@
+ERROR 2010-11-06T18:41:06 supybot Invalid user dictionary file, resetting to empty.
+ERROR 2010-11-06T18:41:06 supybot Exact error: IOError: [Errno 2] No such file or directory: 'conf/users.conf'
+ERROR 2010-11-06T18:41:06 supybot Invalid channel database, resetting to empty.
+ERROR 2010-11-06T18:41:06 supybot Exact error: IOError: [Errno 2] No such file or directory: 'conf/channels.conf'
+WARNING 2010-11-06T18:41:06 supybot Couldn't open ignore database: [Errno 2] No such file or directory: 'conf/ignores.conf'
+INFO 2010-11-06T18:41:07 supybot Shutdown initiated.
