@@ -1,1 +1,3 @@
-Insert a description of your plugin here, with any notes, etc. about using it.
+This plugin aims to provide a highly configurable protection against flood and spam.
+
+Warning: it is still in beta
