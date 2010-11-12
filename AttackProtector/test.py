@@ -160,6 +160,14 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
         self.failIf(self._getIfAnswerIsThisBan() == False,
                     'Cleans the collection before it should be cleaned')
 
+    def testCleanCollectionAfterPunishment(self):
+        for i in range(1, 6):
+            self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
+        self._getIfAnswerIsThisBan()
+        self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
+        self.failIf(self._getIfAnswerIsThisBan() == False,
+                    'Doesn\'t clean the join collection after having banned.')
+
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
