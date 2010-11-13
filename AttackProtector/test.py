@@ -51,6 +51,9 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
         reason = '%s flood detected' % kind
         return self._getIfAnswerIsEqual(ircmsgs.kick(self.channel, self.nick,
                                                  reason))
+    def _getIfAnswerIsMode(self, mode):
+        return self._getIfAnswerIsEqual(ircmsgs.IrcMsg(prefix="", command="MODE",
+            args=(self.channel, mode)))
 
     #################################
     # Join tests
@@ -66,6 +69,25 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             self.irc.feedMsg(msg)
         self.failIf(self._getIfAnswerIsThisBan(),
                     'Reaction to no join flood.')
+
+    #################################
+    # GroupJoin tests
+    def testPunishGroupJoinFlood(self):
+        for i in range(1, 20):
+            prefix = self.prefix.split('@')
+            prefix = '@'.join(['%s%i' % (prefix[0], i), prefix[1]])
+            msg = ircmsgs.join(self.channel, prefix=prefix)
+            self.irc.feedMsg(msg)
+        self.failIf(self._getIfAnswerIsMode('+i') == False,
+                    'No reaction to groupjoin flood.')
+    def testPunishNotNoGroupJoinFlood(self):
+        for i in range(1, 19):
+            prefix = self.prefix.split('@')
+            prefix = '@'.join(['%s%i' % (prefix[0], i), prefix[1]])
+            msg = ircmsgs.join(self.channel, prefix=prefix)
+            self.irc.feedMsg(msg)
+        self.failIf(self._getIfAnswerIsMode('+i'),
+                    'Reaction to no groupjoin flood.')
 
     #################################
     # Part tests
@@ -147,7 +169,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
     def testCleanCollection(self):
         for i in range(1, 4):
             self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
-        time.sleep(6)
+        time.sleep(11)
         self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
         self.failIf(self._getIfAnswerIsThisBan(),
                     'Doesn\'t clean the join collection.')

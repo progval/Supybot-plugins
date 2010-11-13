@@ -35,6 +35,7 @@ import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircmsgs as ircmsgs
+import supybot.registry as registry
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 
@@ -96,6 +97,7 @@ class AttackProtectorDatabase:
         if count >= int(filterParser.match(detection).group('number')):
             protector._slot(lastItem)
 
+
 class AttackProtector(callbacks.Plugin):
     """This plugin protects channels against spam and flood"""
     def __init__(self, irc):
@@ -115,12 +117,26 @@ class AttackProtector(callbacks.Plugin):
                 if newNick in c.users:
                     channels.append(channel)
             prefix = '*!' + msg.prefix.split('!')[1]
-        for channel in channels:
-            if self.registryValue('%s.detection' % kind, channel) == '0p0':
-                continue
-            item = AttackProtectorDatabaseItem(kind, prefix,
-                                               channel, self, irc)
-            self._database.add(item)
+        try:
+            for channel in channels:
+                item = None
+                if not self.registryValue('%s.detection' % kind, channel) == \
+                '0p0':
+                    item = AttackProtectorDatabaseItem(kind, prefix,
+                                                       channel, self, irc)
+                    self._database.add(item)
+                
+                try:
+                    if not self.registryValue('group%s.detection' % kind, 
+                    channel) == '0p0':
+                        item = AttackProtectorDatabaseItem('group%s' % kind,
+                                                            '*!*@*', channel,
+                                                            self, irc)
+                        self._database.add(item)
+                except registry.NonExistentRegistryEntry:
+                    pass
+        except UnboundLocalError:
+            pass
 
     def doJoin(self, irc, msg):
         self._eventCatcher(irc, msg, 'join')
@@ -151,6 +167,9 @@ class AttackProtector(callbacks.Plugin):
             msg = ircmsgs.kick(channel, nick, reason)
             irc.queueMsg(msg)
             msg = ircmsgs.ban(channel, prefix)
+            irc.queueMsg(msg)
+        elif punishment == 'mode+i':
+            msg = ircmsgs.mode(channel, '+i')
             irc.queueMsg(msg)
 AttackProtector = internationalizeDocstring(AttackProtector)
 

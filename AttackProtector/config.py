@@ -61,7 +61,7 @@ class XpY(registry.String):
 XpY = internationalizeDocstring(XpY)
 
 class Punishment(registry.OnlySomeStrings):
-    validStrings = ('ban', 'kick', 'kban')
+    validStrings = ('ban', 'kick', 'kban', 'mode+i')
 Punishment = internationalizeDocstring(Punishment)
 
 AttackProtector = conf.registerPlugin('AttackProtector')
@@ -74,10 +74,11 @@ conf.registerGlobalValue(AttackProtector, 'delay',
     wait before being enabled. A too low value makes the bot believe that
     its incoming messages 'flood' on connection is an attack.""")))
 
-kinds = {'join': ['5p5', 'ban'],
+kinds = {'join': ['5p10', 'ban'],
          'part': ['4p5', 'ban'],
          'nick': ['7p300', 'ban'],
-         'message': ['10p20', 'kick']}
+         'message': ['10p20', 'kick'],
+         'groupjoin': ['20p10', 'mode+i']}
 for kind in kinds:
     data = kinds[kind]
     conf.registerGroup(AttackProtector, kind)
