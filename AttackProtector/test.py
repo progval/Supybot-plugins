@@ -33,6 +33,7 @@ from supybot.test import *
 
 class AttackProtectorTestCase(ChannelPluginTestCase):
     plugins = ('AttackProtector',)
+    config = {'supybot.plugins.AttackProtector.join.detection': '5p2'}
 
     #################################
     # Utilities
@@ -169,7 +170,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
     def testCleanCollection(self):
         for i in range(1, 4):
             self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
-        time.sleep(11)
+        time.sleep(3)
         self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
         self.failIf(self._getIfAnswerIsThisBan(),
                     'Doesn\'t clean the join collection.')
@@ -177,7 +178,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
     def testDontCleanCollectionToEarly(self):
         for i in range(1, 4):
             self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
-        time.sleep(2)
+        time.sleep(1)
         self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
         self.failIf(self._getIfAnswerIsThisBan() == False,
                     'Cleans the collection before it should be cleaned')
