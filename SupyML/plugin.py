@@ -95,41 +95,33 @@ class SupyMLParser:
         self.warnings = []
         self.data = self._parse(code)
 
-    def _run(self, code, proxify):
+    def _run(self, code):
         """Runs the command using Supybot engine"""
         tokens = callbacks.tokenize(str(code))
-        if proxify:
-            fakeIrc = FakeIrc(self._irc)
-            # TODO : add nested level
-        else:
-            fakeIrc = self._irc
+        fakeIrc = FakeIrc(self._irc)
+        # TODO : add nested level
         self._plugin.Proxy(fakeIrc, self._msg, tokens)
         self.rawData = fakeIrc._rawData
-        if proxify:
-            # TODO : don't wait if the plugin is not threaded
-            time.sleep(0.1)
-            return fakeIrc._data
+        # TODO : don't wait if the plugin is not threaded
+        time.sleep(0.1)
+        return fakeIrc._data
 
-    def _parse(self, code, variables={}, proxify=False):
+    def _parse(self, code, variables={}):
         """Returns a dom object from the code."""
         dom = minidom.parseString(code)
-        output = self._processDocument(dom, variables, proxify)
+        output = self._processDocument(dom, variables)
         return output
 
-    def _processDocument(self, dom, variables={}, proxify=False):
+    def _processDocument(self, dom, variables={}):
         """Handles the root node and call child nodes"""
-        proxify = True
         for childNode in dom.childNodes:
             if isinstance(childNode, minidom.Element):
-                output = self._processNode(childNode, variables, proxify)
+                output = self._processNode(childNode, variables)
         return output
 
-    def _processNode(self, node, variables, proxifyIrc=True):
-        """Returns the value of an internapreted node.
+    def _processNode(self, node, variables):
+        """Returns the value of an internapreted node."""
 
-        Takes an optional attribute, passed to self._run() that mean if the
-        Irc object should be proxified. If it is not, the real Irc object is
-        used, datas are sent to IRC, and this function will return None."""
         if isinstance(node, minidom.Text):
             return node.data
         output = node.nodeName + ' '
@@ -146,10 +138,9 @@ class SupyMLParser:
                 output += self._processSet(childNode, variables)
             else:
                 output += self._processNode(childNode, variables) or ''
-        value = self._run(output, proxifyIrc)
+        value = self._run(output)
         return value
 
-    # Don't proxify variables
     def _processSet(self, node, variables):
         """Handles the <set> tag"""
         variableName = str(node.attributes['name'].value)
@@ -187,7 +178,7 @@ class SupyMLParser:
         if loopType == 'while':
             try:
                 while utils.str.toBool(self._parse(loopCond, variables,
-                                                   True).split(': ')[-1]):
+                                                  ).split(': ')[-1]):
                     loopContent = '<echo>%s</echo>' % loopContent
                     output += self._parse(loopContent) or ''
             except AttributeError: # toBool() failed
