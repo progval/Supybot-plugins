@@ -48,7 +48,7 @@ except:
     # without the i18n plugin
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
-    
+
 filterParser=re.compile('(?P<number>[0-9]+)p(?P<seconds>[0-9]+)')
 
 class AttackProtectorDatabaseItem:
@@ -66,14 +66,14 @@ class AttackProtectorDatabaseItem:
 class AttackProtectorDatabase:
     def __init__(self):
         self._collections = {}
-    
+
     def add(self, item):
         if not self._collections.has_key(item.kind):
             self._collections.update({item.kind: []})
         self._collections[item.kind].append(item)
         self.refresh()
         self.detectAttack(item)
-    
+
     def refresh(self):
         currentTime = time.time() # Caching
         for kind in self._collections:
@@ -81,7 +81,7 @@ class AttackProtectorDatabase:
             for item in collection:
                 if item.expire < currentTime:
                     collection.remove(item)
-    
+
     def detectAttack(self, lastItem):
         collection = self._collections[lastItem.kind]
         prefix = lastItem.prefix
@@ -89,7 +89,7 @@ class AttackProtectorDatabase:
         protector = lastItem.protector
         kind = lastItem.kind
         count = 0
-        
+
         for item in collection:
             if item.prefix == prefix and item.channel == channel:
                 count += 1
@@ -125,10 +125,10 @@ class AttackProtector(callbacks.Plugin):
                     item = AttackProtectorDatabaseItem(kind, prefix,
                                                        channel, self, irc)
                     self._database.add(item)
-                
+
                 try:
-                    if not self.registryValue('group%s.detection' % kind, 
-                    channel) == '0p0':
+                    if not self.registryValue('group%s.detection' % kind,
+                        channel) == '0p0':
                         item = AttackProtectorDatabaseItem('group%s' % kind,
                                                             '*!*@*', channel,
                                                             self, irc)
