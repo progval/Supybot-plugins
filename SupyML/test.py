@@ -36,7 +36,7 @@ class SupyMLTestCase(ChannelPluginTestCase):
     #################################
     # Utilities
     def _getIfAnswerIsEqual(self, msg):
-        time.sleep(0.2)
+        time.sleep(0.1)
         m = self.irc.takeMsg()
         while m is not None:
             if repr(m) == repr(msg):
@@ -137,5 +137,16 @@ class SupyMLTestCase(ChannelPluginTestCase):
                             '</echo>',
                             '45')
 
+    def testMaxNesting(self):
+        self.assertNotError('SupyML eval ' +
+                         '<echo>'*30+
+                            'foo' +
+                         '</echo>'*30
+                        )
+        self.assertError('SupyML eval ' +
+                         '<echo>'*31+
+                            'foo' +
+                         '</echo>'*31
+                        )
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

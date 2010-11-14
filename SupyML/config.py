@@ -55,5 +55,7 @@ SupyML = conf.registerPlugin('SupyML')
 # conf.registerGlobalValue(SupyML, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
 
+conf.registerGlobalValue(SupyML, 'maxnodes', registry.Integer(30, """Determines
+    the maximum number of nodes processed by the 'SupyML eval' command."""))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

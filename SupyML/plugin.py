@@ -32,6 +32,7 @@ import re
 import copy
 import time
 import Queue
+import supybot.conf as conf
 from xml.dom import minidom
 import supybot.world as world
 import supybot.utils as utils
@@ -58,6 +59,9 @@ class LoopError(Exception):
     pass
 
 class LoopTypeIsMissing(Exception):
+    pass
+
+class MaximumNodesNumberExceeded(Exception):
     pass
 
 parseMessage = re.compile('\w+: (?P<content>.*)')
@@ -87,19 +91,25 @@ class FakeIrc():
         return getattr(self.__dict__['_irc'], name)
 
 class SupyMLParser:
-    def __init__(self, plugin, irc, msg, code):
+    def __init__(self, plugin, irc, msg, code, maxNodes):
         self._plugin = plugin
         self._irc = irc
         self._msg = msg
         self._code = code
         self.warnings = []
+        self._maxNodes = maxNodes
+        self.nodesCount = 0
         self.data = self._parse(code)
+
+    def _startNode(self):
+        self.nodesCount += 1
+        if self.nodesCount >= self._maxNodes:
+            raise MaximumNodesNumberExceeded()
 
     def _run(self, code):
         """Runs the command using Supybot engine"""
         tokens = callbacks.tokenize(str(code))
         fakeIrc = FakeIrc(self._irc)
-        # TODO : add nested level
         self._plugin.Proxy(fakeIrc, self._msg, tokens)
         self.rawData = fakeIrc._rawData
         # TODO : don't wait if the plugin is not threaded
@@ -108,6 +118,7 @@ class SupyMLParser:
 
     def _parse(self, code, variables={}):
         """Returns a dom object from the code."""
+        self._startNode()
         dom = minidom.parseString(code)
         output = self._processDocument(dom, variables)
         return output
@@ -126,6 +137,7 @@ class SupyMLParser:
             return node.data
         output = node.nodeName + ' '
         for childNode in node.childNodes:
+            self._startNode()
             if not repr(node) == repr(childNode.parentNode):
                 continue
             if childNode.nodeName == 'loop':
@@ -204,7 +216,8 @@ class SupyML(callbacks.Plugin):
         """<SupyML script>
 
         Executes the <SupyML script>"""
-        parser = SupyMLParser(self, irc, msg, code)
+        parser = SupyMLParser(self, irc, msg, code,
+                              self.registryValue('maxnodes')+2)
         if world.testing and len(parser.warnings) != 0:
             print parser.warnings
         if parser.rawData is not None:
