@@ -69,17 +69,16 @@ class SpellChecker:
         if level >= 7:
             self._checking = 'lol'
             self.checkLol()
-    
+
     def _raise(self, message):
         self._errors.append('[%s] %s' % (self._checking, message))
-    
+
     def _detect(self, mode, correct, mask, displayedMask=None, wizard=' '):
         if displayedMask is None:
             displayedMask = mask
         raise_ = False
         text = self._text
         nickRemover = re.match('[^ ]*: (?P<text>.*)', text)
-        print repr(text)
         if nickRemover is not None:
             text = nickRemover.group('text')
         text = '%s%s%s' % (wizard, text, wizard)
@@ -91,7 +90,7 @@ class SpellChecker:
             raise_ = True
         elif mode == 'regexp' and re.match('.*%s.*' % mask, text):
             raise_ = True
-        
+
         if raise_:
             if self._checking == 'conjugaison' or \
             self._checking == 'typographie':
@@ -101,7 +100,7 @@ class SpellChecker:
                     correct = '`%s`' % '`, ou `'.join(correct)
                 else:
                     correct = '`%s`' % correct
-                    
+
                 if displayedMask.__class__ == list:
                     displayedMask = '`%s`' % '` ou `'.join(displayedMask)
                 else:
@@ -119,7 +118,7 @@ class SpellChecker:
         self._detect(mode='single', correct=["aime", "aimes", "aiment"],
                      mask='m')
         self._detect(mode='single', correct=['eu', 'eut'], mask='u')
-        self._detect(mode='regexp', correct="c'est", 
+        self._detect(mode='regexp', correct="c'est",
                      mask="(?<!(du|Du|le|Le|en|En)) C (?<!c')",
                      displayedMask='C')
 
@@ -173,7 +172,7 @@ class SpellChecker:
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation simple est toujours "
                      "suivi d'un espace",
-                     mask="(?<(https?|ftp))[:!?;][^ _]", wizard='_')
+                     mask="(?<!(tp|ps))[:!?;][^ _]", wizard='_')
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation simple n'est jamais "
                      "précédé d'un espace",
@@ -182,14 +181,14 @@ class SpellChecker:
                      correct="Un caractère de ponctuation simple est toujours "
                      "suivi d'un espace",
                      mask=",[^ _]", wizard='_')
-    
+
     def getErrors(self):
         return self._errors
 
 class GoodFrench(callbacks.Plugin):
     def detect(self, irc, msg, args, text):
         """<texte>
-        
+
         Cherche des fautes dans le <texte>, en fonction de la valeur locale de
         supybot.plugins.GoodFrench.level."""
         checker = SpellChecker(text, self.registryValue('level', msg.channel))
@@ -208,7 +207,7 @@ class GoodFrench(callbacks.Plugin):
         prefix = msg.prefix
         nick = prefix.split('!')[0]
         text = msg.args[1]
-        
+
         checker = SpellChecker(text, self.registryValue('level', channel))
         errors = checker.getErrors()
         if len(errors) == 0:
@@ -219,7 +218,7 @@ class GoodFrench(callbacks.Plugin):
             reason = 'Erreurs : %s' % ' | '.join(errors)
         msg = ircmsgs.kick(channel, nick, reason)
         irc.queueMsg(msg)
-    
+
     detect = wrap(detect, ['text'])
 
 
