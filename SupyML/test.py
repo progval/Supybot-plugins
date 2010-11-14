@@ -55,6 +55,8 @@ class SupyMLTestCase(ChannelPluginTestCase):
         answer = ircmsgs.IrcMsg(prefix="", command="PRIVMSG",
                         args=('ProgVal', 'test wants me to tell you: foo'))
         self.failIf(self._getIfAnswerIsEqual(answer) == False)
+        self.assertResponse('SupyML eval <nne>4 5</nne>', 'true')
+        self.assertResponse('SupyML eval <echo><nne>4 5</nne></echo>', 'true')
 
     def testNoMoreThanOneAnswer(self):
         self.assertResponse('SupyML eval '
@@ -95,24 +97,25 @@ class SupyMLTestCase(ChannelPluginTestCase):
                                     '<var name="foo" />'
                                 '</echo>'
                             '</echo>',
-                            'bar')
+                            'barbar')
 
     def testWhile(self):
         self.assertResponse('SupyML eval '
                             '<echo>'
-                                '<set name="foo">bar</set>'
+                                '<set name="foo">4</set>'
                                 '<loop>'
                                     '<while>'
                                         '<nne>'
                                             '<var name="foo" /> 5'
                                         '</nne>'
                                     '</while>'
+                                    '<set name="foo">5</set>'
                                     '<echo>'
                                         'bar'
                                     '</echo>'
                                 '</loop>'
                             '</echo>',
-                            'bar'*5)
+                            'barbar')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

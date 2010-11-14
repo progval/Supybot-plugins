@@ -32,10 +32,8 @@ numerics, but it is their own problems.
 Variable lifetime
 -----------------
 
-When setting a new variable, the variable is readable and writable in the
-node where it is created, and in the child nodes.
-If a child node write a variable defined in a parent node, the new value of
-the variable will be available in the parent node.
+When creating/setting/editing a variable or its value, the changes are
+available everywhere in the source code.
 
 About the names
 ---------------
