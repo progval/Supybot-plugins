@@ -32,7 +32,7 @@ import time
 from supybot.test import *
 
 class SupyMLTestCase(ChannelPluginTestCase):
-    plugins = ('SupyML', 'Utilities', 'Conditional')
+    plugins = ('SupyML', 'Utilities', 'Conditional', 'Math')
     #################################
     # Utilities
     def _getIfAnswerIsEqual(self, msg):
@@ -116,6 +116,26 @@ class SupyMLTestCase(ChannelPluginTestCase):
                                 '</loop>'
                             '</echo>',
                             'bar')
+        self.assertResponse('SupyML eval '
+                            '<echo>'
+                                '<set name="foo">3</set>'
+                                '<loop>'
+                                    '<while>'
+                                        '<nne>'
+                                            '<var name="foo" /> 5'
+                                        '</nne>'
+                                    '</while>'
+                                    '<set name="foo">'
+                                        '<calc>'
+                                            '<var name="foo" /> + 1'
+                                        '</calc>'
+                                    '</set>'
+                                    '<echo>'
+                                        '<var name="foo" />'
+                                    '</echo>'
+                                '</loop>'
+                            '</echo>',
+                            '45')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

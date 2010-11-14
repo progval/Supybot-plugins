@@ -60,22 +60,30 @@ class LoopError(Exception):
 class LoopTypeIsMissing(Exception):
     pass
 
+parseMessage = re.compile('\w+: (?P<content>.*)')
 class FakeIrc():
     def __init__(self, irc):
         self._irc = irc
         self._message = ''
         self._data = ''
+        self._rawData = None
     def error(self, message):
         message = message
         self._data = message
     def reply(self, message):
         self._data = message
     def queueMsg(self, message):
-        if message.command == 'PRIVMSG':
-            self._data = message.args[1]
+        self._rawData = message
+        if message.command in ('PRIVMSG', 'NOTICE'):
+            parsed = parseMessage.match(message.args[1])
+            if parsed is not None:
+                message = parsed.group('content')
+            else:
+                message = message.args[1]
+        self._data = message
     def __getattr__(self, name):
-        if name == '_data':
-            return self.__dict__['_data']
+        if name == '_data' or name == '_rawData':
+            return self.__dict__[name]
         return getattr(self.__dict__['_irc'], name)
 
 class SupyMLParser:
@@ -85,7 +93,7 @@ class SupyMLParser:
         self._msg = msg
         self._code = code
         self.warnings = []
-        self._parse(code)
+        self.data = self._parse(code)
 
     def _run(self, code, proxify):
         """Runs the command using Supybot engine"""
@@ -96,6 +104,7 @@ class SupyMLParser:
         else:
             fakeIrc = self._irc
         self._plugin.Proxy(fakeIrc, self._msg, tokens)
+        self.rawData = fakeIrc._rawData
         if proxify:
             # TODO : don't wait if the plugin is not threaded
             time.sleep(0.1)
@@ -109,6 +118,7 @@ class SupyMLParser:
 
     def _processDocument(self, dom, variables={}, proxify=False):
         """Handles the root node and call child nodes"""
+        proxify = True
         for childNode in dom.childNodes:
             if isinstance(childNode, minidom.Element):
                 output = self._processNode(childNode, variables, proxify)
@@ -177,9 +187,9 @@ class SupyMLParser:
         if loopType == 'while':
             try:
                 while utils.str.toBool(self._parse(loopCond, variables,
-                                                   True).split(': ')[1]):
+                                                   True).split(': ')[-1]):
                     loopContent = '<echo>%s</echo>' % loopContent
-                    output += self._parse(loopContent)
+                    output += self._parse(loopContent) or ''
             except AttributeError: # toBool() failed
                 pass
             except ValueError: # toBool() failed
@@ -206,6 +216,10 @@ class SupyML(callbacks.Plugin):
         parser = SupyMLParser(self, irc, msg, code)
         if world.testing and len(parser.warnings) != 0:
             print parser.warnings
+        if parser.rawData is not None:
+            irc.queueMsg(parser.rawData)
+        else:
+            irc.reply(parser.data)
 
     eval=wrap(eval, ['text'])
 SupyML = internationalizeDocstring(SupyML)
