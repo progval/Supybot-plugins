@@ -170,12 +170,15 @@ class SupyMLParser:
                 raise LoopTypeIsMissing(node.toxml())
             elif loopType is None:
                 loopType = childNode.nodeName
-                loopCond = childNode.toxml()[len('<while>'):-len('</while>')]
+                loopCond = childNode.toxml()
+                loopCond = loopCond[len(loopType+'<>'):-len(loopType+'</>')]
             else:
                 loopContent += childNode.toxml()
         if loopType == 'while':
             try:
-                while utils.str.toBool(self._parse(loopCond, variables, True)):
+                while utils.str.toBool(self._parse(loopCond, variables,
+                                                   True).split(': ')[1]):
+                    loopContent = '<echo>%s</echo>' % loopContent
                     output += self._parse(loopContent)
             except AttributeError: # toBool() failed
                 pass
