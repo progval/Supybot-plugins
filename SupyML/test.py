@@ -149,4 +149,18 @@ class SupyMLTestCase(ChannelPluginTestCase):
                          '</echo>'*31
                         )
 
+    def testWarnings(self):
+        self.assertResponse('SupyML eval <echo>'
+                                '<set name="">'
+                                    'bar'
+                                '</set>'
+                                '<var name="" />'
+                            '</echo>', 'bar')
+        self.assertResponse('SupyML eval --warnings <echo>'
+                                '<set name="">'
+                                    'bar'
+                                '</set>'
+                                '<var name="" />'
+                            '</echo>', 'Error: Empty variable name')
+
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

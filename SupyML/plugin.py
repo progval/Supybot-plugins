@@ -165,6 +165,7 @@ class SupyMLParser:
     def _processVar(self, node, variables):
         """Handles the <var /> tag"""
         variableName = node.attributes['name'].value
+        self._checkVariableName(variableName)
         try:
             return variables[variableName]
         except KeyError:
@@ -212,20 +213,22 @@ class SupyML(callbacks.Plugin):
     This scripts (Supybot Markup Language) are script written in a XML-based
     language."""
     #threaded = True
-    def eval(self, irc, msg, args, code):
-        """<SupyML script>
+    def eval(self, irc, msg, args, optlist, code):
+        """[--warnings] <SupyML script>
 
         Executes the <SupyML script>"""
         parser = SupyMLParser(self, irc, msg, code,
                               self.registryValue('maxnodes')+2)
-        if world.testing and len(parser.warnings) != 0:
-            print parser.warnings
+        for item in optlist:
+            if ('warnings', True) == item and len(parser.warnings) != 0:
+                irc.error(' & '.join(parser.warnings))
         if parser.rawData is not None:
             irc.queueMsg(parser.rawData)
         else:
             irc.reply(parser.data)
 
-    eval=wrap(eval, ['text'])
+    eval=wrap(eval, [getopts({'warnings':''}), 'text'])
+
 SupyML = internationalizeDocstring(SupyML)
 
 Class = SupyML
