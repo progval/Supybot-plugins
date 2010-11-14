@@ -201,12 +201,12 @@ class GoodFrench(callbacks.Plugin):
             irc.reply('Il semble y avoir des erreurs : %s' %
                       ' | '.join(errors))
     def doPrivmsg(self, irc, msg):
-        if world.testing: # FIXME
-            return
         channel = msg.args[0]
+        text = msg.args[1]
         prefix = msg.prefix
         nick = prefix.split('!')[0]
-        text = msg.args[1]
+        if callbacks.addressed(irc.nick, msg): #message is direct command
+            return
 
         checker = SpellChecker(text, self.registryValue('level', channel))
         errors = checker.getErrors()
