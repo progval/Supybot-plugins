@@ -82,7 +82,7 @@ class SpellChecker:
         if nickRemover is not None:
             text = nickRemover.group('text')
         text = '%s%s%s' % (wizard, text, wizard)
-        AntislashDoubleYou = '[^a-zA-Z0-9éèàùâêûôîäëüïö]'
+        AntislashDoubleYou = '[^a-zA-Z0-9éèàùâêûôîäëüïö\']'
         if mode == 'single' and re.match('.*%s%s%s.*' % (AntislashDoubleYou,
                                                         mask,
                                                         AntislashDoubleYou),
