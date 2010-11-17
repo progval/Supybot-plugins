@@ -64,11 +64,11 @@ class SpellChecker:
             self._checking = 'abbréviation'
             self.checkAbbreviation()
         if level >= 6:
-            self._checking = 'typographie'
-            self.checkTypographic()
-        if level >= 7:
             self._checking = 'lol'
             self.checkLol()
+        if level >= 7:
+            self._checking = 'typographie'
+            self.checkTypographic()
 
     def _raise(self, message):
         self._errors.append('[%s] %s' % (self._checking, message))

@@ -53,7 +53,10 @@ conf.registerChannelValue(GoodFrench, 'level',
     2 : filtre les erreurs de pluriel ;
     3 : filtre les fautes de conjugaison courantes ;
     4 : filtre les fautes d'orthographe courantes ;
-    5 : filtre les abbréviations ("t'as" au lieu de "tu as")"""))
+    5 : filtre les abbréviations ("t'as" au lieu de "tu as") ;
+    6 : filtre les 'lol'
+    7 : filtre les erreurs de typographie (note : a tendance à avoir la
+    gachette facile)"""))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
