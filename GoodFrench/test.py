@@ -49,7 +49,7 @@ class GoodFrenchTestCase(ChannelPluginTestCase):
     def testDetect(self):
         self.assertRegexp("GoodFrench detect %s" % self._bad, 'erreurs : ')
         self.assertRegexp("GoodFrench detect %s" % self._good, 'correcte')
-    
+
     def testKick(self):
         msg = ircmsgs.privmsg(self.channel, self._bad,
                               prefix=self.prefix)
@@ -60,35 +60,35 @@ class GoodFrenchTestCase(ChannelPluginTestCase):
                               prefix=self.prefix)
         self.irc.feedMsg(msg)
         self.failIf(self._isKicked(), 'Kicked on correct sentence')
-    
+
     def assertMistake(self, text):
         try:
             self.assertRegexp("GoodFrench detect %s" % text, 'erreurs? : ')
         except AssertionError as e:
             print text
             raise e
-    
+
     def testMistakes(self):
         for text in ["je suis pas là", "j'ai pas faim", "j'ait", "je ait",
                      "il es", "quel est la", "quelle est le",
-		     "C'est bon; il est parti", "C'est bon , il est parti",
-		     "C'est bon ,il est parti", "C'est bon ;il est parti",
-		     "lol", "loooool", "l00oo ol", "LOOO00ool", "10001"]:
+                     "C'est bon; il est parti", "C'est bon , il est parti",
+                     "C'est bon ,il est parti", "C'est bon ;il est parti",
+                     "lol", "loooool", "l00oo ol", "LOOO00ool", "10001"]:
             self.assertMistake(text)
-    
+
     def assertNoMistake(self, text):
         try:
             self.assertRegexp("GoodFrench detect %s" % text, 'correcte')
         except AssertionError as e:
             print text
             raise e
-    
+
     def testNotMistakes(self):
         for text in ["je ne suis pas là", "je n'ai pas faim", "j'ai",
-                     "il est", "quelle est la", "quel est le",
-		     "C'est bon ; il est parti", "C'est bon, il est parti"]:
+                     "il est", "quelle est la", "quel est le", "je sais",
+                     "C'est bon ; il est parti", "C'est bon, il est parti"]:
             self.assertNoMistake(text)
-	
+
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
