@@ -30,9 +30,13 @@
 
 import supybot.conf as conf
 import supybot.registry as registry
-from supybot.i18n import PluginInternationalization, internationalizeDocstring
-
-_ = PluginInternationalization('WebStats')
+try:
+    from supybot.i18n import PluginInternationalization
+    from supybot.i18n import internationalizeDocstring
+    _ = PluginInternationalization('WebStats')
+except:
+    _ = lambda x:x
+    internationalizeDocstring = lambda x:x
 
 def configure(advanced):
     # This will be called by supybot to configure this module.  advanced is
@@ -54,5 +58,10 @@ conf.registerGlobalValue(WebStats.server, 'host',
 conf.registerGlobalValue(WebStats.server, 'port',
     registry.Integer(8080, _("""Determines the port the web server will
         bind.""")))
+
+conf.registerGroup(WebStats, 'channel')
+conf.registerChannelValue(WebStats.channel, 'enable',
+    registry.Boolean(False, _("""Determines whether the stats are enabled
+        for this channel.""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

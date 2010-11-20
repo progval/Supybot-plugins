@@ -7,10 +7,8 @@ content = \
 </p>
 """
 
-content = '%s%s%s' % (skeleton.start, content, skeleton.end)
-
-print 'toto'
-
-def get():
+def get(useSkeleton=True):
     global content
+    if useSkeleton:
+        content = '%s%s%s' % (skeleton.start, content, skeleton.end)
     return content
