@@ -40,6 +40,10 @@ body, html {
     text-align: center;
 }
 
+li {
+    list-style-type: none;
+}
+
 #header {
     width: 100%;
     font-size: 1.2em;
@@ -59,7 +63,6 @@ body, html {
 }
 
 #menu li {
-    list-style-type: none;
     display: inline;
 }
 
@@ -73,9 +76,6 @@ h1 {
     text-align: center;
 }
 
-.chanslist li {
-    list-style-type: none;
-}
 .chanslist li a:visited {
     color: blue;
 }
