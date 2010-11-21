@@ -386,6 +386,36 @@ class WebStats(callbacks.Plugin):
         self.db.recordMessage(channel, nick, content)
     doNotice = doPrivmsg
 
+    def doJoin(self, irc, msg):
+        channel = msg.args[0]
+        if not self.registryValue('channel.enable', channel):
+            return
+        nick = msg.prefix.split('!')[0]
+        self.db.recordMove(channel, nick, 'join')
+
+    def doPart(self, irc, msg):
+        channel = msg.args[0]
+        if not self.registryValue('channel.enable', channel):
+            return
+        if len(msg.args) > 1:
+            message = msg.args[1]
+        else:
+            message = ''
+        nick = msg.prefix.split('!')[0]
+        self.db.recordMove(channel, nick, 'part', message)
+
+    def doQuit(self, irc, msg):
+        channel = msg.args[0]
+        if not self.registryValue('channel.enable', channel):
+            return
+        nick = msg.prefix.split('!')[0]
+        if len(msg.args) > 1:
+            message = msg.args[1]
+        else:
+            message = ''
+        nick = msg.prefix.split('!')[0]
+        self.db.recordMove(channel, nick, 'quit', message)
+
 Class = WebStats
 
 

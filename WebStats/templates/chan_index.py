@@ -17,7 +17,10 @@ def progressbar(item, max_):
                       <div class="text">%i</div>
                       <div style="width: %ipx" class="color"></div>
                   </td>"""
-    template %= (item, round(float(item)/float(max_)*100))
+    try:
+        template %= (item, round(float(item)/float(max_)*100))
+    except ZeroDivisionError:
+        template %= (item, 0)
     return template
 
 def get(useSkeleton, channel, db):
@@ -34,10 +37,13 @@ def get(useSkeleton, channel, db):
                     <th>%s</th>
                     <th style="width: 100px;">%s</th>
                     <th style="width: 100px;">%s</th>
+                    <th style="width: 100px;">%s</th>
+                    <th style="width: 100px;">%s</th>
+                    <th style="width: 100px;">%s</th>
                 </tr>"""
-    output %= (_('Hour'), _('Lines'), _('Words'))
+    output %= (_('Hour'), _('Lines'), _('Words'), _('Joins'), _('Parts'), _('Quits'))
     items = db.getChanXXlyData(channel, 'hour')
-    max_ = [0, 0]
+    max_ = [0, 0, 0, 0, 0, 0]
     for hour in items:
         for index in range(0, len(max_)):
             max_[index] = max(max_[index], items[hour][index])
@@ -46,10 +52,16 @@ def get(useSkeleton, channel, db):
                         <td>%s</td>
                         %s
                         %s
+                        %s
+                        %s
+                        %s
                     </tr>""" % \
                  (hour,
                  progressbar(items[hour][0], max_[0]),
-                 progressbar(items[hour][1], max_[1])
+                 progressbar(items[hour][1], max_[1]),
+                 progressbar(items[hour][3], max_[3]),
+                 progressbar(items[hour][4], max_[4]),
+                 progressbar(items[hour][5], max_[5])
                  )
     output += '</table>'
     if useSkeleton:
