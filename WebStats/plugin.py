@@ -134,6 +134,7 @@ class WebStatsDB:
             self.makeDb()
 
     def makeDb(self):
+        """Create the tables in the database"""
         cursor = self._conn.cursor()
         cursor.execute("""CREATE TABLE messages (
                           chan VARCHAR(128),
@@ -168,6 +169,7 @@ class WebStatsDB:
         cursor.close()
 
     def getChannels(self):
+        """Get a list of channels in the database"""
         cursor = self._conn.cursor()
         cursor.execute("""SELECT chan FROM chans_cache""")
         results = []
@@ -177,6 +179,9 @@ class WebStatsDB:
         return results
 
     def recordMessage(self, chan, nick, message):
+        """Called by doPrivmsg or onNotice.
+
+        Stores the message in the database"""
         cursor = self._conn.cursor()
         cursor.execute("""INSERT INTO messages VALUES (?,?,?,?)""",
                        (chan, nick, time.time(), message))
@@ -186,6 +191,9 @@ class WebStatsDB:
             self.refreshCache()
 
     def recordMove(self, chan, nick, type_, message=''):
+        """Called by doJoin, doPart, or doQuit.
+
+        Stores the 'move' in the database"""
         cursor = self._conn.cursor()
         cursor.execute("""INSERT INTO moves VALUES (?,?,?,?,?)""",
                        (chan, nick, time.time(), type_, message))
@@ -195,6 +203,7 @@ class WebStatsDB:
             self.refreshCache()
 
     def refreshCache(self):
+        """Clears the cache tables, and populate them"""
         self._truncateCache()
         tmp_chans_cache = {}
         tmp_nicks_cache = {}
@@ -222,22 +231,33 @@ class WebStatsDB:
         self._conn.commit()
 
     def _addKeyInTmpCacheIfDoesNotExist(self, tmpCache, key):
+        """Takes a temporary cache list and key.
+
+        If the key is not in the list, add it in the list with value list
+        filled with zeros."""
         if not tmpCache.has_key(key):
             tmpCache.update({key: [0, 0, 0, 0, 0, 0]})
 
     def _truncateCache(self):
+        """Clears the cache tables"""
         cursor = self._conn.cursor()
         cursor.execute("""DELETE FROM chans_cache""")
         cursor.execute("""DELETE FROM nicks_cache""")
         cursor.close()
 
     def _incrementTmpCache(self, tmpCache, index, content):
+        """Takes a temporary cache list, the index it'll increment, and the
+        message content.
+
+        Updates the temporary cache to count the content."""
         self._addKeyInTmpCacheIfDoesNotExist(tmpCache, index)
         tmpCache[index][0] += 1
         tmpCache[index][1] += len(content.split(' '))
         tmpCache[index][2] += len(content)
 
     def _getIndexes(self, chan, nick, timestamp):
+        """Takes a chan name, a nick, and a timestamp, and returns two index,
+        to crawl the temporary chans and nicks caches."""
         dt = datetime.datetime.today()
         dt.fromtimestamp(timestamp)
         chanindex = (chan, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
@@ -245,6 +265,8 @@ class WebStatsDB:
         return chanindex, nickindex
 
     def _writeTmpCacheToCache(self, tmpCache, type_):
+        """Takes a temporary cache list, its type, and write it in the cache
+        database."""
         cursor = self._conn.cursor()
         for index in tmpCache:
             data = tmpCache[index]
@@ -256,6 +278,8 @@ class WebStatsDB:
 
 
     def getChanGlobalData(self, chanName):
+        """Returns a tuple, containing the channel stats, on all the recording
+        period."""
         cursor = self._conn.cursor()
         cursor.execute("""SELECT lines, words, chars, joins, parts, quits
                           FROM chans_cache WHERE chan=?""", (chanName,))
@@ -267,6 +291,7 @@ class WebStatsHTTPServer(BaseHTTPServer.HTTPServer):
     timeout = 0.1
 
 class Server:
+    """The WebStats HTTP server handler."""
     def __init__(self, plugin):
         self.serve = True
         self._plugin = plugin
@@ -289,10 +314,7 @@ class Server:
         time.sleep(1) # Let the socket be really closed
 
 
-@internationalizeDocstring
 class WebStats(callbacks.Plugin):
-    """Add the help for "@plugin help WebStats" here
-    This should describe *how* to use this plugin."""
     def __init__(self, irc):
         self.__parent = super(WebStats, self)
         callbacks.Plugin.__init__(self, irc)
