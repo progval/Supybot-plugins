@@ -281,7 +281,8 @@ class WebStatsDB:
         """Returns a tuple, containing the channel stats, on all the recording
         period."""
         cursor = self._conn.cursor()
-        cursor.execute("""SELECT lines, words, chars, joins, parts, quits
+        cursor.execute("""SELECT SUM(lines), SUM(words), SUM(chars),
+                                 SUM(joins), SUM(parts), SUM(quits)
                           FROM chans_cache WHERE chan=?""", (chanName,))
         row = cursor.fetchone()
         return row
