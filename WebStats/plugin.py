@@ -31,6 +31,7 @@
 import os
 import sys
 import time
+import datetime
 import threading
 import BaseHTTPServer
 import supybot.conf as conf
@@ -87,6 +88,11 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 content_type = 'text/html'
                 self.end_headers()
                 output = getTemplate('about').get(not testing)
+            elif self.path == '/%s/' % _('channels'):
+                response = 404
+                content_type = 'text/html'
+                output = """<p style="font-size: 20em">BAM!</p>
+                <p>You played with the URL, you losed.</p>"""
             elif self.path.startswith('/%s/' % _('channels')):
                 response = 200
                 content_type = 'text/html'
@@ -138,7 +144,12 @@ class WebStatsDB:
                           content TEXT
                           )""")
         cursor.execute("""CREATE TABLE chans_cache (
-                          chan VARCHAR(128) PRIMARY KEY,
+                          chan VARCHAR(128),
+                          year INT,
+                          month TINYINT,
+                          day TINYINT,
+                          dayofweek TINYINT,
+                          hour TINYINT,
                           lines INTEGER,
                           words INTEGER,
                           chars INTEGER,
@@ -147,7 +158,12 @@ class WebStatsDB:
                           quits INTEGER
                           )""")
         cursor.execute("""CREATE TABLE nicks_cache (
-                          nick VARCHAR(128) PRIMARY KEY,
+                          nick VARCHAR(128),
+                          year INT,
+                          month TINYINT,
+                          day TINYINT,
+                          dayofweek TINYINT,
+                          hour TINYINT,
                           lines INTEGER,
                           words INTEGER,
                           chars INTEGER,
@@ -196,48 +212,56 @@ class WebStatsDB:
         cursor.execute("""SELECT * FROM messages""")
         for row in cursor:
             chan, nick, timestamp, content = row
-            if not tmp_chans_cache.has_key(chan):
-                tmp_chans_cache.update({chan: [0, 0, 0, 0, 0, 0]})
-            tmp_chans_cache[chan][0] += 1
-            tmp_chans_cache[chan][1] += len(content.split(' '))
-            tmp_chans_cache[chan][2] += len(content)
-            if not tmp_nicks_cache.has_key(nick):
-                tmp_nicks_cache.update({nick: [0, 0, 0, 0, 0, 0]})
-            tmp_nicks_cache[nick][0] += 1
-            tmp_nicks_cache[nick][1] += len(content.split(' '))
-            tmp_nicks_cache[nick][2] += len(content)
+            dt = datetime.datetime.today()
+            dt.fromtimestamp(timestamp)
+            index = (chan, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
+            if not tmp_chans_cache.has_key(index):
+                tmp_chans_cache.update({index: [0, 0, 0, 0, 0, 0]})
+            tmp_chans_cache[index][0] += 1
+            tmp_chans_cache[index][1] += len(content.split(' '))
+            tmp_chans_cache[index][2] += len(content)
+            if not tmp_nicks_cache.has_key(index):
+                tmp_nicks_cache.update({index: [0, 0, 0, 0, 0, 0]})
+            tmp_nicks_cache[index][0] += 1
+            tmp_nicks_cache[index][1] += len(content.split(' '))
+            tmp_nicks_cache[index][2] += len(content)
         cursor.close()
         cursor = self._conn.cursor()
         cursor.execute("""SELECT * FROM moves""")
         for row in cursor:
             chan, nick, timestamp, type_, content = row
-            if not tmp_chans_cache.has_key(chan):
-                tmp_chans_cache.update({chan: [0, 0, 0, 0, 0, 0]})
+            dt = datetime.datetime.today()
+            dt.fromtimestamp(timestamp)
+            chanindex = (chan, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
+            nickindex = (nick, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
+            if not tmp_chans_cache.has_key(chanindex):
+                tmp_chans_cache.update({chanindex: [0, 0, 0, 0, 0, 0]})
+            if not tmp_nicks_cache.has_key(nickindex):
+                tmp_nicks_cache.update({nickindex: [0, 0, 0, 0, 0, 0]})
             id = {'join': 3, 'part': 4, 'quit': 5}[type_]
-            tmp_chans_cache[chan][id] += 1
-            tmp_nicks_cache[nick][id] += 1
+            tmp_chans_cache[chanindex][id] += 1
+            tmp_nicks_cache[nickindex][id] += 1
         cursor.close()
         cursor = self._conn.cursor()
-        for chan in tmp_chans_cache:
-            data = tmp_chans_cache[chan]
-            cursor.execute("INSERT INTO chans_cache VALUES(?,?,?,?,?,?,?)",
-                           (chan, data[0], data[1], data[2], data[3],
-                            data[4], data[5]))
-        for nick in tmp_nicks_cache:
-            data = tmp_nicks_cache[nick]
-            cursor.execute("INSERT INTO nicks_cache VALUES(?,?,?,?,?,?,?)",
-                           (nick, data[0], data[1], data[2], data[3],
-                            data[4], data[5]))
+        for index in tmp_chans_cache:
+            data = tmp_chans_cache[index]
+            cursor.execute("INSERT INTO chans_cache VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                           (index[0], index[1], index[2], index[3], index[4], index[5],
+                            data[0], data[1], data[2], data[3], data[4], data[5]))
+        for index in tmp_nicks_cache:
+            data = tmp_nicks_cache[index]
+            cursor.execute("INSERT INTO nicks_cache VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                           (index[0], index[1], index[2], index[3], index[4], index[5],
+                            data[0], data[1], data[2], data[3], data[4], data[5]))
         cursor.close()
         self._conn.commit()
 
-    def getChanMainData(self, chanName):
+    def getChanGlobalData(self, chanName):
         cursor = self._conn.cursor()
-        cursor.execute("SELECT * FROM chans_cache WHERE chan=?", (chanName,))
+        cursor.execute("""SELECT lines, words, chars, joins, parts, quits
+                          FROM chans_cache WHERE chan=?""", (chanName,))
         row = cursor.fetchone()
-        if row is None:
-            return None
-        return (str(row[0]),) + row[1:]
+        return row
 
 
 class Server:
@@ -282,6 +306,8 @@ class WebStats(callbacks.Plugin):
 
     def doPrivmsg(self, irc, msg):
         channel = msg.args[0]
+        if channel == 'AUTH':
+            return
         if not self.registryValue('channel.enable', channel):
             return
         content = msg.args[1]
