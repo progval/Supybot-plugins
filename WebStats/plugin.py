@@ -171,7 +171,7 @@ class WebStatsDB:
     def getChannels(self):
         """Get a list of channels in the database"""
         cursor = self._conn.cursor()
-        cursor.execute("""SELECT chan FROM chans_cache""")
+        cursor.execute("""SELECT DISTINCT(chan) FROM chans_cache""")
         results = []
         for row in cursor:
             results.append(row[0])
