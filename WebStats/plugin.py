@@ -259,7 +259,7 @@ class WebStatsDB:
         """Takes a chan name, a nick, and a timestamp, and returns two index,
         to crawl the temporary chans and nicks caches."""
         dt = datetime.datetime.today()
-        dt.fromtimestamp(timestamp)
+        dt = dt.fromtimestamp(timestamp)
         chanindex = (chan, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
         nickindex = (nick, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
         return chanindex, nickindex
@@ -286,6 +286,26 @@ class WebStatsDB:
                           FROM chans_cache WHERE chan=?""", (chanName,))
         row = cursor.fetchone()
         return row
+
+    def getChanRecordingTimeBoundaries(self, chanName):
+        """Returns two tuples, containing the min and max values of each
+        year/month/day/dayofweek/hour field.
+
+        Note that this data comes from the cache, so they might be a bit
+        outdated if DEBUG is False."""
+        cursor = self._conn.cursor()
+        cursor.execute("""SELECT MIN(year), MIN(month), MIN(day),
+                                 MIN(dayofweek), MIN(hour)
+                          FROM chans_cache WHERE chan=?""", (chanName,))
+        min_ = cursor.fetchone()
+
+        cursor = self._conn.cursor()
+        cursor.execute("""SELECT MAX(year), MAX(month), MAX(day),
+                                 MAX(dayofweek), MAX(hour)
+                          FROM chans_cache WHERE chan=?""", (chanName,))
+        max_ = cursor.fetchone()
+
+        return min_, max_
 
 class WebStatsHTTPServer(BaseHTTPServer.HTTPServer):
     """A simple class that set a smaller timeout to the socket"""
