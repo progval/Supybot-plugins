@@ -125,6 +125,7 @@ class WebStatsDB:
             os.remove(filename)
             alreadyExists = False
         self._conn = sqlite3.connect(filename, check_same_thread = False)
+        self._conn.text_factory = str
         if not alreadyExists:
             self.makeDb()
 
@@ -143,7 +144,7 @@ class WebStatsDB:
                           type CHAR(4),
                           content TEXT
                           )""")
-        cursor.execute("""CREATE TABLE chans_cache (
+        cacheTableCreator = """CREATE TABLE %s_cache (
                           chan VARCHAR(128),
                           year INT,
                           month TINYINT,
@@ -156,21 +157,9 @@ class WebStatsDB:
                           joins INTEGER,
                           parts INTEGER,
                           quits INTEGER
-                          )""")
-        cursor.execute("""CREATE TABLE nicks_cache (
-                          nick VARCHAR(128),
-                          year INT,
-                          month TINYINT,
-                          day TINYINT,
-                          dayofweek TINYINT,
-                          hour TINYINT,
-                          lines INTEGER,
-                          words INTEGER,
-                          chars INTEGER,
-                          joins INTEGER,
-                          parts INTEGER,
-                          quits INTEGER
-                          )""")
+                          )"""
+        cursor.execute(cacheTableCreator % 'chans')
+        cursor.execute(cacheTableCreator % 'nicks')
         self._conn.commit()
         cursor.close()
 
@@ -202,59 +191,65 @@ class WebStatsDB:
             self.refreshCache()
 
     def refreshCache(self):
-        cursor = self._conn.cursor()
-        cursor.execute("""DELETE FROM chans_cache""")
-        cursor.execute("""DELETE FROM nicks_cache""")
-        cursor.close()
+        self._truncateCache()
         tmp_chans_cache = {}
         tmp_nicks_cache = {}
         cursor = self._conn.cursor()
         cursor.execute("""SELECT * FROM messages""")
         for row in cursor:
             chan, nick, timestamp, content = row
-            dt = datetime.datetime.today()
-            dt.fromtimestamp(timestamp)
-            index = (chan, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
-            if not tmp_chans_cache.has_key(index):
-                tmp_chans_cache.update({index: [0, 0, 0, 0, 0, 0]})
-            tmp_chans_cache[index][0] += 1
-            tmp_chans_cache[index][1] += len(content.split(' '))
-            tmp_chans_cache[index][2] += len(content)
-            if not tmp_nicks_cache.has_key(index):
-                tmp_nicks_cache.update({index: [0, 0, 0, 0, 0, 0]})
-            tmp_nicks_cache[index][0] += 1
-            tmp_nicks_cache[index][1] += len(content.split(' '))
-            tmp_nicks_cache[index][2] += len(content)
+            chanindex, nickindex = self._getIndexes(chan, nick, timestamp)
+            self._incrementTmpCache(tmp_chans_cache, chanindex, content)
+            self._incrementTmpCache(tmp_nicks_cache, nickindex, content)
         cursor.close()
         cursor = self._conn.cursor()
         cursor.execute("""SELECT * FROM moves""")
         for row in cursor:
             chan, nick, timestamp, type_, content = row
-            dt = datetime.datetime.today()
-            dt.fromtimestamp(timestamp)
-            chanindex = (chan, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
-            nickindex = (nick, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
-            if not tmp_chans_cache.has_key(chanindex):
-                tmp_chans_cache.update({chanindex: [0, 0, 0, 0, 0, 0]})
-            if not tmp_nicks_cache.has_key(nickindex):
-                tmp_nicks_cache.update({nickindex: [0, 0, 0, 0, 0, 0]})
+            chanindex, nickindex = self._getIndexes(chan, nick, timestamp)
+            self._addKeyInTmpCacheIfDoesNotExist(tmp_chans_cache, chanindex)
+            self._addKeyInTmpCacheIfDoesNotExist(tmp_nicks_cache, nickindex)
             id = {'join': 3, 'part': 4, 'quit': 5}[type_]
             tmp_chans_cache[chanindex][id] += 1
             tmp_nicks_cache[nickindex][id] += 1
         cursor.close()
-        cursor = self._conn.cursor()
-        for index in tmp_chans_cache:
-            data = tmp_chans_cache[index]
-            cursor.execute("INSERT INTO chans_cache VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
-                           (index[0], index[1], index[2], index[3], index[4], index[5],
-                            data[0], data[1], data[2], data[3], data[4], data[5]))
-        for index in tmp_nicks_cache:
-            data = tmp_nicks_cache[index]
-            cursor.execute("INSERT INTO nicks_cache VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
-                           (index[0], index[1], index[2], index[3], index[4], index[5],
-                            data[0], data[1], data[2], data[3], data[4], data[5]))
-        cursor.close()
+        self._writeTmpCacheToCache(tmp_chans_cache, 'chan')
+        self._writeTmpCacheToCache(tmp_nicks_cache, 'nick')
         self._conn.commit()
+
+    def _addKeyInTmpCacheIfDoesNotExist(self, tmpCache, key):
+        if not tmpCache.has_key(key):
+            tmpCache.update({key: [0, 0, 0, 0, 0, 0]})
+
+    def _truncateCache(self):
+        cursor = self._conn.cursor()
+        cursor.execute("""DELETE FROM chans_cache""")
+        cursor.execute("""DELETE FROM nicks_cache""")
+        cursor.close()
+
+    def _incrementTmpCache(self, tmpCache, index, content):
+        self._addKeyInTmpCacheIfDoesNotExist(tmpCache, index)
+        tmpCache[index][0] += 1
+        tmpCache[index][1] += len(content.split(' '))
+        tmpCache[index][2] += len(content)
+
+    def _getIndexes(self, chan, nick, timestamp):
+        dt = datetime.datetime.today()
+        dt.fromtimestamp(timestamp)
+        chanindex = (chan, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
+        nickindex = (nick, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
+        return chanindex, nickindex
+
+    def _writeTmpCacheToCache(self, tmpCache, type_):
+        cursor = self._conn.cursor()
+        for index in tmpCache:
+            data = tmpCache[index]
+            cursor.execute("""INSERT INTO %ss_cache
+                    VALUES(?,?,?,?,?,?,?,?,?,?,?,?)""" % type_,
+                    (index[0], index[1], index[2], index[3], index[4], index[5],
+                    data[0], data[1], data[2], data[3], data[4], data[5]))
+        cursor.close()
+
 
     def getChanGlobalData(self, chanName):
         cursor = self._conn.cursor()
