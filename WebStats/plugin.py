@@ -36,6 +36,7 @@ import threading
 import BaseHTTPServer
 import supybot.conf as conf
 import supybot.world as world
+import supybot.log as log
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
@@ -71,6 +72,9 @@ class FooException(Exception):
     pass
 
 class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    def log_request(self, code=None, size=None):
+        # By default, it logs the request to stderr
+        pass
     def do_GET(self):
         output = ''
         try:
@@ -258,6 +262,9 @@ class WebStatsDB:
         row = cursor.fetchone()
         return row
 
+class WebStatsHTTPServer(BaseHTTPServer.HTTPServer):
+    """A simple class that set a smaller timeout to the socket"""
+    timeout = 0.1
 
 class Server:
     def __init__(self, plugin):
@@ -270,11 +277,11 @@ class Server:
         while not done:
             time.sleep(1)
             try:
-                httpd = BaseHTTPServer.HTTPServer(serverAddress, HTTPHandler)
+                httpd = WebStatsHTTPServer(serverAddress, HTTPHandler)
                 done = True
             except:
                 pass
-        print 'WebStats web server launched'
+        log.info('WebStats web server launched')
         httpd.db = self._plugin.db
         while self.serve:
             httpd.handle_request()
