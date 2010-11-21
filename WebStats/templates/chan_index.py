@@ -21,12 +21,17 @@ def get(useSkeleton, channel, db):
     output = utils.str.format(output, (items[0], 'line'), (items[1], 'word'),
                                        (items[2], 'char'), (items[3], 'join'),
                                        (items[4], 'part'), (items[5], 'quit'))
-    output += '<table><tr><th>%s</th><th style="width: 100px;">%s</th></tr>'
-    output %= (_('Hour'), _('Lines'))
+    output += """<table><tr>
+                    <th>%s</th>
+                    <th style="width: 100px;">%s</th>
+                    <th style="width: 100px;">%s</th>
+                </tr>"""
+    output %= (_('Hour'), _('Lines'), _('Words'))
     items = db.getChanXXlyData(channel, 'hour')
-    max_ = 0
+    max_ = [0, 0]
     for hour in items:
-        max_ = max(max_, items[hour][0])
+        for index in range(0, len(max_)):
+            max_[index] = max(max_[index], items[hour][index])
     for hour in items:
         output += """<tr>
                         <td>%s</td>
@@ -34,8 +39,18 @@ def get(useSkeleton, channel, db):
                             <div class="text">%i</div>
                             <div style="width: %ipx" class="color"></div>
                         </td>
+                        <td class="progressbar">
+                            <div class="text">%i</div>
+                            <div style="width: %ipx" class="color"></div>
+                        </td>
                     </tr>""" % \
-                 (hour, items[hour][0], round(float(items[hour][0])/float(max_)*100))
+                 (hour,
+                 items[hour][0],
+                 round(float(items[hour][0])/float(max_[0])*100),
+
+                 items[hour][1],
+                 round(float(items[hour][1])/float(max_[1])*100),
+                 )
     output += '</table>'
     if useSkeleton:
         output = ''.join([skeleton.start, output, skeleton.end])
