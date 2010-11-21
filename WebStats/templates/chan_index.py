@@ -44,10 +44,15 @@ def get(useSkeleton, channel, db):
     output %= (_('Hour'), _('Lines'), _('Words'), _('Joins'), _('Parts'), _('Quits'))
     items = db.getChanXXlyData(channel, 'hour')
     max_ = [0, 0, 0, 0, 0, 0]
-    for hour in items:
+    min_hour = 24
+    max_hour = 0
+    for item in items:
+        min_hour = min(min_hour, item)
+        max_hour = max(max_hour, item)
+    for hour in range(min_hour, max_hour+1):
         for index in range(0, len(max_)):
             max_[index] = max(max_[index], items[hour][index])
-    for hour in items:
+    for hour in range(min_hour, max_hour+1):
         output += """<tr>
                         <td>%s</td>
                         %s
