@@ -125,7 +125,7 @@ class WebStatsDB:
     def __init__(self):
         filename = conf.supybot.directories.data.dirize('WebStats.db')
         alreadyExists = os.path.exists(filename)
-        if alreadyExists and (DEBUG or testing):
+        if alreadyExists and testing:
             os.remove(filename)
             alreadyExists = False
         self._conn = sqlite3.connect(filename, check_same_thread = False)
@@ -306,6 +306,32 @@ class WebStatsDB:
         max_ = cursor.fetchone()
 
         return min_, max_
+
+    def getChanXXlyData(self, chanName, type_):
+        """Same as getChanGlobalData, but for the given
+        year/month/day/dayofweek/hour.
+
+        For example, getChanXXlyData('#test', 'hour') returns a list of 24
+        getChanGlobalData-like tuples."""
+        sampleQuery = """SELECT lines, words, chars, joins, parts, quits
+                         FROM chans_cache WHERE chan=? and %s=?"""
+        min_, max_ = self.getChanRecordingTimeBoundaries(chanName)
+        typeToIndex = {"year":0, "month":1, "day":2, "dayofweek":3, "hour":4}
+        if type_ not in typeToIndex:
+            raise ValueError("Invalid type")
+        min_ = min_[typeToIndex[type_]]
+        max_ = max_[typeToIndex[type_]]
+        results = {}
+        for index in range(min_, max_+1):
+            query = sampleQuery % (type_)
+            cursor = self._conn.cursor()
+            cursor.execute(query, (chanName, index))
+            try:
+                results.update({index: cursor.fetchone()})
+            except:
+                self._addKeyInTmpCacheIfDoesNotExist(results, index)
+            cursor.close()
+        return results
 
 class WebStatsHTTPServer(BaseHTTPServer.HTTPServer):
     """A simple class that set a smaller timeout to the socket"""

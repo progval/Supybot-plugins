@@ -79,6 +79,27 @@ h1 {
 .chanslist li a:visited {
     color: blue;
 }
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+.progressbar {
+    border: orange 1px solid;
+    height: 20px;
+}
+.progressbar .color {
+    background-color: orange;
+    height: 20px;
+    text-align: center;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+.progressbar .text {
+    position: absolute;
+    width: 100px;
+    text-align: center;
+}
 """
 
 def get(useSkeleton=True):
