@@ -11,6 +11,15 @@ except:
 content = \
 '<h1>%s</h1><p>%s</p>'
 
+
+def progressbar(item, max_):
+    template = """<td class="progressbar">
+                      <div class="text">%i</div>
+                      <div style="width: %ipx" class="color"></div>
+                  </td>"""
+    template %= (item, round(float(item)/float(max_)*100))
+    return template
+
 def get(useSkeleton, channel, db):
     channel = '#' + channel
     items = db.getChanGlobalData(channel)
@@ -35,21 +44,12 @@ def get(useSkeleton, channel, db):
     for hour in items:
         output += """<tr>
                         <td>%s</td>
-                        <td class="progressbar">
-                            <div class="text">%i</div>
-                            <div style="width: %ipx" class="color"></div>
-                        </td>
-                        <td class="progressbar">
-                            <div class="text">%i</div>
-                            <div style="width: %ipx" class="color"></div>
-                        </td>
+                        %s
+                        %s
                     </tr>""" % \
                  (hour,
-                 items[hour][0],
-                 round(float(items[hour][0])/float(max_[0])*100),
-
-                 items[hour][1],
-                 round(float(items[hour][1])/float(max_[1])*100),
+                 progressbar(items[hour][0], max_[0]),
+                 progressbar(items[hour][1], max_[1])
                  )
     output += '</table>'
     if useSkeleton:
