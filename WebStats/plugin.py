@@ -418,7 +418,8 @@ class WebStats(callbacks.Plugin):
         else:
             message = ''
         for channel in self.ircstates[irc].channels:
-            if self.registryValue('channel.enable', channel):
+            if self.registryValue('channel.enable', channel) and \
+                msg.nick in self.ircstates[irc].channels[channel].users:
                 self.db.recordMove(channel, nick, 'quit', message)
 
     # The two fellowing functions comes from the Relay plugin, provided
