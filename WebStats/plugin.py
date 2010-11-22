@@ -167,7 +167,7 @@ class WebStatsDB:
                           quits INTEGER
                           )"""
         cursor.execute(cacheTableCreator % ('chans', ''))
-        cursor.execute(cacheTableCreator % ('nicks', 'nick VARCHAR(128)'))
+        cursor.execute(cacheTableCreator % ('nicks', 'nick VARCHAR(128),'))
         self._conn.commit()
         cursor.close()
 
