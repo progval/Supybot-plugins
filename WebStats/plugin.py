@@ -148,7 +148,7 @@ class WebStatsDB:
                           chan VARCHAR(128),
                           nick VARCHAR(128),
                           time TIMESTAMP,
-                          type CHAR(4),
+                          type VARCHAR(16),
                           content TEXT
                           )""")
         cacheTableCreator = """CREATE TABLE %s_cache (
@@ -164,7 +164,10 @@ class WebStatsDB:
                           chars INTEGER,
                           joins INTEGER,
                           parts INTEGER,
-                          quits INTEGER
+                          quits INTEGER,
+                          nicks INTEGER,
+                          kickers INTEGER,
+                          kickeds INTEGER
                           )"""
         cursor.execute(cacheTableCreator % ('chans', ''))
         cursor.execute(cacheTableCreator % ('nicks', 'nick VARCHAR(128),'))
@@ -225,7 +228,8 @@ class WebStatsDB:
             chanindex, nickindex = self._getIndexes(chan, nick, timestamp)
             self._addKeyInTmpCacheIfDoesNotExist(tmp_chans_cache, chanindex)
             self._addKeyInTmpCacheIfDoesNotExist(tmp_nicks_cache, nickindex)
-            id = {'join': 3, 'part': 4, 'quit': 5}[type_]
+            id = {'join':3,'part':4,'quit':5,'nick':6,'kicker':7,'kicked':8}
+            id = id[type_]
             tmp_chans_cache[chanindex][id] += 1
             tmp_nicks_cache[nickindex][id] += 1
         cursor.close()
@@ -239,7 +243,7 @@ class WebStatsDB:
         If the key is not in the list, add it in the list with value list
         filled with zeros."""
         if not tmpCache.has_key(key):
-            tmpCache.update({key: [0, 0, 0, 0, 0, 0]})
+            tmpCache.update({key: [0, 0, 0, 0, 0, 0, 0, 0, 0]})
 
     def _truncateCache(self):
         """Clears the cache tables"""
@@ -284,9 +288,18 @@ class WebStatsDB:
         period."""
         cursor = self._conn.cursor()
         cursor.execute("""SELECT SUM(lines), SUM(words), SUM(chars),
-                                 SUM(joins), SUM(parts), SUM(quits)
+                                 SUM(joins), SUM(parts), SUM(quits),
+                                 SUM(nicks), SUM(kickers), SUM(kickeds)
                           FROM chans_cache WHERE chan=?""", (chanName,))
         row = cursor.fetchone()
+        if None in row:
+            oldrow = row
+            row = None
+            for item in oldrow:
+                if row is None:
+                    row = (0,)
+                else:
+                    row += (0,)
         return row
 
     def getChanRecordingTimeBoundaries(self, chanName):
@@ -315,7 +328,7 @@ class WebStatsDB:
 
         For example, getChanXXlyData('#test', 'hour') returns a list of 24
         getChanGlobalData-like tuples."""
-        sampleQuery = """SELECT lines, words, chars, joins, parts, quits
+        sampleQuery = """SELECT lines, words, chars, joins, parts, quits, nicks, kickers, kickeds
                          FROM chans_cache WHERE chan=? and %s=?"""
         min_, max_ = self.getChanRecordingTimeBoundaries(chanName)
         typeToIndex = {"year":0, "month":1, "day":2, "dayofweek":3, "hour":4}
@@ -421,6 +434,27 @@ class WebStats(callbacks.Plugin):
             if self.registryValue('channel.enable', channel) and \
                 msg.nick in self.ircstates[irc].channels[channel].users:
                 self.db.recordMove(channel, nick, 'quit', message)
+    def doNick(self, irc, msg):
+        nick = msg.prefix.split('!')[0]
+        if len(msg.args) > 1:
+            message = msg.args[1]
+        else:
+            message = ''
+        for channel in self.ircstates[irc].channels:
+            if self.registryValue('channel.enable', channel) and \
+                msg.nick in self.ircstates[irc].channels[channel].users:
+                self.db.recordMove(channel, nick, 'nick', message)
+    def doKick(self, irc, msg):
+        nick = msg.prefix.split('!')[0]
+        if len(msg.args) > 1:
+            message = msg.args[1]
+        else:
+            message = ''
+        for channel in self.ircstates[irc].channels:
+            if self.registryValue('channel.enable', channel) and \
+                msg.nick in self.ircstates[irc].channels[channel].users:
+                self.db.recordMove(channel, nick, 'kicker', message)
+                self.db.recordMove(channel, msg.args[2], 'kicked', message)
 
     # The two fellowing functions comes from the Relay plugin, provided
     # with Supybot

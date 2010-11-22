@@ -40,10 +40,13 @@ def get(useSkeleton, channel, db):
                     <th style="width: 100px;">%s</th>
                     <th style="width: 100px;">%s</th>
                     <th style="width: 100px;">%s</th>
+                    <th style="width: 100px;">%s</th>
+                    <th style="width: 100px;">%s</th>
                 </tr>"""
-    output %= (_('Hour'), _('Lines'), _('Words'), _('Joins'), _('Parts'), _('Quits'))
+    output %= (_('Hour'), _('Lines'), _('Words'), _('Joins'), _('Parts'),
+               _('Quits'), _('Nick changes'), _('Kicks'))
     items = db.getChanXXlyData(channel, 'hour')
-    max_ = [0, 0, 0, 0, 0, 0]
+    max_ = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     min_hour = 24
     max_hour = 0
     for item in items:
@@ -60,13 +63,17 @@ def get(useSkeleton, channel, db):
                         %s
                         %s
                         %s
+                        %s
+                        %s
                     </tr>""" % \
                  (hour,
                  progressbar(items[hour][0], max_[0]),
                  progressbar(items[hour][1], max_[1]),
                  progressbar(items[hour][3], max_[3]),
                  progressbar(items[hour][4], max_[4]),
-                 progressbar(items[hour][5], max_[5])
+                 progressbar(items[hour][5], max_[5]),
+                 progressbar(items[hour][6], max_[6]),
+                 progressbar(items[hour][8], max_[8])
                  )
     output += '</table>'
     if useSkeleton:
