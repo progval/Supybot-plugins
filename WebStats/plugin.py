@@ -39,7 +39,9 @@ import supybot.world as world
 import supybot.log as log
 import supybot.utils as utils
 from supybot.commands import *
+import supybot.irclib as irclib
 import supybot.plugins as plugins
+import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 
@@ -369,6 +371,8 @@ class WebStats(callbacks.Plugin):
     def __init__(self, irc):
         self.__parent = super(WebStats, self)
         callbacks.Plugin.__init__(self, irc)
+        self.lastmsg = {}
+        self.ircstates = {}
         self.db = WebStatsDB()
         self._server = Server(self)
         if not world.testing:
@@ -409,16 +413,44 @@ class WebStats(callbacks.Plugin):
         self.db.recordMove(channel, nick, 'part', message)
 
     def doQuit(self, irc, msg):
-        channel = msg.args[0]
-        if not self.registryValue('channel.enable', channel):
-            return
         nick = msg.prefix.split('!')[0]
         if len(msg.args) > 1:
             message = msg.args[1]
         else:
             message = ''
-        nick = msg.prefix.split('!')[0]
-        self.db.recordMove(channel, nick, 'quit', message)
+        for channel in self.ircstates[irc].channels:
+            if self.registryValue('channel.enable', channel):
+                self.db.recordMove(channel, nick, 'quit', message)
+
+    # The two fellowing functions comes from the Relay plugin, provided
+    # with Supybot
+    def __call__(self, irc, msg):
+        try:
+            irc = self._getRealIrc(irc)
+            if irc not in self.ircstates:
+                self._addIrc(irc)
+            self.ircstates[irc].addMsg(irc, self.lastmsg[irc])
+        finally:
+            self.lastmsg[irc] = msg
+        self.__parent.__call__(irc, msg)
+    def _addIrc(self, irc):
+        # Let's just be extra-special-careful here.
+        if irc not in self.ircstates:
+            self.ircstates[irc] = irclib.IrcState()
+        if irc not in self.lastmsg:
+            self.lastmsg[irc] = ircmsgs.ping('this is just a fake message')
+        if irc.afterConnect:
+            # We've probably been reloaded.  Let's send some messages to get
+            # our IrcState objects up to current.
+            for channel in irc.state.channels:
+                irc.queueMsg(ircmsgs.who(channel))
+                irc.queueMsg(ircmsgs.names(channel))
+    def _getRealIrc(self, irc):
+        if isinstance(irc, irclib.Irc):
+            return irc
+        else:
+            return irc.getRealIrc()
+
 
 Class = WebStats
 
