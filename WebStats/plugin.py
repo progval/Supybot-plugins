@@ -353,7 +353,7 @@ class WebStatsDB:
 
 class WebStatsHTTPServer(BaseHTTPServer.HTTPServer):
     """A simple class that set a smaller timeout to the socket"""
-    timeout = 0.1
+    timeout = 0.3
 
 class Server:
     """The WebStats HTTP server handler."""
