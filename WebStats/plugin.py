@@ -329,8 +329,8 @@ class WebStatsDB:
             cursor.execute(query, (chanName, index))
             try:
                 row = cursor.fetchone()
-		if row is None:
-		    raise Exception()
+                if row is None:
+                    raise Exception()
                 results.update({index: row})
             except:
                 self._addKeyInTmpCacheIfDoesNotExist(results, index)
