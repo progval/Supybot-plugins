@@ -99,6 +99,8 @@ table {
     position: absolute;
     width: 100px;
     text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 """
 

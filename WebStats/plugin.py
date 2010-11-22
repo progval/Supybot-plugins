@@ -107,7 +107,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 response = 404
                 content_type = 'text/html'
                 output = getTemplate('error404').get(not testing)
-        except Exception as e:
+        except FooException as e:
             response = 500
             content_type = 'text/html'
             if output == '':
@@ -327,7 +327,10 @@ class WebStatsDB:
             cursor = self._conn.cursor()
             cursor.execute(query, (chanName, index))
             try:
-                results.update({index: cursor.fetchone()})
+                row = cursor.fetchone()
+		if row is None:
+		    raise Exception()
+                results.update({index: row})
             except:
                 self._addKeyInTmpCacheIfDoesNotExist(results, index)
             cursor.close()
