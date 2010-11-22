@@ -1,3 +1,4 @@
+import time
 try:
     from supybot.i18n import PluginInternationalization
     from supybot.i18n import internationalizeDocstring
@@ -30,7 +31,8 @@ end = \
         <p id="footer">
             <a href="http://supybot.com">Supybot</a> and
             <a href="http://supybot-fr.tk/WebStats">WebStats</a> powered.<br />
-            Libre software available under BSD licence.
+            Libre software available under BSD licence.<br />
+            Page generated at %s.
         </p>
     </body>
-</html>"""
+</html>""" % (time.strftime('%H:%M:%S'))
