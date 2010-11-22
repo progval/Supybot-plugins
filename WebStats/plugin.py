@@ -263,8 +263,8 @@ class WebStatsDB:
         to crawl the temporary chans and nicks caches."""
         dt = datetime.datetime.today()
         dt = dt.fromtimestamp(timestamp)
-        chanindex = (chan, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
-        nickindex = (nick, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
+        chanindex=(chan, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
+        nickindex=(chan, nick, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
         return chanindex, nickindex
 
     def _writeTmpCacheToCache(self, tmpCache, type_):
@@ -273,10 +273,9 @@ class WebStatsDB:
         cursor = self._conn.cursor()
         for index in tmpCache:
             data = tmpCache[index]
+            values = index + tuple(data)
             cursor.execute("""INSERT INTO %ss_cache
-                    VALUES(?,?,?,?,?,?,?,?,?,?,?,?)""" % type_,
-                    (index[0], index[1], index[2], index[3], index[4], index[5],
-                    data[0], data[1], data[2], data[3], data[4], data[5]))
+                    VALUES(%s)""" % (type_, ('?,'*len(values))[0:-1]), values)
         cursor.close()
 
 
