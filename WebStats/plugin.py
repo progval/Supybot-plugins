@@ -351,6 +351,25 @@ class WebStatsDB:
             cursor.close()
         return results
 
+    def getChanNickData(self, chanName, nick):
+        """Same as getChanGlobalData, but only for one nick."""
+        cursor = self._conn.cursor()
+        cursor.execute("""SELECT lines, words, chars, joins, parts, quits,
+                                 nicks, kickers, kickeds
+                          FROM nicks_cache WHERE chan=? and nick=?""",
+                       (chanName, nick))
+        row = cursor.fetchone()
+        if None in row:
+            oldrow = row
+            row = None
+            for item in oldrow:
+                if row is None:
+                    row = (0,)
+                else:
+                    row += (0,)
+        return row
+
+
 class WebStatsHTTPServer(BaseHTTPServer.HTTPServer):
     """A simple class that set a smaller timeout to the socket"""
     timeout = 0.3
