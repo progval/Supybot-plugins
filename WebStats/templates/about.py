@@ -19,7 +19,7 @@ content = _(
     </li>
     <li>
         <a href="mailto:progval@gmail.com">ProgVal</a>'s
-        <a href="http://supybot-fr/WebStats">WebStats plugin for Supybot</a>
+        <a href="http://supybot-fr.tk/WebStats">WebStats plugin for Supybot</a>
     </li>
 """)
 
