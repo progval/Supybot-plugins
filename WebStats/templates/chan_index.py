@@ -23,21 +23,36 @@ def progressbar(item, max_):
         template %= (item, 0)
     return template
 
-def fillTable(items, indexes):
+def fillTable(items, indexes, orderby=None):
     output = ''
     max_ = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     for index in indexes:
         for index_ in range(0, len(max_)):
             max_[index_] = max(max_[index_], items[index][index_])
-    for index in indexes:
+    rowsList = []
+    if orderby is not None:
+        while len(items) > 0:
+            maximumIndex = None
+            highScore = 0
+            for index in items:
+                if items[index][orderby] >= highScore:
+                    maximumIndex = index
+                    highScore = items[index][orderby]
+            rowsList.append((maximumIndex, items.pop(maximumIndex)))
+            print rowsList
+    else:
+        for index in indexes:
+            rowsList.append((index, items.pop(index)))
+    for row in rowsList:
+        index, row = row
         output += '<tr><td>%s</td>' % index
-        for cell in (progressbar(items[index][0], max_[0]),
-                     progressbar(items[index][1], max_[1]),
-                     progressbar(items[index][3], max_[3]),
-                     progressbar(items[index][4], max_[4]),
-                     progressbar(items[index][5], max_[5]),
-                     progressbar(items[index][6], max_[6]),
-                     progressbar(items[index][8], max_[8])
+        for cell in (progressbar(row[0], max_[0]),
+                     progressbar(row[1], max_[1]),
+                     progressbar(row[3], max_[3]),
+                     progressbar(row[4], max_[4]),
+                     progressbar(row[5], max_[5]),
+                     progressbar(row[6], max_[6]),
+                     progressbar(row[8], max_[8])
                      ):
             output += cell
         output += '</tr>'
@@ -68,7 +83,12 @@ def get(useSkeleton, channel, db, orderby=None):
         min_hour = min(min_hour, item)
         max_hour = max(max_hour, item)
     output += tableHeaders
-    output += fillTable(items, range(min_hour, max_hour+1))
+    if orderby is None or orderby == '':
+        output += fillTable(items, range(min_hour, max_hour+1))
+    else:
+        index = {'lines':0, 'words':1, 'chars':2, 'joins':3, 'parts':4,
+                'quits':55, 'nicks':6, 'kickers':7, 'kickeds':8}[orderby]
+        output += fillTable(items, range(min_hour, max_hour+1), index)
     output += '</table>'
 
     if useSkeleton:
