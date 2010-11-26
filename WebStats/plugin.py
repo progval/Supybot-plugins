@@ -102,9 +102,19 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             elif self.path.startswith('/%s/' % _('channels')):
                 response = 200
                 content_type = 'text/html'
-                chanName = self.path.split('/')[2]
-                output = getTemplate('chan_index').get(not testing, chanName,
-                                                       self.server.db)
+                splittedPath = self.path.split('/')
+                chanName = splittedPath[2]
+                print splittedPath
+                if len(splittedPath) == 3:
+                    output = getTemplate('chan_index').get(not testing,
+                                                           chanName,
+                                                           self.server.db)
+                else:
+                    subdir = splittedPath[3]
+                    output = getTemplate('chan_index').get(not testing,
+                                                           chanName,
+                                                           self.server.db,
+                                                           subdir)
             else:
                 response = 404
                 content_type = 'text/html'

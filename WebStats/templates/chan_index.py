@@ -48,7 +48,7 @@ headers = (_('Hour'), _('Lines'), _('Words'), _('Joins'), _('Parts'),
 tableHeaders = '<table><tr>'
 for header in headers:
     tableHeaders += '<th style="width: 100px;">%s</th>' % header
-def get(useSkeleton, channel, db):
+def get(useSkeleton, channel, db, orderby=None):
     channel = '#' + channel
     items = db.getChanGlobalData(channel)
     bound = db.getChanRecordingTimeBoundaries(channel)
