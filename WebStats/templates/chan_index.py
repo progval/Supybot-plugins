@@ -23,6 +23,26 @@ def progressbar(item, max_):
         template %= (item, 0)
     return template
 
+def fillTable(items, indexes):
+    output = ''
+    max_ = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    for index in indexes:
+        for index_ in range(0, len(max_)):
+            max_[index_] = max(max_[index_], items[index][index_])
+    for index in indexes:
+        output += '<tr><td>%s</td>' % index
+        for cell in (progressbar(items[index][0], max_[0]),
+                     progressbar(items[index][1], max_[1]),
+                     progressbar(items[index][3], max_[3]),
+                     progressbar(items[index][4], max_[4]),
+                     progressbar(items[index][5], max_[5]),
+                     progressbar(items[index][6], max_[6]),
+                     progressbar(items[index][8], max_[8])
+                     ):
+            output += cell
+        output += '</tr>'
+    return output
+
 headers = (_('Hour'), _('Lines'), _('Words'), _('Joins'), _('Parts'),
            _('Quits'), _('Nick changes'), _('Kicks'))
 tableHeaders = '<table><tr>'
@@ -41,30 +61,16 @@ def get(useSkeleton, channel, db):
                                        (items[4], 'part'), (items[5], 'quit'),
                                        (items[6], 'nick change'),
                                        (items[8], 'kick'))
-    output += tableHeaders
     items = db.getChanXXlyData(channel, 'hour')
-    max_ = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     min_hour = 24
     max_hour = 0
     for item in items:
         min_hour = min(min_hour, item)
         max_hour = max(max_hour, item)
-    for hour in range(min_hour, max_hour+1):
-        for index in range(0, len(max_)):
-            max_[index] = max(max_[index], items[hour][index])
-    for hour in range(min_hour, max_hour+1):
-        output += '<tr><td>%s</td>' % hour
-        for cell in (progressbar(items[hour][0], max_[0]),
-                     progressbar(items[hour][1], max_[1]),
-                     progressbar(items[hour][3], max_[3]),
-                     progressbar(items[hour][4], max_[4]),
-                     progressbar(items[hour][5], max_[5]),
-                     progressbar(items[hour][6], max_[6]),
-                     progressbar(items[hour][8], max_[8])
-                     ):
-            output += cell
-        output += '</tr>'
+    output += tableHeaders
+    output += fillTable(items, range(min_hour, max_hour+1))
     output += '</table>'
+
     if useSkeleton:
         output = ''.join([skeleton.start, output, skeleton.end])
     return output
