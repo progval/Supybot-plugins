@@ -92,7 +92,6 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             elif self.path == '/about/':
                 response = 200
                 content_type = 'text/html'
-                self.end_headers()
                 output = getTemplate('about').get(not testing)
             elif self.path == '/%s/' % _('channels'):
                 response = 404
