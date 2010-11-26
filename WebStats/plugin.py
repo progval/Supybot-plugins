@@ -114,7 +114,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                     output = getTemplate('chan_index').get(not testing,
                                                            chanName,
                                                            self.server.db,
-                                                           subdir)
+                                                           subdir.lower())
             else:
                 response = 404
                 content_type = 'text/html'
