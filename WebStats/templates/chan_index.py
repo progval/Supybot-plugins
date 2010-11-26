@@ -39,7 +39,6 @@ def fillTable(items, indexes, orderby=None):
                     maximumIndex = index
                     highScore = items[index][orderby]
             rowsList.append((maximumIndex, items.pop(maximumIndex)))
-            print rowsList
     else:
         for index in indexes:
             rowsList.append((index, items.pop(index)))
