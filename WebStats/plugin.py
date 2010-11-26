@@ -103,13 +103,14 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 response = 200
                 content_type = 'text/html'
                 splittedPath = self.path.split('/')
+                assert len(splittedPath) > 2
                 chanName = splittedPath[2]
-                print splittedPath
                 if len(splittedPath) == 3:
                     output = getTemplate('chan_index').get(not testing,
                                                            chanName,
                                                            self.server.db)
                 else:
+                    assert len(splittedPath) > 3
                     subdir = splittedPath[3]
                     output = getTemplate('chan_index').get(not testing,
                                                            chanName,
@@ -310,6 +311,7 @@ class WebStatsDB:
                     row = (0,)
                 else:
                     row += (0,)
+        assert None not in row
         return row
 
     def getChanRecordingTimeBoundaries(self, chanName):
@@ -334,6 +336,8 @@ class WebStatsDB:
             min_ = tuple([int('0') for x in max_])
         if None in max_:
             max_ = tuple([int('0') for x in max_])
+        assert None not in min_
+        assert None not in max_
         return min_, max_
 
     def getChanXXlyData(self, chanName, type_):
@@ -363,6 +367,7 @@ class WebStatsDB:
             except:
                 self._addKeyInTmpCacheIfDoesNotExist(results, index)
             cursor.close()
+        assert None not in results
         return results
 
     def getChanNickGlobalData(self, chanName, nick):
@@ -381,6 +386,7 @@ class WebStatsDB:
                     row = (0,)
                 else:
                     row += (0,)
+        assert None not in row
         return row
 
 
