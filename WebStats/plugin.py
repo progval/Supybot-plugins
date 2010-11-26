@@ -351,7 +351,7 @@ class WebStatsDB:
             cursor.close()
         return results
 
-    def getChanNickData(self, chanName, nick):
+    def getChanNickGlobalData(self, chanName, nick):
         """Same as getChanGlobalData, but only for one nick."""
         cursor = self._conn.cursor()
         cursor.execute("""SELECT lines, words, chars, joins, parts, quits,
