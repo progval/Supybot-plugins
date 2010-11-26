@@ -320,6 +320,10 @@ class WebStatsDB:
                           FROM chans_cache WHERE chan=?""", (chanName,))
         max_ = cursor.fetchone()
 
+        if None in min_:
+            min_ = tuple([int('0') for x in max_])
+        if None in max_:
+            max_ = tuple([int('0') for x in max_])
         return min_, max_
 
     def getChanXXlyData(self, chanName, type_):
