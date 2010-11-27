@@ -380,17 +380,11 @@ class WebStatsDB:
                           FROM nicks_cache WHERE chan=?""", (chanName,))
         results = {}
         for row in cursor:
-            print row
             if not results.has_key(row[0]):
                 results.update({row[0]: row[1:]})
             else:
-                print '-------------'
-                print row
-                print results[row[0]]
-                print zip(row[1:], results[row[0]][1:])
                 results.update({row[0]: tuple(sum(i)
                     for i in zip(row[1:], results[row[0]]))})
-        print results
         return results
 
 
