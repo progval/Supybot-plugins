@@ -346,7 +346,7 @@ class WebStatsDB:
         For example, getChanXXlyData('#test', 'hour') returns a list of 24
         getChanGlobalData-like tuples."""
         sampleQuery = """SELECT SUM(lines), SUM(words), SUM(chars),
-			 SUM(joins), SUM(parts), SUM(quits),
+                         SUM(joins), SUM(parts), SUM(quits),
                          SUM(nicks), SUM(kickers), SUM(kickeds)
                          FROM chans_cache WHERE chan=? and %s=?"""
         min_, max_ = self.getChanRecordingTimeBoundaries(chanName)
@@ -359,14 +359,12 @@ class WebStatsDB:
         for index in range(min_, max_+1):
             query = sampleQuery % (type_)
             cursor = self._conn.cursor()
-	    print query
             cursor.execute(query, (chanName, index))
             try:
                 row = cursor.fetchone()
-		assert row is not None
-		if None in row:
-		    row=tuple([0 for x in range(0,len(row))])
-		print row
+                assert row is not None
+                if None in row:
+                    row=tuple([0 for x in range(0,len(row))])
                 results.update({index: row})
             except:
                 self._addKeyInTmpCacheIfDoesNotExist(results, index)
