@@ -42,7 +42,7 @@ def fillTable(items, orderby=None):
     else:
         for index in items.keys():
             rowsList.append((index, items.pop(index)))
-    for row in rowsList:
+    for row in rowsList[0:20]:
         index, row = row
         output += '<tr><td>%s</td>' % index
         for cell in (progressbar(row[0], max_[0]),
