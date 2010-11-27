@@ -15,7 +15,30 @@ def get(useSkeleton, channel, db, urlLevel, page, orderby=None):
                                        (items[6], 'nick change'),
                                        (items[8], 'kick'))
     items = db.getChanNickGlobalData(channel, 20)
+    nbItems = len(items)
     output += getTable(_('Nick'), items, channel, urlLevel, page, orderby)
+
+    page = int(page)
+    output += '<p>'
+    if nbItems >= 25:
+        if page == 0:
+            output += '1 '
+        else:
+            output += '<a href="0.htm">1</a> '
+        if page > 100:
+            output += '... '
+        for i in range(int(max(1, page/25-3)), int(min(nbItems/3, page/25+3))):
+            if page != i:
+                output += '<a href="%i.htm">%i</a> ' % (page*3-1, page*3)
+            else:
+                output += '%i ' % page*3
+        if nbItems - page > 100:
+            output += '... '
+        if page == nbItems -1:
+            output += '%i' % nbItems
+        else:
+            output += '<a href="%i.htm">%i</a>' % (nbItems-1, nbItems)
+        output += '</p>'
 
     if useSkeleton:
         output = ''.join([skeleton.start, output, skeleton.end])
