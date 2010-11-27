@@ -375,21 +375,23 @@ class WebStatsDB:
     def getChanNickGlobalData(self, chanName, nick):
         """Same as getChanGlobalData, but only for one nick."""
         cursor = self._conn.cursor()
-        cursor.execute("""SELECT lines, words, chars, joins, parts, quits,
-                                 nicks, kickers, kickeds
-                          FROM nicks_cache WHERE chan=? and nick=?""",
-                       (chanName, nick))
-        row = cursor.fetchone()
-        if None in row:
-            oldrow = row
-            row = None
-            for item in oldrow:
-                if row is None:
-                    row = (0,)
-                else:
-                    row += (0,)
-        assert None not in row
-        return row
+        cursor.execute("""SELECT nick, lines, words, chars, joins, parts,
+                                 quits, nicks, kickers, kickeds
+                          FROM nicks_cache WHERE chan=?""", (chanName,))
+        results = {}
+        for row in cursor:
+            print row
+            if not results.has_key(row[0]):
+                results.update({row[0]: row[1:]})
+            else:
+                print '-------------'
+                print row
+                print results[row[0]]
+                print zip(row[1:], results[row[0]][1:])
+                results.update({row[0]: tuple(sum(i)
+                    for i in zip(row[1:], results[row[0]]))})
+        print results
+        return results
 
 
 class WebStatsHTTPServer(BaseHTTPServer.HTTPServer):
@@ -495,7 +497,7 @@ class WebStats(callbacks.Plugin):
             if self.registryValue('channel.enable', channel) and \
                 msg.nick in self.ircstates[irc].channels[channel].users:
                 self.db.recordMove(channel, nick, 'kicker', message)
-                self.db.recordMove(channel, msg.args[2], 'kicked', message)
+                self.db.recordMove(channel, msg.args[1], 'kicked', message)
 
     # The two fellowing functions comes from the Relay plugin, provided
     # with Supybot
