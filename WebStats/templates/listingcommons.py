@@ -43,7 +43,7 @@ def fillTable(items, page, orderby=None):
     else:
         for index in items.keys():
             rowsList.append((index, items.pop(index)))
-    for row in rowsList[int(page)-1:20]:
+    for row in rowsList[int(page):int(page)+25]:
         index, row = row
         output += '<tr><td>%s</td>' % index
         for cell in (progressbar(row[0], max_[0]),
