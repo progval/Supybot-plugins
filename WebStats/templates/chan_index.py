@@ -57,12 +57,43 @@ def fillTable(items, indexes, orderby=None):
         output += '</tr>'
     return output
 
-headers = (_('Hour'), _('Lines'), _('Words'), _('Joins'), _('Parts'),
+headers = ('%s', _('Lines'), _('Words'), _('Joins'), _('Parts'),
            _('Quits'), _('Nick changes'), _('Kicks'))
 tableHeaders = '<table><tr>'
 for header in headers:
     tableHeaders += '<th style="width: 100px;"><a href="%%s%s">%s</a></th>' %\
                     (header, header)
+
+nameToColumnIndex = {'lines':0,'words':1,'chars':2,'joins':3,'parts':4,
+                     'quits':5,'nicks':6,'kickers':7,'kickeds':8,'kicks':7}
+def getTable(items, channel, orderby):
+    min_hour = 24
+    max_hour = 0
+    for item in items:
+        min_hour = min(min_hour, item)
+        max_hour = max(max_hour, item)
+    percentParameter = tuple()
+    for foo in range(1, len(tableHeaders.split('%s'))-2):
+        percentParameter += ('/%s/%s/' % (_('channels'), channel[1:]),)
+        if len(percentParameter) == 1:
+            percentParameter += (_('Hour'),_('Hour'))
+    print tableHeaders
+    print percentParameter
+    output = tableHeaders % percentParameter
+    if orderby is not None:
+        orderby = orderby.split('%20')[0]
+        if not orderby.endswith('s'):
+            orderby += 's'
+        try:
+            index = nameToColumnIndex[orderby]
+            output += fillTable(items, range(min_hour, max_hour+1), index)
+        except KeyError:
+            orderby = None
+    if orderby is None:
+        output += fillTable(items, range(min_hour, max_hour+1))
+    output += '</table>'
+    return output
+
 def get(useSkeleton, channel, db, orderby=None):
     channel = '#' + channel
     items = db.getChanGlobalData(channel)
@@ -77,28 +108,7 @@ def get(useSkeleton, channel, db, orderby=None):
                                        (items[6], 'nick change'),
                                        (items[8], 'kick'))
     items = db.getChanXXlyData(channel, 'hour')
-    min_hour = 24
-    max_hour = 0
-    for item in items:
-        min_hour = min(min_hour, item)
-        max_hour = max(max_hour, item)
-    percentParameter = tuple()
-    for foo in range(1, len(tableHeaders.split('%s'))):
-        percentParameter += ('/%s/%s/' % (_('channels'), channel[1:]),)
-    output += tableHeaders % percentParameter
-    if orderby is not None:
-        orderby = orderby.split('%20')[0]
-        if not orderby.endswith('s'):
-            orderby += 's'
-        try:
-            index = {'lines':0,'words':1,'chars':2,'joins':3,'parts':4,'quits':5,
-                     'nicks':6,'kickers':7,'kickeds':8,'kicks':7}[orderby]
-            output += fillTable(items, range(min_hour, max_hour+1), index)
-        except KeyError:
-            orderby = None
-    if orderby is None:
-        output += fillTable(items, range(min_hour, max_hour+1))
-    output += '</table>'
+    output += getTable(items, channel, orderby)
 
     if useSkeleton:
         output = ''.join([skeleton.start, output, skeleton.end])
