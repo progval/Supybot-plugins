@@ -434,6 +434,8 @@ class WebStats(callbacks.Plugin):
 
     def doPrivmsg(self, irc, msg):
         channel = msg.args[0]
+        if not channel.startswith('#'):
+            return
         if channel == 'AUTH':
             return
         if not self.registryValue('channel.enable', channel):
