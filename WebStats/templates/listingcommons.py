@@ -31,18 +31,16 @@ def fillTable(items, page, orderby=None):
         for index_ in range(0, len(max_)):
             max_[index_] = max(max_[index_], items[index][index_])
     rowsList = []
-    if orderby is not None:
-        while len(items) > 0:
-            maximumIndex = None
-            highScore = -1
-            for index in items:
-                if items[index][orderby] > highScore:
-                    maximumIndex = index
-                    highScore = items[index][orderby]
-            rowsList.append((maximumIndex, items.pop(maximumIndex)))
-    else:
-        for index in items.keys():
-            rowsList.append((index, items.pop(index)))
+    while len(items) > 0:
+        maximumIndex = (0, 0, 0, 0, 0)
+        highScore = -1
+        for index in items:
+            if orderby is not None and items[index][orderby] > highScore:
+                maximumIndex = index
+                highScore = items[index][orderby]
+            if orderby is None and index < maximumIndex:
+                maximumIndex = index
+        rowsList.append((maximumIndex, items.pop(maximumIndex)))
     for row in rowsList[int(page):int(page)+25]:
         index, row = row
         output += '<tr><td>%s</td>' % index
