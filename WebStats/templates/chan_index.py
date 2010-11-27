@@ -93,7 +93,7 @@ def get(useSkeleton, channel, db, orderby=None):
         if not orderby.endswith('s'):
             orderby += 's'
         index = {'lines':0, 'words':1, 'chars':2, 'joins':3, 'parts':4,
-                'quits':55, 'nicks':6, 'kickers':7, 'kickeds':8}[orderby]
+                'quits':5, 'nicks':6, 'kickers':7, 'kickeds':8}[orderby]
         output += fillTable(items, range(min_hour, max_hour+1), index)
     output += '</table>'
 
