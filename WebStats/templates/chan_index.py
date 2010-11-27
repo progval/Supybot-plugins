@@ -15,12 +15,14 @@ content = \
 def progressbar(item, max_):
     template = """<td class="progressbar">
                       <div class="text">%i</div>
-                      <div style="width: %ipx" class="color"></div>
+                      <div style="width: %ipx; background-color: #%s" class="color"></div>
                   </td>"""
     try:
-        template %= (item, round(float(item)/float(max_)*100))
+        percent = round(float(item)/float(max_)*100)
+        color = round((100-percent)/10)*3+59
+        template %= (item, percent, 'ef%i%i' % (color, color))
     except ZeroDivisionError:
-        template %= (item, 0)
+        template %= (item, 0, 'orange')
     return template
 
 def fillTable(items, orderby=None):
