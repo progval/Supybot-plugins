@@ -92,8 +92,8 @@ def get(useSkeleton, channel, db, orderby=None):
         orderby = orderby.split('%20')[0]
         if not orderby.endswith('s'):
             orderby += 's'
-        index = {'lines':0, 'words':1, 'chars':2, 'joins':3, 'parts':4,
-                'quits':5, 'nicks':6, 'kickers':7, 'kickeds':8}[orderby]
+        index = {'lines':0,'words':1,'chars':2,'joins':3,'parts':4,'quits':5,
+                 'nicks':6,'kickers':7,'kickeds':8,'kicks':7}[orderby]
         output += fillTable(items, range(min_hour, max_hour+1), index)
     output += '</table>'
 
