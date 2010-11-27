@@ -15,7 +15,7 @@ content = _(
         The well-known <a href="http://python.org">Python</a> programming language
     </li>
     <li>
-        <a href="http://supybot.com">Supybot</a>, the greatest Python IRC bot
+        <a href="http://supybot.com">Supybot</a>, the best Python IRC bot in existance
     </li>
     <li>
         <a href="mailto:progval@gmail.com">ProgVal</a>'s
