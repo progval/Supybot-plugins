@@ -15,12 +15,12 @@ content = \
 def progressbar(item, max_):
     template = """<td class="progressbar">
                       <div class="text">%i</div>
-                      <div style="width: %ipx; background-color: #%s" class="color"></div>
+                      <div style="width: %ipx; background-color: %s" class="color"></div>
                   </td>"""
     try:
         percent = round(float(item)/float(max_)*100)
         color = round((100-percent)/10)*3+59
-        template %= (item, percent, 'ef%i%i' % (color, color))
+        template %= (item, percent, '#ef%i%i' % (color, color))
     except ZeroDivisionError:
         template %= (item, 0, 'orange')
     return template
@@ -66,6 +66,7 @@ tableHeaders = '<table><tr><th><a href="%s">%s</a></th>'
 for header in headers:
     tableHeaders += '<th style="width: 100px;"><a href="%%s%s">%s</a></th>' %\
                     (header, header)
+tableHeaders += '</tr>'
 
 nameToColumnIndex = {'lines':0,'words':1,'chars':2,'joins':3,'parts':4,
                      'quits':5,'nicks':6,'kickers':7,'kickeds':8,'kicks':7}
@@ -103,14 +104,15 @@ def get(useSkeleton, channel, db, orderby=None):
                                        (items[4], 'part'), (items[5], 'quit'),
                                        (items[6], 'nick change'),
                                        (items[8], 'kick'))
-    output += '<a name="hourly"></a>'
+    output += '<p><a name="hourly"></a></p>'
     items = db.getChanXXlyData(channel, 'hour')
     output += getTable(_('Hour'), items, channel, orderby)
 
-    output += '<br /><a name="nickly"></a>'
+    output += '<p><a name="nickly"></a></p>'
 
     items = db.getChanNickGlobalData(channel, 20)
     output += getTable(_('Nick'), items, channel, orderby)
+
 
     if useSkeleton:
         output = ''.join([skeleton.start, output, skeleton.end])
