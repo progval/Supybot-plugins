@@ -61,7 +61,8 @@ headers = (_('Hour'), _('Lines'), _('Words'), _('Joins'), _('Parts'),
            _('Quits'), _('Nick changes'), _('Kicks'))
 tableHeaders = '<table><tr>'
 for header in headers:
-    tableHeaders += '<th style="width: 100px;">%s</th>' % header
+    tableHeaders += '<th style="width: 100px;"><a href="%%s%s">%s</a></th>' %\
+                    (header, header)
 def get(useSkeleton, channel, db, orderby=None):
     channel = '#' + channel
     items = db.getChanGlobalData(channel)
@@ -81,8 +82,11 @@ def get(useSkeleton, channel, db, orderby=None):
     for item in items:
         min_hour = min(min_hour, item)
         max_hour = max(max_hour, item)
-    output += tableHeaders
-    if orderby is None or orderby == '':
+    percentParameter = tuple()
+    for foo in range(1, len(tableHeaders.split('%s'))):
+        percentParameter += ('/%s/%s/' % (_('channels'), channel[1:]),)
+    output += tableHeaders % percentParameter
+    if orderby is None:
         output += fillTable(items, range(min_hour, max_hour+1))
     else:
         index = {'lines':0, 'words':1, 'chars':2, 'joins':3, 'parts':4,
