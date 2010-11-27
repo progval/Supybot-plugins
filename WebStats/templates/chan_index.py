@@ -86,15 +86,18 @@ def get(useSkeleton, channel, db, orderby=None):
     for foo in range(1, len(tableHeaders.split('%s'))):
         percentParameter += ('/%s/%s/' % (_('channels'), channel[1:]),)
     output += tableHeaders % percentParameter
-    if orderby is None:
-        output += fillTable(items, range(min_hour, max_hour+1))
-    else:
+    if orderby is not None:
         orderby = orderby.split('%20')[0]
         if not orderby.endswith('s'):
             orderby += 's'
-        index = {'lines':0,'words':1,'chars':2,'joins':3,'parts':4,'quits':5,
-                 'nicks':6,'kickers':7,'kickeds':8,'kicks':7}[orderby]
-        output += fillTable(items, range(min_hour, max_hour+1), index)
+        try:
+            index = {'lines':0,'words':1,'chars':2,'joins':3,'parts':4,'quits':5,
+                     'nicks':6,'kickers':7,'kickeds':8,'kicks':7}[orderby]
+            output += fillTable(items, range(min_hour, max_hour+1), index)
+        except KeyError:
+            orderby = None
+    if orderby is None:
+        output += fillTable(items, range(min_hour, max_hour+1))
     output += '</table>'
 
     if useSkeleton:
