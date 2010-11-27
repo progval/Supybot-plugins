@@ -345,7 +345,8 @@ class WebStatsDB:
 
         For example, getChanXXlyData('#test', 'hour') returns a list of 24
         getChanGlobalData-like tuples."""
-        sampleQuery = """SELECT lines, words, chars, joins, parts, quits, nicks, kickers, kickeds
+        sampleQuery = """SELECT lines, words, chars, joins, parts, quits,
+                         nicks, kickers, kickeds
                          FROM chans_cache WHERE chan=? and %s=?"""
         min_, max_ = self.getChanRecordingTimeBoundaries(chanName)
         typeToIndex = {"year":0, "month":1, "day":2, "dayofweek":3, "hour":4}
