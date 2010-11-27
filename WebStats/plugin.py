@@ -79,6 +79,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         pass
     def do_GET(self):
         output = ''
+        splittedPath = self.path.split('/')
         try:
             if self.path == '/design.css':
                 response = 200
@@ -98,19 +99,23 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 content_type = 'text/html'
                 output = """<p style="font-size: 20em">BAM!</p>
                 <p>You played with the URL, you losed.</p>"""
-            elif self.path.endswith('/')&(self.path.startswith('/global/') or
-                                          self.path.startswith('/nicks/')):
+            elif splittedPath[1] in ('nicks','global') and self.path[-1]=='/'\
+                    or splittedPath[1] == 'nicks' and \
+                    self.path.endswith('.htm'):
                 response = 200
                 content_type = 'text/html'
-                splittedPath = self.path.split('/')
                 assert len(splittedPath) > 2
                 chanName = splittedPath[2]
                 getTemplate('listingcommons') # Reload
+                page = splittedPath[-1][0:-len('.htm')]
+                if page == '':
+                    page = '0'
                 if len(splittedPath) == 3:
                     output = getTemplate(splittedPath[1]).get(not testing,
                                                            chanName,
                                                            self.server.db,
-                                                           len(splittedPath))
+                                                           len(splittedPath),
+                                                           page)
                 else:
                     assert len(splittedPath) > 3
                     subdir = splittedPath[3]
@@ -118,6 +123,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                                                            chanName,
                                                            self.server.db,
                                                            len(splittedPath),
+                                                           page,
                                                            subdir.lower())
             else:
                 response = 404

@@ -1,7 +1,7 @@
 from listingcommons import *
 from listingcommons import _
 
-def get(useSkeleton, channel, db, urlLevel, orderby=None):
+def get(useSkeleton, channel, db, urlLevel, page, orderby=None):
     channel = '#' + channel
     items = db.getChanGlobalData(channel)
     bound = db.getChanRecordingTimeBoundaries(channel)
@@ -15,7 +15,7 @@ def get(useSkeleton, channel, db, urlLevel, orderby=None):
                                        (items[6], 'nick change'),
                                        (items[8], 'kick'))
     items = db.getChanNickGlobalData(channel, 20)
-    output += getTable(_('Nick'), items, channel, urlLevel, orderby)
+    output += getTable(_('Nick'), items, channel, urlLevel, page, orderby)
 
     if useSkeleton:
         output = ''.join([skeleton.start, output, skeleton.end])

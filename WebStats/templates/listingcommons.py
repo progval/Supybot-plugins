@@ -24,7 +24,7 @@ def progressbar(item, max_):
         template %= (item, 0, 'orange')
     return template
 
-def fillTable(items, orderby=None):
+def fillTable(items, page, orderby=None):
     output = ''
     max_ = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     for index in items:
@@ -43,7 +43,7 @@ def fillTable(items, orderby=None):
     else:
         for index in items.keys():
             rowsList.append((index, items.pop(index)))
-    for row in rowsList[0:20]:
+    for row in rowsList[int(page)-1:20]:
         index, row = row
         output += '<tr><td>%s</td>' % index
         for cell in (progressbar(row[0], max_[0]),
@@ -69,7 +69,7 @@ tableHeaders += '</tr>'
 
 nameToColumnIndex = {'lines':0,'words':1,'chars':2,'joins':3,'parts':4,
                      'quits':5,'nicks':6,'kickers':7,'kickeds':8,'kicks':7}
-def getTable(firstColumn, items, channel, urlLevel, orderby):
+def getTable(firstColumn, items, channel, urlLevel, page, orderby):
     percentParameter = tuple()
     for foo in range(1, len(tableHeaders.split('%s'))-1):
         percentParameter += ('./' + '../'*(urlLevel-4),)
@@ -82,10 +82,10 @@ def getTable(firstColumn, items, channel, urlLevel, orderby):
             orderby += 's'
         try:
             index = nameToColumnIndex[orderby]
-            output += fillTable(items, index)
+            output += fillTable(items, page, index)
         except KeyError:
             orderby = None
     if orderby is None:
-        output += fillTable(items)
+        output += fillTable(items, page)
     output += '</table>'
     return output
