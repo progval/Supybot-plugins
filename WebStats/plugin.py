@@ -93,27 +93,31 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 response = 200
                 content_type = 'text/html'
                 output = getTemplate('about').get(not testing)
-            elif self.path == '/%s/' % _('channels'):
+            elif self.path == '/global/':
                 response = 404
                 content_type = 'text/html'
                 output = """<p style="font-size: 20em">BAM!</p>
                 <p>You played with the URL, you losed.</p>"""
-            elif self.path.startswith('/%s/' % _('channels')):
+            elif self.path.endswith('/')&(self.path.startswith('/global/') or
+                                          self.path.startswith('/nicks/')):
                 response = 200
                 content_type = 'text/html'
                 splittedPath = self.path.split('/')
                 assert len(splittedPath) > 2
                 chanName = splittedPath[2]
+                getTemplate('listingcommons') # Reload
                 if len(splittedPath) == 3:
-                    output = getTemplate('chan_index').get(not testing,
+                    output = getTemplate(splittedPath[1]).get(not testing,
                                                            chanName,
-                                                           self.server.db)
+                                                           self.server.db,
+                                                           len(splittedPath))
                 else:
                     assert len(splittedPath) > 3
                     subdir = splittedPath[3]
-                    output = getTemplate('chan_index').get(not testing,
+                    output = getTemplate(splittedPath[1]).get(not testing,
                                                            chanName,
                                                            self.server.db,
+                                                           len(splittedPath),
                                                            subdir.lower())
             else:
                 response = 404
