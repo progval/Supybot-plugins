@@ -27,11 +27,11 @@ def get(useSkeleton, channel, db, urlLevel, page, orderby=None):
             output += '<a href="0.htm">1</a> '
         if page > 100:
             output += '... '
-        for i in range(int(max(1, page/25-3)), int(min(nbItems/3, page/25+3))):
-            if page != i:
-                output += '<a href="%i.htm">%i</a> ' % (page*3-1, page*3)
+        for i in range(int(max(1, page/25-3))+1, int(min(nbItems/25, page/25+3))+2):
+            if page != i*25-1:
+                output += '<a href="%i.htm">%i</a> ' % (i*25-1, i*25)
             else:
-                output += '%i ' % page*3
+                output += '%i ' % (i*25)
         if nbItems - page > 100:
             output += '... '
         if page == nbItems -1:
