@@ -188,7 +188,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
         self._getIfAnswerIsThisBan()
         self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
-        self.failIf(self._getIfAnswerIsThisBan() == False,
+        self.failIf(self._getIfAnswerIsThisBan(),
                     'Doesn\'t clean the join collection after having banned.')
 
 

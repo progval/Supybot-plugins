@@ -96,6 +96,9 @@ class AttackProtectorDatabase:
         detection = protector.registryValue(kind + '.detection', channel)
         if count >= int(filterParser.match(detection).group('number')):
             protector._slot(lastItem)
+            for index, item in enumerate(collection):
+                if item.prefix == prefix and item.channel == channel:
+                    collection.pop(index)
 
 
 class AttackProtector(callbacks.Plugin):
