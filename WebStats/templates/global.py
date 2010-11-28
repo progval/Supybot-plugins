@@ -17,7 +17,8 @@ def get(useSkeleton, channel, db, urlLevel, page, orderby=None):
                                        (items[6], 'nick change'),
                                        (items[8], 'kick'))
     items = db.getChanXXlyData(channel, 'hour')
-    output += getTable(_('Hour'), items, channel, urlLevel, page, orderby)
+    html, nbDisplayed = getTable(_('Hour'), items, channel, urlLevel, page, orderby)
+    output += html
 
     if useSkeleton:
         output = ''.join([skeleton.start, output, skeleton.end])

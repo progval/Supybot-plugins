@@ -26,6 +26,7 @@ def progressbar(item, max_):
 
 def fillTable(items, page, orderby=None):
     output = ''
+    nbDisplayed = 0
     max_ = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     for index in items:
         for index_ in range(0, len(max_)):
@@ -43,6 +44,7 @@ def fillTable(items, page, orderby=None):
         item = items.pop(maximumIndex)
         if sum(item[0:1] + item[3:]) > 5:
             rowsList.append((maximumIndex, item))
+            nbDisplayed += 1
     for row in rowsList[int(page):int(page)+25]:
         index, row = row
         output += '<tr><td>%s</td>' % index
@@ -57,7 +59,7 @@ def fillTable(items, page, orderby=None):
                      ):
             output += cell
         output += '</tr>'
-    return output
+    return output, nbDisplayed
 
 headers = (_('Lines'), _('Words'), _('Joins'), _('Parts'),
            _('Quits'), _('Nick changes'), _('Kicks'), _('Kicked'))
@@ -82,10 +84,11 @@ def getTable(firstColumn, items, channel, urlLevel, page, orderby):
             orderby += 's'
         try:
             index = nameToColumnIndex[orderby]
-            output += fillTable(items, page, index)
+            html, nbDisplayed = fillTable(items, page, index)
         except KeyError:
             orderby = None
     if orderby is None:
-        output += fillTable(items, page)
+        html, nbDisplayed = fillTable(items, page)
+    output += html
     output += '</table>'
-    return output
+    return output, nbDisplayed
