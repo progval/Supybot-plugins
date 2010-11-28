@@ -31,6 +31,7 @@
 import os
 import sys
 import time
+import random
 import datetime
 import threading
 import BaseHTTPServer
@@ -58,7 +59,7 @@ except:
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
 
-DEBUG = True
+DEBUG = False
 
 testing = world.testing
 
@@ -213,7 +214,7 @@ class WebStatsDB:
                        (chan, nick, time.time(), message))
         self._conn.commit()
         cursor.close()
-        if DEBUG:
+        if DEBUG or random.randint(0,50) == 10:
             self.refreshCache()
 
     def recordMove(self, chan, nick, type_, message=''):
@@ -225,7 +226,7 @@ class WebStatsDB:
                        (chan, nick, time.time(), type_, message))
         self._conn.commit()
         cursor.close()
-        if DEBUG:
+        if DEBUG or random.randint(0,50) == 10:
             self.refreshCache()
 
     def refreshCache(self):
