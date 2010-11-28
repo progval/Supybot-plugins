@@ -12,10 +12,12 @@ content = _(
 """<p>This website is powered by three awesome softwares :
 <ul>
     <li>
-        The well-known <a href="http://python.org">Python</a> programming language
+        The well-known <a href="http://python.org">Python</a> programming
+        language
     </li>
     <li>
-        <a href="http://supybot.com">Supybot</a>, the best Python IRC bot in existance
+        <a href="http://supybot.com">Supybot</a>, the best Python IRC bot in
+        existance
     </li>
     <li>
         <a href="mailto:progval@gmail.com">ProgVal</a>'s

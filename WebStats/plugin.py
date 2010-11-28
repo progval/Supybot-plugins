@@ -288,8 +288,8 @@ class WebStatsDB:
         to crawl the temporary chans and nicks caches."""
         dt = datetime.datetime.today()
         dt = dt.fromtimestamp(timestamp)
-        chanindex=(chan, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
-        nickindex=(chan, nick, dt.year, dt.month, dt.day, dt.weekday(), dt.hour)
+        chanindex = (chan,dt.year,dt.month,dt.day,dt.weekday(),dt.hour)
+        nickindex = (chan,nick,dt.year,dt.month,dt.day,dt.weekday(),dt.hour)
         return chanindex, nickindex
 
     def _writeTmpCacheToCache(self, tmpCache, type_):

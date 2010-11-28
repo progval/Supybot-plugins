@@ -14,7 +14,8 @@ content = \
 def progressbar(item, max_):
     template = """<td class="progressbar">
                       <div class="text">%i</div>
-                      <div style="width: %ipx; background-color: %s" class="color"></div>
+                      <div style="width: %ipx; background-color: %s"
+                      class="color"></div>
                   </td>"""
     try:
         percent = round(float(item)/float(max_)*100)
