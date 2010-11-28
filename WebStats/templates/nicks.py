@@ -17,6 +17,7 @@ def get(useSkeleton, channel, db, urlLevel, page, orderby=None):
     items = db.getChanNickGlobalData(channel, 20)
     nbItems = len(items)
     output += getTable(_('Nick'), items, channel, urlLevel, page, orderby)
+    nbItems -= len(items)
 
     page = int(page)
     output += '<p>'
