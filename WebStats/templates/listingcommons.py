@@ -40,7 +40,9 @@ def fillTable(items, page, orderby=None):
                 highScore = items[index][orderby]
             if orderby is None and index < maximumIndex:
                 maximumIndex = index
-        rowsList.append((maximumIndex, items.pop(maximumIndex)))
+        item = items.pop(maximumIndex)
+        if sum(item[0:1] + item[3:]) > 5:
+            rowsList.append((maximumIndex, item))
     for row in rowsList[int(page):int(page)+25]:
         index, row = row
         output += '<tr><td>%s</td>' % index
