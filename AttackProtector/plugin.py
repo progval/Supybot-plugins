@@ -168,8 +168,8 @@ class AttackProtector(callbacks.Plugin):
             irc.queueMsg(msg)
             msg = ircmsgs.ban(channel, prefix)
             irc.queueMsg(msg)
-        elif punishment == 'mode+i':
-            msg = ircmsgs.mode(channel, '+i')
+        elif punishment.startswith('mode'):
+            msg = ircmsgs.mode(channel, punishment[len('mode'):])
             irc.queueMsg(msg)
 AttackProtector = internationalizeDocstring(AttackProtector)
 

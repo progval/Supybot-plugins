@@ -61,7 +61,7 @@ class XpY(registry.String):
 XpY = internationalizeDocstring(XpY)
 
 class Punishment(registry.OnlySomeStrings):
-    validStrings = ('ban', 'kick', 'kban', 'mode+i')
+    validStrings = ('ban', 'kick', 'kban', 'mode+i', 'mode+N', 'mode+m')
 Punishment = internationalizeDocstring(Punishment)
 
 AttackProtector = conf.registerPlugin('AttackProtector')
@@ -78,7 +78,10 @@ kinds = {'join': ['5p10', 'ban'],
          'part': ['4p5', 'ban'],
          'nick': ['7p300', 'ban'],
          'message': ['10p20', 'kick'],
-         'groupjoin': ['20p10', 'mode+i']}
+         'groupjoin': ['20p10', 'mode+i'],
+         'grouppart': ['20p10', 'mode+i'],
+         'groupnick': ['20p10', 'mode+N'],
+         'groupmessage': ['100p10', 'mode+m']}
 for kind in kinds:
     data = kinds[kind]
     conf.registerGroup(AttackProtector, kind)
