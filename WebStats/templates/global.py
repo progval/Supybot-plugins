@@ -7,15 +7,15 @@ def get(useSkeleton, channel, db, urlLevel, page, orderby=None):
     bound = db.getChanRecordingTimeBoundaries(channel)
     output = '<h1>%s</h1>' % _('Stats about %s channel')
     output %= channel
-    output += '<p><a href="/nicks/%s/">View nick-by-nick stats</a></p>' % \
-                                                                channel[1:]
+    output += '<p><a href="/nicks/%s/">%s</a></p>' % (channel[1:],
+                                                 _('View nick-by-nick stats'))
     output += '<p>%s</p>' % _('There were %n, %n, %n, %n, %n, %n, %n, '
                               'and %n.')
-    output = utils.str.format(output, (items[0], 'line'), (items[1], 'word'),
-                                       (items[2], 'char'), (items[3], 'join'),
-                                       (items[4], 'part'), (items[5], 'quit'),
-                                       (items[6], 'nick change'),
-                                       (items[8], 'kick'))
+    output = utils.str.format(output, (items[0], _('line')), (items[1], _('word')),
+                                       (items[2], _('char')), (items[3], _('join')),
+                                       (items[4], _('part')), (items[5], _('quit')),
+                                       (items[6], _('nick change')),
+                                       (items[8], _('kick')))
     items = db.getChanXXlyData(channel, 'hour')
     html, nbDisplayed = getTable(_('Hour'), items, channel, urlLevel, page, orderby)
     output += html

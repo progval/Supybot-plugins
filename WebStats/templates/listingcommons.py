@@ -70,8 +70,9 @@ for header in headers:
                     (header, header)
 tableHeaders += '</tr>'
 
-nameToColumnIndex = {'lines':0,'words':1,'chars':2,'joins':3,'parts':4,
-                     'quits':5,'nicks':6,'kickers':7,'kickeds':8,'kicks':7}
+nameToColumnIndex = {_('lines'):0,_('words'):1,_('chars'):2,_('joins'):3,
+                     _('parts'):4,_('quits'):5,_('nicks'):6,_('kickers'):7,
+                     _('kickeds'):8,_('kicks'):7}
 def getTable(firstColumn, items, channel, urlLevel, page, orderby):
     percentParameter = tuple()
     for foo in range(1, len(tableHeaders.split('%s'))-1):

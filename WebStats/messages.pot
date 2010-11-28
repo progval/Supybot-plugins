@@ -1,0 +1,225 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2010-11-28 15:53+CET\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: ./config.py:56
+msgid ""
+"Determines the hostname the web server will\n"
+"        bind. Empty value is equivalent to 0.0.0.0."
+msgstr ""
+
+#: ./config.py:59
+msgid ""
+"Determines the port the web server will\n"
+"        bind."
+msgstr ""
+
+#: ./config.py:64
+msgid ""
+"Determines whether the stats are enabled\n"
+"        for this channel."
+msgstr ""
+
+#: ./plugin.py:94 ./templates/skeleton.py:27
+msgid "about"
+msgstr ""
+
+#: ./templates/about.py:11
+msgid ""
+"<p>This website is powered by three awesome softwares :\n"
+"<ul>\n"
+"    <li>\n"
+"        The well-known <a href=\"http://python.org\">Python</a> programming\n"
+"        language\n"
+"    </li>\n"
+"    <li>\n"
+"        <a href=\"http://supybot.com\">Supybot</a>, the best Python IRC bot in\n"
+"        existance\n"
+"    </li>\n"
+"    <li>\n"
+"        <a href=\"mailto:progval@gmail.com\">ProgVal</a>'s\n"
+"        <a href=\"http://supybot-fr.tk/WebStats\">WebStats plugin for Supybot</a>\n"
+"    </li>\n"
+msgstr ""
+
+#: ./templates/design.py:62
+msgid "Menu:"
+msgstr ""
+
+#: ./templates/global.py:8
+msgid "Stats about %s channel"
+msgstr ""
+
+#: ./templates/global.py:11
+msgid "View nick-by-nick stats"
+msgstr ""
+
+#: ./templates/global.py:12
+msgid "There were %n, %n, %n, %n, %n, %n, %n, and %n."
+msgstr ""
+
+#: ./templates/global.py:14
+msgid "line"
+msgstr ""
+
+#: ./templates/global.py:14
+msgid "word"
+msgstr ""
+
+#: ./templates/global.py:15
+msgid "char"
+msgstr ""
+
+#: ./templates/global.py:15
+msgid "join"
+msgstr ""
+
+#: ./templates/global.py:16
+msgid "part"
+msgstr ""
+
+#: ./templates/global.py:16
+msgid "quit"
+msgstr ""
+
+#: ./templates/global.py:17
+msgid "nick change"
+msgstr ""
+
+#: ./templates/global.py:18
+msgid "kick"
+msgstr ""
+
+#: ./templates/global.py:20
+msgid "Hour"
+msgstr ""
+
+#: ./templates/index.py:17
+msgid "Stats available for no channels"
+msgstr ""
+
+#: ./templates/index.py:19
+msgid "Stats available for a channel:"
+msgstr ""
+
+#: ./templates/index.py:21
+msgid "Stats available for channels:"
+msgstr ""
+
+#: ./templates/index.py:26
+msgid "View the stats for the %s channel"
+msgstr ""
+
+#: ./templates/listingcommons.py:65
+msgid "Joins"
+msgstr ""
+
+#: ./templates/listingcommons.py:65
+msgid "Lines"
+msgstr ""
+
+#: ./templates/listingcommons.py:65
+msgid "Parts"
+msgstr ""
+
+#: ./templates/listingcommons.py:65
+msgid "Words"
+msgstr ""
+
+#: ./templates/listingcommons.py:66
+msgid "Kicked"
+msgstr ""
+
+#: ./templates/listingcommons.py:66
+msgid "Kicks"
+msgstr ""
+
+#: ./templates/listingcommons.py:66
+msgid "Nick changes"
+msgstr ""
+
+#: ./templates/listingcommons.py:66
+msgid "Quits"
+msgstr ""
+
+#: ./templates/listingcommons.py:73
+msgid "chars"
+msgstr ""
+
+#: ./templates/listingcommons.py:73
+msgid "joins"
+msgstr ""
+
+#: ./templates/listingcommons.py:73
+msgid "lines"
+msgstr ""
+
+#: ./templates/listingcommons.py:73
+msgid "words"
+msgstr ""
+
+#: ./templates/listingcommons.py:74
+msgid "kickers"
+msgstr ""
+
+#: ./templates/listingcommons.py:74
+msgid "nicks"
+msgstr ""
+
+#: ./templates/listingcommons.py:74
+msgid "parts"
+msgstr ""
+
+#: ./templates/listingcommons.py:74
+msgid "quits"
+msgstr ""
+
+#: ./templates/listingcommons.py:75
+msgid "kickeds"
+msgstr ""
+
+#: ./templates/listingcommons.py:75
+msgid "kicks"
+msgstr ""
+
+#: ./templates/nicks.py:8
+msgid "Stats about %s channel users"
+msgstr ""
+
+#: ./templates/nicks.py:11
+msgid "View global stats"
+msgstr ""
+
+#: ./templates/nicks.py:13
+msgid "Nick"
+msgstr ""
+
+#: ./templates/skeleton.py:26
+msgid "Come back to the root page"
+msgstr ""
+
+#: ./templates/skeleton.py:26
+msgid "Home"
+msgstr ""
+
+#: ./templates/skeleton.py:27
+msgid "About"
+msgstr ""
+
+#: ./templates/skeleton.py:27
+msgid "Get more informations about this website"
+msgstr ""
+

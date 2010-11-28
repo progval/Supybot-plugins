@@ -91,7 +91,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 content_type = 'text/html'
                 output = getTemplate('index').get(not testing,
                                                  self.server.db.getChannels())
-            elif self.path == '/about/':
+            elif self.path == '/%s/' % _('about'):
                 response = 200
                 content_type = 'text/html'
                 output = getTemplate('about').get(not testing)
