@@ -187,7 +187,7 @@ msgstr "kicks"
 
 #: templates/listingcommons.py:74
 msgid "nicks"
-msgstr "nicks"
+msgstr "changememts%20de%20nick"
 
 #: templates/listingcommons.py:74
 msgid "parts"
