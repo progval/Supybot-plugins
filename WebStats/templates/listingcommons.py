@@ -81,15 +81,14 @@ def getTable(firstColumn, items, channel, urlLevel, page, orderby):
             percentParameter += (firstColumn,)
     output = tableHeaders % percentParameter
     if orderby is not None:
-        for orderby in orderby.split('%20'):
-            if not orderby.endswith('s'):
-                orderby += 's'
-            try:
-                index = nameToColumnIndex[orderby]
-                html, nbDisplayed = fillTable(items, page, index)
-            except KeyError:
-	        continue
-            break
+        orderby = orderby.split('%20')[0]
+        if not orderby.endswith('s'):
+            orderby += 's'
+        try:
+            index = nameToColumnIndex[orderby]
+            html, nbDisplayed = fillTable(items, page, index)
+        except KeyError:
+            orderby = None
     if orderby is None:
         html, nbDisplayed = fillTable(items, page)
     output += html
