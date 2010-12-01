@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ProgVal\n"
-"POT-Creation-Date: 2010-11-28 15:53+CET\n"
+"POT-Creation-Date: 2010-12-01 17:22+CET\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Valentin Lorentz <progval@gmail.com>\n"
 "Language-Team: ProgVal <progval@gmail.com>\n"
@@ -133,75 +133,75 @@ msgstr "Statistiques disponibles pour les canaux :"
 msgid "View the stats for the %s channel"
 msgstr "Voir les statistiques pour le canal %s"
 
-#: templates/listingcommons.py:65
+#: templates/listingcommons.py:66
 msgid "Joins"
 msgstr "Arrivées"
 
-#: templates/listingcommons.py:65
+#: templates/listingcommons.py:66
 msgid "Lines"
 msgstr "Lignes"
 
-#: templates/listingcommons.py:65
+#: templates/listingcommons.py:66
 msgid "Parts"
 msgstr "Départs"
 
-#: templates/listingcommons.py:65
+#: templates/listingcommons.py:66
 msgid "Words"
 msgstr "Mots"
 
-#: templates/listingcommons.py:66
+#: templates/listingcommons.py:67
 msgid "Kicked"
-msgstr "Kickés"
+msgstr "Kické"
 
-#: templates/listingcommons.py:66
+#: templates/listingcommons.py:67
 msgid "Kicks"
 msgstr "Kicks"
 
-#: templates/listingcommons.py:66
+#: templates/listingcommons.py:67
 msgid "Nick changes"
 msgstr "Changements de nick"
 
-#: templates/listingcommons.py:66
+#: templates/listingcommons.py:67
 msgid "Quits"
 msgstr "Quits"
 
-#: templates/listingcommons.py:73
+#: templates/listingcommons.py:74
 msgid "chars"
-msgstr "caract%c3%a8res"
+msgstr "caractères"
 
-#: templates/listingcommons.py:73
+#: templates/listingcommons.py:74
 msgid "joins"
-msgstr "arriv%c3%a9es"
+msgstr "arrivées"
 
-#: templates/listingcommons.py:73
+#: templates/listingcommons.py:74
 msgid "lines"
 msgstr "lignes"
 
-#: templates/listingcommons.py:73
+#: templates/listingcommons.py:74
 msgid "words"
 msgstr "mots"
 
-#: templates/listingcommons.py:74
+#: templates/listingcommons.py:75
 msgid "kickers"
 msgstr "kicks"
 
-#: templates/listingcommons.py:74
-msgid "nicks"
-msgstr "changememts%20de%20nick"
+#: templates/listingcommons.py:75
+msgid "nick changes"
+msgstr "changements de nick"
 
-#: templates/listingcommons.py:74
+#: templates/listingcommons.py:75
 msgid "parts"
-msgstr "d%c3%a9parts"
+msgstr "départs"
 
-#: templates/listingcommons.py:74
+#: templates/listingcommons.py:75
 msgid "quits"
 msgstr "quits"
 
-#: templates/listingcommons.py:75
-msgid "kickeds"
-msgstr "kick%c3%a9s"
+#: templates/listingcommons.py:76
+msgid "kicked"
+msgstr "kické"
 
-#: templates/listingcommons.py:75
+#: templates/listingcommons.py:76
 msgid "kicks"
 msgstr "kicks"
 
@@ -232,4 +232,7 @@ msgstr "À propos"
 #: templates/skeleton.py:27
 msgid "Get more informations about this website"
 msgstr "Plus d'informations à propos de ce site"
+
+#~ msgid "nicks"
+#~ msgstr "nicks"
 

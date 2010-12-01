@@ -1,3 +1,4 @@
+import urllib
 import skeleton
 import supybot.utils as utils
 try:
@@ -71,8 +72,8 @@ for header in headers:
 tableHeaders += '</tr>'
 
 nameToColumnIndex = {_('lines'):0,_('words'):1,_('chars'):2,_('joins'):3,
-                     _('parts'):4,_('quits'):5,_('nicks'):6,_('kickers'):7,
-                     _('kickeds'):8,_('kicks'):7}
+                     _('parts'):4,_('quits'):5,_('nick changes'):6,_('kickers'):7,
+                     _('kicked'):8,_('kicks'):7}
 def getTable(firstColumn, items, channel, urlLevel, page, orderby):
     percentParameter = tuple()
     for foo in range(1, len(tableHeaders.split('%s'))-1):
@@ -81,9 +82,7 @@ def getTable(firstColumn, items, channel, urlLevel, page, orderby):
             percentParameter += (firstColumn,)
     output = tableHeaders % percentParameter
     if orderby is not None:
-        orderby = orderby.split('%20')[0]
-        if not orderby.endswith('s'):
-            orderby += 's'
+        orderby = urllib.unquote(orderby)
         try:
             index = nameToColumnIndex[orderby]
             html, nbDisplayed = fillTable(items, page, index)
