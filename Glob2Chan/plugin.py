@@ -71,23 +71,22 @@ class Glob2Chan(callbacks.Plugin):
             mode = 'yog'
         elif mode is None:
             mode = 'irc'
-        if not mode in ('yog', 'irc'):
-            irc.error('Modes can are only "irc" and "yog"')
-            return
-        if mode == 'irc':
+        if mode == 'yog':
             irc.reply('(help for YOG users:) If you are feed up with getting '
                 'a welcome message each time you log in, type "@nowelcome". '
                 'If you want to send an automatically alert to every people '
                 'who wants to play but who is not reading the chat, type '
                 '"@ask4game". For more information, ask for help, with '
                 'typing `!ask4help`. You can find stats about this channel '
-                'at http://openihs.org:8081/global/glob2')
-        elif mode == 'yog':
+                'at http://stats.supybot-fr.tk/global/glob2')
+        elif mode == 'irc':
             irc.reply('(help for IRC users:) If you want to be notified each '
                 'time someone uses "@ask4game" (game query) or "@ask4help" '
                 '(help query), type "@subscribe ask4game" or "@subscribe '
                 'ask4help" (depending on what you want). The opposite of '
                 '"@subscribe" is "@unsubscribe".')
+        else:
+            irc.error('Modes can are only "irc" and "yog"')
     g2help = wrap(g2help, [optional('somethingWithoutSpaces')])
 
     def nowelcome(self, irc, msg, args):
