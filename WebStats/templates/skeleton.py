@@ -1,11 +1,5 @@
 import time
-try:
-    from supybot.i18n import PluginInternationalization
-    from supybot.i18n import internationalizeDocstring
-    _ = PluginInternationalization('WebStats')
-except:
-    _ = lambda x:x
-    internationalizeDocstring = lambda x:x
+from WebStats.plugin import _
 
 start = \
 """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

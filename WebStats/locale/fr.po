@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ProgVal\n"
-"POT-Creation-Date: 2010-12-01 17:22+CET\n"
+"POT-Creation-Date: 2010-12-04 14:29+CET\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Valentin Lorentz <progval@gmail.com>\n"
 "Language-Team: ProgVal <progval@gmail.com>\n"
@@ -31,7 +31,18 @@ msgid ""
 "        for this channel."
 msgstr "Détermine si les statistiques sont activées pour ce canal."
 
-#: plugin.py:94
+#: config.py:67
+msgid ""
+"Determines what language is used on the\n"
+"        website"
+msgstr "Détermine quelle langue est utilisée sur le site web."
+
+#: config.py:67
+#: plugin.py:60
+msgid "en"
+msgstr "fr"
+
+#: plugin.py:98
 #: templates/skeleton.py:27
 msgid "about"
 msgstr "apropos"
@@ -133,75 +144,75 @@ msgstr "Statistiques disponibles pour les canaux :"
 msgid "View the stats for the %s channel"
 msgstr "Voir les statistiques pour le canal %s"
 
-#: templates/listingcommons.py:66
+#: templates/listingcommons.py:60
 msgid "Joins"
 msgstr "Arrivées"
 
-#: templates/listingcommons.py:66
+#: templates/listingcommons.py:60
 msgid "Lines"
 msgstr "Lignes"
 
-#: templates/listingcommons.py:66
+#: templates/listingcommons.py:60
 msgid "Parts"
 msgstr "Départs"
 
-#: templates/listingcommons.py:66
+#: templates/listingcommons.py:60
 msgid "Words"
 msgstr "Mots"
 
-#: templates/listingcommons.py:67
+#: templates/listingcommons.py:61
 msgid "Kicked"
 msgstr "Kické"
 
-#: templates/listingcommons.py:67
+#: templates/listingcommons.py:61
 msgid "Kicks"
 msgstr "Kicks"
 
-#: templates/listingcommons.py:67
+#: templates/listingcommons.py:61
 msgid "Nick changes"
 msgstr "Changements de nick"
 
-#: templates/listingcommons.py:67
+#: templates/listingcommons.py:61
 msgid "Quits"
 msgstr "Quits"
 
-#: templates/listingcommons.py:74
+#: templates/listingcommons.py:68
 msgid "chars"
 msgstr "caractères"
 
-#: templates/listingcommons.py:74
+#: templates/listingcommons.py:68
 msgid "joins"
 msgstr "arrivées"
 
-#: templates/listingcommons.py:74
+#: templates/listingcommons.py:68
 msgid "lines"
 msgstr "lignes"
 
-#: templates/listingcommons.py:74
+#: templates/listingcommons.py:68
 msgid "words"
 msgstr "mots"
 
-#: templates/listingcommons.py:75
+#: templates/listingcommons.py:69
 msgid "kickers"
 msgstr "kicks"
 
-#: templates/listingcommons.py:75
+#: templates/listingcommons.py:69
 msgid "nick changes"
 msgstr "changements de nick"
 
-#: templates/listingcommons.py:75
+#: templates/listingcommons.py:69
 msgid "parts"
 msgstr "départs"
 
-#: templates/listingcommons.py:75
+#: templates/listingcommons.py:69
 msgid "quits"
 msgstr "quits"
 
-#: templates/listingcommons.py:76
+#: templates/listingcommons.py:70
 msgid "kicked"
 msgstr "kické"
 
-#: templates/listingcommons.py:76
+#: templates/listingcommons.py:70
 msgid "kicks"
 msgstr "kicks"
 

@@ -63,5 +63,8 @@ conf.registerGroup(WebStats, 'channel')
 conf.registerChannelValue(WebStats.channel, 'enable',
     registry.Boolean(False, _("""Determines whether the stats are enabled
         for this channel.""")))
+conf.registerChannelValue(WebStats.channel, 'language',
+    registry.String(_('en'), _("""Determines what language is used on the
+        website""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

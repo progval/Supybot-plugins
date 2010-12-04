@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2010-12-01 17:22+CET\n"
+"POT-Creation-Date: 2010-12-04 14:29+CET\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,7 +33,17 @@ msgid ""
 "        for this channel."
 msgstr ""
 
-#: ./plugin.py:94 ./templates/skeleton.py:27
+#: ./config.py:67
+msgid ""
+"Determines what language is used on the\n"
+"        website"
+msgstr ""
+
+#: ./config.py:67 ./plugin.py:60
+msgid "en"
+msgstr ""
+
+#: ./plugin.py:98 ./templates/skeleton.py:27
 msgid "about"
 msgstr ""
 
@@ -123,75 +133,75 @@ msgstr ""
 msgid "View the stats for the %s channel"
 msgstr ""
 
-#: ./templates/listingcommons.py:66
+#: ./templates/listingcommons.py:60
 msgid "Joins"
 msgstr ""
 
-#: ./templates/listingcommons.py:66
+#: ./templates/listingcommons.py:60
 msgid "Lines"
 msgstr ""
 
-#: ./templates/listingcommons.py:66
+#: ./templates/listingcommons.py:60
 msgid "Parts"
 msgstr ""
 
-#: ./templates/listingcommons.py:66
+#: ./templates/listingcommons.py:60
 msgid "Words"
 msgstr ""
 
-#: ./templates/listingcommons.py:67
+#: ./templates/listingcommons.py:61
 msgid "Kicked"
 msgstr ""
 
-#: ./templates/listingcommons.py:67
+#: ./templates/listingcommons.py:61
 msgid "Kicks"
 msgstr ""
 
-#: ./templates/listingcommons.py:67
+#: ./templates/listingcommons.py:61
 msgid "Nick changes"
 msgstr ""
 
-#: ./templates/listingcommons.py:67
+#: ./templates/listingcommons.py:61
 msgid "Quits"
 msgstr ""
 
-#: ./templates/listingcommons.py:74
+#: ./templates/listingcommons.py:68
 msgid "chars"
 msgstr ""
 
-#: ./templates/listingcommons.py:74
+#: ./templates/listingcommons.py:68
 msgid "joins"
 msgstr ""
 
-#: ./templates/listingcommons.py:74
+#: ./templates/listingcommons.py:68
 msgid "lines"
 msgstr ""
 
-#: ./templates/listingcommons.py:74
+#: ./templates/listingcommons.py:68
 msgid "words"
 msgstr ""
 
-#: ./templates/listingcommons.py:75
+#: ./templates/listingcommons.py:69
 msgid "kickers"
 msgstr ""
 
-#: ./templates/listingcommons.py:75
+#: ./templates/listingcommons.py:69
 msgid "nick changes"
 msgstr ""
 
-#: ./templates/listingcommons.py:75
+#: ./templates/listingcommons.py:69
 msgid "parts"
 msgstr ""
 
-#: ./templates/listingcommons.py:75
+#: ./templates/listingcommons.py:69
 msgid "quits"
 msgstr ""
 
-#: ./templates/listingcommons.py:76
+#: ./templates/listingcommons.py:70
 msgid "kicked"
 msgstr ""
 
-#: ./templates/listingcommons.py:76
+#: ./templates/listingcommons.py:70
 msgid "kicks"
 msgstr ""
 

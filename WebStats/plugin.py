@@ -38,6 +38,7 @@ import BaseHTTPServer
 import supybot.conf as conf
 import supybot.world as world
 import supybot.log as log
+import supybot.conf as conf
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.irclib as irclib
@@ -52,10 +53,15 @@ except ImportError:
     from pysqlite2 import dbapi2 as sqlite3 # for python2.4
 
 try:
-    from supybot.i18n import PluginInternationalization
-    from supybot.i18n import internationalizeDocstring
-    _ = PluginInternationalization('WebStats')
-except:
+    from supybot.i18n import _PluginInternationalization
+    class WebStatsInternationalization(_PluginInternationalization):
+        def __init__(self):
+            self.name = 'WebStats'
+            self.changeLanguage(conf.supybot.language())
+        def changeLanguage(self, language):
+            self.loadLocale(language)
+    _ = WebStatsInternationalization()
+except ImportError:
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
 
@@ -112,6 +118,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 if page == '':
                     page = '0'
                 if len(splittedPath) == 3:
+                    _.changeLanguage(self.server.plugin._getLanguage(chanName))
                     output = getTemplate(splittedPath[1]).get(not testing,
                                                            chanName,
                                                            self.server.db,
@@ -119,6 +126,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                                                            page)
                 else:
                     assert len(splittedPath) > 3
+                    _.changeLanguage(self.server.plugin._getLanguage(chanName))
                     subdir = splittedPath[3]
                     output = getTemplate(splittedPath[1]).get(not testing,
                                                            chanName,
@@ -420,6 +428,7 @@ class Server:
             except:
                 pass
         log.info('WebStats web server launched')
+        httpd.plugin = self._plugin
         httpd.db = self._plugin.db
         while self.serve:
             httpd.handle_request()
@@ -506,7 +515,10 @@ class WebStats(callbacks.Plugin):
                 self.db.recordMove(channel, nick, 'kicker', message)
                 self.db.recordMove(channel, msg.args[1], 'kicked', message)
 
-    # The two fellowing functions comes from the Relay plugin, provided
+    def _getLanguage(self, channel):
+        return self.registryValue('channel.language', '#' + channel)
+
+    # The fellowing functions comes from the Relay plugin, provided
     # with Supybot
     def __call__(self, irc, msg):
         try:
