@@ -38,7 +38,12 @@ def fillTable(items, page, orderby=None):
             if orderby is None and index < maximumIndex:
                 maximumIndex = index
         item = items.pop(maximumIndex)
-        if sum(item[0:1] + item[3:]) > 5:
+        try:
+            int(index)
+            indexIsInt = True
+        except:
+            indexIsInt = False
+        if sum(item[0:1] + item[3:]) > 5 or indexIsInt:
             rowsList.append((maximumIndex, item))
             nbDisplayed += 1
     for row in rowsList[int(page):int(page)+25]:
