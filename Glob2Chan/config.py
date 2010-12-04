@@ -44,6 +44,13 @@ Glob2Chan = conf.registerPlugin('Glob2Chan')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(Glob2Chan, 'someConfigVariableName',
 #     registry.Boolean(False, """Help for someConfigVariableName."""))
+conf.registerGlobalValue(Glob2Chan, 'nowelcome', registry.String('',
+    '''List of nick that doesn't get the welcome message.'''))
+conf.registerGlobalValue(Glob2Chan, 'gamers', registry.String('',
+    '''List of nick that are notified when someone calls @ask4game.'''))
+conf.registerGlobalValue(Glob2Chan, 'helpers', registry.String('',
+    '''List of nick that are notified when someone calls @ask4help.'''))
+
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

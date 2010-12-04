@@ -29,9 +29,11 @@
 ###
 
 from supybot.test import *
+import supybot.ircmsgs as ircmsgs
 
 class Glob2ChanTestCase(PluginTestCase):
     plugins = ('Glob2Chan',)
+
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
