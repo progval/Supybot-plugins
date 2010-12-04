@@ -1,11 +1,5 @@
 import skeleton
-try:
-    from supybot.i18n import PluginInternationalization
-    from supybot.i18n import internationalizeDocstring
-    _ = PluginInternationalization('WebStats')
-except:
-    _ = lambda x:x
-    internationalizeDocstring = lambda x:x
+from WebStats.plugin import _
 
 content = """
 <h1>%s</h1>
