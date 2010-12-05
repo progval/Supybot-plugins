@@ -57,9 +57,7 @@ try:
     class WebStatsInternationalization(_PluginInternationalization):
         def __init__(self):
             self.name = 'WebStats'
-            self.changeLanguage(conf.supybot.language())
-        def changeLanguage(self, language):
-            self.loadLocale(language)
+            self.loadLocale(conf.supybot.language())
     _ = WebStatsInternationalization()
 except ImportError:
     _ = lambda x:x
@@ -118,7 +116,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 if page == '':
                     page = '0'
                 if len(splittedPath) == 3:
-                    _.changeLanguage(self.server.plugin._getLanguage(chanName))
+                    _.loadLocale(self.server.plugin._getLanguage(chanName))
                     output = getTemplate(splittedPath[1]).get(not testing,
                                                            chanName,
                                                            self.server.db,
@@ -126,7 +124,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                                                            page)
                 else:
                     assert len(splittedPath) > 3
-                    _.changeLanguage(self.server.plugin._getLanguage(chanName))
+                    _.loadLocale(self.server.plugin._getLanguage(chanName))
                     subdir = splittedPath[3]
                     output = getTemplate(splittedPath[1]).get(not testing,
                                                            chanName,
