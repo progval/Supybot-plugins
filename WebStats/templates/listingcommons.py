@@ -66,7 +66,7 @@ headers = (_('Lines'), _('Words'), _('Joins'), _('Parts'),
            _('Quits'), _('Nick changes'), _('Kicks'), _('Kicked'))
 tableHeaders = '<table><tr><th><a href="%s">%s</a></th>'
 for header in headers:
-    tableHeaders += '<th style="width: 100px;"><a href="%%s%s/">%s</a></th>' %\
+    tableHeaders += '<th style="width: 150px;"><a href="%%s%s/">%s</a></th>' %\
                     (header, header)
 tableHeaders += '</tr>'
 

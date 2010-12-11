@@ -97,7 +97,7 @@ table {
 }
 .progressbar .text {
     position: absolute;
-    width: 100px;
+    width: 150px;
     text-align: center;
     margin-top: auto;
     margin-bottom: auto;
