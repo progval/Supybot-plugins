@@ -136,7 +136,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 response = 404
                 content_type = 'text/html'
                 output = getTemplate('error404').get(not testing)
-        except FooException as e:
+        except FooException, e:
             response = 500
             content_type = 'text/html'
             if output == '':
