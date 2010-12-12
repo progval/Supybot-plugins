@@ -230,7 +230,6 @@ class PackagesServer:
         url += 'protocol=supybot&version=0.1'
         return urllib2.urlopen(urllib2.Request(url))
 
-@internationalizeDocstring
 class Packages(callbacks.Plugin):
     """This plugins allows to download packages for Supybot."""
     threaded = True
@@ -248,6 +247,7 @@ class Packages(callbacks.Plugin):
         irc.reply(format('%L', self._packagesServer.packages.keys()))
         
     
+Packages = internationalizeDocstring(Package)
 
 Class = Packages
 
