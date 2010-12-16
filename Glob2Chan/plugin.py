@@ -78,7 +78,7 @@ class Glob2Chan(callbacks.Plugin):
                 'who wants to play but who is not reading the chat, type '
                 '"@ask4game". For more information, ask for help, with '
                 'typing `!ask4help`. You can find stats about this channel '
-                'at http://stats.supybot-fr.tk/global/glob2')
+                'at http://stats.supybot-fr.tk/global/glob2/')
         elif mode == 'irc':
             irc.reply('(help for IRC users:) If you want to be notified each '
                 'time someone uses "@ask4game" (game query) or "@ask4help" '
