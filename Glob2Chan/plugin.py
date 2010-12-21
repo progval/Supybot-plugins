@@ -117,7 +117,7 @@ class Glob2Chan(callbacks.Plugin):
             return
         online = irc.state.channels[channel].users
         gamers = self.registryValue('gamers')
-        onlineGamers = [x for x in online if x in gamers]
+        onlineGamers = [x for x in online if x in gamers and x != msg.nick]
         if len(onlineGamers) == 0:
             irc.reply('Sorry, no registered gamer is online')
             return
@@ -136,7 +136,7 @@ class Glob2Chan(callbacks.Plugin):
             return
         online = irc.state.channels[channel].users
         helpers = self.registryValue('helpers')
-        onlineHelpers = [x for x in online if x in helpers]
+        onlineHelpers = [x for x in online if x in helpers and x != msg.nick]
         if len(onlineHelpers) == 0:
             irc.reply('Sorry, no registered helper is online')
             return
