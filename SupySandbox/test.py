@@ -49,7 +49,8 @@ class SupySandboxTestCase(PluginTestCase):
                             ' $$   toto=False', "foo")
 
     def testProtections(self):
-        self.assertResponse('sandbox while True: pass', "Killed")
+        self.assertError('sandbox while True: pass')
+        self.assertError('sandbox foo="bar"; $$ while True:foo=foo*10')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

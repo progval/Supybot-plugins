@@ -59,6 +59,8 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 from cStringIO import StringIO
 
+class SandboxError(Exception):
+    pass
 
 def createSandboxConfig():
     cfg = S.SandboxConfig(
@@ -160,11 +162,11 @@ def handleChild(childpid, r):
         n += 1
     if not pid:
         os.kill(childpid, signal.SIGKILL)
-        return 'Timeout'
+        raise SandboxError('Timeout')
     elif os.WIFEXITED(status):
         return txt.rstrip()
     elif os.WIFSIGNALED(status):
-        return 'Killed'
+        raise SandboxError('Killed')
 
 def handle_line(line):
     r, w = os.pipe()
@@ -188,7 +190,10 @@ class SupySandbox(callbacks.Plugin):
         
         Runs Python code safely thanks to pysandbox"""
         code = self._parser.match(msg.args[1]).group('code')
-        irc.reply(handle_line(code.replace(' $$ ', '\n')))
+        try:
+            irc.reply(handle_line(code.replace(' $$ ', '\n')))
+        except SandboxError, e:
+            irc.error('; '.join(e.args))
         
     def runtests(self, irc, msg, args):
         irc.reply(runTests())
