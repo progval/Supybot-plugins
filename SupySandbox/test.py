@@ -33,24 +33,23 @@ from supybot.test import *
 
 class SupySandboxTestCase(PluginTestCase):
     plugins = ('SupySandbox',)
-    
+
     def testFschfschTestcase(self):
         self.assertResponse('runtests', 'True')
-    
+
     def testCodeIsSuccessfullyRunned(self):
         self.assertResponse('sandbox 1+1', "2")
         self.assertResponse('sandbox print 1+1', "2")
         self.assertResponse('sandbox print \'toto\'', "toto")
-    
+
     def testMultine(self):
         self.assertResponse('sandbox print 1; print 2', "'1\\n2'")
         self.assertResponse('sandbox print 1 $$ print 2', "'1\\n2'")
         self.assertResponse('sandbox toto=True $$ while toto: $$   print "foo"'
                             ' $$   toto=False', "foo")
-        
+
     def testProtections(self):
-        #self.assertResponse('sandbox while True: print 1', "Timeout")
-        pass
+        self.assertResponse('sandbox while True: pass', "Killed")
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

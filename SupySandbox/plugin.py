@@ -50,6 +50,7 @@ import sys
 import time
 import random
 import select
+import signal
 import resource as R
 import supybot.utils as utils
 from supybot.commands import *
