@@ -72,8 +72,7 @@ class FortyTwo(callbacks.Plugin):
     This should describe *how* to use this plugin."""
     @internationalizeDocstring
     def find(self, irc, msg, args, optlist):
-        """[--domain <glob>] [--purpose <glob>] [--resolve <true|false>]
-        [--http <integer>]
+        """[--domain <glob>] [--purpose <glob>] [--resolve <true|false>] [--http <integer>]
 
         Returns all the domains that matches the search. --domain and
         --purpose take a glob (a string with wildcards) that have to match
