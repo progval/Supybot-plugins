@@ -61,7 +61,10 @@ class Domain:
             if node.nodeName == 'resolve':
                 data = {'No': False, 'Yes': True}[data]
             elif node.nodeName == 'http':
-                data = int(data)
+                try:
+                    data = int(data)
+                except ValueError:
+                    data = 0
             self.__dict__.update({node.nodeName: data})
         assert None not in (self.domain, self.purpose, self.resolve, self.http)
 
