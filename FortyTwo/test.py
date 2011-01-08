@@ -44,13 +44,6 @@ class FortyTwoTestCase(PluginTestCase):
         self.assertNotError('find --purpose *42registry*')
         self.assertNotError('find --purpose *42regi?try*')
         self.assertError('find --purpose egiergergrkghoerhergejrgerhg')
-        self.assertNotError('find --resolve true')
-        self.assertNotError('find --resolve false')
-        self.assertError('find --resolve oprgrgrg')
-        self.assertNotError('find --http 200')
-        self.assertNotError('find --http 000')
-        self.assertError('find --http 999')
-        self.assertError('find --http foo')
         self.assertResponse('find --domain nic?42', 'nic.42')
 
     def testPurpose(self):

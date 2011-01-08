@@ -45,28 +45,17 @@ class Domain:
     def __init__(self, dom, warnings):
         self.domain = None
         self.purpose = None
-        self.resolve = None
-        self.http = None
         for node in dom.childNodes:
-            if not node.nodeName in 'domain purpose resolve http www'.split():
+            if not node.nodeName in 'domain purpose'.split():
                 warnings.append(_("Unknown node '%s'") % node.nodeName)
-                continue
-            if node.nodeName == 'www':
                 continue
             try:
                 data = node.firstChild.data
             except AttributeError:
                 # Empty purpose, for instance
                 data = ''
-            if node.nodeName == 'resolve':
-                data = {'No': False, 'Yes': True}[data]
-            elif node.nodeName == 'http':
-                try:
-                    data = int(data)
-                except ValueError:
-                    data = 0
             self.__dict__.update({node.nodeName: data})
-        assert None not in (self.domain, self.purpose, self.resolve, self.http)
+        assert None not in (self.domain, self.purpose)
 
 
 @internationalizeDocstring
@@ -75,7 +64,7 @@ class FortyTwo(callbacks.Plugin):
     This should describe *how* to use this plugin."""
     @internationalizeDocstring
     def find(self, irc, msg, args, optlist):
-        """[--domain <glob>] [--purpose <glob>] [--resolve <true|false>] [--http <integer>]
+        """[--domain <glob>] [--purpose <glob>]
 
         Returns all the domains that matches the search. --domain and
         --purpose take a glob (a string with wildcards) that have to match
@@ -88,8 +77,6 @@ class FortyTwo(callbacks.Plugin):
         for name, value in optlist:
             if name == 'domain':    domain = translate(value)
             if name == 'purpose':   purpose = translate(value)
-            if name == 'resolve':   resolve = value
-            if name == 'http':      http = value
         if not hasattr(self, '_lastRefresh') or \
                 self._lastRefresh<time.time()-self.registryValue('lifetime'):
             self._refreshCache()
@@ -97,19 +84,12 @@ class FortyTwo(callbacks.Plugin):
         for obj in self._domains:
             if not domain.match(obj.domain) or not purpose.match(obj.purpose):
                 continue
-            if resolve is not None and obj.resolve != resolve:
-                continue
-            if http is not None and obj.http != http:
-                continue
             results.append(obj.domain)
         if results == []:
             irc.error(_('No such domain'))
         else:
             irc.reply(_(', ').join(results))
-    find = wrap(find, [getopts({'domain': 'glob',
-                                'purpose': 'glob',
-                                'resolve': 'boolean',
-                                'http': 'int'})])
+    find = wrap(find, [getopts({'domain': 'glob', 'purpose': 'glob'})])
 
     @internationalizeDocstring
     def fetch(self, irc, msg, args):
