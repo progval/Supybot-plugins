@@ -33,7 +33,7 @@ from supybot.test import *
 
 class TriggerTestCase(ChannelPluginTestCase):
     plugins = ('Trigger', 'Utilities')
-    config = {'supybot.plugins.Trigger.triggers.join': 'ping',
+    config = {'supybot.plugins.Trigger.triggers.join': 'echo Hi $nick',
               'supybot.plugins.Trigger.triggers.part': 'echo foo',
               'supybot.plugins.Trigger.triggers.privmsg': 'echo bar',
               'supybot.plugins.Trigger.triggers.notice': 'echo baz'}
@@ -48,11 +48,6 @@ class TriggerTestCase(ChannelPluginTestCase):
         return False
 
     def testBasics(self):
-        self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
-        msg = ircmsgs.privmsg(self.channel, 'pong')
-        self.failIf(not self._getIfAnswerIsEqual(msg), 'Does not reply to '
-                'triggered ping on join')
-
         self.irc.feedMsg(ircmsgs.part(self.channel, prefix=self.prefix))
         msg = ircmsgs.privmsg(self.channel, 'foo')
         self.failIf(not self._getIfAnswerIsEqual(msg), 'Does not reply to '
@@ -67,5 +62,11 @@ class TriggerTestCase(ChannelPluginTestCase):
         msg = ircmsgs.privmsg(self.channel, 'baz')
         self.failIf(not self._getIfAnswerIsEqual(msg), 'Does not reply to '
                 'triggered echo on notice')
+
+    def testSubstitude(self):
+        self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
+        msg = ircmsgs.privmsg(self.channel, 'Hi test')
+        self.failIf(not self._getIfAnswerIsEqual(msg), 'Does not welcome me')
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
