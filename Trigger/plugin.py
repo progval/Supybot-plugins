@@ -45,7 +45,6 @@ class Trigger(callbacks.Plugin):
         command = self.registryValue('triggers.%s' % triggerName)
         if command == '':
             return
-        command = ircutils.standardSubstitute(irc, msg, command)
         tokens = callbacks.tokenize(command)
         try:
             self.Proxy(irc.irc, msg, tokens)
