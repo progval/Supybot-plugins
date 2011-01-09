@@ -75,21 +75,26 @@ class Glob2Chan(callbacks.Plugin):
         elif mode is None:
             mode = 'irc'
         if mode == 'yog':
-            irc.reply('(help for YOG users:) If you are feed up with getting '
-                'a welcome message each time you log in, type "@nowelcome". '
+            irc.reply('\x02(help for YOG users:)\x02 If you are feed up with'
+                'getting a welcome message each time you log in, type '
+                '"\x02@nowelcome\x02".'
                 'If you want to send an automatically alert to every people '
                 'who wants to play but who is not reading the chat, type '
-                '"@ask4game". For more information, ask for help, with '
-                'typing `!ask4help`. You can find stats about this channel '
-                'at http://stats.supybot-fr.tk/global/glob2/')
+                '"\x02@ask4game\x02". For more information, ask for help, with '
+                'typing "\x02@ask4help\x02".')
         elif mode == 'irc':
-            irc.reply('(help for IRC users:) If you want to be notified each '
-                'time someone uses "@ask4game" (game query) or "@ask4help" '
-                '(help query), type "@subscribe ask4game" or "@subscribe '
-                'ask4help" (depending on what you want). The opposite of '
-                '"@subscribe" is "@unsubscribe".')
+            irc.reply('\x02(help for IRC users:)\x02 If you want to be notified each '
+                'time someone uses "\x02@ask4game\x02" (game query) or "\x02@ask4help\x02" '
+                '(help query), type "\x02@subscribe ask4game\x02" or "\x02@subscribe '
+                'ask4help\x02" (depending on what you want). The opposite of '
+                '"\x02@subscribe\x02" is "\x02@unsubscribe\x02".')
         else:
             irc.error('Modes can are only "irc" and "yog"')
+        irc.reply('I am a Supybot-powered IRC bot; don\'t try to talk or play'
+                  'with me ;) If you have questions, bug reports, features '
+                  'request, ... ask my owner, he is \x02ProgVal\x02. '
+                  'You can find stats about this channel '
+                  'at \x02http://stats.supybot-fr.tk/global/glob2/\x02')
     g2help = wrap(g2help, [optional('somethingWithoutSpaces')])
 
     def nowelcome(self, irc, msg, args):
