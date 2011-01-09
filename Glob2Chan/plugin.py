@@ -63,6 +63,9 @@ class Glob2Chan(callbacks.Plugin):
             (nick, version)))
 
     def g2help(self, irc, msg, args, mode):
+        """[{irc|yog}]
+
+        Prints help for IRC/YOG users."""
         channel = msg.args[0]
         if channel != '#glob2':
             return
@@ -102,7 +105,7 @@ class Glob2Chan(callbacks.Plugin):
                 'you a welcome message, but you ask me to stop sending them '
                 'to you. Are you crazy?')
             return
-        self.registryValue('nowelcome', value='%s %s' %
+        self.setRegistryValue('nowelcome', value='%s %s' %
                 (self.registryValue('nowelcome'), nick))
         irc.reply('I will not send you again the welcome message')
     nowelcome = wrap(nowelcome, [])
