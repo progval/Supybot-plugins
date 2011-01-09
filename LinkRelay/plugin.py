@@ -44,15 +44,15 @@ import supybot.callbacks as callbacks
 class LinkRelay(callbacks.Plugin):
     noIgnore = True
     threaded = True
-    
+
     # Put a list of all the relays that you want to add here.  Only messages
-    # matching the regex will be relayed. 
+    # matching the regex will be relayed.
     # syntax is [sourceChannel, sourceNetwork, targetChannel, targetNetwork, regex]
     relaysToAdd = [
-            #['#supybot', 'freenode', '#supybot-bots', 'freenode', ''],
-            #['#supybot-bots', 'freenode', '#supybot', 'freenode', '']
+            #['#supybot-test', 'sudoserv', '#progval', 'freenode', ''],
+            #['#progval', 'freenode', '#supybot-test', 'sudoserv', '']
             ]
-     
+
     # include any nick substitutions that you want to make here
     # (for example, if a user is in both channels, and doesn't want to get
     # highlighted every time they say a message)
@@ -62,7 +62,8 @@ class LinkRelay(callbacks.Plugin):
 
 
     class Relay():
-        def __init__(self, sourceChannel, sourceNetwork, targetChannel, targetNetwork, channelRegex, networkRegex, messageRegex):
+        def __init__(self, sourceChannel, sourceNetwork, targetChannel,
+                     targetNetwork, channelRegex, networkRegex, messageRegex):
             self.sourceChannel = sourceChannel
             self.sourceNetwork = sourceNetwork
             self.targetChannel = targetChannel
@@ -78,13 +79,20 @@ class LinkRelay(callbacks.Plugin):
         self.__parent.__init__(irc)
         self.relays = []
         for relay in self.relaysToAdd:
-            self.relays.append(self.Relay(relay[0], relay[1], relay[2], relay[3], re.compile('^%s$' % relay[0], re.I), re.compile('^%s$' % relay[1]), re.compile(relay[4])))
+            self.relays.append(self.Relay(relay[0],
+                                          relay[1],
+                                          relay[2],
+                                          relay[3],
+                                          re.compile('^%s$' % relay[0], re.I),
+                                          re.compile('^%s$' % relay[1]),
+                                          re.compile(relay[4])))
         for IRC in world.ircs:
             self.addIRC(IRC)
 
 
     def simpleHash(self, s):
-        colors = ["\x0305", "\x0304", "\x0303", "\x0309", "\x0302", "\x0312", "\x0306",   "\x0313", "\x0310", "\x0311", "\x0307"]
+        colors = ["\x0305", "\x0304", "\x0303", "\x0309", "\x0302", "\x0312",
+                  "\x0306",   "\x0313", "\x0310", "\x0311", "\x0307"]
         num = 0
         for i in s:
             num += ord(i)
@@ -118,7 +126,13 @@ class LinkRelay(callbacks.Plugin):
                 hasIRC = 'Link healthy!'
             else:
                 hasIRC = '\x0304IRC object not scraped yet.\x03'
-            irc.sendMsg(ircmsgs.privmsg(msg.args[0], '\x02%s\x02 on \x02%s\x02   ==>   \x02%s\x02 on \x02%s\x02.  %s' % (relay.sourceChannel, relay.sourceNetwork, relay.targetChannel, relay.targetNetwork, hasIRC)))
+            irc.sendMsg(ircmsgs.privmsg(msg.args[0],'\x02%s\x02 on \x02%s\x02'
+                        '==>   \x02%s\x02 on \x02%s\x02.  %s' %
+                        (relay.sourceChannel,
+                         relay.sourceNetwork,
+                         relay.targetChannel,
+                         relay.targetNetwork,
+                         hasIRC)))
 
     def doPrivmsg(self, irc, msg):
         self.addIRC(irc)
@@ -133,7 +147,7 @@ class LinkRelay(callbacks.Plugin):
                     s = self.formatPrivMsg(irc.nick, msg.args[1])
                     self.sendToOthers(irc, msg, s)
         return msg
-   
+
 
     def doPing(self, irc, msg):
         self.addIRC(irc)
@@ -146,15 +160,20 @@ class LinkRelay(callbacks.Plugin):
         s = '\x0314%s has left on %s' % (msg.nick, irc.network)
         self.sendToOthers(irc, msg, s)
 
-#    def doQuit(self, irc, msg):
-#        for channel in self.ircstates[irc].channels:
-#            if msg.nick in self.ircstates[irc].channels[channel].users:
-#                s = '\x0314%s has quit on %s (%s)' % (msg.nick, irc.network, msg.args[0])
-#                m = msg
-#                self.sendToOthers(irc, msg, s)
+    #def doQuit(self, irc, msg):
+    #    for channel in self.ircstates[irc].channels:
+    #        if msg.nick in self.ircstates[irc].channels[channel].users:
+    #            s = '\x0314%s has quit on %s (%s)' % (msg.nick,
+    #                                                  irc.network,
+    #                                                  msg.args[0])
+    #            m = msg
+    #            self.sendToOthers(irc, msg, s)
 
     def doKick(self, irc, msg):
-        s = '\x0314%s has been kicked on %s by %s (%s)' % (msg.args[1], irc.network, msg.nick, msg.args[2])
+        s = '\x0314%s has been kicked on %s by %s (%s)' % (msg.args[1],
+                                                           irc.network,
+                                                           msg.nick,
+                                                           msg.args[2])
         self.sendToOthers(irc, msg, s)
 
     def sendToOthers(self, irc, triggerMsg, s):
@@ -166,23 +185,30 @@ class LinkRelay(callbacks.Plugin):
                     (len(triggerMsg.args[1]) < 1 or
                             relay.messageRegex.search(triggerMsg.args[1])):
                 if not relay.hasIRC:
-                    self.log.info('LinkRelay:  IRC %s not yet scraped.' % relay.targetNetwork)
+                    self.log.info('LinkRelay:  IRC %s not yet scraped.' %
+                                  relay.targetNetwork)
                 elif relay.targetIRC.zombie:
-                    self.log.info('LinkRelay:  IRC %s appears to be a zombie' % relay.targetNetwork)
+                    self.log.info('LinkRelay:  IRC %s appears to be a zombie'%
+                                  relay.targetNetwork)
                 elif relay.targetChannel not in relay.targetIRC.state.channels:
-                    self.log.info('LinkRelay:  I\'m not in in %s on %s' % (relay.targetChannel, relay.targetNetwork))
+                    self.log.info('LinkRelay:  I\'m not in in %s on %s' %
+                                  (relay.targetChannel, relay.targetNetwork))
                 else:
-#                    if re.match('\x0314\w+ has quit on \w+ \(.*\)', s):
-#                        pm = False
-#                    else:
-#                        pm = True
-#                    for chan in irc.state.channels:
-#                        if re.match('^%s$' % relay.sourceChannel, chan):
-#                            pm = False
-                    if triggerMsg.args[0] not in irc.state.channels and not re.match('\x0314\w+ has quit on \w+ \(.*\)', s):
-                        # cuts off the end of commands, so that passwords won't be revealed in relayed PM's
+                    #if re.match('\x0314\w+ has quit on \w+ \(.*\)', s):
+                    #    pm = False
+                    #else:
+                    #    pm = True
+                    #for chan in irc.state.channels:
+                    #    if re.match('^%s$' % relay.sourceChannel, chan):
+                    #        pm = False
+                    if triggerMsg.args[0] not in irc.state.channels and \
+                            not re.match('\x0314\w+ has quit on \w+ \(.*\)', s):
+                        # cuts off the end of commands, so that passwords
+                        # won't be revealed in relayed PM's
                         if callbacks.addressed(irc.nick, triggerMsg):
-                            s = re.sub('(>\x03 \w+) .*', '\\1 \x0314[truncated]', s)
+                            s = re.sub('(>\x03 \w+) .*',
+                                       '\\1 \x0314[truncated]',
+                                       s)
                         s = '(via PM) %s' % s
                     msg = ircmsgs.privmsg(relay.targetChannel, s)
                     msg.tag('relayedMsg')
@@ -204,9 +230,12 @@ class LinkRelay(callbacks.Plugin):
         <channel> is only necessary if the message
         isn't sent on the channel itself."""
         for relay in self.relays:
-            if relay.targetChannel == channel and relay.targetNetwork == irc.network:
+            if relay.targetChannel == channel and \
+                    relay.targetNetwork == irc.network:
                 if not relay.hasIRC:
-                    irc.reply('I haven\'t scraped the IRC object for %s yet.  Try again in a minute or two.' % relay.targetNetwork)
+                    irc.reply('I haven\'t scraped the IRC object for %s yet. '
+                              'Try again in a minute or two.' % \
+                              relay.targetNetwork)
                 else:
                     users = []
                     ops = []
@@ -215,7 +244,9 @@ class LinkRelay(callbacks.Plugin):
                     normals = []
                     numUsers = 0
                     try:
-                        Channel = relay.targetIRC.state.channels[relay.sourceChannel] #need to do something about this -- right now it won't match a regex channel
+                        source = relay.sourceChannel
+                        # FIXME: right now it won't match a regex channe
+                        Channel = relay.targetIRC.state.channels[source]
                     except KeyError:
                         continue
                     for s in Channel.users:
@@ -237,7 +268,10 @@ class LinkRelay(callbacks.Plugin):
                     #utils.sortBy(ircutils.toLower, normals)
                     users.sort()
                     msg.tag('relayedMsg')
-                    s = '%d users in %s on %s:  %s' % (numUsers, relay.sourceChannel, relay.sourceNetwork, utils.str.commaAndify(users))
+                    s = '%d users in %s on %s:  %s' % (numUsers,
+                            relay.sourceChannel,
+                            relay.sourceNetwork,
+                            utils.str.commaAndify(users))
                     irc.queueMsg(ircmsgs.privmsg(msg.args[0], s))
         irc.noReply()
     nicks = wrap(nicks, ['Channel'])
