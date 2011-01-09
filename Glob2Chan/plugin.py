@@ -75,10 +75,10 @@ class Glob2Chan(callbacks.Plugin):
         elif mode is None:
             mode = 'irc'
         if mode == 'yog':
-            irc.reply('\x02(help for YOG users:)\x02 If you are feed up with'
+            irc.reply('\x02(help for YOG users:)\x02 If you are fed up with '
                 'getting a welcome message each time you log in, type '
-                '"\x02@nowelcome\x02".'
-                'If you want to send an automatically alert to every people '
+                '"\x02@nowelcome\x02". '
+                'If you want to send an automatic alert to everybody '
                 'who wants to play but who is not reading the chat, type '
                 '"\x02@ask4game\x02". For more information, ask for help, with '
                 'typing "\x02@ask4help\x02".')
@@ -90,9 +90,9 @@ class Glob2Chan(callbacks.Plugin):
                 '"\x02@subscribe\x02" is "\x02@unsubscribe\x02".')
         else:
             irc.error('Modes can are only "irc" and "yog"')
-        irc.reply('I am a Supybot-powered IRC bot; don\'t try to talk or play'
-                  'with me ;) If you have questions, bug reports, features '
-                  'request, ... ask my owner, he is \x02ProgVal\x02. '
+        irc.reply('I am a Supybot-powered IRC bot. Don\'t try to talk or play '
+                  'with me ;) If you have questions, bug reports, feature '
+                  'requests, ... ask my owner, he is \x02ProgVal\x02. '
                   'You can find stats about this channel '
                   'at \x02http://stats.supybot-fr.tk/global/glob2/\x02')
     g2help = wrap(g2help, [optional('somethingWithoutSpaces')])
