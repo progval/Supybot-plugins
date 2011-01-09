@@ -30,6 +30,9 @@
 import supybot.conf as conf
 import supybot.ircutils as ircutils
 import supybot.registry as registry
+from supybot.i18n import PluginInternationalization, internationalizeDocstring
+
+_ = PluginInternationalization('LinkRelay')
 
 def configure(advanced):
     from supybot.questions import output, expect, anything, something, yn
@@ -38,23 +41,23 @@ def configure(advanced):
 
 LinkRelay = conf.registerPlugin('LinkRelay')
 conf.registerChannelValue(LinkRelay, 'color',
-    registry.Boolean(False, """Determines whether the bot will color Relayed
-    PRIVMSGs so as to make the messages easier to read."""))
+    registry.Boolean(False, _("""Determines whether the bot will color Relayed
+    PRIVMSGs so as to make the messages easier to read.""")))
 conf.registerChannelValue(LinkRelay, 'topicSync',
-    registry.Boolean(True, """Determines whether the bot will synchronize
-    topics between networks in the channels it Relays."""))
+    registry.Boolean(True, _("""Determines whether the bot will synchronize
+    topics between networks in the channels it Relays.""")))
 conf.registerChannelValue(LinkRelay, 'hostmasks',
-    registry.Boolean(False, """Determines whether the bot will Relay the
+    registry.Boolean(False, _("""Determines whether the bot will Relay the
     hostmask of the person joining or parting the channel when he or she joins
-    or parts."""))
+    or parts.""")))
 conf.registerChannelValue(LinkRelay, 'includeNetwork',
-    registry.Boolean(True, """Determines whether the bot will include the
+    registry.Boolean(True, _("""Determines whether the bot will include the
     network in Relayed PRIVMSGs; if you're only Relaying between two networks,
-    it's somewhat redundant, and you may wish to save the space."""))
+    it's somewhat redundant, and you may wish to save the space.""")))
 conf.registerChannelValue(LinkRelay, 'noticeNonPrivmsgs',
-    registry.Boolean(False, """Determines whether the bot will used NOTICEs
+    registry.Boolean(False, _("""Determines whether the bot will used NOTICEs
     rather than PRIVMSGs for non-PRIVMSG Relay messages (i.e., joins, parts,
-    nicks, quits, modes, etc.)"""))
+    nicks, quits, modes, etc.)""")))
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
