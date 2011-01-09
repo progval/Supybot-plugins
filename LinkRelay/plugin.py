@@ -39,8 +39,11 @@ import supybot.irclib as irclib
 import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
-#from supybot.utils.structures import MultiSet, TimeoutQueue
+from supybot.i18n import PluginInternationalization, internationalizeDocstring
 
+_ = PluginInternationalization('LinkRelay')
+
+@internationalizeDocstring
 class LinkRelay(callbacks.Plugin):
     noIgnore = True
     threaded = True
@@ -117,6 +120,7 @@ class LinkRelay(callbacks.Plugin):
         return s
 
 
+    @internationalizeDocstring
     def list(self, irc, msg, args):
         """takes no arguments
 
@@ -223,6 +227,7 @@ class LinkRelay(callbacks.Plugin):
                 relay.hasIRC = True
 
 
+    @internationalizeDocstring
     def nicks(self, irc, msg, args, channel):
         """[<channel>]
 
