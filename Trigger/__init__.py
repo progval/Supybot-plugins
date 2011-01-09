@@ -38,7 +38,7 @@ import supybot.world as world
 
 # Use this for the version of this plugin.  You may wish to put a CVS keyword
 # in here if you're keeping the plugin in CVS or some similar system.
-__version__ = ""
+__version__ = "0.1"
 
 # XXX Replace this with an appropriate author or supybot.Author instance.
 if not hasattr(supybot.authors, 'progval'):
@@ -51,7 +51,7 @@ __author__ = supybot.authors.progval
 __contributors__ = {}
 
 # This is a url where the most recent plugin package can be downloaded.
-__url__ = '' # 'http://supybot.com/Members/yourname/Trigger/download'
+__url__ = 'http://supybot-fr.tk/Trigger'
 
 import config
 import plugin

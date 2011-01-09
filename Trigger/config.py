@@ -51,7 +51,7 @@ conf.registerGroup(Trigger, 'triggers')
 
 for trigger in 'join part privmsg notice'.split(' '):
     conf.registerChannelValue(Trigger.triggers, trigger,
-        registry.String('', _("""Commands sent on %s""")))
+        registry.String('', _("""Command triggered by %s""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
