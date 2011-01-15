@@ -43,18 +43,26 @@ from supybot.i18n import PluginInternationalization, internationalizeDocstring
 
 _ = PluginInternationalization('LinkRelay')
 
+def writeToConfig(plugin, from_, to, regexp):
+    from_, to = from_.split('@'), to.split('@')
+    args = from_
+    args.extend(to)
+    args.append(regexp)
+    s = ' | '.join(args)
+
+    currentConfig = plugin.registryValue('relays')
+    if s in currentConfig.split(' || '):
+        return False
+    if currentConfig == '':
+        plugin.setRegistryValue('relays', value=s)
+    else:
+        plugin.setRegistryValue('relays',value=' || '.join((currentConfig,s)))
+    return True
+
 @internationalizeDocstring
 class LinkRelay(callbacks.Plugin):
     noIgnore = True
     threaded = True
-
-    # Put a list of all the relays that you want to add here.  Only messages
-    # matching the regex will be relayed.
-    # syntax is [sourceChannel, sourceNetwork, targetChannel, targetNetwork, regex]
-    relaysToAdd = [
-            #['#supybot-test', 'sudoserv', '#progval', 'freenode', ''],
-            #['#progval', 'freenode', '#supybot-test', 'sudoserv', '']
-            ]
 
     # include any nick substitutions that you want to make here
     # (for example, if a user is in both channels, and doesn't want to get
@@ -81,7 +89,10 @@ class LinkRelay(callbacks.Plugin):
         self.__parent = super(LinkRelay, self)
         self.__parent.__init__(irc)
         self.relays = []
-        for relay in self.relaysToAdd:
+        for relay in self.registryValue('relays').split(' || '):
+            relay = relay.split(' | ')
+            if not len(relay) == 5:
+                continue
             self.relays.append(self.Relay(relay[0],
                                           relay[1],
                                           relay[2],
@@ -280,6 +291,59 @@ class LinkRelay(callbacks.Plugin):
                     irc.queueMsg(ircmsgs.privmsg(msg.args[0], s))
         irc.noReply()
     nicks = wrap(nicks, ['Channel'])
+
+
+    @internationalizeDocstring
+    def add(self, irc, msg, args, tupleOptlist):
+        """[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]
+
+        Adds a relay to the list. You must give at least --from or --to; if
+        one of them is not given, it defaults to the current channel@network.
+        Only messages matching <regexp> will be relayed; if <regexp> is not
+        given, everything is relayed.
+        If --reciprocal is given, another relay will be added automatically,
+        in the opposite direction."""
+        optlist = {}
+        for key, value in tupleOptlist:
+            optlist.update({key: value})
+        if 'from' not in optlist and 'to' not in optlist:
+            irc.error(_('You must give at least --from or --to.'))
+            return
+        for name in ('from', 'to'):
+            if name not in optlist:
+                optlist.update({name: '%s@%s' % (msg.args[0], irc.network)})
+        if 'regexp' not in optlist:
+            optlist.update({'regexp': ''})
+        if 'reciprocal' in optlist:
+            optlist.update({'reciprocal': True})
+        else:
+            optlist.update({'reciprocal': False})
+        if not len(optlist['from'].split('@')) == 2:
+            irc.error(_('--from should be like "--from #channel@network"'))
+            return
+        if not len(optlist['to'].split('@')) == 2:
+            irc.error(_('--to should be like "--to #channel@network"'))
+            return
+
+        failedWrites = 0
+        if not writeToConfig(self, optlist['from'],
+                             optlist['to'], optlist['regexp']):
+            failedWrites += 1
+        if optlist['reciprocal']:
+            if not writeToConfig(self, optlist['to'],
+                                 optlist['from'], optlist['regexp']):
+                failedWrites +=1
+
+        if failedWrites == 0:
+            irc.replySuccess()
+        else:
+            irc.error(_('One (or more) relay(s) already exists and has not '
+                      'been added.'))
+    add = wrap(add, [('checkCapability', 'admin'),
+                     getopts({'from': 'something',
+                              'to': 'something',
+                              'regexp': 'regexpMatcher',
+                              'reciprocal': ''})])
 
 
 Class = LinkRelay

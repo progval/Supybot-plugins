@@ -59,5 +59,10 @@ conf.registerChannelValue(LinkRelay, 'noticeNonPrivmsgs',
     rather than PRIVMSGs for non-PRIVMSG Relay messages (i.e., joins, parts,
     nicks, quits, modes, etc.)""")))
 
+conf.registerGlobalValue(LinkRelay, 'relays',
+    registry.String('', _("""You should edit this configuration variable
+    yourself. Use @LinkRelay {add|remove} instead.""")))
+
+
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

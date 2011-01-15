@@ -1,5 +1,6 @@
 ###
 # Copyright (c) 2010, quantumlemur
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,7 +31,13 @@
 from supybot.test import *
 
 class LinkRelayTestCase(PluginTestCase):
-    plugins = ('LinkRelay',)
+    plugins = ('LinkRelay','Config')
+
+    def testAdd(self):
+        self.assertResponse('config supybot.plugins.LinkRelay.relays', ' ')
+        self.assertNotError('linkrelay add --from #foo@bar --to #baz@bam')
+        self.assertResponse('config supybot.plugins.LinkRelay.relays',
+                            '#foo | bar | #baz | bam | ')
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
