@@ -30,14 +30,31 @@
 
 from supybot.test import *
 
-class LinkRelayTestCase(PluginTestCase):
+class LinkRelayTestCase(ChannelPluginTestCase):
     plugins = ('LinkRelay','Config')
 
     def testAdd(self):
-        self.assertResponse('config supybot.plugins.LinkRelay.relays', ' ')
+        self.assertNotError('config supybot.plugins.LinkRelay.relays ""')
         self.assertNotError('linkrelay add --from #foo@bar --to #baz@bam')
         self.assertResponse('config supybot.plugins.LinkRelay.relays',
                             '#foo | bar | #baz | bam | ')
+
+        self.assertNotError('config supybot.plugins.LinkRelay.relays ""')
+        self.assertNotError('linkrelay add --from #foo@bar --to #baz@bam '
+                            '--reciprocal')
+        self.assertResponse('config supybot.plugins.LinkRelay.relays',
+                            '#foo | bar | #baz | bam |  || '
+                            '#baz | bam | #foo | bar | ')
+
+        self.assertNotError('config supybot.plugins.LinkRelay.relays ""')
+        self.assertNotError('linkrelay add --from #foo@bar')
+        self.assertResponse('config supybot.plugins.LinkRelay.relays',
+                            '#foo | bar | #test | test | ')
+
+        self.assertNotError('config supybot.plugins.LinkRelay.relays ""')
+        self.assertNotError('linkrelay add --to #foo@bar')
+        self.assertResponse('config supybot.plugins.LinkRelay.relays',
+                            '#test | test | #foo | bar | ')
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
