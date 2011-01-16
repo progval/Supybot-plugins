@@ -43,21 +43,6 @@ from supybot.i18n import PluginInternationalization, internationalizeDocstring
 
 _ = PluginInternationalization('LinkRelay')
 
-def writeToConfig(plugin, from_, to, regexp):
-    from_, to = from_.split('@'), to.split('@')
-    args = from_
-    args.extend(to)
-    args.append(regexp)
-    s = ' | '.join(args)
-
-    currentConfig = plugin.registryValue('relays')
-    if s in currentConfig.split(' || '):
-        return False
-    if currentConfig == '':
-        plugin.setRegistryValue('relays', value=s)
-    else:
-        plugin.setRegistryValue('relays',value=' || '.join((currentConfig,s)))
-    return True
 
 @internationalizeDocstring
 class LinkRelay(callbacks.Plugin):
@@ -293,16 +278,32 @@ class LinkRelay(callbacks.Plugin):
     nicks = wrap(nicks, ['Channel'])
 
 
-    @internationalizeDocstring
-    def add(self, irc, msg, args, tupleOptlist):
-        """[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]
+    # The fellowing functions handle configuration
+    def _writeToConfig(self, from_, to, regexp, add):
+        from_, to = from_.split('@'), to.split('@')
+        args = from_
+        args.extend(to)
+        args.append(regexp)
+        s = ' | '.join(args)
 
-        Adds a relay to the list. You must give at least --from or --to; if
-        one of them is not given, it defaults to the current channel@network.
-        Only messages matching <regexp> will be relayed; if <regexp> is not
-        given, everything is relayed.
-        If --reciprocal is given, another relay will be added automatically,
-        in the opposite direction."""
+        currentConfig = self.registryValue('relays')
+        if add == True:
+            if s in currentConfig.split(' || '):
+                return False
+            if currentConfig == '':
+                self.setRegistryValue('relays', value=s)
+            else:
+                self.setRegistryValue('relays',
+                                      value=' || '.join((currentConfig,s)))
+        else:
+            newConfig = currentConfig.split(' || ')
+            if s not in newConfig:
+                return False
+            newConfig.remove(s)
+            self.setRegistryValue('relays', value=' || '.join(newConfig))
+        return True
+
+    def _parseOptlist(self, irc, msg, tupleOptlist):
         optlist = {}
         for key, value in tupleOptlist:
             optlist.update({key: value})
@@ -324,22 +325,71 @@ class LinkRelay(callbacks.Plugin):
         if not len(optlist['to'].split('@')) == 2:
             irc.error(_('--to should be like "--to #channel@network"'))
             return
+        return optlist
+
+    @internationalizeDocstring
+    def add(self, irc, msg, args, optlist):
+        """[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]
+
+        Adds a relay to the list. You must give at least --from or --to; if
+        one of them is not given, it defaults to the current channel@network.
+        Only messages matching <regexp> will be relayed; if <regexp> is not
+        given, everything is relayed.
+        If --reciprocal is given, another relay will be added automatically,
+        in the opposite direction."""
+        optlist = self._parseOptlist(irc, msg, optlist)
+        if optlist is None:
+            return
 
         failedWrites = 0
-        if not writeToConfig(self, optlist['from'],
-                             optlist['to'], optlist['regexp']):
+        if not self._writeToConfig(optlist['from'], optlist['to'],
+                                   optlist['regexp'], True):
             failedWrites += 1
         if optlist['reciprocal']:
-            if not writeToConfig(self, optlist['to'],
-                                 optlist['from'], optlist['regexp']):
+            if not self._writeToConfig(optlist['to'], optlist['from'],
+                                       optlist['regexp'], True):
                 failedWrites +=1
 
         if failedWrites == 0:
             irc.replySuccess()
         else:
             irc.error(_('One (or more) relay(s) already exists and has not '
-                      'been added.'))
+                        'been added.'))
     add = wrap(add, [('checkCapability', 'admin'),
+                     getopts({'from': 'something',
+                              'to': 'something',
+                              'regexp': 'regexpMatcher',
+                              'reciprocal': ''})])
+
+    @internationalizeDocstring
+    def remove(self, irc, msg, args, optlist):
+        """[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]
+
+        Remove a relay from the list. You must give at least --from or --to; if
+        one of them is not given, it defaults to the current channel@network.
+        Only messages matching <regexp> will be relayed; if <regexp> is not
+        given, everything is relayed.
+        If --reciprocal is given, another relay will be removed automatically,
+        in the opposite direction."""
+        optlist = self._parseOptlist(irc, msg, optlist)
+        if optlist is None:
+            return
+
+        failedWrites = 0
+        if not self._writeToConfig(optlist['from'], optlist['to'],
+                                   optlist['regexp'], False):
+            failedWrites += 1
+        if optlist['reciprocal']:
+            if not self._writeToConfig(optlist['to'], optlist['from'],
+                                       optlist['regexp'], False):
+                failedWrites +=1
+
+        if failedWrites == 0:
+            irc.replySuccess()
+        else:
+            irc.error(_('One (or more) relay(s) did not exist and has not '
+                        'been removed.'))
+    remove = wrap(remove, [('checkCapability', 'admin'),
                      getopts({'from': 'something',
                               'to': 'something',
                               'regexp': 'regexpMatcher',

@@ -56,6 +56,13 @@ class LinkRelayTestCase(ChannelPluginTestCase):
         self.assertResponse('config supybot.plugins.LinkRelay.relays',
                             '#test | test | #foo | bar | ')
 
+    def testRemove(self):
+        self.assertNotError('config supybot.plugins.LinkRelay.relays '
+                            '"#foo | bar | #baz | bam | "')
+        self.assertNotError('linkrelay remove --from #foo@bar --to #baz@bam')
+        self.assertResponse('config supybot.plugins.LinkRelay.relays', ' ')
+
+
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
 
