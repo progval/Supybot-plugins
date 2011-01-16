@@ -73,6 +73,11 @@ class LinkRelay(callbacks.Plugin):
     def __init__(self, irc):
         self.__parent = super(LinkRelay, self)
         self.__parent.__init__(irc)
+        self._loadFromConfig()
+        for IRC in world.ircs:
+            self.addIRC(IRC)
+
+    def _loadFromConfig(self):
         self.relays = []
         for relay in self.registryValue('relays').split(' || '):
             relay = relay.split(' | ')
@@ -85,8 +90,7 @@ class LinkRelay(callbacks.Plugin):
                                           re.compile('^%s$' % relay[0], re.I),
                                           re.compile('^%s$' % relay[1]),
                                           re.compile(relay[4])))
-        for IRC in world.ircs:
-            self.addIRC(IRC)
+
 
 
     def simpleHash(self, s):
@@ -350,6 +354,7 @@ class LinkRelay(callbacks.Plugin):
                                        optlist['regexp'], True):
                 failedWrites +=1
 
+        self._loadFromConfig()
         if failedWrites == 0:
             irc.replySuccess()
         else:
@@ -384,6 +389,7 @@ class LinkRelay(callbacks.Plugin):
                                        optlist['regexp'], False):
                 failedWrites +=1
 
+        self._loadFromConfig()
         if failedWrites == 0:
             irc.replySuccess()
         else:
