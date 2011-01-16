@@ -60,8 +60,8 @@ conf.registerChannelValue(LinkRelay, 'noticeNonPrivmsgs',
     nicks, quits, modes, etc.)""")))
 
 conf.registerGlobalValue(LinkRelay, 'relays',
-    registry.String('', _("""You should edit this configuration variable
-    yourself. Use @LinkRelay {add|remove} instead.""")))
+    registry.String('', _("""You shouldn't edit this configuration variable
+    yourself unless you know what you do. Use @LinkRelay {add|remove} instead.""")))
 
 
 
