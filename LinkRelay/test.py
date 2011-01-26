@@ -62,6 +62,24 @@ class LinkRelayTestCase(ChannelPluginTestCase):
         self.assertNotError('linkrelay remove --from #foo@bar --to #baz@bam')
         self.assertResponse('config supybot.plugins.LinkRelay.relays', ' ')
 
+    def testSubstitute(self):
+        self.assertNotError('config supybot.plugins.LinkRelay.substitutes ""')
+        self.assertNotError('linkrelay substitute foobar foo*bar')
+        self.assertResponse('config supybot.plugins.LinkRelay.substitutes',
+                            'foobar | foo*bar')
+        self.assertNotError('linkrelay substitute baz b*z')
+        self.assertResponse('config supybot.plugins.LinkRelay.substitutes',
+                            'foobar | foo*bar || baz | b*z')
+
+    def testNoSubstitute(self):
+        self.assertNotError('config supybot.plugins.LinkRelay.substitutes '
+                            'foobar | foo*bar || baz | b*z')
+        self.assertNotError('linkrelay nosubstitute baz')
+        self.assertResponse('config supybot.plugins.LinkRelay.substitutes',
+                            'foobar | foo*bar')
+        self.assertNotError('linkrelay nosubstitute foobar')
+        self.assertResponse('config supybot.plugins.LinkRelay.substitutes', ' ')
+
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

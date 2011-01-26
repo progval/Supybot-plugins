@@ -49,14 +49,6 @@ class LinkRelay(callbacks.Plugin):
     noIgnore = True
     threaded = True
 
-    # include any nick substitutions that you want to make here
-    # (for example, if a user is in both channels, and doesn't want to get
-    # highlighted every time they say a message)
-    nickSubstitutions = {
-            #'quantumlemur': 'quantu*lemu*'
-            }
-
-
     class Relay():
         def __init__(self, sourceChannel, sourceNetwork, targetChannel,
                      targetNetwork, channelRegex, networkRegex, messageRegex):
@@ -90,6 +82,7 @@ class LinkRelay(callbacks.Plugin):
                                           re.compile('^%s$' % relay[0], re.I),
                                           re.compile('^%s$' % relay[1]),
                                           re.compile(relay[4])))
+        self.nickSubstitutions = self.registryValue('substitutes')
 
 
 
@@ -400,6 +393,66 @@ class LinkRelay(callbacks.Plugin):
                               'to': 'something',
                               'regexp': 'regexpMatcher',
                               'reciprocal': ''})])
+
+    def _getSubstitutes(self):
+        # Get a list of strings
+        substitutes = self.registryValue('substitutes').split(' || ')
+        if substitutes == ['']:
+            return {}
+        # Convert it to a list of tuples
+        substitutes = [tuple(x.split(' | ')) for x in substitutes]
+        # Finally, make a dictionnary
+        substitutes = dict(substitutes)
+
+        return substitutes
+
+    def _setSubstitutes(self, substitutes):
+        # Get a list of tuples from the dictionnary
+        substitutes = substitutes.items()
+        # Make it a list of strings
+        substitutes = ['%s | %s' % (x,y) for x,y in substitutes]
+        # Finally, get a string
+        substitutes = ' || '.join(substitutes)
+
+        self.setRegistryValue('substitutes', value=substitutes)
+
+
+    @internationalizeDocstring
+    def substitute(self, irc, msg, args, regexp, to):
+        """<regexp> <replacement>
+
+        Replaces all nicks that matches the <regexp> by the <replacement>
+        string."""
+        substitutes = self._getSubstitutes()
+        # Don't check if it is already in the config: if will be overriden
+        # automatically and that is a good thing.
+        substitutes.update({regexp: to})
+        self._setSubstitutes(substitutes)
+        self._loadFromConfig()
+        irc.replySuccess()
+    substitute = wrap(substitute, [('checkCapability', 'admin'),
+                                   'something',
+                                   'text'])
+
+    @internationalizeDocstring
+    def nosubstitute(self, irc, msg, args, regexp):
+        """<regexp>
+
+        Undo a substitution."""
+        substitutes = self._getSubstitutes()
+        if regexp not in substitutes:
+            irc.error(_('This regexp was not in the nick substitutions '
+                        'database'))
+            return
+        # Don't check if it is already in the config: if will be overriden
+        # automatically and that is a good thing.
+        substitutes.pop(regexp)
+        self._setSubstitutes(substitutes)
+        self._loadFromConfig()
+        irc.replySuccess()
+    nosubstitute = wrap(nosubstitute, [('checkCapability', 'admin'),
+                                       'something'])
+
 
 
 Class = LinkRelay
