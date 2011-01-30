@@ -270,7 +270,7 @@ class LinkRelay(callbacks.Plugin):
                             relay.sourceChannel,
                             relay.sourceNetwork,
                             utils.str.commaAndify(users))
-                    irc.queueMsg(ircmsgs.privmsg(msg.args[0], s))
+                    irc.reply(s)
         irc.noReply()
     nicks = wrap(nicks, ['Channel'])
 
