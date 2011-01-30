@@ -267,8 +267,8 @@ class LinkRelay(callbacks.Plugin):
                     users.sort()
                     msg.tag('relayedMsg')
                     s = '%d users in %s on %s:  %s' % (numUsers,
-                            relay.sourceChannel,
-                            relay.sourceNetwork,
+                            relay.targetChannel,
+                            relay.targetNetwork,
                             utils.str.commaAndify(users))
                     irc.reply(s)
         irc.noReply()
