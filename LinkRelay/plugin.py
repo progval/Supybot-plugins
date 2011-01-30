@@ -59,7 +59,8 @@ class LinkRelay(callbacks.Plugin):
             self.channelRegex = channelRegex
             self.networkRegex = networkRegex
             self.messageRegex = messageRegex
-            self.hasIRC = False
+            self.hasTargetIRC = False
+            self.hasSourceIRC = False
 
 
     def __init__(self, irc):
@@ -119,17 +120,17 @@ class LinkRelay(callbacks.Plugin):
 
         Returns all the defined relay links"""
         for relay in self.relays:
-            if relay.hasIRC:
-                hasIRC = 'Link healthy!'
+            if relay.hasTargetIRC:
+                hasTargetIRC = 'Link healthy!'
             else:
-                hasIRC = '\x0304IRC object not scraped yet.\x03'
+                hasTargetIRC = '\x0304IRC object not scraped yet.\x03'
             irc.sendMsg(ircmsgs.privmsg(msg.args[0],'\x02%s\x02 on \x02%s\x02'
                         '==>   \x02%s\x02 on \x02%s\x02.  %s' %
                         (relay.sourceChannel,
                          relay.sourceNetwork,
                          relay.targetChannel,
                          relay.targetNetwork,
-                         hasIRC)))
+                         hasTargetIRC)))
 
     def doPrivmsg(self, irc, msg):
         self.addIRC(irc)
@@ -181,7 +182,7 @@ class LinkRelay(callbacks.Plugin):
                     relay.networkRegex.match(irc.network) and \
                     (len(triggerMsg.args[1]) < 1 or
                             relay.messageRegex.search(triggerMsg.args[1])):
-                if not relay.hasIRC:
+                if not relay.hasTargetIRC:
                     self.log.info('LinkRelay:  IRC %s not yet scraped.' %
                                   relay.targetNetwork)
                 elif relay.targetIRC.zombie:
@@ -215,9 +216,12 @@ class LinkRelay(callbacks.Plugin):
     def addIRC(self, irc):
         match = False
         for relay in self.relays:
-            if relay.targetNetwork == irc.network and not relay.hasIRC:
+            if relay.targetNetwork == irc.network and not relay.hasTargetIRC:
                 relay.targetIRC = irc
-                relay.hasIRC = True
+                relay.hasTargetIRC = True
+            if relay.sourceNetwork == irc.network and not relay.hasSourceIRC:
+                relay.sourceIRC = irc
+                relay.hasSourceIRC = True
 
 
     @internationalizeDocstring
@@ -230,7 +234,7 @@ class LinkRelay(callbacks.Plugin):
         for relay in self.relays:
             if relay.targetChannel == channel and \
                     relay.targetNetwork == irc.network:
-                if not relay.hasIRC:
+                if not relay.hasTargetIRC:
                     irc.reply('I haven\'t scraped the IRC object for %s yet. '
                               'Try again in a minute or two.' % \
                               relay.targetNetwork)
@@ -244,7 +248,7 @@ class LinkRelay(callbacks.Plugin):
                     try:
                         source = relay.sourceChannel
                         # FIXME: right now it won't match a regex channe
-                        Channel = relay.targetIRC.state.channels[source]
+                        Channel = relay.sourceIRC.state.channels[source]
                     except KeyError:
                         continue
                     for s in Channel.users:
