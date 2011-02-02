@@ -7,7 +7,7 @@ def get(useSkeleton, channel, db, urlLevel, page, orderby=None):
     bound = db.getChanRecordingTimeBoundaries(channel)
     output = '<h1>%s</h1>' % _('Stats about %s channel')
     output %= channel
-    output += '<p><a href="/nicks/%s/">%s</a></p>' % (channel[1:],
+    output += '<p><a href="/nicks/%s/">%s</a></p>' % (channel[1:].replace('#', ' '),
                                                  _('View nick-by-nick stats'))
     output += '<p>%s</p>' % _('There were %n, %n, %n, %n, %n, %n, %n, '
                               'and %n.')
