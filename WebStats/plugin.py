@@ -110,7 +110,7 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 response = 200
                 content_type = 'text/html'
                 assert len(splittedPath) > 2
-                chanName = splittedPath[2]
+                chanName = splittedPath[2].replace('%20', '#')
                 getTemplate('listingcommons') # Reload
                 page = splittedPath[-1][0:-len('.htm')]
                 if page == '':
