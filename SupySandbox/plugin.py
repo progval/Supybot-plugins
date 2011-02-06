@@ -1,5 +1,5 @@
 ###
-# Copyright (c) 2010, Valentin Lorentz
+# Copyright (c) 2010-2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ EVAL_MAXMEMORYBYTES = 75 * 1024 * 1024 # 10 MiB
 try:
     import sandbox as S
 except ImportError:
-    print 'You need pysandbox in order to run fschfsch ' + \
+    print 'You need pysandbox in order to run SupySandbox plugin ' + \
           '[http://github.com/haypo/pysandbox].'
     raise
 import re
