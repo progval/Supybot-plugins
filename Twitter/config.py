@@ -1,6 +1,6 @@
 ###
 # Copyright (c) 2007, Andy Berdan
-# Copyright (c) 2011, Andy Berdan
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
