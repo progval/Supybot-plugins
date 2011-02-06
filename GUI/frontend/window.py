@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'window.ui'
 #
-# Created: Sun Feb  6 09:28:44 2011
+# Created: Sun Feb  6 09:34:43 2011
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -50,10 +50,24 @@ class Ui_window(object):
         window.addTab(self.configurationTab, "")
         self.commandsTab = QtGui.QWidget()
         self.commandsTab.setObjectName("commandsTab")
+        self.verticalLayout = QtGui.QVBoxLayout(self.commandsTab)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.commandsHistory = QtGui.QPlainTextEdit(self.commandsTab)
+        self.commandsHistory.setObjectName("commandsHistory")
+        self.verticalLayout.addWidget(self.commandsHistory)
+        self.commandsWritingLayout = QtGui.QHBoxLayout()
+        self.commandsWritingLayout.setObjectName("commandsWritingLayout")
+        self.commandEdit = QtGui.QLineEdit(self.commandsTab)
+        self.commandEdit.setObjectName("commandEdit")
+        self.commandsWritingLayout.addWidget(self.commandEdit)
+        self.commandSend = QtGui.QPushButton(self.commandsTab)
+        self.commandSend.setObjectName("commandSend")
+        self.commandsWritingLayout.addWidget(self.commandSend)
+        self.verticalLayout.addLayout(self.commandsWritingLayout)
         window.addTab(self.commandsTab, "")
 
         self.retranslateUi(window)
-        window.setCurrentIndex(0)
+        window.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(window)
 
     def retranslateUi(self, window):
@@ -63,5 +77,6 @@ class Ui_window(object):
         self.configurationSetButton.setText(QtGui.QApplication.translate("window", "Set", None, QtGui.QApplication.UnicodeUTF8))
         self.configurationHelpLabel.setText(QtGui.QApplication.translate("window", "Help", None, QtGui.QApplication.UnicodeUTF8))
         window.setTabText(window.indexOf(self.configurationTab), QtGui.QApplication.translate("window", "Configuration", None, QtGui.QApplication.UnicodeUTF8))
+        self.commandSend.setText(QtGui.QApplication.translate("window", "PushButton", None, QtGui.QApplication.UnicodeUTF8))
         window.setTabText(window.indexOf(self.commandsTab), QtGui.QApplication.translate("window", "Commands", None, QtGui.QApplication.UnicodeUTF8))
 

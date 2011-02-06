@@ -14,7 +14,7 @@
    <string>TabWidget</string>
   </property>
   <property name="currentIndex">
-   <number>0</number>
+   <number>1</number>
   </property>
   <widget class="QWidget" name="configurationTab">
    <attribute name="title">
@@ -76,6 +76,25 @@
    <attribute name="title">
     <string>Commands</string>
    </attribute>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QPlainTextEdit" name="commandsHistory"/>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="commandsWritingLayout">
+      <item>
+       <widget class="QLineEdit" name="commandEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="commandSend">
+        <property name="text">
+         <string>PushButton</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
