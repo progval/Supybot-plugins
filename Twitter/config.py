@@ -1,5 +1,6 @@
 ###
 # Copyright (c) 2007, Andy Berdan
+# Copyright (c) 2011, Andy Berdan
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -50,7 +51,7 @@ Twitter = conf.registerPlugin('Twitter')
 conf.registerGlobalValue(Twitter, 'account',
         registry.String('', "twitter.com account name"))
 conf.registerGlobalValue(Twitter, 'password',
-        registry.String('', "twitter.com password"))
+        registry.String('', "twitter.com password", private=True))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
