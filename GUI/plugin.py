@@ -31,6 +31,7 @@
 import re
 import time
 import socket
+import threading
 import SocketServer
 import supybot.utils as utils
 from supybot.commands import *
@@ -68,24 +69,26 @@ class ThreadedTCPServer(SocketServer.TCPServer):
 
 class RequestHandler(SocketServer.StreamRequestHandler):
     def handle(self):
+        self.request.settimeout(0.5)
         currentLine = ''
         while self.server.enabled:
             if not '\n' in currentLine:
                 try:
                     data = self.request.recv(4096)
                 except socket.timeout:
+                    time.sleep(0.1) # in case of odd problem
                     continue
             if '\n' in data:
-                splitted = (currentLine + data).split('\r\n')
+                splitted = (currentLine + data).split('\n')
                 currentLine = splitted[0]
-                nextLines = '\r\n'.join(splitted[1:])
+                nextLines = '\n'.join(splitted[1:])
             else:
                 continue
             tokens = callbacks.tokenize(currentLine)
             fakeIrc = FakeIrc(self.server._irc)
-            msg = ircmsgs.privmsg('#supybot-gui', currentLine + '\n')
+            msg = ircmsgs.privmsg('#supybot-gui', currentLine)
             self.server._plugin.Proxy(fakeIrc, msg, tokens)
-            self.request.send(fakeIrc.message)
+            self.request.send(fakeIrc.message + '\n')
             currentLine = nextLines
 
 
@@ -101,29 +104,15 @@ class GUI(callbacks.Plugin):
                 break
             except socket.error: # Address already in use
                 time.sleep(1)
+        self._server.timeout = 0.5
+
+        # Used by request handlers:
         self._server._irc = irc
         self._server._plugin = self
         self._server.enabled = True
 
-    @internationalizeDocstring
-    def start(self, irc, msg, args):
-        """takes no arguments
-
-        Starts the GUI server."""
-        irc.replySuccess()
-        self._server.handle_request()
-    start = wrap(start, [('checkCapability', 'owner')])
-
-    @internationalizeDocstring
-    def stop(self, irc, msg, args):
-        """takes no arguments
-
-        Stopss the GUI server."""
-        if not hasattr(self, '_server'):
-            irc.error(_('Server not enabled'))
-            return
-        irc.replySuccess()
-    stop = wrap(stop, [('checkCapability', 'owner')])
+        threading.Thread(target=self._server.serve_forever,
+                         name='GUI server').start()
 
     def __die__(self, irc):
         self.__parent = super(GUI, self)

@@ -1,0 +1,9 @@
+Remote-control:
+	Move the server address/port to the configuration
+	Add authentication
+
+Frontend:
+	Handle remote-control changes ;)
+	Disable editing commands history
+	Handle 'broken pipe' errors
+	Display received data

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'window.ui'
 #
-# Created: Sun Feb  6 09:34:43 2011
+# Created: Sun Feb  6 18:11:09 2011
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -77,6 +77,6 @@ class Ui_window(object):
         self.configurationSetButton.setText(QtGui.QApplication.translate("window", "Set", None, QtGui.QApplication.UnicodeUTF8))
         self.configurationHelpLabel.setText(QtGui.QApplication.translate("window", "Help", None, QtGui.QApplication.UnicodeUTF8))
         window.setTabText(window.indexOf(self.configurationTab), QtGui.QApplication.translate("window", "Configuration", None, QtGui.QApplication.UnicodeUTF8))
-        self.commandSend.setText(QtGui.QApplication.translate("window", "PushButton", None, QtGui.QApplication.UnicodeUTF8))
+        self.commandSend.setText(QtGui.QApplication.translate("window", "Envoyer", None, QtGui.QApplication.UnicodeUTF8))
         window.setTabText(window.indexOf(self.commandsTab), QtGui.QApplication.translate("window", "Commands", None, QtGui.QApplication.UnicodeUTF8))
 
