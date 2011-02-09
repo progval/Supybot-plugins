@@ -68,6 +68,10 @@ class GetReplies(QtCore.QObject):
                 data = sock.recv(4096)
             except socket.timeout:
                 return
+        if not data: # Frontend closed connection
+            self._timer.stop()
+            self._commandsHistory.appendPlainText('* Broken connection *')
+            return
         if '\n' in data:
             splitted = (currentLine + data).split('\n')
             nextLines = '\n'.join(splitted[1:])

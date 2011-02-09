@@ -78,6 +78,8 @@ class RequestHandler(SocketServer.StreamRequestHandler):
                 except socket.timeout:
                     time.sleep(0.1) # in case of odd problem
                     continue
+            if not data: # Server closed connection
+                return
             if '\n' in data:
                 splitted = (currentLine + data).split('\n')
                 currentLine = splitted[0]
@@ -114,10 +116,10 @@ class GUI(callbacks.Plugin):
         threading.Thread(target=self._server.serve_forever,
                          name='GUI server').start()
 
-    def __die__(self, irc):
-        self.__parent = super(GUI, self)
-        callbacks.Plugin.__die__(self, irc)
+    def die(self):
+        self.__parent.die()
         self._server.enabled = False
+        time.sleep(1)
         self._server.shutdown()
         del self._server
 
