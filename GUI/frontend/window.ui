@@ -85,7 +85,11 @@
    </attribute>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QPlainTextEdit" name="commandsHistory"/>
+     <widget class="QPlainTextEdit" name="commandsHistory">
+      <property name="textInteractionFlags">
+       <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
     </item>
     <item>
      <layout class="QHBoxLayout" name="commandsWritingLayout">

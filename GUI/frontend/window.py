@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'window.ui'
 #
-# Created: Mon Feb  7 20:18:57 2011
+# Created: Wed Feb  9 09:24:35 2011
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -57,6 +57,7 @@ class Ui_window(object):
         self.verticalLayout = QtGui.QVBoxLayout(self.commandsTab)
         self.verticalLayout.setObjectName("verticalLayout")
         self.commandsHistory = QtGui.QPlainTextEdit(self.commandsTab)
+        self.commandsHistory.setTextInteractionFlags(QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
         self.commandsHistory.setObjectName("commandsHistory")
         self.verticalLayout.addWidget(self.commandsHistory)
         self.commandsWritingLayout = QtGui.QHBoxLayout()

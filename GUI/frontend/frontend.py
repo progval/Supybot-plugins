@@ -83,7 +83,7 @@ class Window(QtGui.QTabWidget, window.Ui_window):
         QtGui.QWidget.__init__(self, parent)
         self.setupUi(self)
 
-        self.connect(self.commandSend, QtCore.SIGNAL('returnPressed()'),
+        self.connect(self.commandEdit, QtCore.SIGNAL('returnPressed()'),
                      self.commandSendHandler)
         self.connect(self.commandSend, QtCore.SIGNAL('clicked()'),
                      self.commandSendHandler)
@@ -93,8 +93,12 @@ class Window(QtGui.QTabWidget, window.Ui_window):
     def commandSendHandler(self):
         command = self.commandEdit.text()
         self.commandEdit.clear()
-        sendCommand(command)
-        self.commandsHistory.appendPlainText('<-- ' + command)
+        try:
+            sendCommand(command)
+            s = '<-- ' + command
+        except socket.error:
+            s = '(not sent) <-- ' + command
+        self.commandsHistory.appendPlainText(s)
 
 
 
