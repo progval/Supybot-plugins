@@ -52,7 +52,7 @@ sock.settimeout(0.01)
 _ = lambda x:x
 
 def sendCommand(command):
-    sock.send(str(command) + '\n')
+    sock.send(unicode(command).encode('utf8', 'replace') + '\n')
 
 class GetReplies(QtCore.QObject):
     def __init__(self, commandsHistory):
@@ -71,7 +71,8 @@ class GetReplies(QtCore.QObject):
         if '\n' in data:
             splitted = (currentLine + data).split('\n')
             nextLines = '\n'.join(splitted[1:])
-            self._commandsHistory.appendPlainText('--> ' + splitted[0])
+            self._commandsHistory.appendPlainText('--> ' +
+                                                  splitted[0].decode('utf8'))
 
 class Window(QtGui.QTabWidget, window.Ui_window):
     def __init__(self, parent=None):
