@@ -11,7 +11,14 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TabWidget</string>
+   <string>Supybot GUI</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icon.png</normaloff>icon.png</iconset>
+  </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
   </property>
   <property name="currentIndex">
    <number>1</number>
@@ -88,7 +95,7 @@
       <item>
        <widget class="QPushButton" name="commandSend">
         <property name="text">
-         <string>Envoyer</string>
+         <string>Send</string>
         </property>
        </widget>
       </item>

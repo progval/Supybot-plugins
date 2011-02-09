@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'window.ui'
 #
-# Created: Sun Feb  6 18:11:09 2011
+# Created: Mon Feb  7 20:18:57 2011
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,6 +13,10 @@ class Ui_window(object):
     def setupUi(self, window):
         window.setObjectName("window")
         window.resize(761, 591)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        window.setWindowIcon(icon)
+        window.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
         self.configurationTab = QtGui.QWidget()
         self.configurationTab.setObjectName("configurationTab")
         self.horizontalLayout = QtGui.QHBoxLayout(self.configurationTab)
@@ -71,12 +75,12 @@ class Ui_window(object):
         QtCore.QMetaObject.connectSlotsByName(window)
 
     def retranslateUi(self, window):
-        window.setWindowTitle(QtGui.QApplication.translate("window", "TabWidget", None, QtGui.QApplication.UnicodeUTF8))
+        window.setWindowTitle(QtGui.QApplication.translate("window", "Supybot GUI", None, QtGui.QApplication.UnicodeUTF8))
         self.configurationVariableLabel.setText(QtGui.QApplication.translate("window", "Value", None, QtGui.QApplication.UnicodeUTF8))
         self.configurationDefaultButton.setText(QtGui.QApplication.translate("window", "Default", None, QtGui.QApplication.UnicodeUTF8))
         self.configurationSetButton.setText(QtGui.QApplication.translate("window", "Set", None, QtGui.QApplication.UnicodeUTF8))
         self.configurationHelpLabel.setText(QtGui.QApplication.translate("window", "Help", None, QtGui.QApplication.UnicodeUTF8))
         window.setTabText(window.indexOf(self.configurationTab), QtGui.QApplication.translate("window", "Configuration", None, QtGui.QApplication.UnicodeUTF8))
-        self.commandSend.setText(QtGui.QApplication.translate("window", "Envoyer", None, QtGui.QApplication.UnicodeUTF8))
+        self.commandSend.setText(QtGui.QApplication.translate("window", "Send", None, QtGui.QApplication.UnicodeUTF8))
         window.setTabText(window.indexOf(self.commandsTab), QtGui.QApplication.translate("window", "Commands", None, QtGui.QApplication.UnicodeUTF8))
 
