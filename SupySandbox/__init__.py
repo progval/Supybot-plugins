@@ -50,7 +50,7 @@ __author__ = supybot.Author('Valentin Lorentz', 'ProgVal',
 __contributors__ = {}
 
 # This is a url where the most recent plugin package can be downloaded.
-__url__ = 'http://supybot-fr.tk/SupySandbox'
+__url__ = 'http://supybot.fr.cr/SupySandbox'
 
 import config
 import plugin

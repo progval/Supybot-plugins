@@ -61,7 +61,7 @@ msgid ""
 "    </li>\n"
 "    <li>\n"
 "        <a href=\"mailto:progval@gmail.com\">ProgVal</a>'s\n"
-"        <a href=\"http://supybot-fr.tk/WebStats\">WebStats plugin for Supybot</a>\n"
+"        <a href=\"http://supybot.fr.cr/WebStats\">WebStats plugin for Supybot</a>\n"
 "    </li>\n"
 msgstr ""
 

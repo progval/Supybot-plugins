@@ -51,7 +51,7 @@ __author__ = supybot.authors.progval
 __contributors__ = {}
 
 # This is a url where the most recent plugin package can be downloaded.
-__url__ = 'http://supybot-fr.tk/AttackProtector'
+__url__ = 'http://supybot.fr.cr/AttackProtector'
 # 'http://supybot.com/Members/yourname/AttackProtector/download'
 
 import config

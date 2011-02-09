@@ -51,7 +51,7 @@ __author__ = supybot.authors.progval
 __contributors__ = {}
 
 # This is a url where the most recent plugin package can be downloaded.
-__url__ = 'http://supybot-fr.tk/WebStats'
+__url__ = 'http://supybot.fr.cr/WebStats'
 # 'http://supybot.com/Members/yourname/WebStats/download'
 
 import config

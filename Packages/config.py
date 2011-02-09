@@ -55,7 +55,7 @@ Packages = conf.registerPlugin('Packages')
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
 conf.registerGroup(Packages, 'sources')
 conf.registerGlobalValue(Packages.sources, 'plugins',
-    registry.String('http://plugins.supybot-fr.tk', _("""The URL where the
+    registry.String('http://plugins.supybot.fr.cr', _("""The URL where the
     plugins packages are.""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
