@@ -112,6 +112,8 @@ if __name__ == "__main__":
     window = Window()
     window.show()
 
+    window.commandEdit.setFocus()
+
     status = app.exec_()
     running = False
     sys.exit(status)
