@@ -54,43 +54,53 @@ _ = lambda x:x
 
 
 def sendCommand(command):
+    """Get a command, send it, and returns a unique hash, used to identify
+    replies to this command."""
     hash_ = hashlib.sha1(str(time.time()) + command).hexdigest()
     command = '%s: %s\n' % (hash_, unicode(command).encode('utf8', 'replace'))
     sock.send(command)
     return hash_
 
 class Window(QtGui.QTabWidget, window.Ui_window):
+    """Represents the main window."""
     def __init__(self, eventsManager, parent=None):
         QtGui.QWidget.__init__(self, parent)
 
         self._eventsManager = eventsManager
 
         self.setupUi(self)
-
         self.connect(self.commandEdit, QtCore.SIGNAL('returnPressed()'),
                      self.commandSendHandler)
         self.connect(self.commandSend, QtCore.SIGNAL('clicked()'),
                      self.commandSendHandler)
 
     def commandSendHandler(self):
+        """Slot called when the user clicks 'Send' or presses 'Enter' in the
+        raw commands tab."""
         command = self.commandEdit.text()
         self.commandEdit.clear()
         try:
             self._eventsManager.hook(sendCommand(command), self.replyReceived)
-            s = '<-- ' + command
+            s = _('<-- ') + command
         except socket.error:
-            s = '(not sent) <-- ' + command
+            s = _('(not sent) <-- ') + command
         self.commandsHistory.appendPlainText(s)
 
     def replyReceived(self, reply):
-        self.commandsHistory.appendPlainText('--> ' + reply.decode('utf8'))
+        """Called by the events manager when a reply to a raw command is
+        received."""
+        self.commandsHistory.appendPlainText(_('--> ') + reply.decode('utf8'))
 
     def displaySpecialMessage(self, message):
-        self.commandsHistory.appendPlainText('* %s *' % message)
+        """Called by the events manager when a special message has to be
+        displayed."""
+        self.commandsHistory.appendPlainText(_('* %s *') % message)
 
 
 
 class EventsManager(QtCore.QObject):
+    """This class handles all incoming messages, and call the associated
+    callback (using hook() method)"""
     def __init__(self):
         self._currentLine = ''
         self._hooks = {} # FIXME: should be cleared every minute
@@ -101,8 +111,8 @@ class EventsManager(QtCore.QObject):
         self._timerGetReplies.start(100)
 
     def _getReplies(self):
+        """Called by the QTimer; fetches the messages and calls the hooks."""
         currentLine = self._currentLine
-        print(repr(currentLine))
         self.currentLine = ''
         if not '\n' in currentLine:
             try:
@@ -111,7 +121,7 @@ class EventsManager(QtCore.QObject):
                 return
         if not data: # Frontend closed connection
             self._timer.stop()
-            self.callbackSpecialMessage('connection broken')
+            self.callbackSpecialMessage(_('connection broken'))
             return
         if '\n' in data:
             splitted = (currentLine + data).split('\n')
@@ -125,16 +135,17 @@ class EventsManager(QtCore.QObject):
         self._currentLine = nextLines
 
     def hook(self, hash_, callback):
+        """Attach a callback to a hash: everytime a reply with this hash is
+        received, the callback is called."""
         self._hooks[hash_] = callback
 
     def unhook(self, hash_):
+        """Undo hook()."""
         return self._hooks.pop(hash_)
 
 
 
 if __name__ == "__main__":
-    running = True
-
     app = QtGui.QApplication(sys.argv)
 
     eventsManager = EventsManager()
@@ -145,6 +156,4 @@ if __name__ == "__main__":
 
     eventsManager.callbackSpecialMessages = window.displaySpecialMessage
 
-    status = app.exec_()
-    running = False
-    sys.exit(status)
+    sys.exit(app.exec_())
