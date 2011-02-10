@@ -33,6 +33,7 @@
 # Standard library
 from __future__ import print_function
 import threading
+import hashlib
 import socket
 import time
 import sys
@@ -52,16 +53,37 @@ sock.settimeout(0.01)
 _ = lambda x:x
 
 def sendCommand(command):
-    sock.send(unicode(command).encode('utf8', 'replace') + '\n')
+    hash_ = hashlib.sha1(str(time.time()) + command).hexdigest()
+    command = '%s: %s\n' % (hash_, unicode(command).encode('utf8', 'replace'))
+    sock.send(command)
+    return hash_
 
-class GetReplies(QtCore.QObject):
-    def __init__(self, commandsHistory):
-        self._commandsHistory = commandsHistory
-        self._timer = QtCore.QTimer()
-        self.connect(self._timer, QtCore.SIGNAL('timeout()'),
-                     self.run);
-        self._timer.start(100)
-    def run(self):
+class Window(QtGui.QTabWidget, window.Ui_window):
+    def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+        self.setupUi(self)
+
+        self.connect(self.commandEdit, QtCore.SIGNAL('returnPressed()'),
+                     self.commandSendHandler)
+        self.connect(self.commandSend, QtCore.SIGNAL('clicked()'),
+                     self.commandSendHandler)
+
+        self._timerGetReplies = QtCore.QTimer()
+        self.connect(self._timerGetReplies, QtCore.SIGNAL('timeout()'),
+                     self._getReplies);
+        self._timerGetReplies.start(100)
+
+    def commandSendHandler(self):
+        command = self.commandEdit.text()
+        self.commandEdit.clear()
+        try:
+            sendCommand(command)
+            s = '<-- ' + command
+        except socket.error:
+            s = '(not sent) <-- ' + command
+        self.commandsHistory.appendPlainText(s)
+
+    def _getReplies(self):
         currentLine = ''
         if not '\n' in currentLine:
             try:
@@ -75,30 +97,10 @@ class GetReplies(QtCore.QObject):
         if '\n' in data:
             splitted = (currentLine + data).split('\n')
             nextLines = '\n'.join(splitted[1:])
-            self._commandsHistory.appendPlainText('--> ' +
-                                                  splitted[0].decode('utf8'))
-
-class Window(QtGui.QTabWidget, window.Ui_window):
-    def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
-        self.setupUi(self)
-
-        self.connect(self.commandEdit, QtCore.SIGNAL('returnPressed()'),
-                     self.commandSendHandler)
-        self.connect(self.commandSend, QtCore.SIGNAL('clicked()'),
-                     self.commandSendHandler)
-
-        self._getReplies = GetReplies(self.commandsHistory)
-
-    def commandSendHandler(self):
-        command = self.commandEdit.text()
-        self.commandEdit.clear()
-        try:
-            sendCommand(command)
-            s = '<-- ' + command
-        except socket.error:
-            s = '(not sent) <-- ' + command
-        self.commandsHistory.appendPlainText(s)
+            splitted = splitted[0].split(': ')
+            hash_, reply = splitted[0], ': '.join(splitted[1:])
+            self.commandsHistory.appendPlainText('--> ' +
+                                                 reply.decode('utf8'))
 
 
 

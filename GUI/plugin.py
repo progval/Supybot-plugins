@@ -86,11 +86,15 @@ class RequestHandler(SocketServer.StreamRequestHandler):
                 nextLines = '\n'.join(splitted[1:])
             else:
                 continue
-            tokens = callbacks.tokenize(currentLine)
+            splitted = currentLine.split(': ')
+            hash_, command = splitted[0], ': '.join(splitted[1:])
+
+            tokens = callbacks.tokenize(command)
             fakeIrc = FakeIrc(self.server._irc)
             msg = ircmsgs.privmsg('#supybot-gui', currentLine)
             self.server._plugin.Proxy(fakeIrc, msg, tokens)
-            self.request.send(fakeIrc.message + '\n')
+
+            self.request.send('%s: %s\n' % (hash_, fakeIrc.message))
             currentLine = nextLines
 
 
