@@ -80,7 +80,8 @@ class Window(QtGui.QTabWidget, window.Ui_window):
         command = self.commandEdit.text()
         self.commandEdit.clear()
         try:
-            self._eventsManager.hook(sendCommand(command), self.replyReceived)
+            # No hooking, because the callback would be the default callback
+            sendCommand(command)
             s = _('<-- ') + command
         except socket.error:
             s = _('(not sent) <-- ') + command
@@ -110,6 +111,11 @@ class EventsManager(QtCore.QObject):
                      self._getReplies);
         self._timerGetReplies.start(100)
 
+        self._timerCleanHooks = QtCore.QTimer()
+        self.connect(self._timerCleanHooks, QtCore.SIGNAL('timeout()'),
+                     self._cleanHooks);
+        self._timerCleanHooks.start(100)
+
     def _getReplies(self):
         """Called by the QTimer; fetches the messages and calls the hooks."""
         currentLine = self._currentLine
@@ -128,20 +134,27 @@ class EventsManager(QtCore.QObject):
             nextLines = '\n'.join(splitted[1:-1])
             splitted = splitted[0].split(': ')
             hash_, reply = splitted[0], ': '.join(splitted[1:])
-            assert hash_ in self._hooks
-            self._hooks[hash_](reply)
+            if hash_ in self._hooks:
+                self._hooks[hash_](reply)
+            else:
+                self.defaultCallback(reply)
         else:
             nextLines = currentLine + data
         self._currentLine = nextLines
 
-    def hook(self, hash_, callback):
+    def hook(self, hash_, callback, lifeTime=60):
         """Attach a callback to a hash: everytime a reply with this hash is
         received, the callback is called."""
-        self._hooks[hash_] = callback
+        self._hooks[hash_] = (callback, time.time() + lifeTime())
 
     def unhook(self, hash_):
         """Undo hook()."""
         return self._hooks.pop(hash_)
+
+    def _cleanHooks(self):
+        for hash_, data in self._hooks.items():
+            if data[1] < time.time():
+                self._hooks.pop(hash_)
 
 
 
@@ -155,5 +168,6 @@ if __name__ == "__main__":
     window.commandEdit.setFocus()
 
     eventsManager.callbackSpecialMessages = window.displaySpecialMessage
+    eventsManager.defaultCallback = window.replyReceived
 
     sys.exit(app.exec_())
