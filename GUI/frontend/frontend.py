@@ -52,6 +52,7 @@ sock.settimeout(0.01)
 # FIXME: internationalize
 _ = lambda x:x
 
+
 def sendCommand(command):
     hash_ = hashlib.sha1(str(time.time()) + command).hexdigest()
     command = '%s: %s\n' % (hash_, unicode(command).encode('utf8', 'replace'))
@@ -59,8 +60,11 @@ def sendCommand(command):
     return hash_
 
 class Window(QtGui.QTabWidget, window.Ui_window):
-    def __init__(self, parent=None):
+    def __init__(self, eventsManager, parent=None):
         QtGui.QWidget.__init__(self, parent)
+
+        self._eventsManager = eventsManager
+
         self.setupUi(self)
 
         self.connect(self.commandEdit, QtCore.SIGNAL('returnPressed()'),
@@ -68,23 +72,38 @@ class Window(QtGui.QTabWidget, window.Ui_window):
         self.connect(self.commandSend, QtCore.SIGNAL('clicked()'),
                      self.commandSendHandler)
 
-        self._timerGetReplies = QtCore.QTimer()
-        self.connect(self._timerGetReplies, QtCore.SIGNAL('timeout()'),
-                     self._getReplies);
-        self._timerGetReplies.start(100)
-
     def commandSendHandler(self):
         command = self.commandEdit.text()
         self.commandEdit.clear()
         try:
-            sendCommand(command)
+            self._eventsManager.hook(sendCommand(command), self.replyReceived)
             s = '<-- ' + command
         except socket.error:
             s = '(not sent) <-- ' + command
         self.commandsHistory.appendPlainText(s)
 
+    def replyReceived(self, reply):
+        self.commandsHistory.appendPlainText('--> ' + reply.decode('utf8'))
+
+    def displaySpecialMessage(self, message):
+        self.commandsHistory.appendPlainText('* %s *' % message)
+
+
+
+class EventsManager(QtCore.QObject):
+    def __init__(self):
+        self._currentLine = ''
+        self._hooks = {} # FIXME: should be cleared every minute
+
+        self._timerGetReplies = QtCore.QTimer()
+        self.connect(self._timerGetReplies, QtCore.SIGNAL('timeout()'),
+                     self._getReplies);
+        self._timerGetReplies.start(100)
+
     def _getReplies(self):
-        currentLine = ''
+        currentLine = self._currentLine
+        print(repr(currentLine))
+        self.currentLine = ''
         if not '\n' in currentLine:
             try:
                 data = sock.recv(4096)
@@ -92,15 +111,24 @@ class Window(QtGui.QTabWidget, window.Ui_window):
                 return
         if not data: # Frontend closed connection
             self._timer.stop()
-            self._commandsHistory.appendPlainText('* Broken connection *')
+            self.callbackSpecialMessage('connection broken')
             return
         if '\n' in data:
             splitted = (currentLine + data).split('\n')
-            nextLines = '\n'.join(splitted[1:])
+            nextLines = '\n'.join(splitted[1:-1])
             splitted = splitted[0].split(': ')
             hash_, reply = splitted[0], ': '.join(splitted[1:])
-            self.commandsHistory.appendPlainText('--> ' +
-                                                 reply.decode('utf8'))
+            assert hash_ in self._hooks
+            self._hooks[hash_](reply)
+        else:
+            nextLines = currentLine + data
+        self._currentLine = nextLines
+
+    def hook(self, hash_, callback):
+        self._hooks[hash_] = callback
+
+    def unhook(self, hash_):
+        return self._hooks.pop(hash_)
 
 
 
@@ -109,10 +137,13 @@ if __name__ == "__main__":
 
     app = QtGui.QApplication(sys.argv)
 
-    window = Window()
-    window.show()
+    eventsManager = EventsManager()
 
+    window = Window(eventsManager)
+    window.show()
     window.commandEdit.setFocus()
+
+    eventsManager.callbackSpecialMessages = window.displaySpecialMessage
 
     status = app.exec_()
     running = False
