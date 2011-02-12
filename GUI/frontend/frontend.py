@@ -83,7 +83,6 @@ class Connection(QtGui.QTabWidget, connection.Ui_connection):
         Return wheter or not the connection succeed. Note that a successful
         connection with a failed authentication is interpreted as successful.
         """
-        authentication
         server = str(self.editServer.text()).split(':')
         username = str(self.editUsername.text())
         password = str(self.editPassword.text())
