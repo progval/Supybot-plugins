@@ -108,9 +108,11 @@ class GUI(callbacks.Plugin):
     def __init__(self, irc):
         self.__parent = super(GUI, self)
         callbacks.Plugin.__init__(self, irc)
+        host = self.registryValue('host')
+        port = self.registryValue('port')
         while True:
             try:
-                self._server = ThreadedTCPServer(('127.0.0.1', 14789),
+                self._server = ThreadedTCPServer((host, port),
                                                  RequestHandler)
                 break
             except socket.error: # Address already in use

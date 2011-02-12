@@ -47,6 +47,10 @@ GUI = conf.registerPlugin('GUI')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(GUI, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
+conf.registerGlobalValue(GUI, 'host',
+    registry.String('127.0.0.1', _("""The host the server will bind.""")))
+conf.registerGlobalValue(GUI, 'port',
+    registry.Integer(14789, _("""The port the server will bind.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
