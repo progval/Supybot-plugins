@@ -31,12 +31,14 @@
 import re
 import time
 import socket
+import hashlib
 import threading
 import SocketServer
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircmsgs as ircmsgs
+import supybot.commands as commands
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 from supybot.i18n import PluginInternationalization, internationalizeDocstring
@@ -69,8 +71,11 @@ class ThreadedTCPServer(SocketServer.TCPServer):
 
 class RequestHandler(SocketServer.StreamRequestHandler):
     def handle(self):
+        def hash_(data):
+            return hashlib.sha1(str(time.time()) + data).hexdigest()
         self.request.settimeout(0.5)
         currentLine = ''
+        prefix = 'a%s!%s@%s.supybot-gui' % tuple([hash_(x)[0:6] for x in 'abc'])
         while self.server.enabled:
             if not '\n' in currentLine:
                 try:
@@ -91,7 +96,7 @@ class RequestHandler(SocketServer.StreamRequestHandler):
 
             tokens = callbacks.tokenize(command)
             fakeIrc = FakeIrc(self.server._irc)
-            msg = ircmsgs.privmsg('#supybot-gui', currentLine)
+            msg = ircmsgs.privmsg(self.server._irc.nick, currentLine, prefix)
             self.server._plugin.Proxy(fakeIrc, msg, tokens)
 
             self.request.send('%s: %s\n' % (hash_, fakeIrc.message))

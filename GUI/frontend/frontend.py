@@ -37,29 +37,80 @@ import hashlib
 import socket
 import time
 import sys
+import re
 
 # Third-party modules
 from PyQt4 import QtCore, QtGui
 
 # Local modules
+import connection
 import window
 
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect(('localhost', 14789))
-sock.settimeout(0.01)
 
 # FIXME: internationalize
 _ = lambda x:x
 
 
-def sendCommand(command):
-    """Get a command, send it, and returns a unique hash, used to identify
-    replies to this command."""
-    hash_ = hashlib.sha1(str(time.time()) + command).hexdigest()
-    command = '%s: %s\n' % (hash_, unicode(command).encode('utf8', 'replace'))
-    sock.send(command)
-    return hash_
+
+class Connection(QtGui.QTabWidget, connection.Ui_connection):
+    """Represents the connection dialog."""
+    def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+
+        self.setupUi(self)
+
+    def accept(self):
+        """Signal called when the button 'accept' is clicked."""
+        self.state.text = _('Connecting...')
+        if not self._connect():
+            self.state.text = _('Connection failed.')
+            return
+
+        self.state.text = _('Connected. Loading GUI...')
+
+        window = Window(self._eventsManager)
+        window.show()
+        window.commandEdit.setFocus()
+
+        self._eventsManager.callbackConnectionClosed = window.connectionClosed
+        self._eventsManager.defaultCallback = window.replyReceived
+
+        self.hide()
+
+    def _connect(self):
+        """Connects to the server, using the filled fields in the GUI.
+        Return wheter or not the connection succeed. Note that a successful
+        connection with a failed authentication is interpreted as successful.
+        """
+        authentication
+        server = str(self.editServer.text()).split(':')
+        username = str(self.editUsername.text())
+        password = str(self.editPassword.text())
+
+        assert len(server) == 2
+        assert re.match('[0-9]+', server[1])
+        assert ' ' not in username
+        assert ' ' not in password
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        server[1] = int(server[1])
+        try:
+            sock.connect(tuple(server))
+        except socket.error:
+            return False
+        sock.settimeout(0.01)
+
+        self._eventsManager = EventsManager(sock)
+
+        self._eventsManager.sendCommand('identify %s %s' %
+                                        (username, password))
+        return True
+
+    def reject(self):
+        """Signal called when the button 'close' is clicked."""
+        exit()
 
 class Window(QtGui.QTabWidget, window.Ui_window):
     """Represents the main window."""
@@ -81,7 +132,7 @@ class Window(QtGui.QTabWidget, window.Ui_window):
         self.commandEdit.clear()
         try:
             # No hooking, because the callback would be the default callback
-            sendCommand(command)
+            self._eventsManager.sendCommand(command)
             s = _('<-- ') + command
         except socket.error:
             s = _('(not sent) <-- ') + command
@@ -92,17 +143,21 @@ class Window(QtGui.QTabWidget, window.Ui_window):
         received."""
         self.commandsHistory.appendPlainText(_('--> ') + reply.decode('utf8'))
 
-    def displaySpecialMessage(self, message):
+    def connectionClosed(self):
         """Called by the events manager when a special message has to be
         displayed."""
-        self.commandsHistory.appendPlainText(_('* %s *') % message)
+        self.commandsHistory.appendPlainText(_('* connection closed *'))
+        self.commandEdit.readOnly = True
+        self._eventsManager.stop()
 
 
 
 class EventsManager(QtCore.QObject):
     """This class handles all incoming messages, and call the associated
     callback (using hook() method)"""
-    def __init__(self):
+    def __init__(self, sock):
+        self._sock = sock
+        self.defaultCallback = lambda x:x
         self._currentLine = ''
         self._hooks = {} # FIXME: should be cleared every minute
 
@@ -122,12 +177,11 @@ class EventsManager(QtCore.QObject):
         self.currentLine = ''
         if not '\n' in currentLine:
             try:
-                data = sock.recv(4096)
+                data = self._sock.recv(4096)
             except socket.timeout:
                 return
         if not data: # Frontend closed connection
-            self._timer.stop()
-            self.callbackSpecialMessage(_('connection broken'))
+            self.callbackConnectionClosed()
             return
         if '\n' in data:
             splitted = (currentLine + data).split('\n')
@@ -135,7 +189,7 @@ class EventsManager(QtCore.QObject):
             splitted = splitted[0].split(': ')
             hash_, reply = splitted[0], ': '.join(splitted[1:])
             if hash_ in self._hooks:
-                self._hooks[hash_](reply)
+                self._hooks[hash_][0](reply)
             else:
                 self.defaultCallback(reply)
         else:
@@ -145,7 +199,7 @@ class EventsManager(QtCore.QObject):
     def hook(self, hash_, callback, lifeTime=60):
         """Attach a callback to a hash: everytime a reply with this hash is
         received, the callback is called."""
-        self._hooks[hash_] = (callback, time.time() + lifeTime())
+        self._hooks[hash_] = (callback, time.time() + lifeTime)
 
     def unhook(self, hash_):
         """Undo hook()."""
@@ -156,18 +210,24 @@ class EventsManager(QtCore.QObject):
             if data[1] < time.time():
                 self._hooks.pop(hash_)
 
+    def sendCommand(self, command):
+        """Get a command, send it, and returns a unique hash, used to identify
+        replies to this command."""
+        hash_ = hashlib.sha1(str(time.time()) + command).hexdigest()
+        command = '%s: %s\n' % (hash_, unicode(command).encode('utf8', 'replace'))
+        self._sock.send(command)
+        return hash_
+
+    def stop(self):
+        """Stops the loop."""
+        self._timer.stop()
 
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
 
-    eventsManager = EventsManager()
+    connection = Connection()
+    connection.show()
 
-    window = Window(eventsManager)
-    window.show()
-    window.commandEdit.setFocus()
-
-    eventsManager.callbackSpecialMessages = window.displaySpecialMessage
-    eventsManager.defaultCallback = window.replyReceived
 
     sys.exit(app.exec_())
