@@ -157,6 +157,10 @@ class LinkRelay(callbacks.Plugin):
         s = '\x0314%s has left on %s' % (msg.nick, irc.network)
         self.sendToOthers(irc, msg, s)
 
+    def doNick(self, irc, msg):
+        s = '\x0314%s (%s) changed his nickname to' % (msg.nick, irc.network)
+        self.sendToOthers(irc, msg, s)
+
     #def doQuit(self, irc, msg):
     #    for channel in self.ircstates[irc].channels:
     #        if msg.nick in self.ircstates[irc].channels[channel].users:
