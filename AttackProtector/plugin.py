@@ -52,7 +52,7 @@ except:
 filterParser=re.compile('(?P<number>[0-9]+)p(?P<seconds>[0-9]+)')
 
 class AttackProtectorDatabaseItem:
-    def __init__(self, kind, prefix, channel, protector, irc):
+    def __init__(self, kind, prefix, channel, protector, irc, msg):
         self.kind = kind
         self.prefix = prefix
         self.channel = channel
@@ -60,6 +60,7 @@ class AttackProtectorDatabaseItem:
         self.protector = protector
         value = protector.registryValue('%s.detection' % kind, channel)
         self.irc = irc
+        self.msg = msg
         parsed = filterParser.match(value)
         self.expire = self.time + int(parsed.group('seconds'))
 
@@ -125,8 +126,8 @@ class AttackProtector(callbacks.Plugin):
                 item = None
                 if not self.registryValue('%s.detection' % kind, channel) == \
                 '0p0':
-                    item = AttackProtectorDatabaseItem(kind, prefix,
-                                                       channel, self, irc)
+                    item = AttackProtectorDatabaseItem(kind, prefix, channel,
+                                                       self, irc, msg)
                     self._database.add(item)
 
                 try:
@@ -134,7 +135,7 @@ class AttackProtector(callbacks.Plugin):
                         channel) == '0p0':
                         item = AttackProtectorDatabaseItem('group%s' % kind,
                                                             '*!*@*', channel,
-                                                            self, irc)
+                                                            self, irc, msg)
                         self._database.add(item)
                 except registry.NonExistentRegistryEntry:
                     pass
@@ -154,6 +155,7 @@ class AttackProtector(callbacks.Plugin):
 
     def _slot(self, lastItem):
         irc = lastItem.irc
+        msg = lastItem.msg
         channel = lastItem.channel
         prefix = lastItem.prefix
         nick = prefix.split('!')[0]
@@ -174,6 +176,9 @@ class AttackProtector(callbacks.Plugin):
         elif punishment.startswith('mode'):
             msg = ircmsgs.mode(channel, punishment[len('mode'):])
             irc.queueMsg(msg)
+        elif punishment.startswith('command '):
+            tokens = callbacks.tokenize(punishment[len('command '):])
+            self.Proxy(irc, msg, tokens)
 AttackProtector = internationalizeDocstring(AttackProtector)
 
 

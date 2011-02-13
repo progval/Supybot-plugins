@@ -32,8 +32,10 @@ import time
 from supybot.test import *
 
 class AttackProtectorTestCase(ChannelPluginTestCase):
-    plugins = ('AttackProtector',)
-    config = {'supybot.plugins.AttackProtector.join.detection': '5p2'}
+    plugins = ('AttackProtector', 'Utilities')
+    config = {'supybot.plugins.AttackProtector.join.detection': '5p2',
+              'supybot.plugins.AttackProtector.part.punishment':
+              'command echo hi !'}
 
     #################################
     # Utilities
@@ -96,13 +98,15 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
         for i in range(1, 5):
             msg = ircmsgs.part(self.channel, prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.failIf(self._getIfAnswerIsThisBan() == False,
+        msg = ircmsgs.privmsg(self.channel, 'hi !')
+        self.failIf(self._getIfAnswerIsEqual(msg) == False,
                     'No reaction to part flood.')
     def testPunishNotNoPartFlood(self):
         for i in range(1, 4):
             msg = ircmsgs.part(self.channel, prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.failIf(self._getIfAnswerIsThisBan(),
+        msg = ircmsgs.privmsg(self.channel, 'hi !')
+        self.failIf(self._getIfAnswerIsEqual(msg),
                     'Reaction to no part flood.')
 
     #################################
