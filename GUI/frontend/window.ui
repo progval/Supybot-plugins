@@ -21,7 +21,7 @@
    <locale language="English" country="UnitedStates"/>
   </property>
   <property name="currentIndex">
-   <number>1</number>
+   <number>0</number>
   </property>
   <widget class="QWidget" name="configurationTab">
    <attribute name="title">
@@ -29,7 +29,18 @@
    </attribute>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QTreeView" name="configurationTree"/>
+     <layout class="QVBoxLayout" name="configurationTreeLayout">
+      <item>
+       <widget class="QTreeView" name="configurationTree"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="refreshConfigurationTree">
+        <property name="text">
+         <string>Refresh</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <layout class="QVBoxLayout" name="configurationDetailsLayout">

@@ -51,6 +51,38 @@ import window
 # FIXME: internationalize
 _ = lambda x:x
 
+refreshingTree = threading.Lock()
+class ConfigurationTreeRefresh:
+    def __init__(self, eventsManager, configurationTree):
+        if not refreshingTree.acquire(False):
+            return
+        self._eventsManager = eventsManager
+
+        parentItem = QtGui.QStandardItemModel()
+        parentItem.name = QtCore.QString(_('configuration variables'))
+        configurationTree.setModel(parentItem)
+        self.items = {'supybot': parentItem}
+
+        hash_ = eventsManager.sendCommand('config search ""')
+        eventsManager.hook(hash_, self.slot)
+
+    def slot(self, reply):
+        """Slot called when a childs list is got."""
+        childs = reply.split(', ')
+        for child in childs:
+            if '\x02' in child:
+                hash_ = self._eventsManager.sendCommand('more')
+                self._eventsManager.hook(hash_, self.slot)
+                break
+            elif ' ' in child:
+                refreshingTree.release()
+                break
+            splitted = child.split('.')
+            parent, name = '.'.join(splitted[0:-1]), splitted[-1]
+            item = QtGui.QStandardItem(name)
+            self.items[parent].appendRow(item)
+            self.items[child] = item
+
 
 
 class Connection(QtGui.QTabWidget, connection.Ui_connection):
@@ -124,6 +156,9 @@ class Window(QtGui.QTabWidget, window.Ui_window):
         self.connect(self.commandSend, QtCore.SIGNAL('clicked()'),
                      self.commandSendHandler)
 
+        self.connect(self.refreshConfigurationTree, QtCore.SIGNAL('clicked()'),
+                     self._refreshConfigurationTree)
+
     def commandSendHandler(self):
         """Slot called when the user clicks 'Send' or presses 'Enter' in the
         raw commands tab."""
@@ -148,6 +183,11 @@ class Window(QtGui.QTabWidget, window.Ui_window):
         self.commandsHistory.appendPlainText(_('* connection closed *'))
         self.commandEdit.readOnly = True
         self._eventsManager.stop()
+
+    def _refreshConfigurationTree(self):
+        """Slot called when the user clicks 'Refresh' under the configuration
+        tree."""
+        ConfigurationTreeRefresh(self._eventsManager, self.configurationTree)
 
 
 
@@ -176,14 +216,15 @@ class EventsManager(QtCore.QObject):
         self.currentLine = ''
         if not '\n' in currentLine:
             try:
-                data = self._sock.recv(4096)
+                data = self._sock.recv(65536)
+                if not data: # Frontend closed connection
+                    self.callbackConnectionClosed()
+                    return
+                currentLine += data
             except socket.timeout:
                 return
-        if not data: # Frontend closed connection
-            self.callbackConnectionClosed()
-            return
-        if '\n' in data:
-            splitted = (currentLine + data).split('\n')
+        if '\n' in currentLine:
+            splitted = currentLine.split('\n')
             nextLines = '\n'.join(splitted[1:-1])
             splitted = splitted[0].split(': ')
             hash_, reply = splitted[0], ': '.join(splitted[1:])
@@ -192,7 +233,7 @@ class EventsManager(QtCore.QObject):
             else:
                 self.defaultCallback(reply)
         else:
-            nextLines = currentLine + data
+            nextLines = currentLine
         self._currentLine = nextLines
 
     def hook(self, hash_, callback, lifeTime=60):

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'window.ui'
 #
-# Created: Wed Feb  9 09:24:35 2011
+# Created: Sat Feb 12 17:11:05 2011
 #      by: PyQt4 UI code generator 4.7.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -21,9 +21,15 @@ class Ui_window(object):
         self.configurationTab.setObjectName("configurationTab")
         self.horizontalLayout = QtGui.QHBoxLayout(self.configurationTab)
         self.horizontalLayout.setObjectName("horizontalLayout")
+        self.configurationTreeLayout = QtGui.QVBoxLayout()
+        self.configurationTreeLayout.setObjectName("configurationTreeLayout")
         self.configurationTree = QtGui.QTreeView(self.configurationTab)
         self.configurationTree.setObjectName("configurationTree")
-        self.horizontalLayout.addWidget(self.configurationTree)
+        self.configurationTreeLayout.addWidget(self.configurationTree)
+        self.refreshConfigurationTree = QtGui.QPushButton(self.configurationTab)
+        self.refreshConfigurationTree.setObjectName("refreshConfigurationTree")
+        self.configurationTreeLayout.addWidget(self.refreshConfigurationTree)
+        self.horizontalLayout.addLayout(self.configurationTreeLayout)
         self.configurationDetailsLayout = QtGui.QVBoxLayout()
         self.configurationDetailsLayout.setObjectName("configurationDetailsLayout")
         self.configurationEditLayout = QtGui.QVBoxLayout()
@@ -72,11 +78,12 @@ class Ui_window(object):
         window.addTab(self.commandsTab, "")
 
         self.retranslateUi(window)
-        window.setCurrentIndex(1)
+        window.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(window)
 
     def retranslateUi(self, window):
         window.setWindowTitle(QtGui.QApplication.translate("window", "Supybot GUI", None, QtGui.QApplication.UnicodeUTF8))
+        self.refreshConfigurationTree.setText(QtGui.QApplication.translate("window", "Refresh", None, QtGui.QApplication.UnicodeUTF8))
         self.configurationVariableLabel.setText(QtGui.QApplication.translate("window", "Value", None, QtGui.QApplication.UnicodeUTF8))
         self.configurationDefaultButton.setText(QtGui.QApplication.translate("window", "Default", None, QtGui.QApplication.UnicodeUTF8))
         self.configurationSetButton.setText(QtGui.QApplication.translate("window", "Set", None, QtGui.QApplication.UnicodeUTF8))
