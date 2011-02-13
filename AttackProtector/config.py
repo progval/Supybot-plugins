@@ -76,6 +76,9 @@ AttackProtector = conf.registerPlugin('AttackProtector')
 # conf.registerGlobalValue(AttackProtector, 'someConfigVariableName',
 #     registry.Boolean(False, """Help for someConfigVariableName."""))
 
+conf.registerGlobalValue(AttackProtector, 'exempt',
+    registry.String('nopunish', _("""If a user has this capability, he won't be
+        punished by AttackProtector""")))
 conf.registerGlobalValue(AttackProtector, 'delay',
     registry.Integer(10, _("""Determines how long (in seconds) the plugin will
     wait before being enabled. A too low value makes the bot believe that

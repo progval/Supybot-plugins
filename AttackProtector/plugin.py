@@ -32,6 +32,7 @@ import re
 import time
 
 import supybot.utils as utils
+import supybot.ircdb as ircdb
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircmsgs as ircmsgs
@@ -160,6 +161,15 @@ class AttackProtector(callbacks.Plugin):
         prefix = lastItem.prefix
         nick = prefix.split('!')[0]
         kind = lastItem.kind
+
+        try:
+            ircdb.users.getUser(msg.prefix) # May raise KeyError
+            capability = self.registryValue('exempt')
+            if capability:
+                if ircdb.checkCapability(msg.prefix, capability):
+                    return
+        except KeyError:
+            pass
         punishment = self.registryValue('%s.punishment' % kind, channel)
         reason = _('%s flood detected') % kind
         if punishment == 'kick':

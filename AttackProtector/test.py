@@ -30,9 +30,10 @@
 
 import time
 from supybot.test import *
+import supybot.ircdb as ircdb
 
 class AttackProtectorTestCase(ChannelPluginTestCase):
-    plugins = ('AttackProtector', 'Utilities')
+    plugins = ('AttackProtector', 'Utilities', 'User')
     config = {'supybot.plugins.AttackProtector.join.detection': '5p2',
               'supybot.plugins.AttackProtector.part.punishment':
               'command echo hi !'}
@@ -168,6 +169,29 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             self.irc.feedMsg(msg)
         self.failIf(self._getIfAnswerIsThisKick('message') == False,
                     'No reaction to both notice and privmsg flood.')
+
+    #################################
+    # Test trusted users
+    def testDoesNotPunishTrustedUsers(self):
+        feedMsg = PluginTestCase.feedMsg
+        feedMsg(self, 'register toto foobarbaz')
+        feedMsg(self, 'identify toto foobarbaz')
+        [self.irc.takeMsg() for x in 'xx']
+        self.assertNotError('eval '
+                '''"ircdb.users.getUser(1).capabilities.add('nopunish')"''')
+        self.assertResponse('capabilities', '[nopunish]')
+
+        try:
+            for i in range(1, 5):
+                msg = ircmsgs.join(self.channel, prefix=self.prefix)
+                self.irc.feedMsg(msg)
+            self.failIf(self._getIfAnswerIsThisBan(), 'Punishes trusted user')
+        finally:
+            feedMsg(self, 'hostmask remove toto %s' % self.prefix)
+            feedMsg(self, 'unidentify') # Otherwise, other tests would fail
+            [self.irc.takeMsg() for x in 'xx']
+            self.assertNotRegexp('whoami', 'toto')
+            self.assertError('capabilities')
 
     #################################
     # Global tests
