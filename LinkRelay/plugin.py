@@ -153,7 +153,7 @@ class LinkRelay(callbacks.Plugin):
             # won't be revealed in relayed PM's
             if callbacks.addressed(irc.nick, msg):
                 s = re.sub('(>\x03 \w+) .*',
-                           '\\1 \x0314[truncated]',
+                           '\\1 \x0314[%s]' % _('truncated'),
                            s)
             s = '(via PM) %s' % s
         s = self.formatPrivMsg(msg.nick, s)
@@ -174,17 +174,18 @@ class LinkRelay(callbacks.Plugin):
 
     def doJoin(self, irc, msg):
         self.addIRC(irc)
-        s = '\x0314%s has joined on %s' % (msg.nick, irc.network)
+        s = '\x0314' + _('%s has joined on %s') % (msg.nick, irc.network)
         self.sendToOthers(irc, msg.args[0], s)
 
     def doPart(self, irc, msg):
         self.addIRC(irc)
-        s = '\x0314%s has left on %s' % (msg.nick, irc.network)
+        s = '\x0314' + _('%s has left on %s') % (msg.nick, irc.network)
         self.sendToOthers(irc, msg.args[0], s)
 
     def doKick(self, irc, msg):
         self.addIRC(irc)
-        s = '\x0314%s has been kicked on %s by %s (%s)' % (msg.args[1],
+        s = '\x0314' + _('%s has been kicked on %s by %s (%s)') % \
+                                                           (msg.args[1],
                                                            irc.network,
                                                            msg.nick,
                                                            msg.args[2])
@@ -192,7 +193,7 @@ class LinkRelay(callbacks.Plugin):
 
     def doNick(self, irc, msg):
         self.addIRC(irc)
-        s = '\x0314%s (%s) changed his nickname to %s' % (msg.nick,
+        s = '\x0314' + _('%s (%s) changed his nickname to %s') % (msg.nick,
                                                           irc.network,
                                                           msg.args[0])
         for (channel, c) in irc.state.channels.iteritems():
@@ -200,9 +201,9 @@ class LinkRelay(callbacks.Plugin):
                 self.sendToOthers(irc, channel, s)
 
     def doQuit(self, irc, msg):
-        s = '\x0314%s has quit on %s (%s)' % (msg.nick,
-                                              irc.network,
-                                              msg.args[0])
+        s = '\x0314' + _('%s has quit on %s (%s)') % (msg.nick,
+                                                      irc.network,
+                                                      msg.args[0])
         self.sendToOthers(irc, None, s, msg.nick)
         self.addIRC(irc)
 
@@ -257,8 +258,8 @@ class LinkRelay(callbacks.Plugin):
             if relay.sourceChannel == channel and \
                     relay.sourceNetwork == irc.network:
                 if not relay.hasTargetIRC:
-                    irc.reply('I haven\'t scraped the IRC object for %s yet. '
-                              'Try again in a minute or two.' % \
+                    irc.reply(_('I haven\'t scraped the IRC object for %s '
+                              'yet. Try again in a minute or two.') % \
                               relay.targetNetwork)
                 else:
                     users = []
@@ -272,8 +273,6 @@ class LinkRelay(callbacks.Plugin):
                     channels = relay.targetIRC.state.channels
                     found = False
                     for key, channel_ in channels.items():
-                        print repr(relay.targetChannel)
-                        print repr(key)
                         if re.match(relay.targetChannel, key):
                             found = True
                             break
@@ -299,7 +298,7 @@ class LinkRelay(callbacks.Plugin):
                     #utils.sortBy(ircutils.toLower, normals)
                     users.sort()
                     msg.tag('relayedMsg')
-                    s = '%d users in %s on %s:  %s' % (numUsers,
+                    s = _('%d users in %s on %s:  %s') % (numUsers,
                             relay.targetChannel,
                             relay.targetNetwork,
                             utils.str.commaAndify(users))

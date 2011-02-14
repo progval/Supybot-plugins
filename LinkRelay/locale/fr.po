@@ -1,0 +1,189 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Supybot-fr\n"
+"POT-Creation-Date: 2011-02-14 20:27+CET\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Valentin Lorentz <progval@gmail.com>\n"
+"Language-Team: ProgVal <ProgVal>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Français\n"
+"X-Poedit-Country: France\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: config.py:44
+msgid ""
+"Determines whether the bot will color Relayed\n"
+"    PRIVMSGs so as to make the messages easier to read."
+msgstr "Détermine si le bot colorera les PRIVMSG relayés, de façon à rendre leur lecture plus aisée."
+
+#: config.py:47
+msgid ""
+"Determines whether the bot will synchronize\n"
+"    topics between networks in the channels it Relays."
+msgstr "Détermine si le bot synchronisera les topics entre les différents canaux qu'il relaye."
+
+#: config.py:50
+msgid ""
+"Determines whether the bot will Relay the\n"
+"    hostmask of the person joining or parting the channel when he or she joins\n"
+"    or parts."
+msgstr "Détermine si le bot relayera les noms d'hôte des personnes joignant le canal ou en partant."
+
+#: config.py:54
+msgid ""
+"Determines whether the bot will include the\n"
+"    network in Relayed PRIVMSGs; if you're only Relaying between two networks,\n"
+"    it's somewhat redundant, and you may wish to save the space."
+msgstr "Détermine si le bot incluera le nom du réseau dans les PRIVMSG relayés ; si vous relayez uniquement entre deux réseaux, ce sera quelque chose de redondant et d'inutile, qu'il vaut mieux supprimer pour garder de la place."
+
+#: config.py:58
+msgid ""
+"Determines whether the bot will used NOTICEs\n"
+"    rather than PRIVMSGs for non-PRIVMSG Relay messages (i.e., joins, parts,\n"
+"    nicks, quits, modes, etc.)"
+msgstr "Détermine si le bot utilisera des NOTICEs plutôt que des PRIVMSGs pour relayer les messages qui ne sont pas des PRIVMSG (c'est à dire : arrivées, départs, changement de nicks, quits, modes, etc.)"
+
+#: config.py:63
+msgid ""
+"You shouldn't edit this configuration variable\n"
+"    yourself unless you know what you do. Use @LinkRelay {add|remove} instead."
+msgstr "Vous ne devriez pas éditer cette variable de configuration à moins de savoir ce que vous faites. Utilisez plutôt @LinkRelay {add|remove}."
+
+#: config.py:67
+msgid ""
+"You shouldn't edit this configuration variable\n"
+"    yourself unless you know what you do. Use @LinkRelay (no)substitute instead."
+msgstr "Vous ne devriez pas éditer cette variable de configuration à moins de savoir ce que vous faites. Utilisez plutôt @LinkRelay (nosubstitute)"
+
+#: plugin.py:131
+msgid ""
+"takes no arguments\n"
+"\n"
+"        Returns all the defined relay links"
+msgstr ""
+"ne prend pas d'argument\n"
+"\n"
+"Retourne tous les relais définis."
+
+#: plugin.py:156
+msgid "truncated"
+msgstr "tronqué"
+
+#: plugin.py:177
+msgid "%s has joined on %s"
+msgstr "%s est arrivé sur %s"
+
+#: plugin.py:182
+msgid "%s has left on %s"
+msgstr "%s est parti de %s"
+
+#: plugin.py:187
+msgid "%s has been kicked on %s by %s (%s)"
+msgstr "%s a été kické de %s par %s (%s)"
+
+#: plugin.py:196
+msgid "%s (%s) changed his nickname to %s"
+msgstr "%s (%s) a changé de nom sur %s"
+
+#: plugin.py:204
+msgid "%s has quit on %s (%s)"
+msgstr "%s a quitté %s (%s)"
+
+#: plugin.py:252
+msgid ""
+"[<channel>]\n"
+"\n"
+"        Returns the nicks of the people in the linked channels.\n"
+"        <channel> is only necessary if the message\n"
+"        isn't sent on the channel itself."
+msgstr ""
+"[<canal>]\n"
+"\n"
+"Retourne les nicks des personnes dans les canaux linkés. <canal> n'est nécessaire que si le message n'est pas envoyé sur le canal lui-même."
+
+#: plugin.py:261
+msgid "I haven't scraped the IRC object for %s yet. Try again in a minute or two."
+msgstr "Je n'ai pas encore récupéré l'objet IRC pour %s. Réessayez dans une ou deux minute(s)."
+
+#: plugin.py:301
+msgid "%d users in %s on %s:  %s"
+msgstr "%d utilisateurs sur %s sur %s : %s"
+
+#: plugin.py:340
+msgid "You must give at least --from or --to."
+msgstr "Vous devez donner au moins --from ou --to."
+
+#: plugin.py:352
+msgid "--from should be like \"--from #channel@network\""
+msgstr "--from doit être de la forme \"--from #canal@reseau\""
+
+#: plugin.py:355
+msgid "--to should be like \"--to #channel@network\""
+msgstr "--to doit être de la forme \"--to #canal@reseau\""
+
+#: plugin.py:361
+msgid ""
+"[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]\n"
+"\n"
+"        Adds a relay to the list. You must give at least --from or --to; if\n"
+"        one of them is not given, it defaults to the current channel@network.\n"
+"        Only messages matching <regexp> will be relayed; if <regexp> is not\n"
+"        given, everything is relayed.\n"
+"        If --reciprocal is given, another relay will be added automatically,\n"
+"        in the opposite direction."
+msgstr ""
+"[--from <canal>@<reseau>] [--to <canal>@<reseau>] [--regexp <regexp>] [--reciprocal]\n"
+"\n"
+"Ajoute un relay à la liste. Vous devez donner au moins --from ou --to ; si l'un des deux n'est pas donné, il correspondra par défaut au canal@reseau courant. Seuls les messages correspondant à la <regexp> seront relayés ; si la <regexp> n'est pas donnée, tout est relayé. Si --reciprocal est donné, un autre relai sera ajouté automatiquement, dans le sens inverse."
+
+#: plugin.py:386
+msgid "One (or more) relay(s) already exists and has not been added."
+msgstr "Un (ou plusieurs) relai(s) existe déjà et n'a pas été ajouté."
+
+#: plugin.py:396
+msgid ""
+"[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]\n"
+"\n"
+"        Remove a relay from the list. You must give at least --from or --to; if\n"
+"        one of them is not given, it defaults to the current channel@network.\n"
+"        Only messages matching <regexp> will be relayed; if <regexp> is not\n"
+"        given, everything is relayed.\n"
+"        If --reciprocal is given, another relay will be removed automatically,\n"
+"        in the opposite direction."
+msgstr ""
+"[--from <canal>@<reseau>] [--to <canal>@<reseau>] [--regexp <regexp>] [--reciprocal]\n"
+"\n"
+"Supprime un relay à la liste. Vous devez donner au moins --from ou --to ; si l'un des deux n'est pas donné, il correspondra par défaut au canal@reseau courant. Seuls les messages correspondant à la <regexp> seront relayés ; si la <regexp> n'est pas donnée, tout est relayé. Si --reciprocal est donné, un autre relai sera supprime automatiquement, dans le sens inverse."
+
+#: plugin.py:421
+msgid "One (or more) relay(s) did not exist and has not been removed."
+msgstr "Un (ou plusieurs) relai(s) n'existe pas et n'a pas été supprimé."
+
+#: plugin.py:454
+msgid ""
+"<regexp> <replacement>\n"
+"\n"
+"        Replaces all nicks that matches the <regexp> by the <replacement>\n"
+"        string."
+msgstr ""
+"<regexp> <remplacement>\n"
+"\n"
+"Remplace tous les nicks correspondant à la <regexp> par la chaîne de <remplacement>."
+
+#: plugin.py:471
+msgid ""
+"<regexp>\n"
+"\n"
+"        Undo a substitution."
+msgstr ""
+"<regexp>\n"
+"\n"
+"Défait une substitution."
+
+#: plugin.py:476
+msgid "This regexp was not in the nick substitutions database"
+msgstr "Cette regexp n'est pas dans la base de données des substitutions de nicks."
+
