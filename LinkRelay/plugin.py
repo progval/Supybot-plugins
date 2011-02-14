@@ -88,8 +88,14 @@ class LinkRelay(callbacks.Plugin):
                                           re.compile('^%s$' % relay[1]),
                                           re.compile(relay[4])))
 
-        # FIXME
-        self.nickSubstitutions = self.registryValue('substitutes')
+        self.nickSubstitutions = {}
+        for substitute in self.registryValue('substitutes').split(' || '):
+            if substitute.endswith('|'):
+                substitute += ' '
+            substitute = substitute.split(' | ')
+            if not len(substitute) == 2:
+                continue
+            self.nickSubstitutions[substitute[0]] = substitute[1]
 
 
 
