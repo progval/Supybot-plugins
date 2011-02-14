@@ -209,7 +209,8 @@ class LinkRelay(callbacks.Plugin):
                     if nick in relay.sourceIRCChannels[channel].users:
                         found = True
                         break
-                assert found
+                if not found:
+                    continue
             if relay.channelRegex.match(channel) and \
                     relay.networkRegex.match(irc.network) and \
                     relay.messageRegex.search(s):
