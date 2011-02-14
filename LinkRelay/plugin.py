@@ -30,6 +30,7 @@
 
 import re
 import time
+import copy
 import string
 import supybot.conf as conf
 import supybot.utils as utils
@@ -59,19 +60,23 @@ class LinkRelay(callbacks.Plugin):
             self.channelRegex = channelRegex
             self.networkRegex = networkRegex
             self.messageRegex = messageRegex
-            self.hasIRC = False
+            self.hasTargetIRC = False
+            self.hasSourceIRCChannels = False
 
 
     def __init__(self, irc):
         self.__parent = super(LinkRelay, self)
         self.__parent.__init__(irc)
         self._loadFromConfig()
+        self.ircstates = {}
         for IRC in world.ircs:
             self.addIRC(IRC)
 
     def _loadFromConfig(self):
         self.relays = []
         for relay in self.registryValue('relays').split(' || '):
+            if relay.endswith('|'):
+                relay += ' '
             relay = relay.split(' | ')
             if not len(relay) == 5:
                 continue
@@ -82,6 +87,8 @@ class LinkRelay(callbacks.Plugin):
                                           re.compile('^%s$' % relay[0], re.I),
                                           re.compile('^%s$' % relay[1]),
                                           re.compile(relay[4])))
+
+        # FIXME
         self.nickSubstitutions = self.registryValue('substitutes')
 
 
@@ -119,7 +126,7 @@ class LinkRelay(callbacks.Plugin):
 
         Returns all the defined relay links"""
         for relay in self.relays:
-            if relay.hasIRC:
+            if relay.hasTargetIRC:
                 hasIRC = 'Link healthy!'
             else:
                 hasIRC = '\x0304IRC object not scraped yet.\x03'
@@ -133,8 +140,18 @@ class LinkRelay(callbacks.Plugin):
 
     def doPrivmsg(self, irc, msg):
         self.addIRC(irc)
-        s = self.formatPrivMsg(msg.nick, msg.args[1])
-        self.sendToOthers(irc, msg, s)
+        channel = msg.args[0]
+        s = msg.args[1]
+        if channel not in irc.state.channels: # in private
+            # cuts off the end of commands, so that passwords
+            # won't be revealed in relayed PM's
+            if callbacks.addressed(irc.nick, msg):
+                s = re.sub('(>\x03 \w+) .*',
+                           '\\1 \x0314[truncated]',
+                           s)
+            s = '(via PM) %s' % s
+        s = self.formatPrivMsg(msg.nick, s)
+        self.sendToOthers(irc, channel, s)
 
 
     def outFilter(self, irc, msg):
@@ -142,7 +159,7 @@ class LinkRelay(callbacks.Plugin):
             if not msg.relayedMsg:
                 if msg.args[0] in irc.state.channels:
                     s = self.formatPrivMsg(irc.nick, msg.args[1])
-                    self.sendToOthers(irc, msg, s)
+                    self.sendToOthers(irc, msg.args[0], s)
         return msg
 
 
@@ -150,43 +167,53 @@ class LinkRelay(callbacks.Plugin):
         self.addIRC(irc)
 
     def doJoin(self, irc, msg):
+        self.addIRC(irc)
         s = '\x0314%s has joined on %s' % (msg.nick, irc.network)
-        self.sendToOthers(irc, msg, s)
+        self.sendToOthers(irc, msg.args[0], s)
 
     def doPart(self, irc, msg):
+        self.addIRC(irc)
         s = '\x0314%s has left on %s' % (msg.nick, irc.network)
-        self.sendToOthers(irc, msg, s)
-
-    def doNick(self, irc, msg):
-        s = '\x0314%s (%s) changed his nickname to' % (msg.nick, irc.network)
-        self.sendToOthers(irc, msg, s)
-
-    #def doQuit(self, irc, msg):
-    #    for channel in self.ircstates[irc].channels:
-    #        if msg.nick in self.ircstates[irc].channels[channel].users:
-    #            s = '\x0314%s has quit on %s (%s)' % (msg.nick,
-    #                                                  irc.network,
-    #                                                  msg.args[0])
-    #            m = msg
-    #            self.sendToOthers(irc, msg, s)
+        self.sendToOthers(irc, msg.args[0], s)
 
     def doKick(self, irc, msg):
+        self.addIRC(irc)
         s = '\x0314%s has been kicked on %s by %s (%s)' % (msg.args[1],
                                                            irc.network,
                                                            msg.nick,
                                                            msg.args[2])
         self.sendToOthers(irc, msg, s)
 
-    def sendToOthers(self, irc, triggerMsg, s):
-        channel = triggerMsg.args[0]
-        nick = triggerMsg.nick
+    def doNick(self, irc, msg):
+        self.addIRC(irc)
+        s = '\x0314%s (%s) changed his nickname to %s' % (msg.nick,
+                                                          irc.network,
+                                                          msg.args[0])
+        for (channel, c) in irc.state.channels.iteritems():
+            if msg.args[0] in c.users:
+                self.sendToOthers(irc, channel, s)
+
+    def doQuit(self, irc, msg):
+        s = '\x0314%s has quit on %s (%s)' % (msg.nick,
+                                              irc.network,
+                                              msg.args[0])
+        self.sendToOthers(irc, None, s, msg.nick)
+        self.addIRC(irc)
+
+    def sendToOthers(self, irc, channel, s, nick=None):
         for relay in self.relays:
+            if channel is None:
+                assert nick is not None
+                found = False
+                for channel in relay.sourceIRCChannels:
+                    if nick in relay.sourceIRCChannels[channel].users:
+                        found = True
+                        break
+                assert found
             if relay.channelRegex.match(channel) and \
                     relay.networkRegex.match(irc.network) and \
-                    (len(triggerMsg.args) <= 1 or
-                            len(triggerMsg.args[1]) < 1 or
-                            relay.messageRegex.search(triggerMsg.args[1])):
-                if not relay.hasIRC:
+                    relay.messageRegex.search(s):
+                if not relay.hasTargetIRC:
                     self.log.info('LinkRelay:  IRC %s not yet scraped.' %
                                   relay.targetNetwork)
                 elif relay.targetIRC.zombie:
@@ -196,22 +223,6 @@ class LinkRelay(callbacks.Plugin):
                     self.log.info('LinkRelay:  I\'m not in in %s on %s' %
                                   (relay.targetChannel, relay.targetNetwork))
                 else:
-                    #if re.match('\x0314\w+ has quit on \w+ \(.*\)', s):
-                    #    pm = False
-                    #else:
-                    #    pm = True
-                    #for chan in irc.state.channels:
-                    #    if re.match('^%s$' % relay.sourceChannel, chan):
-                    #        pm = False
-                    if triggerMsg.args[0] not in irc.state.channels and \
-                            not re.match('\x0314\w+ has quit on \w+ \(.*\)', s):
-                        # cuts off the end of commands, so that passwords
-                        # won't be revealed in relayed PM's
-                        if callbacks.addressed(irc.nick, triggerMsg):
-                            s = re.sub('(>\x03 \w+) .*',
-                                       '\\1 \x0314[truncated]',
-                                       s)
-                        s = '(via PM) %s' % s
                     msg = ircmsgs.privmsg(relay.targetChannel, s)
                     msg.tag('relayedMsg')
                     relay.targetIRC.sendMsg(msg)
@@ -220,9 +231,12 @@ class LinkRelay(callbacks.Plugin):
     def addIRC(self, irc):
         match = False
         for relay in self.relays:
-            if relay.targetNetwork == irc.network and not relay.hasIRC:
+            if relay.sourceNetwork == irc.network:
+                relay.sourceIRCChannels = copy.deepcopy(irc.state.channels)
+                relay.hasSourceIRCChannels = True
+            if relay.targetNetwork == irc.network and not relay.hasTargetIRC:
                 relay.targetIRC = irc
-                relay.hasIRC = True
+                relay.hasTargetIRC = True
 
 
     @internationalizeDocstring
@@ -235,7 +249,7 @@ class LinkRelay(callbacks.Plugin):
         for relay in self.relays:
             if relay.sourceChannel == channel and \
                     relay.sourceNetwork == irc.network:
-                if not relay.hasIRC:
+                if not relay.hasTargetIRC:
                     irc.reply('I haven\'t scraped the IRC object for %s yet. '
                               'Try again in a minute or two.' % \
                               relay.targetNetwork)
