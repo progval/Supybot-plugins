@@ -267,22 +267,29 @@ class LinkRelay(callbacks.Plugin):
                     voices = []
                     normals = []
                     numUsers = 0
-                    try:
-                        target = relay.targetChannel
-                        # FIXME: right now it won't match a regex channe
-                        Channel = relay.targetIRC.state.channels[target]
-                    except KeyError:
+                    target = relay.targetChannel
+
+                    channels = relay.targetIRC.state.channels
+                    found = False
+                    for key, channel_ in channels.items():
+                        print repr(relay.targetChannel)
+                        print repr(key)
+                        if re.match(relay.targetChannel, key):
+                            found = True
+                            break
+                    if not found:
                         continue
-                    for s in Channel.users:
+
+                    for s in channel_.users:
                         s = s.strip()
                         if not s:
                             continue
                         numUsers += 1
-                        if s in Channel.ops:
+                        if s in channel_.ops:
                             users.append('@%s' % s)
-                        elif s in Channel.halfops:
+                        elif s in channel_.halfops:
                             users.append('%%%s' % s)
-                        elif s in Channel.voices:
+                        elif s in channel_.voices:
                             users.append('+%s' % s)
                         else:
                             users.append(s)
