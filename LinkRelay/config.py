@@ -39,6 +39,17 @@ def configure(advanced):
     conf.registerPlugin('LinkRelay', True)
 
 
+class ColorNumber(registry.String):
+    """Value must be a valid color number (01, 02, 03, 04, ..., 16)"""
+    def set(self, s):
+        if s not in ('01', '02', '03', '04', '05', '06', '07', '08', '09',
+                     '10', '11', '12', '13', '14', '15', '16'):
+            self.error()
+            return
+        self.setValue(s)
+ColorNumber = internationalizeDocstring(ColorNumber)
+
+
 LinkRelay = conf.registerPlugin('LinkRelay')
 conf.registerChannelValue(LinkRelay, 'color',
     registry.Boolean(False, _("""Determines whether the bot will color Relayed
@@ -67,6 +78,16 @@ conf.registerGlobalValue(LinkRelay, 'substitutes',
     registry.String('', _("""You shouldn't edit this configuration variable
     yourself unless you know what you do. Use @LinkRelay (no)substitute instead.""")))
 
+conf.registerGroup(LinkRelay, 'colors')
+for name, color in {'info': '02',
+                    'truncated': '14',
+                    'join': '14',
+                    'part': '14',
+                    'kick': '14',
+                    'nick': '14',
+                    'quit': '14'}.items():
+    conf.registerGlobalValue(LinkRelay.colors, name,
+        ColorNumber(color, _("""Color used for relaying %s.""") % color))
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
