@@ -26,7 +26,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# pysandbox were originally writen by haypo (under the BSD license), 
+# pysandbox were originally writen by haypo (under the BSD license),
 # and fschfsch by Tila (under the WTFPL license).
 
 ###
@@ -59,8 +59,49 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 from cStringIO import StringIO
 
+
 class SandboxError(Exception):
     pass
+
+class SandboxInterface(object):
+    """This is the base class for interfaces between parent and child."""
+    def __init__(self, pipes):
+        self._read, self._write = pipes
+        self._send('print', 'kikoo')
+    def _send(self, command, data):
+        assert ' ' not in command
+        assert ':' not in command
+        os.write(self._write, '%s:%s\n' % (command, data))
+    def _get(self):
+        lines = []
+        rawData = ''
+        newData = 'foo'
+        while newData != '':
+            newData = os.read(self._read, 256)
+            rawData += newData
+        for line in rawData.split('\n'):
+            if line == '':
+                continue
+            lines.append(line.split(':', 1))
+        return lines
+
+class ChildSide(SandboxInterface):
+    def __init__(self, pipes):
+        super(ChildSide, self).__init__(pipes)
+        sys.stdout = sys.stderr = self
+    def write(self, data):
+        self._send('print', data)
+    def flush(self):
+        pass
+class ParentSide(SandboxInterface):
+    def daemon(self):
+        """Code that needs to be runned while the child is running"""
+        printed = ''
+        for command, data in self._get():
+            if command == 'print':
+                printed += data
+        return printed
+
 
 def createSandboxConfig():
     cfg = S.SandboxConfig(
@@ -81,17 +122,19 @@ def createSandboxConfig():
         'version', 'hexversion', 'version_info')
     return cfg
 
-def _evalPython(line, locals):
-    locals = dict(locals)
+def _evalPython(line, pipes, locals):
+    interface = ChildSide(pipes)
+    locals_ = dict(locals)
+    locals_.update({'interface': interface})
     try:
         if "\n" in line:
             raise SyntaxError()
         code = compile(line, "<irc>", "single")
     except SyntaxError:
         code = compile(line, "<irc>", "exec")
-    exec code in locals
+    exec code in locals_
 
-def evalPython(line, locals=None):
+def evalPython(line, pipes, locals=None):
     sandbox = S.Sandbox(config=createSandboxConfig())
 
     if locals is not None:
@@ -99,67 +142,35 @@ def evalPython(line, locals=None):
     else:
         locals = dict()
     try:
-        sandbox.call(_evalPython, line, locals)
+        sandbox.call(_evalPython, line, pipes, locals)
     except BaseException, e:
         print 'Error: [%s] %s' % (e.__class__.__name__, str(e))
     except:
         print 'Error: <unknown exception>'
     sys.stdout.flush()
 
-def check_output(expr, expected, locals=None):
-    from cStringIO import StringIO
-    original_stdout = sys.stdout
-    try:
-        output = StringIO()
-        sys.stdout = output
-        evalPython(expr, locals)
-        stdout = output.getvalue()
-        assert stdout == expected, "%r != %r" % (stdout, expected)
-    finally:
-        sys.stdout = original_stdout
-
-def runTests():
-    # single
-    check_output('1+1', '2\n')
-    check_output('1; 2', '1\n2\n')
-    check_output(
-        # written in a single line
-        "prime=lambda n,i=2:"
-            "False if n%i==0 else prime(n,i+1) if i*i<n else True; "
-        "prime(17)",
-        "True\n")
-
-    # exec
-    check_output('def f(): print("hello")\nf()', 'hello\n')
-    check_output('print 1\nprint 2', '1\n2\n')
-    check_output('text', "'abc'\n", {'text': 'abc'})
-    return True
-
-def childProcess(line, w, locals):
+def childProcess(line, pipes, locals):
     # reseed after a fork to avoid generating the same sequence for each child
     random.seed()
 
-    sys.stdout = sys.stderr = os.fdopen(w, 'w')
 
     R.setrlimit(R.RLIMIT_CPU, (EVAL_MAXTIMESECONDS, EVAL_MAXTIMESECONDS))
     R.setrlimit(R.RLIMIT_AS, (EVAL_MAXMEMORYBYTES, EVAL_MAXMEMORYBYTES))
     R.setrlimit(R.RLIMIT_NPROC, (0, 0)) # 0 forks
 
-    evalPython(line, locals)
+    evalPython(line, pipes, locals)
 
-def handleChild(childpid, r):
+def handleChild(childpid, pipes):
     txt = ''
-    if __import__("__builtin__").any(select.select([r], [], [], TIMEOUT)):
-        txt = os.read(r, OUT_MAXLEN + 1)
-    os.close(r)
-
     n = 0
-    while n < 6:
+    interface = ParentSide(pipes)
+    while n < 20:
         pid, status = os.waitpid(childpid, os.WNOHANG)
         if pid:
             break
-        time.sleep(.5)
+        time.sleep(.1)
         n += 1
+        txt += interface.daemon()
     if not pid:
         os.kill(childpid, signal.SIGKILL)
         raise SandboxError('Timeout')
@@ -169,35 +180,39 @@ def handleChild(childpid, r):
         raise SandboxError('Killed')
 
 def handle_line(line):
-    r, w = os.pipe()
+    childToParent = os.pipe()
+    parentToChild = os.pipe()
+    child = (childToParent[0], parentToChild[1])
+    parent = (parentToChild[0], childToParent[1])
+    del childToParent, parentToChild
     childpid = os.fork()
     if not childpid:
-        os.close(r)
-        childProcess(line, w, {})
+        pipes = child
+        os.close(parent[0])
+        os.close(parent[1])
+        childProcess(line, pipes, {})
         os._exit(0)
     else:
-        os.close(w)
-        result = handleChild(childpid, r)
+        pipes = parent
+        os.close(child[0])
+        os.close(child[1])
+        result = handleChild(childpid, pipes)
         return result
 
 class SupySandbox(callbacks.Plugin):
     """Add the help for "@plugin help SupySandbox" here
     This should describe *how* to use this plugin."""
-    
+
     _parser = re.compile(r'(.?sandbox)? (?P<code>.*)')
     def sandbox(self, irc, msg, args):
         """<code>
-        
+
         Runs Python code safely thanks to pysandbox"""
         code = self._parser.match(msg.args[1]).group('code')
         try:
             irc.reply(handle_line(code.replace(' $$ ', '\n')))
         except SandboxError, e:
             irc.error('; '.join(e.args))
-        
-    def runtests(self, irc, msg, args):
-        irc.reply(runTests())
-
 
 Class = SupySandbox
 

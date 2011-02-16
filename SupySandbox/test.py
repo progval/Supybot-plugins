@@ -34,9 +34,6 @@ from supybot.test import *
 class SupySandboxTestCase(PluginTestCase):
     plugins = ('SupySandbox',)
 
-    def testFschfschTestcase(self):
-        self.assertResponse('runtests', 'True')
-
     def testCodeIsSuccessfullyRunned(self):
         self.assertResponse('sandbox 1+1', "2")
         self.assertResponse('sandbox print 1+1', "2")
@@ -50,7 +47,10 @@ class SupySandboxTestCase(PluginTestCase):
 
     def testProtections(self):
         self.assertError('sandbox while True: pass')
-        self.assertError('sandbox foo="bar"; $$ while True:foo=foo*10')
+        self.assertError('sandbox foo="bar"; $$ while True:  foo=foo*10')
+
+    def testTmp(self):
+        self.assertResponse('sandbox print foo', 'bar')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
