@@ -154,8 +154,9 @@ class LinkRelay(callbacks.Plugin):
             # won't be revealed in relayed PM's
             if callbacks.addressed(irc.nick, msg):
                 s = re.sub('(>\x03 \w+) .*',
-                           '\\1 \x03%s[%s]' % _('truncated') %
-                           self.registryValue('colors.truncated'),
+                           '\\1 \x03%s[%s]' %
+                                (_('truncated'),
+                                 self.registryValue('colors.truncated')),
                            s)
             s = '(via PM) %s' % s
         s = self.formatPrivMsg(msg.nick, s)
