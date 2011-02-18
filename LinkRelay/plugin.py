@@ -216,12 +216,13 @@ class LinkRelay(callbacks.Plugin):
         self.addIRC(irc)
 
     def sendToOthers(self, irc, channel, s, nick=None):
+        assert channel is not None or nick is not None
         for relay in self.relays:
             if channel is None:
-                assert nick is not None
                 found = False
                 for channel in relay.sourceIRCChannels:
-                    if nick in relay.sourceIRCChannels[channel].users:
+                    if nick in relay.sourceIRCChannels[channel].users and \
+                            relay.channelRegex.match(channel):
                         found = True
                         break
                 if not found:
