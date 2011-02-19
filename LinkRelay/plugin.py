@@ -160,7 +160,7 @@ class LinkRelay(callbacks.Plugin):
                            s)
             s = '(via PM) %s' % s
         s = self.formatPrivMsg(msg.nick, s)
-        self.sendToOthers(irc, channel, s)
+        self.sendToOthers(irc, channel, s, isPrivmsg=True)
 
 
     def outFilter(self, irc, msg):
@@ -168,7 +168,7 @@ class LinkRelay(callbacks.Plugin):
             if not msg.relayedMsg:
                 if msg.args[0] in irc.state.channels:
                     s = self.formatPrivMsg(irc.nick, msg.args[1])
-                    self.sendToOthers(irc, msg.args[0], s)
+                    self.sendToOthers(irc, msg.args[0], s, isPrivmsg=True)
         return msg
 
 
@@ -215,7 +215,7 @@ class LinkRelay(callbacks.Plugin):
         self.sendToOthers(irc, None, s, msg.nick)
         self.addIRC(irc)
 
-    def sendToOthers(self, irc, channel, s, nick=None):
+    def sendToOthers(self, irc, channel, s, nick=None, isPrivmsg=False):
         assert channel is not None or nick is not None
         for relay in self.relays:
             if channel is None:
@@ -240,7 +240,11 @@ class LinkRelay(callbacks.Plugin):
                     self.log.info('LinkRelay:  I\'m not in in %s on %s' %
                                   (relay.targetChannel, relay.targetNetwork))
                 else:
-                    msg = ircmsgs.privmsg(relay.targetChannel, s)
+                    if isPrivmsg or not \
+                            self.registryValue('noticeNonPrivmsgs', channel):
+                        msg = ircmsgs.privmsg(relay.targetChannel, s)
+                    else:
+                        msg = ircmsgs.notice(relay.targetChannel, s)
                     msg.tag('relayedMsg')
                     relay.targetIRC.sendMsg(msg)
 
