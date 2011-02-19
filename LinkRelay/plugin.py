@@ -175,6 +175,14 @@ class LinkRelay(callbacks.Plugin):
     def doPing(self, irc, msg):
         self.addIRC(irc)
 
+    def doMode(self, irc, msg):
+        self.addIRC(irc)
+        s= '\x03%s' % self.registryValue('colors.mode') + \
+           _('%s changed mode on %s to %s') % (msg.nick,
+                                               msg.args[0],
+                                               ' '.join(msg.args[1:]))
+        self.sendToOthers(irc, msg.args[0], s)
+
     def doJoin(self, irc, msg):
         self.addIRC(irc)
         s = '\x03%s' % self.registryValue('colors.join') + \
