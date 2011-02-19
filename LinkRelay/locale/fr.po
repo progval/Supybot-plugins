@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Supybot-fr\n"
-"POT-Creation-Date: 2011-02-16 07:29+CET\n"
+"POT-Creation-Date: 2011-02-19 13:26+CET\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Valentin Lorentz <progval@gmail.com>\n"
 "Language-Team: ProgVal <ProgVal>\n"
@@ -62,7 +62,7 @@ msgid ""
 "    yourself unless you know what you do. Use @LinkRelay (no)substitute instead."
 msgstr "Vous ne devriez pas éditer cette variable de configuration à moins de savoir ce que vous faites. Utilisez plutôt @LinkRelay (nosubstitute)"
 
-#: config.py:90
+#: config.py:91
 msgid "Color used for relaying %s."
 msgstr "Couleur utilidée pour relayer les %s."
 
@@ -76,31 +76,35 @@ msgstr ""
 "\n"
 "Retourne tous les relais définis."
 
-#: plugin.py:157
+#: plugin.py:158
 msgid "truncated"
 msgstr "tronqué"
 
-#: plugin.py:180
+#: plugin.py:181
+msgid "%s changed mode on %s to %s"
+msgstr "%s a défini les modes de %s : %s"
+
+#: plugin.py:189
 msgid "%s has joined on %s"
 msgstr "%s est arrivé sur %s"
 
-#: plugin.py:186
+#: plugin.py:195
 msgid "%s has left on %s"
 msgstr "%s est parti de %s"
 
-#: plugin.py:192
+#: plugin.py:201
 msgid "%s has been kicked on %s by %s (%s)"
 msgstr "%s a été kické de %s par %s (%s)"
 
-#: plugin.py:202
-msgid "%s (%s) changed his nickname to %s"
-msgstr "%s (%s) a changé de nom sur %s"
-
 #: plugin.py:211
+msgid "%s (%s) changed his nickname to %s"
+msgstr "%s (%s) a changé de nom pour %s"
+
+#: plugin.py:220
 msgid "%s has quit on %s (%s)"
 msgstr "%s a quitté %s (%s)"
 
-#: plugin.py:259
+#: plugin.py:273
 msgid ""
 "[<channel>]\n"
 "\n"
@@ -112,27 +116,27 @@ msgstr ""
 "\n"
 "Retourne les nicks des personnes dans les canaux linkés. <canal> n'est nécessaire que si le message n'est pas envoyé sur le canal lui-même."
 
-#: plugin.py:268
+#: plugin.py:282
 msgid "I haven't scraped the IRC object for %s yet. Try again in a minute or two."
 msgstr "Je n'ai pas encore récupéré l'objet IRC pour %s. Réessayez dans une ou deux minute(s)."
 
-#: plugin.py:308
+#: plugin.py:322
 msgid "%d users in %s on %s:  %s"
 msgstr "%d utilisateurs sur %s sur %s : %s"
 
-#: plugin.py:347
+#: plugin.py:361
 msgid "You must give at least --from or --to."
 msgstr "Vous devez donner au moins --from ou --to."
 
-#: plugin.py:359
+#: plugin.py:373
 msgid "--from should be like \"--from #channel@network\""
 msgstr "--from doit être de la forme \"--from #canal@reseau\""
 
-#: plugin.py:362
+#: plugin.py:376
 msgid "--to should be like \"--to #channel@network\""
 msgstr "--to doit être de la forme \"--to #canal@reseau\""
 
-#: plugin.py:368
+#: plugin.py:382
 msgid ""
 "[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]\n"
 "\n"
@@ -147,11 +151,11 @@ msgstr ""
 "\n"
 "Ajoute un relay à la liste. Vous devez donner au moins --from ou --to ; si l'un des deux n'est pas donné, il correspondra par défaut au canal@reseau courant. Seuls les messages correspondant à la <regexp> seront relayés ; si la <regexp> n'est pas donnée, tout est relayé. Si --reciprocal est donné, un autre relai sera ajouté automatiquement, dans le sens inverse."
 
-#: plugin.py:393
+#: plugin.py:407
 msgid "One (or more) relay(s) already exists and has not been added."
 msgstr "Un (ou plusieurs) relai(s) existe déjà et n'a pas été ajouté."
 
-#: plugin.py:403
+#: plugin.py:417
 msgid ""
 "[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]\n"
 "\n"
@@ -166,11 +170,11 @@ msgstr ""
 "\n"
 "Supprime un relay à la liste. Vous devez donner au moins --from ou --to ; si l'un des deux n'est pas donné, il correspondra par défaut au canal@reseau courant. Seuls les messages correspondant à la <regexp> seront relayés ; si la <regexp> n'est pas donnée, tout est relayé. Si --reciprocal est donné, un autre relai sera supprime automatiquement, dans le sens inverse."
 
-#: plugin.py:428
+#: plugin.py:442
 msgid "One (or more) relay(s) did not exist and has not been removed."
 msgstr "Un (ou plusieurs) relai(s) n'existe pas et n'a pas été supprimé."
 
-#: plugin.py:461
+#: plugin.py:475
 msgid ""
 "<regexp> <replacement>\n"
 "\n"
@@ -181,7 +185,7 @@ msgstr ""
 "\n"
 "Remplace tous les nicks correspondant à la <regexp> par la chaîne de <remplacement>."
 
-#: plugin.py:478
+#: plugin.py:492
 msgid ""
 "<regexp>\n"
 "\n"
@@ -191,7 +195,7 @@ msgstr ""
 "\n"
 "Défait une substitution."
 
-#: plugin.py:483
+#: plugin.py:497
 msgid "This regexp was not in the nick substitutions database"
 msgstr "Cette regexp n'est pas dans la base de données des substitutions de nicks."
 

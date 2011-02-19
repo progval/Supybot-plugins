@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2011-02-16 07:29+CET\n"
+"POT-Creation-Date: 2011-02-19 13:26+CET\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,7 +65,7 @@ msgid ""
 "    yourself unless you know what you do. Use @LinkRelay (no)substitute instead."
 msgstr ""
 
-#: config.py:90
+#: config.py:91
 msgid "Color used for relaying %s."
 msgstr ""
 
@@ -77,31 +77,35 @@ msgid ""
 "        Returns all the defined relay links"
 msgstr ""
 
-#: plugin.py:157
+#: plugin.py:158
 msgid "truncated"
 msgstr ""
 
-#: plugin.py:180
+#: plugin.py:181
+msgid "%s changed mode on %s to %s"
+msgstr ""
+
+#: plugin.py:189
 msgid "%s has joined on %s"
 msgstr ""
 
-#: plugin.py:186
+#: plugin.py:195
 msgid "%s has left on %s"
 msgstr ""
 
-#: plugin.py:192
+#: plugin.py:201
 msgid "%s has been kicked on %s by %s (%s)"
 msgstr ""
 
-#: plugin.py:202
+#: plugin.py:211
 msgid "%s (%s) changed his nickname to %s"
 msgstr ""
 
-#: plugin.py:211
+#: plugin.py:220
 msgid "%s has quit on %s (%s)"
 msgstr ""
 
-#: plugin.py:259
+#: plugin.py:273
 #, docstring
 msgid ""
 "[<channel>]\n"
@@ -111,27 +115,27 @@ msgid ""
 "        isn't sent on the channel itself."
 msgstr ""
 
-#: plugin.py:268
+#: plugin.py:282
 msgid "I haven't scraped the IRC object for %s yet. Try again in a minute or two."
 msgstr ""
 
-#: plugin.py:308
+#: plugin.py:322
 msgid "%d users in %s on %s:  %s"
 msgstr ""
 
-#: plugin.py:347
+#: plugin.py:361
 msgid "You must give at least --from or --to."
 msgstr ""
 
-#: plugin.py:359
+#: plugin.py:373
 msgid "--from should be like \"--from #channel@network\""
 msgstr ""
 
-#: plugin.py:362
+#: plugin.py:376
 msgid "--to should be like \"--to #channel@network\""
 msgstr ""
 
-#: plugin.py:368
+#: plugin.py:382
 #, docstring
 msgid ""
 "[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]\n"
@@ -144,11 +148,11 @@ msgid ""
 "        in the opposite direction."
 msgstr ""
 
-#: plugin.py:393
+#: plugin.py:407
 msgid "One (or more) relay(s) already exists and has not been added."
 msgstr ""
 
-#: plugin.py:403
+#: plugin.py:417
 #, docstring
 msgid ""
 "[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]\n"
@@ -161,11 +165,11 @@ msgid ""
 "        in the opposite direction."
 msgstr ""
 
-#: plugin.py:428
+#: plugin.py:442
 msgid "One (or more) relay(s) did not exist and has not been removed."
 msgstr ""
 
-#: plugin.py:461
+#: plugin.py:475
 #, docstring
 msgid ""
 "<regexp> <replacement>\n"
@@ -174,7 +178,7 @@ msgid ""
 "        string."
 msgstr ""
 
-#: plugin.py:478
+#: plugin.py:492
 #, docstring
 msgid ""
 "<regexp>\n"
@@ -182,7 +186,7 @@ msgid ""
 "        Undo a substitution."
 msgstr ""
 
-#: plugin.py:483
+#: plugin.py:497
 msgid "This regexp was not in the nick substitutions database"
 msgstr ""
 
