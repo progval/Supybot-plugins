@@ -44,6 +44,8 @@ if twitter.__version__.split('.') < ['0', '8', '0']:
                       'you need at least version 0.8.0, because older '
                       'versions do not support OAuth authentication.')
 
+
+
 @internationalizeDocstring
 class Twitter(callbacks.Plugin):
     """Add the help for "@plugin help Twitter" here
@@ -114,6 +116,52 @@ class Twitter(callbacks.Plugin):
         api.PostUpdate('[%s] %s' % (user.name, message))
         irc.replySuccess()
     post = wrap(post, ['user', ('checkChannelCapability', 'twitter'), 'text'])
+
+    @internationalizeDocstring
+    def timeline(self, irc, msg, args, channel, user, tupleOptlist):
+        """[<channel>|<user>] [--since <oldest>] [--max <newest>] [--count <number>] \
+        [--noretweet]
+
+        Replies with the timeline of the <user>.
+        If <user> is not given, it defaults to the account associated with the
+        <channel>.
+        If <channel> is not given, it defaults to the current channel.
+        If given, --since and --max take tweet IDs, used as boundaries.
+        If given, --count takes an integer, that stands for the number of
+        tweets to display.
+        If --noretweet is given, only native user's tweet will be displayed.
+        """
+        optlist = {}
+        for key, value in tupleOptlist:
+            optlist.update({key: value})
+        for key in ('since', 'max', 'count'):
+            if key not in optlist:
+                optlist[key] = None
+        optlist['noretweet'] = 'noretweet' in optlist
+
+        api = self._getApi(channel)
+        if not api._oauth_consumer:
+            irc.error(_('No account is associated with this channel. Ask '
+                        'an op, try with another channel.'))
+            return
+        timeline = api.GetUserTimeline(id=user,
+                                       since_id=optlist['since'],
+                                       max_id=optlist['max'],
+                                       count=optlist['count'],
+                                       include_rts=not optlist['noretweet'])
+        reply = ' | '.join([x.text for x in timeline])
+
+        reply = reply.replace("&lt;", "<")
+        reply = reply.replace("&gt;", ">")
+        reply = reply.replace("&amp;", "&")
+        reply = reply.encode('utf8')
+        irc.reply(reply)
+    timeline = wrap(timeline, ['channel',
+                               optional('somethingWithoutSpaces'),
+                               getopts({'since': 'int',
+                                        'max': 'int',
+                                        'count': 'int',
+                                        'noretweet': ''})])
 
 
 
