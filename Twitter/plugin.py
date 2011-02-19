@@ -99,6 +99,22 @@ class Twitter(callbacks.Plugin):
     friendslist = wrap(friendslist, ['channel',
                                      optional('somethingWithoutSpaces')])
 
+    @internationalizeDocstring
+    def post(self, irc, msg, args, user, channel, message):
+        """[<channel>] <message>
+
+        Updates the status of the account associated with the given <channel>
+        to the <message>. If <channel> is not given, it defaults to the
+        current channel."""
+        api = self._getApi(channel)
+        if not api._oauth_consumer:
+            irc.error(_('No account is associated with this channel. Ask '
+                        'an op, try with another channel.'))
+            return
+        api.PostUpdate('[%s] %s' % (user.name, message))
+        irc.replySuccess()
+    post = wrap(post, ['user', ('checkChannelCapability', 'twitter'), 'text'])
+
 
 
     def die(self):
