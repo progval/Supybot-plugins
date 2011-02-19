@@ -225,36 +225,38 @@ class LinkRelay(callbacks.Plugin):
 
     def sendToOthers(self, irc, channel, s, nick=None, isPrivmsg=False):
         assert channel is not None or nick is not None
+        def send():
+            if not relay.hasTargetIRC:
+                self.log.info('LinkRelay:  IRC %s not yet scraped.' %
+                              relay.targetNetwork)
+            elif relay.targetIRC.zombie:
+                self.log.info('LinkRelay:  IRC %s appears to be a zombie'%
+                              relay.targetNetwork)
+            elif relay.targetChannel not in relay.targetIRC.state.channels:
+                self.log.info('LinkRelay:  I\'m not in in %s on %s' %
+                              (relay.targetChannel, relay.targetNetwork))
+            else:
+                if isPrivmsg or not \
+                        self.registryValue('noticeNonPrivmsgs', channel):
+                    msg = ircmsgs.privmsg(relay.targetChannel, s)
+                else:
+                    msg = ircmsgs.notice(relay.targetChannel, s)
+                msg.tag('relayedMsg')
+                relay.targetIRC.sendMsg(msg)
+
         for relay in self.relays:
             if channel is None:
-                found = False
                 for channel in relay.sourceIRCChannels:
                     if nick in relay.sourceIRCChannels[channel].users and \
-                            relay.channelRegex.match(channel):
-                        found = True
-                        break
-                if not found:
-                    continue
-            if relay.channelRegex.match(channel) and \
-                    relay.networkRegex.match(irc.network) and \
-                    relay.messageRegex.search(s):
-                if not relay.hasTargetIRC:
-                    self.log.info('LinkRelay:  IRC %s not yet scraped.' %
-                                  relay.targetNetwork)
-                elif relay.targetIRC.zombie:
-                    self.log.info('LinkRelay:  IRC %s appears to be a zombie'%
-                                  relay.targetNetwork)
-                elif relay.targetChannel not in relay.targetIRC.state.channels:
-                    self.log.info('LinkRelay:  I\'m not in in %s on %s' %
-                                  (relay.targetChannel, relay.targetNetwork))
-                else:
-                    if isPrivmsg or not \
-                            self.registryValue('noticeNonPrivmsgs', channel):
-                        msg = ircmsgs.privmsg(relay.targetChannel, s)
-                    else:
-                        msg = ircmsgs.notice(relay.targetChannel, s)
-                    msg.tag('relayedMsg')
-                    relay.targetIRC.sendMsg(msg)
+                            relay.channelRegex.match(channel) and \
+                            relay.networkRegex.match(irc.network)and \
+                            relay.messageRegex.search(s):
+                        send()
+            else:
+                if relay.channelRegex.match(channel) and \
+                        relay.networkRegex.match(irc.network)and \
+                        relay.messageRegex.search(s):
+                    send()
 
 
     def addIRC(self, irc):
