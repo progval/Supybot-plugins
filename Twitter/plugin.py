@@ -140,7 +140,7 @@ class Twitter(callbacks.Plugin):
         optlist['noretweet'] = 'noretweet' in optlist
 
         api = self._getApi(channel)
-        if not api._oauth_consumer:
+        if not api._oauth_consumer and user is None:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op, try with another channel.'))
             return
