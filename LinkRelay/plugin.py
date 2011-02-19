@@ -195,7 +195,7 @@ class LinkRelay(callbacks.Plugin):
                                                            irc.network,
                                                            msg.nick,
                                                            msg.args[2])
-        self.sendToOthers(irc, msg, s)
+        self.sendToOthers(irc, msg.args[0], s)
 
     def doNick(self, irc, msg):
         self.addIRC(irc)
