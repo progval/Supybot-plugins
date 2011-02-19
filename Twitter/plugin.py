@@ -144,11 +144,17 @@ class Twitter(callbacks.Plugin):
             irc.error(_('No account is associated with this channel. Ask '
                         'an op, try with another channel.'))
             return
-        timeline = api.GetUserTimeline(id=user,
-                                       since_id=optlist['since'],
-                                       max_id=optlist['max'],
-                                       count=optlist['count'],
-                                       include_rts=not optlist['noretweet'])
+        try:
+            timeline = api.GetUserTimeline(id=user,
+                                           since_id=optlist['since'],
+                                           max_id=optlist['max'],
+                                           count=optlist['count'],
+                                           include_rts=not optlist['noretweet'])
+        except twitter.TwitterError:
+            irc.error(_('This user protects his tweets; you need to fetch '
+                        'them from a channel whose associated account can '
+                        'fetch this timeline.'))
+            return
         reply = ' | '.join([x.text for x in timeline])
 
         reply = reply.replace("&lt;", "<")
