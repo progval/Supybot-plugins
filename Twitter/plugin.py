@@ -30,6 +30,7 @@
 
 import twitter
 import supybot.utils as utils
+import supybot.world as world
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
@@ -56,6 +57,11 @@ class Twitter(callbacks.Plugin):
         self.__parent = super(Twitter, self)
         callbacks.Plugin.__init__(self, irc)
         self._apis = {}
+        if world.starting:
+            try:
+                self._getApi().PostUpdate(_('I just woke up. :)'))
+            except:
+                pass
 
     def _getApi(self, channel):
         if channel in self._apis:
