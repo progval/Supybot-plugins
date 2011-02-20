@@ -71,7 +71,11 @@ class GitHub(callbacks.Plugin):
                     args[name] = value
             results = query(self,'repos/search',urllib.quote_plus(search),args)
             reply = ' & '.join(x['name'] for x in results['repositories'])
-            irc.reply(reply.encode('utf'))
+            if reply == '':
+                irc.error(_('No repositories matches your search. Try to '
+                            'develop this software yourself ;)'))
+            else:
+                irc.reply(reply.encode('utf'))
 
         search = wrap(search, ['something',
                                getopts({'page': 'id',
