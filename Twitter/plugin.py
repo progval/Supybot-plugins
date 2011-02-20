@@ -87,9 +87,8 @@ class Twitter(callbacks.Plugin):
         """[<channel>] [<user>]
 
         Replies with the friends (i.e. people who one subscribes to) of the
-        <user>, as the <channel> associated account. <channel> is only
-        needed if you don't run the command in the channel itself. If <user>
-        is not given, it defaults to the channel's account."""
+        <user>. If <user> is not given, it defaults to the <channel>'s account.
+        If <channel> is not given, it defaults to the current channel."""
         api = self._getApi(channel)
         if not api._oauth_consumer and user is None:
             irc.error(_('No account is associated with this channel. Ask '
@@ -117,7 +116,7 @@ class Twitter(callbacks.Plugin):
         api = self._getApi(channel)
         if not api._oauth_consumer:
             irc.error(_('No account is associated with this channel. Ask '
-                        'an op, try with another channel.'))
+                        'an op or try with another channel.'))
             return
         api.PostUpdate('[%s] %s' % (user.name, message))
         irc.replySuccess()
