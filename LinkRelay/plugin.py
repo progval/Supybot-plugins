@@ -244,15 +244,16 @@ class LinkRelay(callbacks.Plugin):
                 msg.tag('relayedMsg')
                 relay.targetIRC.sendMsg(msg)
 
-        for relay in self.relays:
-            if channel is None:
+        if channel is None:
+            for relay in self.relays:
                 for channel in relay.sourceIRCChannels:
                     if nick in relay.sourceIRCChannels[channel].users and \
                             relay.channelRegex.match(channel) and \
                             relay.networkRegex.match(irc.network)and \
                             relay.messageRegex.search(s):
                         send()
-            else:
+        else:
+            for relay in self.relays:
                 if relay.channelRegex.match(channel) and \
                         relay.networkRegex.match(irc.network)and \
                         relay.messageRegex.search(s):
