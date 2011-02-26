@@ -65,21 +65,59 @@ class GitHub(callbacks.Plugin):
 
         @internationalizeDocstring
         def search(self, irc, msg, args, search, optlist):
+            """<searched string> [--page <id>] [--language <language>]
+
+            Searches the string in the repository names database. You can
+            specify the page <id> of the results, and restrict the search
+            to a particular programming <language>."""
             args = {'page': None, 'language': None}
             for name, value in optlist:
                 if name in args:
                     args[name] = value
             results = query(self,'repos/search',urllib.quote_plus(search),args)
-            reply = ' & '.join(x['name'] for x in results['repositories'])
+            reply = ' & '.join('%s/%s' % (x['owner'], x['name'])
+                               for x in results['repositories'])
             if reply == '':
                 irc.error(_('No repositories matches your search. Try to '
                             'develop this software yourself ;)'))
             else:
-                irc.reply(reply.encode('utf'))
-
+                irc.reply(reply.encode('utf8'))
         search = wrap(search, ['something',
                                getopts({'page': 'id',
                                         'language': 'somethingWithoutSpaces'})])
+        @internationalizeDocstring
+        def info(self, irc, msg, args, owner, name, optlist):
+            """<owner> <repository> [--enable <feature> <feature> ...] \
+            [--disable <feature> <feature>]
+
+            Displays informations about <owner>'s <repository>.
+            Enable or disable features (ie. displayed data) according to the
+            request)."""
+            enabled = ['watchers', 'forks', 'pushed_at', 'open_issues',
+                       'description']
+            for mode, features in optlist:
+                features = features.split(' ')
+                for feature in features:
+                    if mode == 'enable':
+                        enabled.append(feature)
+                    else:
+                        try:
+                            enabled.remove(feature)
+                        except ValueError:
+                            # No error is raised, because:
+                            # 1. it wouldn't break anything
+                            # 2. it enhances cross-compatiblity
+                            pass
+            results = query(self, 'repos/show', '%s/%s' % (owner, name), {})
+            results = results['repository']
+            output = []
+            for key, value in results.items():
+                if key in enabled:
+                    output.append('%s: %s' % (key, value))
+            irc.reply(', '.join(output).encode('utf8'))
+        info = wrap(info, ['something', 'something',
+                           getopts({'enable': 'anything',
+                                    'disable': 'anything'})])
 
 
 Class = GitHub
