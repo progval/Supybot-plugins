@@ -101,8 +101,14 @@ class Packages(callbacks.Plugin):
     def install(self, irc, msg, args, filename, optlist):
         """<filename> [--force]
 
-        Installs the package.
+        Installs the package. If the package has been downloaded with Package,
+        just give the package name; otherwise, give the full path (including
+        the extension).
         If given, --force disables sanity checks (usage is deprecated)."""
+        filename = os.path.expanduser(filename)
+        if os.path.sep not in filename:
+            filename = os.path.join(conf.directories.data(), filename)
+            filename += '.tar'
         try:
             file_ = tarfile.open(name=filename, mode='r:*')
         except:
@@ -117,7 +123,7 @@ class Packages(callbacks.Plugin):
         class packaging:
             """Namespace for runned code"""
             exec(file_.extractfile('%s/packaging.py' % directory).read())
-        if not ('force',) in optlist:
+        if not ('force', True) in optlist:
             failures = []
             for feature, version in packaging.requires.items():
                 if feature not in world.features:
