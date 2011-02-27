@@ -29,15 +29,62 @@
 ###
 
 import json
+import time
 import urllib
+import socket
+import threading
+import SocketServer
+import supybot.log as log
 import supybot.utils as utils
+import supybot.world as world
+from cStringIO import StringIO
 from supybot.commands import *
 import supybot.plugins as plugins
+import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 from supybot.i18n import PluginInternationalization, internationalizeDocstring
 
 _ = PluginInternationalization('GitHub')
+
+#####################
+# Server stuff
+#####################
+class ThreadedTCPServer(SocketServer.TCPServer):
+    pass
+
+class RequestHandler(SocketServer.StreamRequestHandler):
+    def handle(self):
+        length = 0
+        currentLine = ''
+        data = ''
+        while self.server.enabled:
+            if not '\r\n' in data:
+                try:
+                    data += self.request.recv(4096)
+                except socket.timeout:
+                    time.sleep(0.1) # in case of odd problem
+                    continue
+            if not data: # Server closed connection
+                return
+            if data.startswith('payload=') and \
+                    len(data) == length:
+                payload = StringIO()
+                payload.write(urllib.unquote(data[len('payload='):]))
+                payload.seek(0)
+                self.server._plugin.announce.onPayload(json.load(payload))
+                return
+            elif '\r\n' in data:
+                splitted = data.split('\r\n')
+                currentLine = splitted[0]
+                data = '\r\n'.join(splitted[1:])
+
+            if currentLine.startswith('Content-Length: '):
+                length = int(currentLine[len('Content-Length: '):])
+
+#####################
+# API access stuff
+#####################
 
 def query(caller, type_, uri_end, args):
     args = dict([(x,y) for x,y in args.items() if y is not None])
@@ -45,19 +92,134 @@ def query(caller, type_, uri_end, args):
                            urllib.urlencode(args))
     return json.load(utils.web.getUrlFd(url))
 
+#####################
+# Plugin itself
+#####################
+
 instance = None
 
 @internationalizeDocstring
 class GitHub(callbacks.Plugin):
     """Add the help for "@plugin help GitHub" here
     This should describe *how* to use this plugin."""
-    threaded = True
 
     def __init__(self, irc):
         global instance
         self.__parent = super(GitHub, self)
         callbacks.Plugin.__init__(self, irc)
         instance = self
+
+
+        if not world.testing:
+            host = self.registryValue('server.host')
+            port = self.registryValue('server.port')
+            while True:
+                try:
+                    self._server = ThreadedTCPServer((host, port),
+                                                     RequestHandler)
+                    break
+                except socket.error: # Address already in use
+                    time.sleep(1)
+            self._server.timeout = 0.5
+
+            # Used by request handlers:
+            self._server._plugin = self
+            self._server.enabled = True
+            threading.Thread(target=self._server.serve_forever,
+                             name='GitHub commits listener').start()
+
+    class announce(callbacks.Commands):
+        def _createPrivmsg(self, channel, payload, commit):
+            bold = ircutils.bold
+            s = '%s/%s (in %s): %s committed %s %s' % \
+                    (payload['repository']['owner']['name'],
+                     bold(payload['repository']['name']),
+                     bold(payload['ref'].split('/')[-1]),
+                     commit['author']['name'],
+                     bold(commit['message']),
+                     commit['url'][0:-34])
+            return ircmsgs.privmsg(channel, s)
+
+        def onPayload(self, payload):
+            repo = '%s/%s' % (payload['repository']['owner']['name'],
+                              payload['repository']['name'])
+            announces = self._load()
+            if repo not in announces:
+                log.info('Commit for repo %s not announced anywhere' % repo)
+                return
+            for channel in announces[repo]:
+                for irc in world.ircs:
+                    if channel in irc.state.channels:
+                        break
+                if channel not in irc.state.channels:
+                    print repr(irc.state.channel)
+                    log.info('Cannot announce commit for repo %s on %s' %
+                             (repo, channel))
+                else:
+                    for commit in payload['commits']:
+                        msg = self._createPrivmsg(channel, payload, commit)
+                        irc.queueMsg(msg)
+
+        def _load(self):
+            announces = instance.registryValue('announces').split(' || ')
+            if announces == ['']:
+                return {}
+            announces = [x.split(' | ') for x in announces]
+            output = {}
+            for repo, chan in announces:
+                if chan not in output:
+                    output[repo] = []
+                output[repo].append(chan)
+            return output
+
+        def _save(self, data):
+            list_ = []
+            for repo, chans in data.items():
+                list_.extend([' | '.join([repo,chan]) for chan in chans])
+            string = ' || '.join(list_)
+            instance.setRegistryValue('announces', value=string)
+
+        @internationalizeDocstring
+        def add(self, irc, msg, args, channel, owner, name):
+            """[<channel>] <owner> <name>
+
+            Announce the commits of the GitHub repository called
+            <owner>/<name> in the <channel>.
+            <channel> defaults to the current channel."""
+            repo = '%s/%s' % (owner, name)
+            announces = self._load()
+            if repo not in announces:
+                announces[repo] = [channel]
+            elif channel in announces[repo]:
+                irc.error(_('This repository is already announced to this '
+                            'channel.'))
+            else:
+                announces[repo].append(channel)
+            self._save(announces)
+            irc.replySuccess()
+        add = wrap(add, ['channel', 'something', 'something'])
+
+        @internationalizeDocstring
+        def remove(self, irc, msg, args, channel, owner, name):
+            """[<channel>] <owner> <name>
+
+            Don't announce the commits of the GitHub repository called
+            <owner>/<name> in the <channel> anymore.
+            <channel> defaults to the current channel."""
+            repo = '%s/%s' % (owner, name)
+            announces = self._load()
+            if repo not in announces:
+                announces[repo] = []
+            elif channel not in announces[repo]:
+                irc.error(_('This repository is not yet announce to this '
+                            'channed.'))
+            else:
+                announces[repo].remove(channel)
+            self._save(announces)
+            irc.replySuccess()
+        remove = wrap(remove, ['channel', 'something', 'something'])
+
+
 
     class repo(callbacks.Commands):
         def _url(self):
@@ -118,6 +280,13 @@ class GitHub(callbacks.Plugin):
         info = wrap(info, ['something', 'something',
                            getopts({'enable': 'anything',
                                     'disable': 'anything'})])
+    def die(self):
+        self.__parent.die()
+        if not world.testing:
+            self._server.enabled = False
+            time.sleep(1)
+            self._server.shutdown()
+            del self._server
 
 
 Class = GitHub

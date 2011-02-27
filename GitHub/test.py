@@ -31,7 +31,27 @@
 from supybot.test import *
 
 class GitHubTestCase(PluginTestCase):
-    plugins = ('GitHub',)
+    plugins = ('GitHub', 'Config')
+    def testAnnounceAdd(self):
+        self.assertNotError('config supybot.plugins.GitHub.announces ""')
+        self.assertNotError('github announce add #foo ProgVal Supybot-fr')
+        self.assertResponse('config supybot.plugins.GitHub.announces',
+                            'ProgVal/Supybot-fr | #foo')
+        self.assertNotError('github announce add #bar ProgVal Supybot-plugins')
+        self.assertResponse('config supybot.plugins.GitHub.announces',
+                            'ProgVal/Supybot-plugins | #bar || '
+                            'ProgVal/Supybot-fr | #foo')
+
+    def testAnnounceRemove(self):
+        self.assertNotError('config supybot.plugins.GitHub.announces '
+                            'ProgVal/Supybot-fr | #foo || '
+                            'ProgVal/Supybot-plugins | #bar')
+        self.assertNotError('github announce remove #foo ProgVal Supybot-fr')
+        self.assertResponse('config supybot.plugins.GitHub.announces',
+                            'ProgVal/Supybot-plugins | #bar')
+        self.assertNotError('github announce remove #bar '
+                            'ProgVal Supybot-plugins')
+        self.assertResponse('config supybot.plugins.GitHub.announces', ' ')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
