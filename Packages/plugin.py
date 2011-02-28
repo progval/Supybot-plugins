@@ -226,8 +226,9 @@ class Packages(callbacks.Plugin):
                 irc.reply(e.args[0])
                 return
         irc.replySuccess()
-    download = wrap(download, ['something', getopts({'version': 'something',
-                                                     'repo': 'httpUrl'})])
+    download = wrap(download, ['owner', 'something',
+                               getopts({'version': 'something',
+                                        'repo': 'httpUrl'})])
 
 
 
