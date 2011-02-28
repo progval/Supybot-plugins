@@ -38,6 +38,14 @@ import optparse
 import supybot.world as world
 unregister = [world.makeDriversDie, world.makeIrcsDie, world.startDying,
               world.finished, world.upkeep]
+if sys.version_info > (3, 0, 0):
+    # clean
+    for function in unregister:
+        atexit.unregister(function)
+else:
+    # less clean
+    for function in unregister:
+        atexit._exithandlers.remove((function, (), {}))
 
 def addToArchive(archive, path):
     for item in os.listdir(path):
@@ -46,10 +54,9 @@ def addToArchive(archive, path):
                 item.endswith('.pyc') or item.endswith('.pyo'):
             continue
         itemPath = os.path.join(path, item)
+        archive.add(itemPath, recursive=False)
         if os.path.isdir(itemPath):
             addToArchive(archive, itemPath)
-        else:
-            archive.add(itemPath)
 
 def main(dirname):
     if dirname.endswith('/'):
@@ -57,6 +64,7 @@ def main(dirname):
     class init:
         """Namespace for runned code"""
         exec(open('%s/__init__.py' % dirname))
+    assert init.__version__ != '', 'Version is empty'
     path = '%s-%s.tar' % (dirname, init.__version__)
     try:
         os.unlink(path)
@@ -65,6 +73,10 @@ def main(dirname):
         pass
     with tarfile.open(path, 'a') as archive:
         addToArchive(archive, dirname)
+        names = archive.getnames()
+        for name in ('__init__', 'config', 'plugin', 'test', 'packaging'):
+            assert '%s/%s.py' % (dirname, name) in names, \
+                    '%s.py is missing' % name
 
 if __name__ == '__main__':
     parser = optparse.OptionParser(usage='Usage: %prog Package.tar',
@@ -73,11 +85,3 @@ if __name__ == '__main__':
     assert len(args) > 0
     dirname = args[0]
     output = main(dirname)
-    if sys.version_info > (3, 0, 0):
-        # clean
-        for function in unregister:
-            atexit.unregister(function)
-    else:
-        # less clean
-        for function in unregister:
-            atexit._exithandlers.remove((function, (), {}))
