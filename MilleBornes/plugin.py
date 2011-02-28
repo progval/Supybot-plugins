@@ -35,15 +35,15 @@ import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 try:
-    from supybot.i18n import _PluginInternationalization
-    class WebStatsInternationalization(_PluginInternationalization):
-        def __init__(self):
-            self.name = 'MilleBornes'
-            self.loadLocale(conf.supybot.language())
-    _ = WebStatsInternationalization()
-except ImportError:
+    from supybot.i18n import PluginInternationalization
+    from supybot.i18n import internationalizeDocstring
+    _ = PluginInternationalization('MilleBornes')
+except:
+    # This are useless functions that's allow to run the plugin on a bot
+    # without the i18n plugin
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
+
 
 @internationalizeDocstring
 class MilleBornes(callbacks.Plugin):

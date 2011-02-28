@@ -43,9 +43,15 @@ import supybot.plugins as plugins
 import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
-from supybot.i18n import PluginInternationalization, internationalizeDocstring
-
-_ = PluginInternationalization('GitHub')
+try:
+    from supybot.i18n import PluginInternationalization
+    from supybot.i18n import internationalizeDocstring
+    _ = PluginInternationalization('GitHub')
+except:
+    # This are useless functions that's allow to run the plugin on a bot
+    # without the i18n plugin
+    _ = lambda x:x
+    internationalizeDocstring = lambda x:x
 
 #####################
 # Server stuff

@@ -1,0 +1,108 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2011-02-20 10:22+CET\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: config.py:52
+msgid "running get_access_token.py is a way to get it"
+msgstr ""
+
+#: config.py:56
+msgid ""
+"The Twitter Access Token key for the bot's\n"
+"        account (%s)"
+msgstr ""
+
+#: config.py:59
+msgid ""
+"The Twitter Access Token secret for the bot's\n"
+"        account (%s)"
+msgstr ""
+
+#: config.py:64
+msgid ""
+"The Twitter Access Token key for this\n"
+"        channel's account (%s)"
+msgstr ""
+
+#: config.py:67
+msgid ""
+"The Twitter Access Token secret for this\n"
+"        channel's account (%s)"
+msgstr ""
+
+#: plugin.py:52
+#, docstring
+msgid ""
+"Add the help for \"@plugin help Twitter\" here\n"
+"    This should describe *how* to use this plugin."
+msgstr ""
+
+#: plugin.py:62
+msgid "I just woke up. :)"
+msgstr ""
+
+#: plugin.py:87
+#, docstring
+msgid ""
+"[<channel>] [<user>]\n"
+"\n"
+"        Replies with the friends (i.e. people who one subscribes to) of the\n"
+"        <user>. If <user> is not given, it defaults to the <channel>'s account.\n"
+"        If <channel> is not given, it defaults to the current channel."
+msgstr ""
+
+#: plugin.py:94
+msgid "No account is associated with this channel. Ask an op, try with another channel, or provide a user name."
+msgstr ""
+
+#: plugin.py:111
+#, docstring
+msgid ""
+"[<channel>] <message>\n"
+"\n"
+"        Updates the status of the account associated with the given <channel>\n"
+"        to the <message>. If <channel> is not given, it defaults to the\n"
+"        current channel."
+msgstr ""
+
+#: plugin.py:118
+msgid "No account is associated with this channel. Ask an op or try with another channel."
+msgstr ""
+
+#: plugin.py:127
+#, docstring
+msgid ""
+"[<channel>|<user>] [--since <oldest>] [--max <newest>] [--count <number>]         [--noretweet]\n"
+"\n"
+"        Replies with the timeline of the <user>.\n"
+"        If <user> is not given, it defaults to the account associated with the\n"
+"        <channel>.\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        If given, --since and --max take tweet IDs, used as boundaries.\n"
+"        If given, --count takes an integer, that stands for the number of\n"
+"        tweets to display.\n"
+"        If --noretweet is given, only native user's tweet will be displayed.\n"
+"        "
+msgstr ""
+
+#: plugin.py:149
+msgid "No account is associated with this channel. Ask an op, try with another channel."
+msgstr ""
+
+#: plugin.py:159
+msgid "This user protects his tweets; you need to fetch them from a channel whose associated account can fetch this timeline."
+msgstr ""
+
