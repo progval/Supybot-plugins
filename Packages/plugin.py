@@ -29,6 +29,7 @@
 ###
 
 import os
+import json
 import tarfile
 import supybot.conf as conf
 import supybot.utils as utils
@@ -91,6 +92,13 @@ def getDirectory(file_):
         return None
     return directory
 
+def getWritableDirectoryFromList(directories):
+    for directory in directories:
+        if os.access(directory, os.W_OK):
+            return directory
+    return None
+
+
 @internationalizeDocstring
 class Packages(callbacks.Plugin):
     """Add the help for "@plugin help Packages" here
@@ -107,7 +115,7 @@ class Packages(callbacks.Plugin):
         If given, --force disables sanity checks (usage is deprecated)."""
         filename = os.path.expanduser(filename)
         if os.path.sep not in filename:
-            filename = os.path.join(conf.directories.data(), filename)
+            filename = os.path.join(conf.supybot.directories.data(), filename)
             filename += '.tar'
         try:
             file_ = tarfile.open(name=filename, mode='r:*')
@@ -135,17 +143,86 @@ class Packages(callbacks.Plugin):
                 irc.error(_('Missing dependency(ies) : ') +
                           ', '.join(failures))
                 return
-        ok = False
-        for directory in conf.supybot.directories.plugins():
-            if os.access(directory, os.W_OK):
-                ok = True
-                break
-        if not ok:
+        directories = conf.supybot.directories.plugins()
+        directory = getWritableDirectoryFromList(directories)
+        if directory is None:
             irc.error(_('No writable plugin directory found.'))
             return
         file_.extractall(directory)
         irc.replySuccess()
     install = wrap(install, ['owner', 'filename', getopts({'force': ''})])
+
+    @internationalizeDocstring
+    def download(self, irc, msg, args, name, optlist):
+        """<package> [--version <version>] [--repo <repository url>]
+
+        Downloads the <package> at the <repository url>.
+        <version> defaults to the latest version available.
+        <repository url> defaults to http://packages.supybot.fr.cr/"""
+        # Parse and check parameters
+        version = None
+        repo = 'http;//packages.supybot.fr.cr/'
+        for key, value in optlist:
+            if key == 'version': version = value
+            elif key == 'repo': repo = value
+        if __builtins__['any']([x in repo for x in ('?', '&')]):
+            # Supybot rewrites any() in commands.py
+            irc.error(_('Bad formed url.'))
+            return
+        selectedPackage = None
+
+        # Get server's index
+        try:
+            index = json.load(utils.web.getUrlFd(repo))
+        except ValueError:
+            irc.error(_('Server\'s JSON is bad formed.'))
+            return
+
+        # Crawl the available packages list
+        for package in index['packages']:
+            if not package['name'] == name:
+                continue
+            if version is None and (
+                    selectedPackage == None or
+                    compareVersion(selectedPackage['version'],
+                                   package['version']) == 1):
+                # If not version given, and [no selected package
+                # or selected package is older than this one]
+                selectedPackage = package
+            elif package['version'] == version:
+                selectedPackage = package
+        if selectedPackage is None:
+            irc.error(_('No packages matches your query.'))
+            return
+
+        # Determines the package's real URL
+        # TODO: handle relative URL starting with /
+        packageUrl = selectedPackage['download-url']
+        if packageUrl.startswith('./'):
+            packageUrl = repo
+            if not packageUrl.endswith('/'):
+                packageUrl += '/'
+            packageUrl += selectedPackage['download-url']
+
+        # Write the package to the disk
+        directory = conf.supybot.directories.data()
+        assert os.access(directory, os.W_OK)
+        path = os.path.join(directory, '%s.tar' % name)
+        try:
+            os.unlink(path)
+        except OSError:
+            # Does not exist
+            pass
+        with open(path, 'ab') as file_:
+            try:
+                file_.write(utils.web.getUrlFd(packageUrl).read())
+            except utils.web.Error as e:
+                irc.reply(e.args[0])
+                return
+    download = wrap(download, ['something', getopts({'version': 'something',
+                                                     'repo': 'httpUrl'})])
+
+
 
 
 Class = Packages
