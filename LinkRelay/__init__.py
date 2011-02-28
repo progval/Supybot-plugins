@@ -50,6 +50,8 @@ __contributors__ = {supybot.authors.progval: ['enhance configurabilty',
                                               'many bug fixes',
                                               'code enhancement']}
 
+__url__ = ""
+
 import config
 import plugin
 reload(plugin) # In case we're being reloaded.
