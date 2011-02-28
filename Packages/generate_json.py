@@ -31,6 +31,7 @@
 
 from __future__ import print_function
 
+import os
 import sys
 import atexit
 import tarfile
@@ -43,11 +44,7 @@ unregister = [world.makeDriversDie, world.makeIrcsDie, world.startDying,
 import plugin # I mean the Supybot plugin, the one which should be distributed
               # with this script and is runned by Supybot.
 
-def main():
-    parser = optparse.OptionParser(usage='Usage: %prog Package.tar',
-                                   version='Supybot Packager 0.1')
-    (options, args) = parser.parse_args()
-    filename = args[0]
+def main(filename):
     with tarfile.open(name=filename, mode='r:*') as file_:
         directory = plugin.getDirectory(file_)
         if not directory:
@@ -99,7 +96,35 @@ def main():
 
 
 if __name__ == '__main__':
-    output = main()
+    parser = optparse.OptionParser(usage='Usage: %prog Package.tar',
+                                   version='Supybot Packager 0.1')
+    (options, args) = parser.parse_args()
+    if len(args) > 0:
+        filename = args[0]
+        output = main(filename)
+    else:
+        output = """
+{
+    "repository": {
+        "maintainers": {
+            "ProgVal": "progval@gmail.com"
+        },
+        "repo-name": "Main packages repository",
+        "repo-url": "http://packages.supybot.fr.cr",
+        "project-name": "Supybot-fr",
+        "project-url": "http://supybot.fr.cr"
+    },
+    "packages": ["""
+        addComma = False
+        for filename in os.listdir('.'):
+            if addComma:
+                output += ','
+            if filename.endswith('.tar'):
+                output += main(filename)
+            addComma = True
+        output += """
+    ]
+}"""
     if sys.version_info > (3, 0, 0):
         # clean
         for function in unregister:
