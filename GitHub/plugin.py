@@ -211,8 +211,8 @@ class GitHub(callbacks.Plugin):
             if repo not in announces:
                 announces[repo] = []
             elif channel not in announces[repo]:
-                irc.error(_('This repository is not yet announce to this '
-                            'channed.'))
+                irc.error(_('This repository is not yet announced to this '
+                            'channel.'))
             else:
                 announces[repo].remove(channel)
             self._save(announces)
