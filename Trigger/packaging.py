@@ -33,7 +33,8 @@
 requires = {'package-installer': '0.1'}
 
 # Additional tags needed for some features of this package.
-suggests = {'i18n': '0.1'}
+suggests = {'i18n': '0.1',
+            'conditional': '0.1'}
 
 # Tags this package provides.
 provides = {'trigger': '0.1'}

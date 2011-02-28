@@ -33,16 +33,23 @@ from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
-from supybot.i18n import PluginInternationalization, internationalizeDocstring
+try:
+    from supybot.i18n import PluginInternationalization
+    from supybot.i18n import internationalizeDocstring
+    _ = PluginInternationalization('Trigger')
+except:
+    # This are useless functions that's allow to run the plugin on a bot
+    # without the i18n plugin
+    _ = lambda x:x
+    internationalizeDocstring = lambda x:x
 
-_ = PluginInternationalization('Trigger')
 
 @internationalizeDocstring
 class Trigger(callbacks.Plugin):
     """Add the help for "@plugin help Trigger" here
     This should describe *how* to use this plugin."""
     def _run(self, irc, msg, triggerName):
-        command = self.registryValue('triggers.%s' % triggerName)
+        command = self.registryValue('triggers.%s' % triggerName, msg.args[0])
         if command == '':
             return
         tokens = callbacks.tokenize(command)
