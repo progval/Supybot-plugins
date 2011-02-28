@@ -48,7 +48,7 @@ def main(filename):
     with tarfile.open(name=filename, mode='r:*') as file_:
         directory = plugin.getDirectory(file_)
         if not directory:
-            print('The file is not a valid package.')
+            print('%s is not a valid package.' % filename)
             return
         class packaging:
             """Namespace for runned code"""
