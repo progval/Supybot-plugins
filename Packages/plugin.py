@@ -161,7 +161,7 @@ class Packages(callbacks.Plugin):
         <repository url> defaults to http://packages.supybot.fr.cr/"""
         # Parse and check parameters
         version = None
-        repo = 'http;//packages.supybot.fr.cr/'
+        repo = 'http://packages.supybot.fr.cr/'
         for key, value in optlist:
             if key == 'version': version = value
             elif key == 'repo': repo = value
