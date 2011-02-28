@@ -8,7 +8,7 @@ format:
 		"maintainers": {
 			"ProgVal": "progval@gmail.com",
 		},
-		"repo-name": "Main packages repository"
+		"repo-name": "Main packages repository",
 		"repo-url": "http://packages.supybot.fr.cr",
 		"project-name": "Supybot-fr",
 		"project-url": "http://supybot.fr.cr"
@@ -21,13 +21,14 @@ format:
 				"ProgVal",
 				"progval@gmail.com"
 			],
-			"url": "http://supybot.fr.cr/GitHub",
+			"info-url": "http://supybot.fr.cr/GitHub",
+			"download-url": "./GitHub-0.1.tar",
 			"requires": {
 				"package-installer": "0.1"
-			}
+			},
 			"suggests": {
 				"i18n": "0.1"
-			}
+			},
 			"provides": {
 			}
 		}
