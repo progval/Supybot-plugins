@@ -219,6 +219,7 @@ class Packages(callbacks.Plugin):
             except utils.web.Error as e:
                 irc.reply(e.args[0])
                 return
+        irc.replySuccess()
     download = wrap(download, ['something', getopts({'version': 'something',
                                                      'repo': 'httpUrl'})])
 
