@@ -28,14 +28,14 @@
 
 ###
 
-# Things this package depends on. Obviously, every package needs a package
+# Tags this package depends on. Obviously, every package needs a package
 # installer to be installed.
 requires = {'package-installer': '0.1'}
 
-# Additional things needed for some features of this package.
+# Additional tags needed for some features of this package.
 suggests = {'i18n': '0.1'}
 
-# Things this package provides.
+# Tags this package provides.
 provides = {'package-installer': '0.1'}
 
 
