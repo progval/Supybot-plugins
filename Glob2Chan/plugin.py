@@ -161,13 +161,10 @@ class Glob2Chan(callbacks.Plugin):
         if channel != '#glob2':
             return
         nick = msg.nick
-        print repr(type_)
         if type_ == 'ask4game':
             if nick in self.registryValue('gamers').split(' '):
                 irc.error('You already subscribed to this list')
                 return
-            print '%s %s' % \
-                (self.registryValue('gamers'), nick)
             self.setRegistryValue('gamers', value='%s %s' %
                 (self.registryValue('gamers'), nick))
         elif type_ == 'ask4help':
@@ -181,6 +178,35 @@ class Glob2Chan(callbacks.Plugin):
                 'ask4help.')
         irc.reply('I will notify you each time someone uses %s.' % type_)
     subscribe = wrap(subscribe, ['somethingWithoutSpaces'])
+
+    def unsubscribe(self, irc, msg, args, type_):
+        """{ask4game|ask4help}
+
+        Unsubscribes you from the gamers/helpers alert list."""
+        channel = msg.args[0]
+        if channel != '#glob2':
+            return
+        nick = msg.nick
+        if type_ == 'ask4game':
+            if nick not in self.registryValue('gamers').split(' '):
+                irc.error('You didn\'t subscribe to this list')
+                return
+            nickslist = self.registryValue('gamers').split(' ')
+            nickslist.remove(nick)
+            self.setRegistryValue('gamers', value=' '.join(nickslist))
+        elif type_ == 'ask4help':
+            if nick in self.registryValue('helpers').split(' '):
+                irc.error('You didn\'t subscribe to this list')
+                return
+            nickslist = self.registryValue('helpers').split(' ')
+            nickslist.remove(nick)
+            self.setRegistryValue('helpers', value=' '.join(nickslist))
+        else:
+            irc.error('The only available unsubscriptions are ask4game and '
+                'ask4help.')
+        irc.reply('I won\'t notify you each time someone uses %s anymore.' %
+                  type_)
+    unsubscribe = wrap(unsubscribe, ['somethingWithoutSpaces'])
 
 Class = Glob2Chan
 
