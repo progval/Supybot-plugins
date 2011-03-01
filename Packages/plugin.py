@@ -266,7 +266,7 @@ class Packages(callbacks.Plugin):
         else:
             irc.reply(', '.join(['%s (%s)' % (y['name'],y['version'])
                                  for x,y in needUpdate.items()]))
-    checkupdates = wrap(checkupdates, ['owner', 'httpUrl'])
+    checkupdates = wrap(checkupdates, ['owner', optional('httpUrl')])
 
 
 
