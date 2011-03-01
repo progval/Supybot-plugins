@@ -59,12 +59,7 @@ class Wikipedia(callbacks.Plugin):
         # first, we get the page
         addr = 'http://en.wikipedia.org/wiki/Special:Search?search=%s' % \
                 urllib.quote_plus(search)
-        try:
             article = utils.web.getUrl(addr)
-        except:
-            irc.reply('Hmm, something went wrong fetching the page. '
-                      'I\'m highlighting quantumlemur so he can take a look.')
-            return
         # parse the page
         tree = lxml.html.document_fromstring(article)
         # check if it gives a "Did you mean..." redirect
