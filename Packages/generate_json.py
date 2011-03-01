@@ -64,6 +64,14 @@ def main(filename):
         if output != '':
             output = output[0:-1] # Remove the ending comma
         return output
+    doc = init.__doc__
+    if doc.startswith('\n'):
+        doc = doc[1:]
+    if doc.endswith('\n'):
+        doc = doc[0:-1]
+    doc = doc.replace('\n', ' ')
+    if doc.startswith('Add a description of the plugin'):
+        doc = ''
     output = """
         {
             "name": "%(name)s",
@@ -75,6 +83,7 @@ def main(filename):
             ],
             "info-url": "%(info_url)s",
             "download-url": "./%(name)s-%(version)s.tar",
+            "description": "%(description)s",
             "requires": {%(requires)s
             },
             "suggests": {%(suggests)s
@@ -87,6 +96,7 @@ def main(filename):
                 'author_nick': init.__author__.nick,
                 'author_email': init.__author__.email,
                 'info_url': init.__url__,
+                'description': doc,
                 'requires': getPrettyJsonFromDict(packaging.requires),
                 'suggests': getPrettyJsonFromDict(packaging.suggests),
                 'provides': getPrettyJsonFromDict(packaging.provides)}
