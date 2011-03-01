@@ -29,8 +29,8 @@
 ###
 
 """
-Add a description of the plugin (to be presented to the user inside the wizard)
-here.  This should describe *what* the plugin does.
+Trigger is the basic plugin which allows to run commands triggered by an
+event (join, part, message, and so on).
 """
 
 import supybot
