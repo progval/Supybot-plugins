@@ -29,6 +29,7 @@
 ###
 
 import os
+import sys
 import json
 import tarfile
 import supybot.conf as conf
@@ -203,6 +204,7 @@ class Packages(callbacks.Plugin):
 
         # Determines the package's real URL
         # TODO: handle relative URL starting with /
+        # FIXME: URL ending with /foobar.txt
         packageUrl = selectedPackage['download-url']
         if packageUrl.startswith('./'):
             packageUrl = repo
@@ -229,6 +231,42 @@ class Packages(callbacks.Plugin):
     download = wrap(download, ['owner', 'something',
                                getopts({'version': 'something',
                                         'repo': 'httpUrl'})])
+
+    @internationalizeDocstring
+    def checkupdates(self, irc, msg, args, repo):
+        """[<repository url>]
+
+        Checks for updates for loaded plugins at the <repository url>.
+        <repository url> defaults to http://packages.supybot.fr.cr/"""
+        if repo is None:
+            repo = 'http://packages.supybot.fr.cr/'
+
+        # Get server's index
+        try:
+            index = json.load(utils.web.getUrlFd(repo))
+        except ValueError:
+            irc.error(_('Server\'s JSON is bad formed.'))
+            return
+
+        # Crawl the index
+        needUpdate = {}
+        for package in index['packages']:
+            if package['name'] in sys.modules and \
+                    compareVersions(sys.modules[package['name']].__version__,
+                                    package['version']) == -1:
+                if package['name'] in needUpdate:
+                    if compareVersions(needUpdate[package['name']].__version__,
+                                        package['version']) != -1:
+                        continue
+                needUpdate.update({package['name']: package})
+
+        # Display results
+        if needUpdate == {}:
+            irc.reply(_('All loaded plugins are up to date :)'))
+        else:
+            irc.reply(', '.join(['%s (%s)' % (y['name'],y['version'])
+                                 for x,y in needUpdate.items()]))
+    checkupdates = wrap(checkupdates, ['owner', 'httpUrl'])
 
 
 
