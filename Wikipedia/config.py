@@ -1,5 +1,6 @@
 ###
 # Copyright (c) 2010, quantumlemur
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -44,9 +45,6 @@ Wikipedia = conf.registerPlugin('Wikipedia')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(Wikipedia, 'someConfigVariableName',
 #     registry.Boolean(False, """Help for someConfigVariableName."""))
-
-conf.registerGlobalValue(Wikipedia, 'debug',
-    registry.Boolean(False, """Output debugging info?"""))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
