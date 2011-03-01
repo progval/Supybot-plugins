@@ -65,6 +65,7 @@ def main(dirname):
         """Namespace for runned code"""
         exec(open('%s/__init__.py' % dirname))
     assert init.__version__ != '', 'Version is empty'
+    assert hasattr(init, '__url__'), 'Has no __url__'
     path = '%s-%s.tar' % (dirname, init.__version__)
     try:
         os.unlink(path)
