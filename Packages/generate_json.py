@@ -117,10 +117,11 @@ if __name__ == '__main__':
     "packages": ["""
         addComma = False
         for filename in os.listdir('.'):
+            if not filename.endswith('.tar'):
+                continue
             if addComma:
                 output += ','
-            if filename.endswith('.tar'):
-                output += main(filename)
+            output += main(filename)
             addComma = True
         output += """
     ]
