@@ -33,5 +33,13 @@ from supybot.test import *
 class WikipediaTestCase(PluginTestCase):
     plugins = ('Wikipedia',)
 
+    def testWiki(self):
+        self.assertRegexp('wiki Monty Python',
+                          '^Monty Python \(sometimes known as The Pythons\).*')
+        self.assertRegexp('wiki Python', '.*is a disambiguation page.*')
+        self.assertRegexp('wiki Foo', '"Foobar" \(Redirect from "Foo"\): '
+                                      'The terms foobar.*')
+
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

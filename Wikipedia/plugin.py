@@ -1,5 +1,6 @@
 ###
 # Copyright (c) 2010, quantumlemur
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -54,152 +55,81 @@ class Wikipedia(callbacks.Plugin):
         """<search term>
 
         Returns the first paragraph of a Wikipedia article"""
-# first, we get the page
-        addr = 'http://en.wikipedia.org/wiki/Special:Search?search=%s' % urllib.quote_plus(search)
+        reply = ''
+        # first, we get the page
+        addr = 'http://en.wikipedia.org/wiki/Special:Search?search=%s' % \
+                urllib.quote_plus(search)
         try:
             article = utils.web.getUrl(addr)
         except:
-            irc.reply('Hmm, something went wrong fetching the page.  I\'m highlighting quantumlemur so he can take a look.')
+            irc.reply('Hmm, something went wrong fetching the page. '
+                      'I\'m highlighting quantumlemur so he can take a look.')
             return
-# parse the page
+        # parse the page
         tree = lxml.html.document_fromstring(article)
-# check if it gives a "Did you mean..." redirect
-        didyoumean = tree.xpath('//div[@class="searchdidyoumean"]/a[@title="Special:Search"]')
+        # check if it gives a "Did you mean..." redirect
+        didyoumean = tree.xpath('//div[@class="searchdidyoumean"]/a'
+                                '[@title="Special:Search"]')
         if didyoumean:
             redirect = didyoumean[0].text_content().strip()
-            irc.reply('I didn\'t find anything for "%s". Did you mean "%s"?' % (search, redirect))
+            reply += ('I didn\'t find anything for "%s". Did you mean "%s"? ' %
+                      (search, redirect))
             addr = 'http://en.wikipedia.org%s' % didyoumean[0].get('href')
             article = utils.web.getUrl(addr)
             tree = lxml.html.document_fromstring(article)
             search = redirect
-# check if it's a page of search results (rather than an article), and if so, retrieve the first result
+        # check if it's a page of search results (rather than an article), and
+        # if so, retrieve the first result
         searchresults = tree.xpath('//div[@class="searchresults"]/ul/li/a')
         if searchresults:
             redirect = searchresults[0].text_content().strip()
-            irc.reply('I didn\'t find anything for "%s", but here\'s the result for "%s":' % (search, redirect))
+            reply += 'I didn\'t find anything for "%s", but here\'s the ' + \
+                     'result for "%s": ' % (search, redirect)
             addr = 'http://en.wikipedia.org%s' % searchresults[0].get('href')
             article = utils.web.getUrl(addr)
             tree = lxml.html.document_fromstring(article)
             search = redirect
-# otherwise, simply return the title and whether it redirected
+        # otherwise, simply return the title and whether it redirected
         else:
-            redirect = re.search('\(Redirected from <a href=[^>]*>([^<]*)</a>\)', article)
+            redirect = re.search('\(Redirected from <a href=[^>]*>([^<]*)'
+                                 '</a>\)', article)
             if redirect:
-                redirect = tree.xpath('//div[@id="contentSub"]/a')[0].text_content().strip()
+                redirect = tree.xpath('//div[@id="contentSub"]/a')[0]
+                redirect = redirect.text_content().strip()
                 title = tree.xpath('//*[@class="firstHeading"]')
                 title = title[0].text_content().strip()
-                irc.reply('"%s" (Redirect from "%s"):' % (title, redirect))
-# extract the address we got it from
+                reply += '"%s" (Redirect from "%s"): ' % (title, redirect)
+        # extract the address we got it from
         addr = re.search('Retrieved from "<a href="([^"]*)">', article)
         addr = addr.group(1)
-# check if it's a disambiguation page
+        # check if it's a disambiguation page
         disambig = tree.xpath('//table[@id="disambigbox"]')
         if disambig:
             disambig = tree.xpath('//div[@id="bodyContent"]/ul/li/a')
             disambig = disambig[:5]
             disambig = [item.text_content() for item in disambig]
             r = utils.str.commaAndify(disambig)
-            irc.reply('%s is a disambiguation page.  Possible results are: %s' % (addr, r))
-# or just as bad, a page listing events in that year
-        elif re.search('This article is about the year [\d]*\.  For the [a-zA-Z ]* [\d]*, see', article):
-            irc.reply('"%s" is a page full of events that happened in that year.  If you were looking for information about the number itself, try searching for "%s_(number)", but don\'t expect anything useful...' % (search, search))
+            reply += '%s is a disambiguation page. Possible results are: %s' %\
+                     (addr, r)
+        # or just as bad, a page listing events in that year
+        elif re.search('This article is about the year [\d]*\. '
+                       'For the [a-zA-Z ]* [\d]*, see', article):
+            reply += ('"%s" is a page full of events that happened in that '
+                      'year.  If you were looking for information about the '
+                      'number itself, try searching for "%s_(number)", but '
+                      'don\'t expect anything useful...') % (search, search)
         else:
-##### etree!
+            ##### etree!
             p = tree.xpath("//div[@id='bodyContent']/p[1]")[0]
             p = p.text_content()
             p = p.strip()
             p = p.encode('utf-8')
-# and finally, return what we've got
-            irc.reply(addr)
-            irc.reply(p)
+            # and finally, return what we've got
+            reply += '%s %s' % (p, ircutils.bold(addr))
+        irc.reply(reply)
     wiki = wrap(wiki, ['text'])
 
 
-
-
-#    def wikiold(self, irc, msg, args, search):
-#        """<Wikipedia search term>
-#
-#        Returns the first paragraph of a Wikipedia article"""
-## first, we get the page
-#        try:
-#            article = utils.web.getUrl('http://en.wikipedia.org/wiki/Special:Search?search=%s' % urllib.quote_plus(search))
-#        except:
-#            irc.reply('Hmm, looks like we broke Wikipedia.  Try again later?')
-#            return
-## check if it gives a "Did you mean..." redirect
-#        if 'class="searchdidyoumean"' in article:
-#            redirect = re.search('class="searchdidyoumean">[^>]*title="Special:Search">(.*?)</div>', article)
-#            redirect = redirect.group(1)
-#            redirect = utils.web.htmlToText(redirect, tagReplace="")
-#            irc.reply('I didn\'t find anything for "%s". Did you mean "%s"?' % (search, redirect))
-#            search = redirect
-#            article = utils.web.getUrl('http://en.wikipedia.org/wiki/Special:Search?search=%s' % urllib.quote_plus(search))
-## then check if it's a page of search results (rather than an article), and if so, retrieve the first result
-#        if '<ul class=\'mw-search-results\'>' in article:
-#            article = article[article.find('<ul class=\'mw-search-results\'>'):len(article)]
-#            article = article[article.find('/'):article.find('" title=')]
-#            redirect = article[article.find('/')+1 : ]
-#            redirect = redirect[redirect.find('/')+1 : ]
-#            redirect = urllib.unquote(redirect)
-#            irc.reply('I didn\'t find anything for "%s", but here\'s the result for "%s":' % (search, redirect))
-#            article = utils.web.getUrl('http://en.wikipedia.org%s' % article.replace(' ', '+'))
-#            search = redirect
-## otherwise, simply return the title and whether it redirected
-#        else:
-#            title = re.search('class="firstHeading">([^<]*)</h1>', article)
-#            redirect = re.search('\(Redirected from <a href=[^>]*>([^<]*)</a>\)', article)
-#            if redirect:
-#                irc.reply('"%s" (Redirect from "%s"):' % (title.group(1), redirect.group(1)))
-#                search = title.group(1)
-## extract the address we got it from
-#        addr = re.search('Retrieved from "<a href="([^"]*)">', article)
-#        addr = addr.group(1)
-## this is a funny html thingie that shows up when there are multiple boxes on a page, and causes problems
-#        article = re.sub('<p><br /></p>', '', article)
-## I hope this doesn't take out anything it shouldn't...
-#        article = re.sub('<p><i>For other uses of ', '', article)
-## check if it's a disambiguation page
-#        if re.search('This <a href="[^>]*>disambiguation</a> page lists articles associated with the same title', article):
-#            irc.reply('"%s" leads to a disambiguation page, so it would be kind of hard to list the results from it in IRC.  I\'d suggest checking out the page yourself: %s' % (search, addr))
-#            return
-## or just as bad, a page listing events in that year
-#        elif re.search('This article is about the year [\d]*\.  For the [a-zA-Z ]* [\d]*, see', article):
-#            irc.reply('"%s" is a page full of events that happened in that year.  If you were looking for information about the number itself, try searching for "%s_(number)", but don\'t expect anything useful...' % (search, search))
-#            return
-## remove the coordinates if the article includes them
-#        coord = article.find('title="Geographic coordinate system">')
-#        p = article.find('<p>')
-#        if p < coord and coord - p < 150:
-#            if self.registryValue('debug'):
-#                irc.reply('\x0314coordinates found at %s...' % article.find('title="Geographic coordinate system'))
-#            article = article[article.find('title="Geographic coordinate system') : len(article)]
-#            article = article[article.find('</p>')+5 : ]
-## step through and count up how many nested tables there are before the first proper paragraph...
-#        tables = 0
-#        while article.find('table') < article.find('<p>') or tables > 0:
-#            tag = re.search('</?table', article)
-#            if '/' in tag.group(0):
-#                tables += -1
-#                if self.registryValue('debug'):
-#                    irc.reply('\x0314table closed at %s/%s, beheading...' % (tag.start(), len(article)))
-#            else:
-#                tables += 1
-#                if self.registryValue('debug'):
-#                    irc.reply('\x0314table opened at %s/%s, beheading...' % (tag.start(), len(article)))
-#            article = article[tag.end():]
-#        if self.registryValue('debug'):
-#            irc.reply('\x0314p at %s, /p at %s' % (article.find('<p>'), article.find('</p>')))
-## finally, isolate the first proper paragraph and strip the HTML
-#        article = article[article.find('<p>'):article.find('</p>')]
-#        article = utils.web.htmlToText(article, tagReplace="")
-## remove any citations from the paragraph
-#        article = re.sub('\[\d*\]', '', article)
-#        article = re.sub('\[citation needed\]', '', article)
-## and finally, return what we've got
-#        irc.reply(addr)
-#        irc.reply(article)
-#    wikiold = wrap(wikiold, ['text'])
 
 Class = Wikipedia
 
