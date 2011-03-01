@@ -120,12 +120,15 @@ class Wikipedia(callbacks.Plugin):
                       'don\'t expect anything useful...') % (search, search)
         else:
             ##### etree!
-            p = tree.xpath("//div[@id='bodyContent']/p[1]")[0]
-            p = p.text_content()
-            p = p.strip()
-            p = p.encode('utf-8')
-            # and finally, return what we've got
-            reply += '%s %s' % (p, ircutils.bold(addr))
+            p = tree.xpath("//div[@id='bodyContent']/p[1]")
+            if len(p) == 0:
+                reply += 'Not found, or page bad formed. '
+            else:
+                p = p[0]
+                p = p.text_content()
+                p = p.strip()
+                p = p.encode('utf-8')
+                reply += '%s %s' % (p, ircutils.bold(addr))
         irc.reply(reply)
     wiki = wrap(wiki, ['text'])
 

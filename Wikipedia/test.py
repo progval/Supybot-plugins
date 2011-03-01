@@ -1,5 +1,6 @@
 ###
 # Copyright (c) 2010, quantumlemur
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -39,6 +40,7 @@ class WikipediaTestCase(PluginTestCase):
         self.assertRegexp('wiki Python', '.*is a disambiguation page.*')
         self.assertRegexp('wiki Foo', '"Foobar" \(Redirect from "Foo"\): '
                                       'The terms foobar.*')
+        self.assertRegexp('wiki roegdfjpoepo', '.*is a disambiguation page.*')
 
 
 
