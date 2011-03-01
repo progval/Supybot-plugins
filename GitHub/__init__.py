@@ -29,8 +29,8 @@
 ###
 
 """
-Add a description of the plugin (to be presented to the user inside the wizard)
-here.  This should describe *what* the plugin does.
+This plugin provides access to the GitHub API, and can announce pushes on
+channels.
 """
 
 import supybot

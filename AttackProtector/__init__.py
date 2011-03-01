@@ -29,8 +29,9 @@
 ###
 
 """
-Add a description of the plugin (to be presented to the user inside the wizard)
-here.  This should describe *what* the plugin does.
+AttackProtectors provides a highly configurable protection against flood and
+other attacks.
+Triggering, punishment, and exceptions can be configured easily.
 """
 
 import supybot

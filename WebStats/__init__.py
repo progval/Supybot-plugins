@@ -29,8 +29,7 @@
 ###
 
 """
-Add a description of the plugin (to be presented to the user inside the wizard)
-here.  This should describe *what* the plugin does.
+WebStats provides statistics for channels, accessible via a Web interface.
 """
 
 import supybot

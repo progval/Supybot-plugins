@@ -29,8 +29,8 @@
 ###
 
 """
-Add a description of the plugin (to be presented to the user inside the wizard)
-here.  This should describe *what* the plugin does.
+This plugins provides access to the Twitter API.
+It supports multiple accounts: one per channel.
 """
 
 import supybot

@@ -29,8 +29,7 @@
 ###
 
 """
-Add a description of the plugin (to be presented to the user inside the wizard)
-here.  This should describe *what* the plugin does.
+Packages is a packaging system for Supybot plugins.
 """
 
 import supybot
@@ -38,7 +37,7 @@ import supybot.world as world
 
 # Use this for the version of this plugin.  You may wish to put a CVS keyword
 # in here if you're keeping the plugin in CVS or some similar system.
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 # XXX Replace this with an appropriate author or supybot.Author instance.
 if not hasattr(supybot.authors, 'progval'):
