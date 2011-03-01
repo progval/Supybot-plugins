@@ -310,6 +310,58 @@ class Packages(callbacks.Plugin):
     search = wrap(search, [optional('httpUrl'),
                            getopts(dict([(x,'glob') for x in options]))])
 
+    def info(self, irc, msg, args, repo, name, version, optlist):
+        """[<repository url>] <package> [<version>] [--author-full]
+
+        Displays informations about the <package>, at the given <version>.
+        <repository url> defaults to http://packages.supybot.fr.cr/ and
+        <version> defaults to the latest available."""
+        # Parse the arguments
+        if repo is None:
+            repo = 'http://packages.supybot.fr.cr/'
+        if version == '--author-full': # Bug in wrap()
+            version = None
+            optlist.append(('--author-full', True))
+
+        # Get server's index
+        try:
+            index = json.load(utils.web.getUrlFd(repo))
+        except ValueError:
+            irc.error(_('Server\'s JSON is bad formed.'))
+            return
+
+        # Crawl the index
+        selectedPackage = None
+        for package in index['packages']:
+            if package['name'] == name:
+                if version is not None and package['version'] != version:
+                    continue
+                if version is None and selectedPackage is not None and \
+                        compareVersions(selectedPackage['version'],
+                                        package['version']) != -1:
+                    continue
+                selectedPackage = package
+
+        # Display result
+        if selectedPackage is None:
+            irc.error('No such package/version.')
+            return
+        selectedPackage['author-name'] = selectedPackage['author'][0]
+        selectedPackage['author-nick'] = selectedPackage['author'][1]
+        selectedPackage['author-email'] = selectedPackage['author'][2]
+        if ('author-full', True) in optlist:
+            selectedPackage['author-string'] = '%s "%s" <%s>' % \
+                                               tuple(selectedPackage['author'])
+        else:
+            selectedPackage['author-string'] = selectedPackage['author-name']
+        for key in ('requires', 'suggests', 'provides'):
+            selectedPackage[key] = ', '.join('%s (%s)' % x for x in
+                                             selectedPackage[key].items())
+        irc.reply(('%(name)s (version %(version)s) has been written by '
+                   '%(author-string)s and requires the fellowing flags: '
+                   '%(requires)s') % selectedPackage)
+    info = wrap(info, [optional('httpUrl'), 'something',
+                       optional('something'), getopts({'author-full': ''})])
 
 
 
