@@ -251,9 +251,10 @@ class Packages(callbacks.Plugin):
         # Crawl the index
         needUpdate = {}
         for package in index['packages']:
-            if package['name'] in sys.modules and \
+            if package['name'] in sys.modules and (
+                    not hasattr(sys.modules[package['name']], '__version__') or
                     compareVersions(sys.modules[package['name']].__version__,
-                                    package['version']) == -1:
+                                    package['version']) == -1):
                 if package['name'] in needUpdate:
                     if compareVersions(needUpdate[package['name']].__version__,
                                         package['version']) != -1:
