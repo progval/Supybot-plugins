@@ -28,6 +28,7 @@
 
 ###
 
+import re
 import os
 import sys
 import json
@@ -268,6 +269,47 @@ class Packages(callbacks.Plugin):
             irc.reply(', '.join(['%s (%s)' % (y['name'],y['version'])
                                  for x,y in needUpdate.items()]))
     checkupdates = wrap(checkupdates, ['owner', optional('httpUrl')])
+
+    def search(self, irc, msg, args, repo, optlist):
+        # Parse the arguments
+        if repo is None:
+            repo = 'http://packages.supybot.fr.cr/'
+        def glob2matcher(glob):
+            glob = utils.python.glob2re(glob)
+            return re.compile(glob).match
+        matchers = {}
+        for key, value in optlist:
+            if value != None:
+                matchers.update({key: glob2matcher(value)})
+
+        # Get server's index
+        try:
+            index = json.load(utils.web.getUrlFd(repo))
+        except ValueError:
+            irc.error(_('Server\'s JSON is bad formed.'))
+            return
+
+        # Crawl packages index
+        results = []
+        for package in index['packages']:
+            ok = True
+            for key, matcher in matchers.items():
+                if key in package and not matcher(str(package[key])):
+                    # If the packages index doesn't have this key, we consider
+                    # the key matched.
+                    ok = False
+                    break
+            if ok:
+                results.append(package)
+
+        # Display results
+        reply = ['%s (%s)' % (x['name'],x['version']) for x in results]
+        reply.sort()
+        irc.reply(', '.join(reply))
+    options = ['name', 'version', 'author', 'description']
+    search = wrap(search, [optional('httpUrl'),
+                           getopts(dict([(x,'glob') for x in options]))])
+
 
 
 
