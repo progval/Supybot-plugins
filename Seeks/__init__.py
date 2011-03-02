@@ -29,8 +29,8 @@
 ###
 
 """
-Add a description of the plugin (to be presented to the user inside the wizard)
-here.  This should describe *what* the plugin does.
+This is a basic but highly configuration plugin that allows to call
+a Seeks node (ie. a search engine).
 """
 
 import supybot
