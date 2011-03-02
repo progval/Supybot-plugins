@@ -1,5 +1,5 @@
 ###
-# Copyright (c) 2010, Pablo Joubert
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,39 +28,14 @@
 
 ###
 
-"""
-Add a description of the plugin (to be presented to the user inside the wizard)
-here.  This should describe *what* the plugin does.
-"""
+# Tags this package depends on. Obviously, every package needs a package
+# installer to be installed.
+requires = {'package-installer': '0.1'}
 
-import supybot
-import supybot.world as world
+# Additional tags needed for some features of this package.
+suggests = {'i18n': '0.1'}
 
-# Use this for the version of this plugin.  You may wish to put a CVS keyword
-# in here if you're keeping the plugin in CVS or some similar system.
-__version__ = "0.1"
-
-# XXX Replace this with an appropriate author or supybot.Author instance.
-__author__ = supybot.Author('Pablo Joubert', 'piti', 'pablo.piti@gmail.com'
-
-# This is a dictionary mapping supybot.Author instances to lists of
-# contributions.
-__contributors__ = {}
-
-# This is a url where the most recent plugin package can be downloaded.
-__url__ = '' # 'http://supybot.com/Members/yourname/Seeks/download'
-
-import config
-import plugin
-reload(plugin) # In case we're being reloaded.
-# Add more reloads here if you add third-party modules and want them to be
-# reloaded when this plugin is reloaded.  Don't forget to import them as well!
-
-if world.testing:
-    import test
-
-Class = plugin.Class
-configure = config.configure
+# Tags this package provides.
+provides = {'seeks': '0.1'}
 
 
-# vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
