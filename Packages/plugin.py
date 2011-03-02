@@ -279,10 +279,18 @@ class Packages(callbacks.Plugin):
                                  for x,y in needUpdate.items()]))
     checkupdates = wrap(checkupdates, ['owner', optional('httpUrl')])
 
-    def search(self, irc, msg, args, repo, optlist):
+    def search(self, irc, msg, args, repo, optlist, description):
+        """[<repository url>] [--name <name>] [--version <version>]\
+            [--author <author>] [<description>]
+
+        Searches the packages matching the query in the <repository url>.
+        <repository url> defaults to http://packages.supybot.fr.cr"""
         # Parse the arguments
         if repo is None:
             repo = 'http://packages.supybot.fr.cr/'
+        if not __builtins__['any'](x in description for x in '*?'):
+            description = '*%s*' % description
+        optlist.append(('description', description))
         def glob2matcher(glob):
             glob = utils.python.glob2re(glob)
             return re.compile(glob).match
@@ -315,9 +323,10 @@ class Packages(callbacks.Plugin):
         reply = ['%s (%s)' % (x['name'],x['version']) for x in results]
         reply.sort()
         irc.reply(', '.join(reply))
-    options = ['name', 'version', 'author', 'description']
+    options = ['name', 'version', 'author']
     search = wrap(search, [optional('httpUrl'),
-                           getopts(dict([(x,'glob') for x in options]))])
+                           getopts(dict([(x,'anything') for x in options])),
+                           optional('text')])
 
     def info(self, irc, msg, args, repo, name, version, optlist):
         """[<repository url>] <package> [<version>] [--author-full]
