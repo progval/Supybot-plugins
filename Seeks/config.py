@@ -45,5 +45,9 @@ Seeks = conf.registerPlugin('Seeks')
 # conf.registerGlobalValue(Seeks, 'someConfigVariableName',
 #     registry.Boolean(False, """Help for someConfigVariableName."""))
 
+conf.registerChannelValue(Seeks, 'url',
+        registry.String('http://www.seeks.fr/search', """The Seeks server
+        that this plugin will use."""))
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

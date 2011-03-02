@@ -36,7 +36,6 @@ from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
-import supybot.schedule as schedule
 
 class Seeks(callbacks.Plugin):
     """Simply calls a seeks node, requesting json"""
@@ -45,20 +44,30 @@ class Seeks(callbacks.Plugin):
     def __init__(self, irc):
         self.__parent = super(Seeks, self)
         self.__parent.__init__(irc)
-# should be changed for your node
-        self.query_str = "http://www.seeks.fr/search?expansion=1&action=expand&output=json&q=" 
-        
+        # should be changed for your node
+        self.query_str = '%s?expansion=1&action=expand&output=json&q='
+
     def search(self, irc, msg, args, query):
-        raw_page = urllib.urlopen(self.query_str + urllib.quote(query).replace('%20','+'))
+        """<query>
+
+        Searches the <query> in a seeks node."""
+        query_str = self.query_str % self.registryValue('url', msg.args[0])
+        query = urllib.quote(query).replace('%20', '+')
+        raw_page = urllib.urlopen(query_str + query)
         page = raw_page.read()
         try:
             content = json.loads(page)
-# only outputs the 5 first results
-            answer = " / ".join(("%s - %s" % (snippet["url"], snippet["seeks_score"])) for snippet in content["snippets"][:4])
+        except:
+            irc.error("Server's JSON is corrupted")
+            return
+        try:
+            # only outputs the 5 first results
+            answer = " / ".join(("%s - %s" % (snippet["url"], snippet["seeks_score"]))
+                                for snippet in content["snippets"][:4])
             irc.reply(answer)
         except:
             irc.reply("no result, maybe a trouble with json ?")
-        
+
     search = wrap(search, ['text'])
 
 Class = Seeks
