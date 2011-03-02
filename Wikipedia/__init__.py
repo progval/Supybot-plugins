@@ -45,7 +45,12 @@ __author__ = supybot.Author('quantumlemur', 'quantumlemur',
 
 # This is a dictionary mapping supybot.Author instances to lists of
 # contributions.
-__contributors__ = {}
+if not hasattr(supybot.authors, 'progval'):
+    supybot.authors.progval = supybot.Author('Valentin Lorentz', 'ProgVal',
+                                             'progval@gmail.com')
+__contributors__ = {supybot.authors.progval: ['enhance configurability',
+                                              'many bug fixes',
+                                              'internationalization']}
 
 # This is a url where the most recent plugin package can be downloaded.
 __url__ = '' # 'http://supybot.com/Members/yourname/Wikipedia/download'

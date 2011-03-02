@@ -31,6 +31,15 @@
 
 import supybot.conf as conf
 import supybot.registry as registry
+try:
+    from supybot.i18n import PluginInternationalization
+    from supybot.i18n import internationalizeDocstring
+    _ = PluginInternationalization('Wikipedia')
+except:
+    # This are useless functions that's allow to run the plugin on a bot
+    # without the i18n plugin
+    _ = lambda x:x
+    internationalizeDocstring = lambda x:x
 
 def configure(advanced):
     # This will be called by supybot to configure this module.  advanced is
@@ -46,5 +55,9 @@ Wikipedia = conf.registerPlugin('Wikipedia')
 # conf.registerGlobalValue(Wikipedia, 'someConfigVariableName',
 #     registry.Boolean(False, """Help for someConfigVariableName."""))
 
+conf.registerChannelValue(Wikipedia, 'url',
+        registry.String(_('en.wikipedia.org'), _("""URL of the website from
+        where you want to pull pages (usually: your language's
+        wikipedia)""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

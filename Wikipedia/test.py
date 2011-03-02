@@ -40,7 +40,8 @@ class WikipediaTestCase(PluginTestCase):
         self.assertRegexp('wiki Python', '.*is a disambiguation page.*')
         self.assertRegexp('wiki Foo', '"Foobar" \(Redirect from "Foo"\): '
                                       'The terms foobar.*')
-        self.assertRegexp('wiki roegdfjpoepo', '.*is a disambiguation page.*')
+        self.assertRegexp('wiki roegdfjpoepo',
+                          'Not found, or page bad formed.*')
 
 
 
