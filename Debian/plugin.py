@@ -466,26 +466,6 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
             irc.reply('I was unable to properly parse the BTS page.')
     bug = wrap(bug, [('id', 'bug')])
 
-    _dpnRe = re.compile(r'"\+2">([^<]+)</font', re.I)
-    def debianize(self, irc, msg, args, words):
-        """<text>
-
-        Turns <text> into a 'debian package name' using
-        http://www.pigdog.com/features/dpn.html.
-        """
-        url = r'http://www.pigdog.org/cgi_bin/dpn.phtml?name=%s'
-        try:
-            text = utils.web.getUrl(url % '+'.join(words))
-        except utils.web.Error, e:
-            irc.error(str(e), Raise=True)
-        m = self._dpnRe.search(text)
-        if m is not None:
-            irc.reply(m.group(1))
-        else:
-            irc.errorPossibleBug('Unable to parse webpage.')
-    debianize = wrap(debianize, [many('something')])
-
-
 Class = Debian
 
 

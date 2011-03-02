@@ -82,9 +82,6 @@ class DebianTestCase(PluginTestCase):
         def testDebincoming(self):
             self.assertNotError('incoming')
 
-        def testDebianize(self):
-            self.assertNotError('debianize supybot')
-
         def testDebstats(self):
             self.assertNotError('stats supybot')
 
