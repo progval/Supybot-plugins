@@ -1,5 +1,6 @@
 ###
 # Copyright (c) 2010, quantumlemur
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -49,7 +50,7 @@ class Trivia(callbacks.Plugin):
     This should describe *how* to use this plugin."""
     threaded = True
 
-    
+
     def __init__(self, irc):
         self.__parent = super(Trivia, self)
         self.__parent.__init__(irc)
@@ -58,7 +59,11 @@ class Trivia(callbacks.Plugin):
         questionfile = self.registryValue('questionFile')
         if not os.path.exists(questionfile):
             f = open(questionfile, 'w')
-            f.write('If you\'re seeing this question, it means that the questions file that you specified wasn\'t found, and a new one has been created.  Go get some questions!%sNo questions found' % self.registryValue('questionFileSeparator'))
+            f.write(('If you\'re seeing this question, it means that the '
+                     'questions file that you specified wasn\'t found, and '
+                     'a new one has been created.  Go get some questions!%s'
+                     'No questions found') %
+                    self.registryValue('questionFileSeparator'))
             f.close()
         self.scorefile = self.registryValue('scoreFile')
         if not os.path.exists(self.scorefile):
@@ -82,20 +87,20 @@ class Trivia(callbacks.Plugin):
         if channel in self.games:
             self.games[channel].answer(msg)
 
-    
+
     class Game:
-        def __init__(self, irc, channel, num, registryValue, games, scores, scorefile):
+        def __init__(self, irc, channel, num, plugin):
             self.rng = random.Random()
             self.rng.seed()
-            self.registryValue = registryValue
+            self.registryValue = plugin.registryValue
             self.irc = irc
             self.channel = channel
             self.num = num
             self.numAsked = 0
             self.hints = 0
-            self.games = games
-            self.scores = scores
-            self.scorefile = scorefile
+            self.games = plugin.games
+            self.scores = plugin.scores
+            self.scorefile = plugin.scorefile
             self.questionfile = self.registryValue('questionFile')
             self.total = num
             self.active = True
@@ -113,12 +118,14 @@ class Trivia(callbacks.Plugin):
             except KeyError:
                 pass
             self.newquestion()
-       
+
 
         def newquestion(self):
+            inactiveShutoff = self.registryValue('inactiveShutoff',
+                                                 self.channel)
             if self.num == 0:
                 self.active = False
-            elif self.unanswered > self.registryValue('inactiveShutoff', self.channel)  and self.registryValue('inactiveShutoff', self.channel) >= 0:
+            elif self.unanswered > inactiveShutoff and inactiveShutoff >= 0:
                 self.reply('Seems like no one\'s playing any more.')
                 self.active = False
             elif len(self.questions) == 0:
@@ -135,10 +142,14 @@ class Trivia(callbacks.Plugin):
             sep = self.registryValue('questionFileSeparator')
             self.q = q[:q.find(sep)]
             self.a = q[q.find(sep)+len(sep):].split(sep)
-            self.reply('\x03%s#%d of %d: %s' % (self.registryValue('color', self.channel), self.numAsked, self.total, self.q))
+            color = self.registryValue('color', self.channel)
+            self.reply('\x03%s#%d of %d: %s' % (color, self.numAsked,
+                                                self.total, self.q))
             def event():
                 self.timedEvent()
-            eventTime = time.time() + self.registryValue('timeout', self.channel) / (self.registryValue('numHints', self.channel) + 1)
+            timeout = self.registryValue('timeout', self.channel)
+            numHints = self.registryValue('numHints', self.channel)
+            eventTime = time.time() + timeout / (numHints + 1)
             if self.active:
                 schedule.addEvent(event, eventTime, 'next_%s' % self.channel)
 
@@ -161,7 +172,7 @@ class Trivia(callbacks.Plugin):
             max = 3
             if len(sorted) < max:
                 max = len(sorted)
-#                self.reply('max: %d.  len: %d' % (max, len(sorted)))
+                #self.reply('max: %d.  len: %d' % (max, len(sorted)))
             s = 'Top finishers: '
             if max > 0:
                 recipients = []
@@ -171,7 +182,7 @@ class Trivia(callbacks.Plugin):
                     s = '%s %s %s.' % (s, item[0], item[1])
                 self.reply(s)
             del self.games[self.channel]
-        
+
 
         def timedEvent(self):
             if self.hints >= self.registryValue('numHints', self.channel):
@@ -185,16 +196,20 @@ class Trivia(callbacks.Plugin):
         def hint(self):
             self.hints += 1
             ans = self.a[0]
-            divider = int( math.ceil( len(ans) * self.registryValue('hintPercentage', self.channel) * self.hints ) )
+            hintPercentage = self.registryValue('hintPercentage', self.channel)
+            divider = int(math.ceil(len(ans) * hintPercentage * self.hints ))
             if divider == len(ans):
                 divider -= 1
             show = ans[ : divider]
             blank = ans[divider : ]
-            blank = re.sub('\w', self.registryValue('blankChar', self.channel), blank)
+            blankChar = self.registryValue('blankChar', self.channel)
+            blank = re.sub('\w', blankChar, blank)
             self.reply('HINT: %s%s' % (show, blank))
             def event():
                 self.timedEvent()
-            eventTime = time.time() + self.registryValue('timeout', self.channel) / (self.registryValue('numHints', self.channel)+1)
+            timeout = self.registryValue('timeout', self.channel)
+            numHints = self.registryValue('numHints', self.channel)
+            eventTime = time.time() + timeout / (numHints + 1)
             if self.active:
                 schedule.addEvent(event, eventTime, 'next_%s' % self.channel)
 
@@ -203,10 +218,11 @@ class Trivia(callbacks.Plugin):
             correct = False
             for ans in self.a:
                 dist = self.DL(str.lower(msg.args[1]), str.lower(ans))
-                if dist <= len(ans)/self.registryValue('flexibility', self.channel):
+                flexibility = self.registryValue('flexibility', self.channel)
+                if dist <= len(ans) / flexibility:
                     correct = True
-#                if self.registryValue('debug'):
-#                    self.reply('Distance: %d' % dist)
+                #if self.registryValue('debug'):
+                #    self.reply('Distance: %d' % dist)
             if correct:
                 if not msg.nick in self.scores:
                     self.scores[msg.nick] = 0
@@ -215,7 +231,8 @@ class Trivia(callbacks.Plugin):
                     self.roundscores[msg.nick] = 0
                 self.roundscores[msg.nick] += 1
                 self.unanswered = 0
-                self.reply('%s got it!  The full answer was: %s.  Points: %d' % (msg.nick, self.a[0], self.scores[msg.nick]))
+                self.reply('%s got it!  The full answer was: %s. Points: %d' %
+                           (msg.nick, self.a[0], self.scores[msg.nick]))
                 schedule.removeEvent('next_%s' % self.channel)
                 self.writeScores()
                 self.newquestion()
@@ -241,27 +258,30 @@ class Trivia(callbacks.Plugin):
                 # Python lists wrap around for negative indices, so put the
                 # leftmost column at the *end* of the list. This matches with
                 # the zero-indexed strings and saves extra calculation.
-                twoago, oneago, thisrow = oneago, thisrow, [0] * len(seq2) + [x + 1]
+                twoago, oneago, thisrow = oneago, thisrow, [0]*len(seq2)+[x+1]
                 for y in xrange(len(seq2)):
                     delcost = oneago[y] + 1
                     addcost = thisrow[y - 1] + 1
                     subcost = oneago[y - 1] + (seq1[x] != seq2[y])
                     thisrow[y] = min(delcost, addcost, subcost)
                     # This block deals with transpositions
-                    if (x > 0 and y > 0 and seq1[x] == seq2[y - 1] and seq1[x-1] == seq2[y] and seq1[x] != seq2[y]):
+                    if x > 0 and y > 0 and seq1[x] == seq2[y - 1] and \
+                            seq1[x-1] == seq2[y] and seq1[x] != seq2[y]:
                         thisrow[y] = min(thisrow[y], twoago[y - 2] + 1)
             return thisrow[len(seq2) - 1]
 
 
-    def trivia(self, irc, msg, args, channel, num):
+    def start(self, irc, msg, args, channel, num):
         """[<channel>] [<number of questions>]
 
-        Starts a game of trivia.  <channel> is only necessary if the message isn't sent in the channel itself."""
+        Starts a game of trivia.  <channel> is only necessary if the message
+        isn't sent in the channel itself."""
         if num == None:
             num = self.registryValue('defaultRoundLength', channel)
-#        elif num > 100:
-#            irc.reply('sorry, for now, you can\'t start games with more than 100 questions :(')
-#            num = 100
+        #elif num > 100:
+        #    irc.reply('sorry, for now, you can\'t start games with more '
+        #              'than 100 questions :(')
+        #    num = 100
         channel = ircutils.toLower(channel)
         if channel in self.games:
             if not self.games[channel].active:
@@ -276,20 +296,21 @@ class Trivia(callbacks.Plugin):
                 self.games[channel].total += num
                 irc.reply('%d questions added to active game!' % num)
         else:
-            self.games[channel] = self.Game(irc, channel, num, self.registryValue, self.games, self.scores, self.scorefile)
+            self.games[channel] = self.Game(irc, channel, num, self)
         irc.noReply()
-    trivia = wrap(trivia, ['channel', optional('positiveInt')])
+    start = wrap(start, ['channel', optional('positiveInt')])
 
 
-    def strivia(self, irc, msg, args, channel):
+    def stop(self, irc, msg, args, channel):
         """[<channel>]
 
-        Stops a running game of trivia.  <channel> is only necessary if the message isn't sent in the channel itself."""
+        Stops a running game of trivia.  <channel> is only necessary if the
+        message isn't sent in the channel itself."""
         channel = ircutils.toLower(channel)
         try:
             schedule.removeEvent('next_%s' % channel)
         except KeyError:
-            pass
+            irc.error('No trivia started')
         if channel in self.games:
             if self.games[channel].active:
                 self.games[channel].stop()
@@ -298,8 +319,8 @@ class Trivia(callbacks.Plugin):
                 irc.reply('Trivia stopped')
         else:
             irc.noReply()
-    strivia = wrap(strivia, ['channel'])    
-   
+    stop = wrap(stop, ['channel'])
+
 
 Class = Trivia
 

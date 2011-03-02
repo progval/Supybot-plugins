@@ -1,5 +1,5 @@
 ###
-# Copyright (c) 2010, quantumlemur
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,13 @@
 
 from supybot.test import *
 
-class TriviaTestCase(PluginTestCase):
+class TriviaTestCase(ChannelPluginTestCase):
     plugins = ('Trivia',)
+
+    def testStartStop(self):
+        self.assertRegexp('start', '...#1 of 10:.*')
+        self.assertResponse('stop', 'Trivia stopping.')
+        self.assertError('stop')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
