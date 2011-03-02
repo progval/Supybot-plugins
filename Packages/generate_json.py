@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 
 ###
 # Copyright (c) 2011, Valentin Lorentz
@@ -96,7 +96,7 @@ def main(filename):
                 'author_nick': init.__author__.nick,
                 'author_email': init.__author__.email,
                 'info_url': init.__url__,
-                'description': doc,
+                'description': doc.replace('"', '\\"'),
                 'requires': getPrettyJsonFromDict(packaging.requires),
                 'suggests': getPrettyJsonFromDict(packaging.suggests),
                 'provides': getPrettyJsonFromDict(packaging.provides)}
