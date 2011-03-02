@@ -48,6 +48,14 @@ Seeks = conf.registerPlugin('Seeks')
 conf.registerChannelValue(Seeks, 'url',
         registry.String('http://www.seeks.fr/search', """The Seeks server
         that this plugin will use."""))
+conf.registerChannelValue(Seeks, 'separator',
+        registry.String('/', """The character(s) to use between search
+        results."""))
+conf.registerChannelValue(Seeks, 'format',
+        registry.String('%(url)s - %(seeks_score)s', """The format used to
+        display each result."""))
+conf.registerChannelValue(Seeks, 'number',
+        registry.Integer(5, """The number of results to display."""))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

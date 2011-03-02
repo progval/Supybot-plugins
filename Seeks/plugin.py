@@ -29,7 +29,7 @@
 ###
 
 import urllib
-import simplejson as json
+import json
 
 import supybot.utils as utils
 from supybot.commands import *
@@ -58,15 +58,18 @@ class Seeks(callbacks.Plugin):
         try:
             content = json.loads(page)
         except:
+            raise
             irc.error("Server's JSON is corrupted")
             return
-        try:
-            # only outputs the 5 first results
-            answer = " / ".join(("%s - %s" % (snippet["url"], snippet["seeks_score"]))
-                                for snippet in content["snippets"][:4])
-            irc.reply(answer)
-        except:
-            irc.reply("no result, maybe a trouble with json ?")
+        snippets = content["snippets"]
+        if len(snippets) == 0:
+            irc.reply('No results')
+            return
+        separator = self.registryValue('separator', msg.args[0])
+        format_ = self.registryValue('format', msg.args[0])
+        number = self.registryValue('number', msg.args[0])
+        answer = " / ".join(format_ % x for x in snippets[:number-1])
+        irc.reply(answer)
 
     search = wrap(search, ['text'])
 
