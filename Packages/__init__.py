@@ -37,7 +37,7 @@ import supybot.world as world
 
 # Use this for the version of this plugin.  You may wish to put a CVS keyword
 # in here if you're keeping the plugin in CVS or some similar system.
-__version__ = "0.1.3"
+__version__ = "0.2.0"
 
 # XXX Replace this with an appropriate author or supybot.Author instance.
 if not hasattr(supybot.authors, 'progval'):

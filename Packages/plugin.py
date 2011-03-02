@@ -50,7 +50,13 @@ except:
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
 
-world.features = {'package-installer': '0.1'}
+if not hasattr(world, 'features'):
+    world.features = {}
+world.features.update({'package-installer': '0.2'})
+
+BIGGER = 1
+EQUAL = 0
+LOWER = -1
 
 def compareVersions(v1, v2):
     """Returns -1, 0, or 1, depending on the newest version."""
@@ -61,14 +67,14 @@ def compareVersions(v1, v2):
         return numbers.extend(patches)
     for index in range(0, min(len(v1), len(v2))):
         if v1[index] < v2[index]:
-            return -1
+            return LOWER
         elif v1[index] > v2[index]:
-            return 1
+            return BIGGER
     if len(v1) < len(v2):
-        return -1
+        return LOWER
     if len(v1) > len(v2):
-        return 1
-    return 0
+        return BIGGER
+    return EQUAL
 
 def getDirectory(file_):
     """Tries to find the directory where plugin files are. Returns None
@@ -144,9 +150,9 @@ class Packages(callbacks.Plugin):
             for feature, version in packaging.requires.items():
                 if feature not in world.features:
                     failures.append(_('%s (missing)') % feature)
-                elif compareVersions(world.features[feature], version) == -1:
+                elif compareVersions(world.features[feature], version) == LOWER:
                     failures.append(_('%s (>=%s needed, but %s available)') %
-                            (feature, world.features[feature], version))
+                            (feature, version, world.features[feature]))
             if failures != []:
                 irc.error(_('Missing dependency(ies) : ') +
                           ', '.join(failures))
@@ -158,6 +164,9 @@ class Packages(callbacks.Plugin):
             return
         file_.extractall(directory)
         irc.replySuccess()
+        if hasattr(packaging, 'additionalReply'):
+            irc.reply('The plugin provides this additional information: %s' %
+                      packaging.additionalReply)
     install = wrap(install, ['owner', 'filename', getopts({'force': ''})])
 
     @internationalizeDocstring
@@ -193,7 +202,7 @@ class Packages(callbacks.Plugin):
             if version is None and (
                     selectedPackage == None or
                     compareVersion(selectedPackage['version'],
-                                   package['version']) == 1):
+                                   package['version']) == BIGGER):
                 # If not version given, and [no selected package
                 # or selected package is older than this one]
                 selectedPackage = package
@@ -255,10 +264,10 @@ class Packages(callbacks.Plugin):
             if package['name'] in sys.modules and (
                     not hasattr(sys.modules[package['name']], '__version__') or
                     compareVersions(sys.modules[package['name']].__version__,
-                                    package['version']) == -1):
+                                    package['version']) == LOWER):
                 if package['name'] in needUpdate:
                     if compareVersions(needUpdate[package['name']].__version__,
-                                        package['version']) != -1:
+                                        package['version']) != LOWER:
                         continue
                 needUpdate.update({package['name']: package})
 
@@ -338,7 +347,7 @@ class Packages(callbacks.Plugin):
                     continue
                 if version is None and selectedPackage is not None and \
                         compareVersions(selectedPackage['version'],
-                                        package['version']) != -1:
+                                        package['version']) != LOWER:
                     continue
                 selectedPackage = package
 
