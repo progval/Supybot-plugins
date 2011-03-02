@@ -162,6 +162,11 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
                              'debian/dists/unstable/Contents-i386.gz',
                              604800, None)
         }
+
+    def __init__(self, irc):
+        callbacks.Plugin.__init__(self, irc)
+        PeriodicFileDownloader.__init__(self)
+
     contents = conf.supybot.directories.data.dirize('Contents-i386.gz')
     def file(self, irc, msg, args, optlist, glob):
         """[--{regexp,exact} <value>] [<glob>]
@@ -200,7 +205,7 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
                              imap(lambda line:(re_obj.search(line), line),fd)))
         else:
             try:
-                (r, w) = popen2.popen4(['zgrep', '-ie', regexp, self.contents])
+                (r, w) = popen2.popen4(['zgrep', '-e', regexp, self.contents])
                 w.close()
             except TypeError:
                 # We're on Windows.
