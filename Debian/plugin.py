@@ -193,7 +193,7 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
         if glob:
             regexp = fnmatch.translate(glob.lstrip('/'))
             regexp = regexp.rstrip('$')
-            regexp = ".*%s.* " % regexp
+            regexp = "%s.* " % regexp
         try:
             re_obj = re.compile(regexp, re.I)
         except re.error, e:
