@@ -1,5 +1,6 @@
 ###
 # Copyright (c) 2010, Pablo Joubert
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -46,7 +47,8 @@ Seeks = conf.registerPlugin('Seeks')
 #     registry.Boolean(False, """Help for someConfigVariableName."""))
 
 conf.registerChannelValue(Seeks, 'url',
-        registry.String('http://www.seeks.fr/search', """The Seeks server
+        registry.String('http://www.seeks.fr/search?expansion=1&'
+        'action=expand&output=json&q=', """The Seeks server
         that this plugin will use."""))
 conf.registerChannelValue(Seeks, 'separator',
         registry.String('/', """The character(s) to use between search

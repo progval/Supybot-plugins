@@ -1,5 +1,6 @@
 ###
 # Copyright (c) 2010, Pablo Joubert
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -45,13 +46,12 @@ class Seeks(callbacks.Plugin):
         self.__parent = super(Seeks, self)
         self.__parent.__init__(irc)
         # should be changed for your node
-        self.query_str = '%s?expansion=1&action=expand&output=json&q='
 
     def search(self, irc, msg, args, query):
         """<query>
 
         Searches the <query> in a seeks node."""
-        query_str = self.query_str % self.registryValue('url', msg.args[0])
+        query_str = self.registryValue('url', msg.args[0])
         query = urllib.quote(query).replace('%20', '+')
         raw_page = urllib.urlopen(query_str + query)
         page = raw_page.read()

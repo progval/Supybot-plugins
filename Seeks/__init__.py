@@ -38,7 +38,7 @@ import supybot.world as world
 
 # Use this for the version of this plugin.  You may wish to put a CVS keyword
 # in here if you're keeping the plugin in CVS or some similar system.
-__version__ = "0.1"
+__version__ = "0.1.1"
 
 # XXX Replace this with an appropriate author or supybot.Author instance.
 __author__ = supybot.Author('Pablo Joubert', 'piti', 'pablo.piti@gmail.com')
@@ -48,7 +48,9 @@ __author__ = supybot.Author('Pablo Joubert', 'piti', 'pablo.piti@gmail.com')
 if not hasattr(supybot.authors, 'progval'):
     supybot.authors.progval = supybot.Author('Valentin Lorentz', 'ProgVal',
                                              'progval@gmail.com')
-__contributors__ = {supybot.authors.progval: ['code enhancements']}
+__contributors__ = {supybot.authors.progval: ['code enhancements',
+                                              'unit test',
+                                              'configurability']}
 
 # This is a url where the most recent plugin package can be downloaded.
 __url__ = '' # 'http://supybot.com/Members/yourname/Seeks/download'
