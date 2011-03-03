@@ -42,7 +42,11 @@ __author__ = supybot.authors.jamessan
 
 # This is a dictionary mapping supybot.Author instances to lists of
 # contributions.
-__contributors__ = {}
+if not hasattr(supybot.authors, 'progval'):
+    supybot.authors.progval = supybot.Author('Valentin Lorentz', 'ProgVal',
+                                            'progval@gmail.com')
+__contributors__ = {supybot.authors.progval: ['fix issues with new version of '
+                                              'Debian websites.']}
 
 import config
 import plugin

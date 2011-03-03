@@ -347,7 +347,12 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
             return ircutils.bold(s)
         return s
 
-    _update = re.compile(r' : ([^<]+)</body', re.I)
+    _update = re.compile(r' : ([^<]+)</body')
+    _bugsCategoryTitle = re.compile(r'<dt id="bugs_.." title="([^>]+)">')
+    _latestVersion = re.compile(r'<span id="latest_version">(.+)</span>')
+    _maintainer = re.compile(r'<a href=".*login=(?P<email>[^<]+)">.*'
+                             '<span class="name" title="maintainer">'
+                             '(?P<name>[^<]+)</span>', re.S)
     def stats(self, irc, msg, args, pkg):
         """<source package>
 
@@ -355,44 +360,57 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
         <source package>.
         """
         pkg = pkg.lower()
-        text = utils.web.getUrl('http://packages.qa.debian.org/%s/%s.html' %
-                                (pkg[0], pkg))
-        if "Error 404" in text:
+        try:
+            text = utils.web.getUrl('http://packages.qa.debian.org/%s/%s.html' %
+                                    (pkg[0], pkg))
+        except utils.web.Error:
             irc.errorInvalid('source package name')
+        for line in text.split('\n'):
+            match = self._latestVersion.search(text)
+            if match is not None:
+                break
+        assert match is not None
+        version = '%s: %s' % (self.bold('Last version'),
+                              match.group(1))
         updated = None
         m = self._update.search(text)
         if m:
             updated = m.group(1)
         soup = BeautifulSoup.BeautifulSoup()
         soup.feed(text)
-        pairs = zip(soup.fetch('td', {'class': 'labelcell'}),
-                    soup.fetch('td', {'class': 'contentcell'}))
+        pairs = zip(soup.fetch('dt'),
+                    soup.fetch('dd'))
         for (label, content) in pairs:
-            if label.string == 'Last version':
-                version = '%s: %s' % (self.bold(label.string), content.string)
-            elif label.string == 'Maintainer':
-                name = content.a.string
-                email = content.fetch('a')[1]['href'][7:]
+            try:
+                title = self._bugsCategoryTitle.search(str(label)).group(1)
+            except AttributeError: # Didn't match
+                if str(label).startswith('<dt id="bugs_all">'):
+                    title = 'All bugs'
+                elif str(label) == '<dt title="Maintainer and Uploaders">' + \
+                                   'maint</dt>':
+                    title = 'Maintainer and Uploaders'
+                else:
+                    continue
+            if title == 'Maintainer and Uploaders':
+                match = self._maintainer.search(str(content))
+                name, email = match.group('name'), match.group('email')
                 maintainer = format('%s: %s %u', self.bold('Maintainer'),
                                     name, utils.web.mungeEmail(email))
-            elif label.string == 'All bugs':
-                bugsAll = format('%i Total', content.first('a').string)
-            elif label.string == 'Release Critical':
-                bugsRC = format('%i RC', content.first('a').string)
-            elif label.string == 'Important and Normal':
+            elif title == 'All bugs':
+                bugsAll = format('%i Total', content.first('span').string)
+            elif title == 'Release Critical':
+                bugsRC = format('%i RC', content.first('span').string)
+            elif title == 'Important and Normal':
                 bugs = format('%i Important/Normal',
-                              content.first('a').string)
-            elif label.string == 'Minor and Wishlist':
+                              content.first('span').string)
+            elif title == 'Minor and Wishlist':
                 bugsMinor = format('%i Minor/Wishlist',
-                                   content.first('a').string)
-            elif label.string == 'Fixed and Pending':
+                                   content.first('span').string)
+            elif title == 'Fixed and Pending':
                 bugsFixed = format('%i Fixed/Pending',
-                                   content.first('a').string)
-            elif label.string == 'Subscribers count':
-                subscribers = format('%s: %i',
-                                     self.bold('Subscribers'), content.string)
+                                   content.first('span').string)
         bugL = (bugsAll, bugsRC, bugs, bugsMinor, bugsFixed)
-        s = '.  '.join((version, maintainer, subscribers,
+        s = '.  '.join((version, maintainer,
                         '%s: %s' % (self.bold('Bugs'), '; '.join(bugL))))
         if updated:
             s = 'As of %s, %s' % (updated, s)
