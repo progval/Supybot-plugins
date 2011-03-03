@@ -399,17 +399,19 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
         irc.reply(s)
     stats = wrap(stats, ['somethingWithoutSpaces'])
 
-    _newpkgre = re.compile(r'<li><a href[^>]+>([^<]+)</a>')
-    def new(self, irc, msg, args, section, glob):
-        """[{main,contrib,non-free}] [<glob>]
+    _newpkgre = re.compile(r'<li><a href[^>/]+>([^<]+)</a>')
+    def new(self, irc, msg, args, section, version, glob):
+        """[{main,contrib,non-free}] [<version>] [<glob>]
 
         Checks for packages that have been added to Debian's unstable branch
         in the past week.  If no glob is specified, returns a list of all
         packages.  If no section is specified, defaults to main.
         """
+        if version is None:
+            version = 'unstable'
         try:
             fd = utils.web.getUrlFd(
-                'http://packages.debian.org/unstable/newpkg_%s' % section)
+                'http://packages.debian.org/%s/%s/newpkg' % (version, section))
         except utils.web.Error, e:
             irc.error(str(e), Raise=True)
         packages = []
@@ -426,6 +428,7 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
             irc.error('No packages matched that search.')
     new = wrap(new, [optional(('literal', ('main', 'contrib', 'non-free')),
                               'main'),
+                     optional('something'),
                      additional('glob', '*')])
 
     _severity = re.compile(r'.*(?:severity set to `([^\']+)\'|'
