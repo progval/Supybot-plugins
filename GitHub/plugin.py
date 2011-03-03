@@ -137,13 +137,17 @@ class GitHub(callbacks.Plugin):
     class announce(callbacks.Commands):
         def _createPrivmsg(self, channel, payload, commit):
             bold = ircutils.bold
+            url = commit['url']
+            data = urllib.urlencode({'url': url})
+            tiny = self.registryValue('tiny', channel)
+            url = urllib.urlopen(tiny, data).read()
             s = '%s/%s (in %s): %s committed %s %s' % \
                     (payload['repository']['owner']['name'],
                      bold(payload['repository']['name']),
                      bold(payload['ref'].split('/')[-1]),
                      commit['author']['name'],
                      bold(commit['message']),
-                     commit['url'][0:-34])
+                     url)
             return ircmsgs.privmsg(channel, s)
 
         def onPayload(self, payload):
