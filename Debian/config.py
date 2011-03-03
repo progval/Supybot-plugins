@@ -37,36 +37,8 @@ def configure(advanced):
     # registry as appropriate.
     from supybot.questions import output, expect, anything, something, yn
     conf.registerPlugin('Debian', True)
-    if not utils.findBinaryInPath('zgrep'):
-        if not advanced:
-            output("""I can't find zgrep in your path.  This is necessary
-                      to run the file command.  I'll disable this command
-                      now.  When you get zgrep in your path, use the command
-                      'enable Debian.file' to re-enable the command.""")
-            capabilities = conf.supybot.capabilities()
-            capabilities.add('-Debian.file')
-            conf.supybot.capabilities.set(capabilities)
-        else:
-            output("""I can't find zgrep in your path.  If you want to run
-                      the file command with any sort of expediency, you'll
-                      need it.  You can use a python equivalent, but it's
-                      about two orders of magnitude slower.  THIS MEANS IT
-                      WILL TAKE AGES TO RUN THIS COMMAND.  Don't do this.""")
-            if yn('Do you want to use a Python equivalent of zgrep?'):
-                conf.supybot.plugins.Debian.pythonZgrep.setValue(True)
-            else:
-                output('I\'ll disable file now.')
-                capabilities = conf.supybot.capabilities()
-                capabilities.add('-Debian.file')
-                conf.supybot.capabilities.set(capabilities)
-
 
 Debian = conf.registerPlugin('Debian')
-conf.registerGlobalValue(Debian, 'pythonZgrep',
-    registry.Boolean(False, """An advanced option, mostly just for testing;
-    uses a Python-coded zgrep rather than the actual zgrep executable,
-    generally resulting in a 50x slowdown.  What would take 2 seconds will
-    take 100 with this enabled.  Don't enable this."""))
 conf.registerChannelValue(Debian, 'bold',
     registry.Boolean(True, """Determines whether the plugin will use bold in
     the responses to some of its commands."""))

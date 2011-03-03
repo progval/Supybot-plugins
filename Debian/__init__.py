@@ -46,7 +46,8 @@ if not hasattr(supybot.authors, 'progval'):
     supybot.authors.progval = supybot.Author('Valentin Lorentz', 'ProgVal',
                                             'progval@gmail.com')
 __contributors__ = {supybot.authors.progval: ['fix issues with new version of '
-                                              'Debian websites.']}
+                                              'Debian websites.',
+                                              '@file refactoring']}
 
 import config
 import plugin
