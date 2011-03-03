@@ -243,17 +243,19 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
     _deblistre = re.compile(r'<h3>Package ([^<]+)</h3>(.*?)</ul>', _debreflags)
     def version(self, irc, msg, args, optlist, package):
         """[--exact] \
+        [--searchon {names,all,sourcenames}]
         [--branch {oldstable,stable,testing,unstable,experimental}] \
         [--section {main,contrib,non-free}] <package name>
 
-        Returns the current version(s) of a Debian package in the given branch
-        (if any, otherwise all available ones are displayed).  If --exact is
-        specified, only packages whose name exactly matches <package name>
-        will be reported.
-        """
+        Returns the current version(s) of the Debian package <package name>.
+        --exact, if given, means you want only the <package name>, and not
+        package names containing this name.
+        --searchon defaults to names, and defines where to search.
+        --branch defaults to all, and defines in what branch to search.
+        --section defaults to all, and defines in what section to search."""
         url = 'http://packages.debian.org/search?keywords=%(keywords)s' + \
-              '&searchon=%(mode)s&suite=%(suite)s&section=%(section)s'
-        args = {'keywords': None, 'mode': 'names', 'suite': 'all',
+              '&searchon=%(searchon)s&suite=%(suite)s&section=%(section)s'
+        args = {'keywords': None, 'searchon': 'names', 'suite': 'all',
                 'section': 'all'}
         for (key, value) in optlist:
             if key == 'exact':
@@ -262,6 +264,8 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
                 args['suite'] = value
             elif key == 'section':
                 args['section'] = value
+            elif key == 'searchon':
+                args['searchon'] = value
         responses = []
         if '*' in package:
             irc.error('Wildcard characters can not be specified.', Raise=True)
@@ -304,6 +308,9 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
                           len(responses), '; '.join(responses))
             irc.reply(resp)
     version = wrap(version, [getopts({'exact': '',
+                                      'searchon': ('literal', ('names',
+                                                               'all',
+                                                               'sourcenames')),
                                       'branch': ('literal', ('oldstable',
                                                              'stable',
                                                              'testing',
