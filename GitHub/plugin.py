@@ -203,6 +203,7 @@ class GitHub(callbacks.Plugin):
             elif channel in announces[repo]:
                 irc.error(_('This repository is already announced to this '
                             'channel.'))
+                return
             else:
                 announces[repo].append(channel)
             self._save(announces)
@@ -223,6 +224,7 @@ class GitHub(callbacks.Plugin):
             elif channel not in announces[repo]:
                 irc.error(_('This repository is not yet announced to this '
                             'channel.'))
+                return
             else:
                 announces[repo].remove(channel)
             self._save(announces)
