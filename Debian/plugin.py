@@ -29,11 +29,9 @@
 
 import os
 import re
-import gzip
 import time
-import popen2
+import urllib
 import fnmatch
-import threading
 
 import BeautifulSoup
 
@@ -46,201 +44,76 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 from supybot.utils.iter import all, imap, ifilter
 
-class PeriodicFileDownloader(object):
-    """A class to periodically download a file/files.
-
-    A class-level dictionary 'periodicFiles' maps names of files to
-    three-tuples of
-    (url, seconds between downloads, function to run with downloaded file).
-
-    'url' should be in some form that urllib2.urlopen can handle (do note that
-    urllib2.urlopen handles file:// links perfectly well.)
-
-    'seconds between downloads' is the number of seconds between downloads,
-    obviously.  An important point to remember, however, is that it is only
-    engaged when a command is run.  I.e., if you say you want the file
-    downloaded every day, but no commands that use it are run in a week, the
-    next time such a command is run, it'll be using a week-old file.  If you
-    don't want such behavior, you'll have to give an error mess age to the user
-    and tell him to call you back in the morning.
-
-    'function to run with downloaded file' is a function that will be passed
-    a string *filename* of the downloaded file.  This will be some random
-    filename probably generated via some mktemp-type-thing.  You can do what
-    you want with this; you may want to build a database, take some stats,
-    or simply rename the file.  You can pass None as your function and the
-    file with automatically be renamed to match the filename you have it listed
-    under.  It'll be in conf.supybot.directories.data, of course.
-
-    Aside from that dictionary, simply use self.getFile(filename) in any method
-    that makes use of a periodically downloaded file, and you'll be set.
-    """
-    periodicFiles = None
-    def __init__(self, *args, **kwargs):
-        if self.periodicFiles is None:
-            raise ValueError, 'You must provide files to download'
-        self.lastDownloaded = {}
-        self.downloadedCounter = {}
-        for filename in self.periodicFiles:
-            if self.periodicFiles[filename][-1] is None:
-                fullname = os.path.join(conf.supybot.directories.data(),
-                                        filename)
-                if os.path.exists(fullname):
-                    self.lastDownloaded[filename] = os.stat(fullname).st_ctime
-                else:
-                    self.lastDownloaded[filename] = 0
-            else:
-                self.lastDownloaded[filename] = 0
-            self.currentlyDownloading = set()
-            self.downloadedCounter[filename] = 0
-            self.getFile(filename)
-        super(PeriodicFileDownloader, self).__init__(*args, **kwargs)
-
-    def _downloadFile(self, filename, url, f):
-        self.currentlyDownloading.add(filename)
-        try:
-            try:
-                infd = utils.web.getUrlFd(url)
-            except IOError, e:
-                self.log.warning('Error downloading %s: %s', url, e)
-                return
-            except utils.web.Error, e:
-                self.log.warning('Error downloading %s: %s', url, e)
-                return
-            confDir = conf.supybot.directories.data()
-            newFilename = os.path.join(confDir, utils.file.mktemp())
-            outfd = file(newFilename, 'wb')
-            start = time.time()
-            s = infd.read(4096)
-            while s:
-                outfd.write(s)
-                s = infd.read(4096)
-            infd.close()
-            outfd.close()
-            self.log.info('Downloaded %s in %s seconds',
-                          filename, time.time()-start)
-            self.downloadedCounter[filename] += 1
-            self.lastDownloaded[filename] = time.time()
-            if f is None:
-                toFilename = os.path.join(confDir, filename)
-                if os.name == 'nt':
-                    # Windows, grrr...
-                    if os.path.exists(toFilename):
-                        os.remove(toFilename)
-                os.rename(newFilename, toFilename)
-            else:
-                start = time.time()
-                f(newFilename)
-                total = time.time() - start
-                self.log.info('Function ran on %s in %s seconds',
-                              filename, total)
-        finally:
-            self.currentlyDownloading.remove(filename)
-
-    def getFile(self, filename):
-        if world.documenting:
-            return
-        (url, timeLimit, f) = self.periodicFiles[filename]
-        if time.time() - self.lastDownloaded[filename] > timeLimit and \
-           filename not in self.currentlyDownloading:
-            self.log.info('Beginning download of %s', url)
-            args = (filename, url, f)
-            name = '%s #%s' % (filename, self.downloadedCounter[filename])
-            t = threading.Thread(target=self._downloadFile, name=name,
-                                 args=(filename, url, f))
-            t.setDaemon(True)
-            t.start()
-            world.threadsSpawned += 1
-
-
-class Debian(callbacks.Plugin, PeriodicFileDownloader):
+class Debian(callbacks.Plugin):
     threaded = True
-    periodicFiles = {
-        # This file is only updated once a week, so there's no sense in
-        # downloading a new one every day.
-        'Contents-i386.gz': ('ftp://ftp.us.debian.org/'
-                             'debian/dists/unstable/Contents-i386.gz',
-                             604800, None)
-        }
 
-    def __init__(self, irc):
-        callbacks.Plugin.__init__(self, irc)
-        PeriodicFileDownloader.__init__(self)
+    _debreflags = re.DOTALL | re.MULTILINE
+    _deblistreFileExact = re.compile(r'<a href="/[^/>]+/[^/>]+">([^<]+)</a>',
+                                     _debreflags)
+    def file(self, irc, msg, args, optlist, filename):
+        """[--exact]
+        [--mode {path,filename,exactfilename}]
+        [--branch {oldstable,stable,testing,unstable,experimental}] \
+        [--section {main,contrib,non-free}] <file name>
 
-    contents = conf.supybot.directories.data.dirize('Contents-i386.gz')
-    def file(self, irc, msg, args, optlist, glob):
-        """[--{regexp,exact} <value>] [<glob>]
-
-        Returns packages in Debian that includes files matching <glob>. If
-        --regexp is given, returns packages that include files matching the
-        given regexp.  If --exact is given, returns packages that include files
-        matching exactly the string given.
-        """
-        self.getFile('Contents-i386.gz')
-        # Make sure it's anchored, make sure it doesn't have a leading slash
-        # (the filenames don't have leading slashes, and people may not know
-        # that).
-        if not optlist and not glob:
-            raise callbacks.ArgumentError
-        if optlist and glob:
-            irc.error('You must specify either a glob or a regexp/exact '
-                      'search, but not both.', Raise=True)
-        for (option, arg) in optlist:
-            if option == 'exact':
-                regexp = arg.lstrip('/')
-            elif option == 'regexp':
-                regexp = arg
-        if glob:
-            regexp = fnmatch.translate(glob.lstrip('/'))
-            regexp = regexp.rstrip('$')
-            regexp = "%s.* " % regexp
+        Returns the package(s) containing the <file name>.
+        --mode defaults to path, and defines how to search.
+        --branch defaults to stable, and defines in what branch to search."""
+        url = 'http://packages.debian.org/search?searchon=contents' + \
+              '&keywords=%(keywords)s&mode=%(mode)s&suite=%(suite)s' + \
+              '&arch=%(arch)s'
+        args = {'keywords': None, 'mode': 'path', 'suite': 'stable',
+                'arch': 'any'}
+        exact = ('exact', True) in optlist
+        for (key, value) in optlist:
+            if key == 'branch':
+                args['suite'] = value
+            elif key == 'arch':
+                args['arch'] = value
+            elif key == 'mode':
+                args['mode'] = value
+        responses = []
+        if '*' in filename:
+            irc.error('Wildcard characters can not be specified.', Raise=True)
+        args['keywords'] = urllib.quote(filename, '')
+        url %= args
         try:
-            re_obj = re.compile(regexp, re.I)
-        except re.error, e:
-            irc.error(format('Error in regexp: %s', e), Raise=True)
-        if self.registryValue('pythonZgrep'):
-            fd = gzip.open(self.contents)
-            r = imap(lambda tup: tup[0],
-                     ifilter(lambda tup: tup[0],
-                             imap(lambda line:(re_obj.search(line), line),fd)))
+            html = utils.web.getUrl(url)
+        except utils.web.Error, e:
+            irc.error(format('I couldn\'t reach the search page (%s).', e),
+                      Raise=True)
+        if 'is down at the moment' in html:
+            irc.error('Packages.debian.org is down at the moment.  '
+                      'Please try again later.', Raise=True)
+        step = 0
+        pkgs = []
+        for line in html.split('\n'):
+            if '<span class="keyword">' in line:
+                step += 1
+            elif step == 1 or (step >= 1 and not exact):
+                pkgs.extend(self._deblistreFileExact.findall(line))
+        if pkgs == []:
+            irc.reply(format('No filename found for %s (%s)',
+                      utils.web.urlunquote(filename), args['suite']))
         else:
-            try:
-                (r, w) = popen2.popen4(['zgrep', '-e', regexp, self.contents])
-                w.close()
-            except TypeError:
-                # We're on Windows.
-                irc.error('This command won\'t work on this platform.  '
-                          'If you think it should (i.e., you know that you '
-                          'have a zgrep binary somewhere) then file a bug '
-                          'about it at http://supybot.sf.net/ .', Raise=True)
-        packages = set()  # Make packages unique
-        try:
-            for line in r:
-                if len(packages) > 100:
-                    irc.error('More than 100 packages matched, '
-                              'please narrow your search.', Raise=True)
-                try:
-                    if hasattr(line, 'group'): # we're actually using
-                        line = line.group(0)   # pythonZgrep  :(
-                    (filename, pkg_list) = line.split()
-                    if filename == 'FILE':
-                        # This is the last line before the actual files.
-                        continue
-                except ValueError: # Unpack list of wrong size.
-                    continue       # We've not gotten to the files yet.
-                packages.update(pkg_list.split(','))
-        finally:
-            if hasattr(r, 'close'):
-                r.close()
-        if len(packages) == 0:
-            irc.reply('I found no packages with that file.')
-        else:
-            irc.reply(format('%L', sorted(packages)))
-    file = wrap(file, [getopts({'regexp':'regexpMatcher','exact':'something'}),
-                       additional('glob')])
+            irc.reply(format('%i matches found: %s (%s)',
+                          len(pkgs), '; '.join(pkgs), args['suite']))
+    file = wrap(file, [getopts({'exact': '',
+                                'branch': ('literal', ('oldstable',
+                                                       'stable',
+                                                       'testing',
+                                                       'unstable',
+                                                       'experimental')),
+                                'mode': ('literal', ('path',
+                                                     'exactfilename',
+                                                     'filename')),
+                                'arch': ('literal', ('main',
+                                                     'contrib',
+                                                     'non-free'))}),
+                                'text'])
 
     _debreflags = re.DOTALL | re.IGNORECASE
-    _deblistre = re.compile(r'<h3>Package ([^<]+)</h3>(.*?)</ul>', _debreflags)
+    _deblistreVersion = re.compile(r'<h3>Package ([^<]+)</h3>(.*?)</ul>', _debreflags)
     def version(self, irc, msg, args, optlist, package):
         """[--exact] \
         [--searchon {names,all,sourcenames}]
@@ -279,7 +152,7 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
         if 'is down at the moment' in html:
             irc.error('Packages.debian.org is down at the moment.  '
                       'Please try again later.', Raise=True)
-        pkgs = self._deblistre.findall(html)
+        pkgs = self._deblistreVersion.findall(html)
         if not pkgs:
             irc.reply(format('No package found for %s (%s)',
                       utils.web.urlunquote(package), args['suite']))

@@ -39,24 +39,6 @@ class DebianTestCase(PluginTestCase):
     cleanDataDir = False
     fileDownloaded = False
     if network:
-        def setUp(self, nick='test'):
-            PluginTestCase.setUp(self)
-            try:
-                datadir = conf.supybot.directories.data
-                if os.path.exists(datadir.dirize('Contents-i386.gz')):
-                    pass
-                else:
-                    print
-                    print "Downloading files, this may take awhile."
-                    filename = datadir.dirize('Contents-i386.gz')
-                    while not os.path.exists(filename):
-                        time.sleep(1)
-                    print "Download complete."
-                    print "Starting test ..."
-                    self.fileDownloaded = True
-            except KeyboardInterrupt:
-                pass
-
         def testDebBugNoHtml(self):
             self.assertNotRegexp('debian bug 287792', r'\<em\>')
 
@@ -77,10 +59,15 @@ class DebianTestCase(PluginTestCase):
                               r'^No package.*')
 
         def testDebfile(self):
-            self.assertHelp('file')
-            if not self.fileDownloaded:
-                pass
-            self.assertRegexp('file --exact bin/gaim', r'net/gaim')
+            self.assertHelp('debian file')
+            self.assertRegexp('debian file oigrgrgregg',
+                              r'^No filename.*\(stable\)')
+            self.assertRegexp('debian file --branch unstable alkdjfad',
+                r'^No filename.*\(unstable\)')
+            self.assertRegexp('debian file --exact --branch stable /bin/sh',
+                              r'2 matches found:.*bash.*dash.*\(stable')
+            self.assertRegexp('debian file --branch stable /bin/sh',
+                              r'3 matches found:.*bash.*dash.*klibc-utils')
 
         def testDebincoming(self):
             self.assertNotError('incoming')
