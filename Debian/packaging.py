@@ -1,5 +1,5 @@
 ###
-# Copyright (c) 2003-2005, James Vega
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,45 +25,17 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+
 ###
 
-"""
-This is a module to contain Debian-specific commands.
-"""
+# Tags this package depends on. Obviously, every package needs a package
+# installer to be installed.
+requires = {'package-installer': '0.1'}
 
-import supybot
-import supybot.world as world
+# Additional tags needed for some features of this package.
+suggests = {}
 
-# Use this for the version of this plugin.  You may wish to put a CVS keyword
-# in here if you're keeping the plugin in CVS or some similar system.
-__version__ = "0.1"
-
-__author__ = supybot.authors.jamessan
-
-# This is a dictionary mapping supybot.Author instances to lists of
-# contributions.
-if not hasattr(supybot.authors, 'progval'):
-    supybot.authors.progval = supybot.Author('Valentin Lorentz', 'ProgVal',
-                                            'progval@gmail.com')
-__contributors__ = {supybot.authors.progval: ['fix issues with new version of '
-                                              'Debian websites.',
-                                              '@file refactoring']}
-
-__url__ = ""
-
-import config
-import plugin
-reload(plugin) # In case we're being reloaded.
-# Add more reloads here if you add third-party modules and want them to be
-# reloaded when this plugin is reloaded.  Don't forget to import them as well!
-import BeautifulSoup
-reload(BeautifulSoup)
-
-if world.testing:
-    import test
-
-Class = plugin.Class
-configure = config.configure
+# Tags this package provides.
+provides = {'debian-fetch-website': '0.1'}
 
 
-# vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
