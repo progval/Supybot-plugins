@@ -241,24 +241,32 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
 
     _debreflags = re.DOTALL | re.IGNORECASE
     _deblistre = re.compile(r'<h3>Package ([^<]+)</h3>(.*?)</ul>', _debreflags)
-    def version(self, irc, msg, args, optlist, branch, package):
-        """[--exact] [{stable,testing,unstable,experimental}] <package name>
+    def version(self, irc, msg, args, optlist, package):
+        """[--exact] \
+        [--branch {oldstable,stable,testing,unstable,experimental}] \
+        [--section {main,contrib,non-free}] <package name>
 
         Returns the current version(s) of a Debian package in the given branch
         (if any, otherwise all available ones are displayed).  If --exact is
         specified, only packages whose name exactly matches <package name>
         will be reported.
         """
-        url = 'http://packages.debian.org/cgi-bin/search_packages.pl?keywords'\
-              '=%s&searchon=names&version=%s&release=all&subword=1'
-        for (option, _) in optlist:
-            if option == 'exact':
-                url = url.replace('&subword=1','')
+        url = 'http://packages.debian.org/search?keywords=%(keywords)s' + \
+              '&searchon=%(mode)s&suite=%(suite)s&section=%(section)s'
+        args = {'keywords': None, 'mode': 'names', 'suite': 'all',
+                'section': 'all'}
+        for (key, value) in optlist:
+            if key == 'exact':
+                url += '&exact=1'
+            elif key == 'branch':
+                args['suite'] = value
+            elif key == 'section':
+                args['section'] = value
         responses = []
         if '*' in package:
             irc.error('Wildcard characters can not be specified.', Raise=True)
-        package = utils.web.urlquote(package)
-        url %= (package, branch)
+        args['keywords'] = utils.web.urlquote(package)
+        url %= args
         try:
             html = utils.web.getUrl(url)
         except utils.web.Error, e:
@@ -270,7 +278,7 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
         pkgs = self._deblistre.findall(html)
         if not pkgs:
             irc.reply(format('No package found for %s (%s)',
-                      utils.web.urlunquote(package), branch))
+                      utils.web.urlunquote(package), args['suite']))
         else:
             for pkg in pkgs:
                 pkgMatch = pkg[0]
@@ -295,10 +303,16 @@ class Debian(callbacks.Plugin, PeriodicFileDownloader):
             resp = format('%i matches found: %s',
                           len(responses), '; '.join(responses))
             irc.reply(resp)
-    version = wrap(version, [getopts({'exact':''}),
-                             optional(('literal', ('stable', 'testing',
-                                       'unstable', 'experimental')), 'all'),
-                             'text'])
+    version = wrap(version, [getopts({'exact': '',
+                                      'branch': ('literal', ('oldstable',
+                                                             'stable',
+                                                             'testing',
+                                                             'unstable',
+                                                             'experimental')),
+                                      'arch': ('literal', ('main',
+                                                           'contrib',
+                                                           'non-free'))}),
+                                      'text'])
 
     _incomingRe = re.compile(r'<a href="(.*?\.deb)">', re.I)
     def incoming(self, irc, msg, args, optlist, globs):

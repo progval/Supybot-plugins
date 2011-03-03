@@ -1,5 +1,6 @@
 ###
 # Copyright (c) 2003-2005, James Vega
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -63,15 +64,17 @@ class DebianTestCase(PluginTestCase):
             self.assertHelp('debian version')
             self.assertRegexp('debian version lakjdfad',
                               r'^No package.*\(all\)')
-            self.assertRegexp('debian version unstable alkdjfad',
+            self.assertRegexp('debian version --branch unstable alkdjfad',
                 r'^No package.*\(unstable\)')
-            self.assertRegexp('debian version gaim',
+            self.assertRegexp('debian version --branch stable gaim',
                               r'\d+ matches found:.*gaim.*\(stable')
             self.assertRegexp('debian version linux-wlan',
                               r'\d+ matches found:.*linux-wlan.*')
             self.assertRegexp('debian version --exact linux-wlan',
                               r'^No package.*\(all\)')
-            self.assertError('debian version unstable')
+            self.assertNotError('debian version unstable')
+            self.assertRegexp('debian version --branch stable unstable',
+                              r'^No package.*')
 
         def testDebfile(self):
             self.assertHelp('file')
