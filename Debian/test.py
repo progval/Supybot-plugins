@@ -39,8 +39,20 @@ class DebianTestCase(PluginTestCase):
     cleanDataDir = False
     fileDownloaded = False
     if network:
-        def testDebBugNoHtml(self):
-            self.assertNotRegexp('debian bug 287792', r'\<em\>')
+        def testDebBug(self):
+            self.assertNotRegexp('debian bug 539859', r'\<em\>')
+            self.assertResponse('debian bug 539859',
+                                '\x02Package\x02: supybot; '
+                                '\x02Subject\x02: configurable error in '
+                                'ShrinkUrl; '
+                                '\x02Reported\x02: by Clint Adams '
+                                '<clintATdebian.org> on '
+                                'Tue, 4 Aug 2009 03:39:37 +0000; '
+                                '\x02Severity\x02: wishlist; '
+                                '\x02Tags\x02: fixed-upstream; '
+                                '<http://bugs.debian.org/cgi-bin/'
+                                'bugreport.cgi?bug=539859>'.replace('AT', '@'))
+            self.assertError('debian bug 551215216542')
 
         def testDebversion(self):
             self.assertHelp('debian version')

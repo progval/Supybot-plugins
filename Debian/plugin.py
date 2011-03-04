@@ -343,20 +343,20 @@ class Debian(callbacks.Plugin):
                      optional('something'),
                      additional('glob', '*')])
 
-    _severity = re.compile(r'.*(?:severity set to `([^\']+)\'|'
-                           r'severity:\s+<em>([^<]+)</em>)', re.I)
-    _package = re.compile(r'Package: <[^>]+>([^<]+)<', re.I | re.S)
+    _severity = re.compile(r'<p>Severity: ([^<]+)</p>', re.I)
+    _package = re.compile(r'<pre class="message">Package: ([^<\n]+)\n',
+                          re.I | re.S)
     _reporter = re.compile(r'Reported by: <[^>]+>([^<]+)<', re.I | re.S)
-    _subject = re.compile(r'<br>([^<]+)</h1>', re.I | re.S)
-    _date = re.compile(r'Date: ([^;]+);', re.I | re.S)
-    _tags = re.compile(r'Tags: <strong>([^<]+)</strong>', re.I)
+    _subject = re.compile(r'<b>Subject:</b> [^:]+: ([^<]+)', re.I | re.S)
+    _date = re.compile(r'<b>Date:</b> ([^\n]+)\n</pre>', re.I | re.S)
+    _tags = re.compile(r'<p>Tags: ([^<]+)</p>', re.I)
     _searches = (_package, _subject, _reporter, _date)
     def bug(self, irc, msg, args, bug):
         """<num>
 
         Returns a description of the bug with bug id <num>.
         """
-        url = 'http://bugs.debian.org/%s' % bug
+        url = 'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=%s' % bug
         try:
             text = utils.web.getUrl(url)
         except utils.web.Error, e:
@@ -383,7 +383,7 @@ class Debian(callbacks.Plugin):
             resp += format('; %u', url)
             irc.reply(resp)
         else:
-            irc.reply('I was unable to properly parse the BTS page.')
+            irc.error('I was unable to properly parse the BTS page.')
     bug = wrap(bug, [('id', 'bug')])
 
 Class = Debian
