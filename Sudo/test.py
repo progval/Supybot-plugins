@@ -30,6 +30,10 @@
 
 import supybot.ircutils as ircutils
 from supybot.test import *
+import plugin
+assert hasattr(plugin, 'SudoDB')
+
+from cStringIO import StringIO
 
 # Disable Admin protection against giving the 'owner' capability.
 strEqual = ircutils.strEqual
@@ -69,6 +73,28 @@ class SudoTestCase(PluginTestCase):
         self.assertResponse('capabilities', '[owner]')
         self.assertRegexp('sudo capabilities', 'Error: '
                           'You must be registered to use this command.*')
+
+    def testSave(self):
+        one = 'spam\n-1\nallow\nfoo!bar@baz\n.*'
+        two = 'egg\n0\ndeny\n\n.*forbid.*'
+        db = plugin.SudoDB()
+        db.add('spam', plugin.SudoRule(-1, 'allow', 'foo!bar@baz', '.*'))
+        assert repr(db) == one + '\n', repr(repr(db))
+        db.add('egg', plugin.SudoRule(0, 'deny', '', '.*forbid.*'))
+        assert repr(db) == '%s\n\n%s\n' % (one, two) or \
+               repr(db) == '%s\n\n%s\n' % (two, one), repr(repr(db))
+
+    def testLoad(self):
+        one = 'spam\n-1\nallow\nfoo!bar@baz\n.*'
+        two = 'egg\n0\ndeny\n\n.*forbid.*'
+        file_ = StringIO()
+        file_.write('%s\n\n%s\n' % (one, two))
+        file_.seek(0)
+        db = plugin.SudoDB()
+        db.load(file_)
+        assert repr(db) == '%s\n\n%s\n' % (one, two) or \
+               repr(db) == '%s\n\n%s\n' % (two, one), repr(repr(db))
+
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

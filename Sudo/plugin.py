@@ -29,8 +29,11 @@
 ###
 
 import re
+import os
 import supybot.log as log
+import supybot.conf as conf
 import supybot.utils as utils
+import supybot.world as world
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.registry as registry
@@ -57,10 +60,14 @@ class NonExistantName(Exception):
 
 class SudoRule:
     def __init__(self, priority, mode, hostmask, regexp):
-        self.priority = priority
+        self.priority = int(priority)
         self.mode = mode
         self.hostmask = hostmask
         self.regexp = regexp
+
+    def __repr__(self):
+        return '\n'.join([str(self.priority), self.mode, self.hostmask,
+                          self.regexp])
 
 class SudoDB:
     def __init__(self):
@@ -91,6 +98,31 @@ class SudoDB:
             return None, None
         return currentName, currentRule
 
+    def save(self, file_):
+        file_.write(repr(self))
+
+    def load(self, file_):
+        currentName = None
+        currentArgs = []
+        for line in file_:
+            if line != '\n' and currentName is None:
+                currentName = line[0:-1]
+            elif currentName is not None and len(currentArgs) != 4:
+                currentArgs.append(line[0:-1])
+            elif currentName is not None:
+                self.rules.update({currentName: SudoRule(*currentArgs)})
+                currentName = None
+                currentArgs = []
+        if currentName is not None:
+            assert currentArgs != []
+            self.rules.update({currentName: SudoRule(*currentArgs)})
+
+
+    def __repr__(self):
+        return '\n\n'.join(['%s\n%s' % (x,repr(y))
+                            for x,y in self.rules.items()]) + '\n'
+
+
 
 
 
@@ -100,6 +132,9 @@ class Sudo(callbacks.Plugin):
     def __init__(self, irc):
         callbacks.Plugin.__init__(self, irc)
         self.db = SudoDB()
+        self._path = os.path.join(conf.supybot.directories.data(), 'sudo.db')
+        if not world.testing and os.path.isfile(self._path):
+            self.db.load(open(self._path, 'ru'))
 
     @internationalizeDocstring
     def add(self, irc, msg, args, priority, name, mode, hostmask, regexp):
@@ -161,6 +196,15 @@ class Sudo(callbacks.Plugin):
             tokens = callbacks.tokenize(command)
             self.Proxy(irc.irc, msg, tokens)
     sudo = wrap(sudo, ['text'])
+
+    def die(self):
+        if not world.testing:
+            try:
+                os.unlink(self._path)
+            except OSError:
+                pass
+            self.db.save(open(self._path, 'au'))
+        callbacks.Plugin.die(self)
 
 
 Class = Sudo
