@@ -51,8 +51,8 @@ class Debian(callbacks.Plugin):
     _deblistreFileExact = re.compile(r'<a href="/[^/>]+/[^/>]+">([^<]+)</a>',
                                      _debreflags)
     def file(self, irc, msg, args, optlist, filename):
-        """[--exact]
-        [--mode {path,filename,exactfilename}]
+        """[--exact] \
+        [--mode {path,filename,exactfilename}] \
         [--branch {oldstable,stable,testing,unstable,experimental}] \
         [--section {main,contrib,non-free}] <file name>
 
@@ -116,7 +116,7 @@ class Debian(callbacks.Plugin):
     _deblistreVersion = re.compile(r'<h3>Package ([^<]+)</h3>(.*?)</ul>', _debreflags)
     def version(self, irc, msg, args, optlist, package):
         """[--exact] \
-        [--searchon {names,all,sourcenames}]
+        [--searchon {names,all,sourcenames}] \
         [--branch {oldstable,stable,testing,unstable,experimental}] \
         [--section {main,contrib,non-free}] <package name>
 
