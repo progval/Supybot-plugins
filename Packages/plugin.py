@@ -289,7 +289,7 @@ class Packages(callbacks.Plugin):
         if repo is None:
             repo = 'http://packages.supybot.fr.cr/'
         if description is None:
-            descriptiob = ''
+            description = ''
         if not __builtins__['any'](x in description for x in '*?'):
             description = '*%s*' % description
         optlist.append(('description', description))
