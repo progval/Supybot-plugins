@@ -201,8 +201,8 @@ class Packages(callbacks.Plugin):
                 continue
             if version is None and (
                     selectedPackage == None or
-                    compareVersion(selectedPackage['version'],
-                                   package['version']) == BIGGER):
+                    compareVersions(selectedPackage['version'],
+                                    package['version']) == BIGGER):
                 # If not version given, and [no selected package
                 # or selected package is older than this one]
                 selectedPackage = package
