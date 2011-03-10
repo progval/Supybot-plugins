@@ -202,7 +202,7 @@ class Packages(callbacks.Plugin):
             if version is None and (
                     selectedPackage == None or
                     compareVersions(selectedPackage['version'],
-                                    package['version']) == BIGGER):
+                                    package['version']) == LOWER):
                 # If not version given, and [no selected package
                 # or selected package is older than this one]
                 selectedPackage = package
