@@ -29,6 +29,7 @@
 ###
 
 import time
+import chardet
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
@@ -51,9 +52,8 @@ class NoLatin1(callbacks.Plugin):
         content = msg.args[1]
         if not self.registryValue('enable', channel):
             return
-        try:
-            unicode(content, errors='strict')
-        except UnicodeDecodeError:
+        encoding = chardet.detect(content)['encoding']
+        if encoding not in ('utf-8', 'ascii'):
             self._warn(irc, channel, msg.prefix.split('!')[0])
 
     def _warn(self, irc, channel, nick):

@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 ###
 # Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
@@ -46,7 +47,12 @@ class NoLatin1TestCase(ChannelPluginTestCase):
     def testNoWarningOnUnicode(self):
         msg = ircmsgs.privmsg(self.channel, 'Hi !', prefix=self.prefix)
         self.irc.feedMsg(msg)
-        assert self.irc.takeMsg() is None
+        msg = self.irc.takeMsg()
+        assert msg is None, msg
+        msg = ircmsgs.privmsg(self.channel, 'é', prefix=self.prefix)
+        self.irc.feedMsg(msg)
+        msg = self.irc.takeMsg()
+        assert msg is None, msg
 
     def testCleanUp(self):
         for foo in range(0, 4):
