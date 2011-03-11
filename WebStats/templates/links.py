@@ -40,13 +40,19 @@ def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
     graph = pygraphviz.AGraph(strict=False, directed=True)
     insertedNicks = []
     for item in items:
-        for i in (1, 2):
-            if item[i] not in insertedNicks:
-                graph.add_node(item[i])
+        if item[0] not in insertedNicks:
+            try:
+                graph.add_node(item[0])
+                insertedNicks.append(item[0])
+            except: # Probably unicode issue
+                pass
         for foo in range(0, int(item[2])):
-            graph.add_edge(item[0], item[1])
+            try:
+                graph.add_edge(item[0], item[1])
+            except:
+                pass
     buffer_ = StringIO()
-    graph.draw(buffer_, prog='fdp', format='png')
+    graph.draw(buffer_, prog='circo', format='png')
     buffer_.seek(0)
     output = buffer_.read()
 
