@@ -1,5 +1,5 @@
 ###
-# Copyright (c) 2010, Valentin Lorentz
+# Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,42 +28,28 @@
 
 ###
 
-"""
-WebStats provides statistics for channels, accessible via a Web interface.
-"""
+from listingcommons import *
+from listingcommons import _
+import pygraphviz
+from cStringIO import StringIO
 
-import supybot
-import supybot.world as world
+def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
+    channel = '#' + channel
+    items = db.getChanLinks(channel)
+    output = ''
+    graph = pygraphviz.AGraph(strict=False, directed=True)
+    insertedNicks = []
+    for item in items:
+        for i in (1, 2):
+            if item[i] not in insertedNicks:
+                graph.add_node(item[i])
+        for foo in range(0, int(item[2])):
+            graph.add_edge(item[0], item[1])
+    buffer_ = StringIO()
+    graph.draw(buffer_, prog='fdp', format='png')
+    buffer_.seek(0)
+    output = buffer_.read()
 
-# Use this for the version of this plugin.  You may wish to put a CVS keyword
-# in here if you're keeping the plugin in CVS or some similar system.
-__version__ = "0.5"
-
-# XXX Replace this with an appropriate author or supybot.Author instance.
-if not hasattr(supybot.authors, 'progval'):
-    supybot.authors.progval =supybot.Author('Valentin Lorentz', 'ProgVal',
-                                            'progval@gmail.com')
-__author__ = supybot.authors.progval
-
-# This is a dictionary mapping supybot.Author instances to lists of
-# contributions.
-__contributors__ = {}
-
-# This is a url where the most recent plugin package can be downloaded.
-__url__ = 'http://supybot.fr.cr/WebStats'
-# 'http://supybot.com/Members/yourname/WebStats/download'
-
-import config
-import plugin
-reload(plugin) # In case we're being reloaded.
-# Add more reloads here if you add third-party modules and want them to be
-# reloaded when this plugin is reloaded.  Don't forget to import them as well!
-
-if world.testing:
-    import test
-
-Class = plugin.Class
-configure = config.configure
-
-
-# vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
+    #if useSkeleton:
+    #    output = ''.join([skeleton.start, output, skeleton.end])
+    return output

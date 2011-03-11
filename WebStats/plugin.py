@@ -1,5 +1,6 @@
+# -*- coding: utf8 -*-
 ###
-# Copyright (c) 2010, Valentin Lorentz
+# Copyright (c) 2010-2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,6 +29,7 @@
 
 ###
 
+import re
 import os
 import sys
 import time
@@ -104,11 +106,14 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 content_type = 'text/html'
                 output = """<p style="font-size: 20em">BAM!</p>
                 <p>You played with the URL, you losed.</p>"""
-            elif splittedPath[1] in ('nicks','global') and self.path[-1]=='/'\
+            elif splittedPath[1] in ('nicks', 'global', 'links') \
+                    and self.path[-1]=='/'\
                     or splittedPath[1] == 'nicks' and \
                     self.path.endswith('.htm'):
                 response = 200
                 content_type = 'text/html'
+                if splittedPath[1] == 'links':
+                    content_type = 'image/png'
                 assert len(splittedPath) > 2
                 chanName = splittedPath[2].replace('%20', '#')
                 getTemplate('listingcommons') # Reload
@@ -178,6 +183,11 @@ class WebStatsDB:
                           type VARCHAR(16),
                           content TEXT
                           )""")
+        cursor.execute("""CREATE TABLE links_cache (
+                          chan VARCHAR(128),
+                          `from` VARCHAR(128),
+                          `to` VARCHAR(128),
+                          `count` VARCHAR(128))""")
         cacheTableCreator = """CREATE TABLE %s_cache (
                           chan VARCHAR(128),
                           %s
@@ -235,11 +245,13 @@ class WebStatsDB:
         if DEBUG or random.randint(0,50) == 10:
             self.refreshCache()
 
+    _regexpAddressedTo = re.compile('^(?P<nick>[^: ]+):')
     def refreshCache(self):
         """Clears the cache tables, and populate them"""
         self._truncateCache()
         tmp_chans_cache = {}
         tmp_nicks_cache = {}
+        tmp_links_cache = {}
         cursor = self._conn.cursor()
         cursor.execute("""SELECT * FROM messages""")
         for row in cursor:
@@ -247,6 +259,22 @@ class WebStatsDB:
             chanindex, nickindex = self._getIndexes(chan, nick, timestamp)
             self._incrementTmpCache(tmp_chans_cache, chanindex, content)
             self._incrementTmpCache(tmp_nicks_cache, nickindex, content)
+
+            matched = self._regexpAddressedTo.match(content)
+            if matched is not None:
+                to = matched.group('nick')
+                if chan not in tmp_links_cache:
+                    tmp_links_cache.update({chan: {}})
+                if nick not in tmp_links_cache[chan]:
+                    tmp_links_cache[chan].update({nick: {}})
+                if to not in tmp_links_cache[chan][nick]:
+                    tmp_links_cache[chan][nick].update({to: 0})
+                tmp_links_cache[chan][nick][to] += 1
+        for chan, nicks in tmp_links_cache.items():
+            for nick, tos in nicks.items(): # Yes, tos is the plural for to
+                for to, count in tos.items():
+                    cursor.execute('INSERT INTO links_cache VALUES(?,?,?,?)',
+                                   (chan, nick, to, count))
         cursor.close()
         cursor = self._conn.cursor()
         cursor.execute("""SELECT * FROM moves""")
@@ -277,6 +305,7 @@ class WebStatsDB:
         cursor = self._conn.cursor()
         cursor.execute("""DELETE FROM chans_cache""")
         cursor.execute("""DELETE FROM nicks_cache""")
+        cursor.execute("""DELETE FROM links_cache""")
         cursor.close()
 
     def _incrementTmpCache(self, tmpCache, index, content):
@@ -403,6 +432,12 @@ class WebStatsDB:
                 results.update({row[0]: tuple(sum(i)
                     for i in zip(row[1:], results[row[0]]))})
         return results
+
+    def getChanLinks(self, chanName):
+        cursor = self._conn.cursor()
+        cursor.execute("""SELECT `from`, `to`, `count` FROM links_cache
+                          WHERE chan=?""", (chanName,))
+        return cursor
 
 
 class WebStatsHTTPServer(BaseHTTPServer.HTTPServer):

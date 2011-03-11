@@ -9,6 +9,8 @@ def get(useSkeleton, channel, db, urlLevel, page, orderby=None):
     output %= channel
     output += '<p><a href="/nicks/%s/">%s</a></p>' % (channel[1:].replace('#', ' '),
                                                  _('View nick-by-nick stats'))
+    output += '<p><a href="/links/%s/">%s</a></p>' % (channel[1:].replace('#', ' '),
+                                                 _('View links'))
     output += '<p>%s</p>' % _('There were %n, %n, %n, %n, %n, %n, %n, '
                               'and %n.')
     output = utils.str.format(output, (items[0], _('line')), (items[1], _('word')),

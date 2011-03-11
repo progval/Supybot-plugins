@@ -9,6 +9,8 @@ def get(useSkeleton, channel, db, urlLevel, page, orderby=None):
     output %= channel
     output += '<p><a href="/global/%s/">%s</a></p>' % (channel[1:].replace('#', ' '),
                                                  _('View global stats'))
+    output += '<p><a href="/links/%s/">%s</a></p>' % (channel[1:].replace('#', ' '),
+                                                 _('View links'))
     items = db.getChanNickGlobalData(channel, 20)
     html, nbDisplayed = getTable(_('Nick'),items,channel,urlLevel,page,orderby)
     output += html
