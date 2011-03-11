@@ -57,7 +57,7 @@ def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
                     pass
             for foo in range(0, int(item[2])):
                 try:
-                    graph.add_edge(item[0], item[1])
+                    graph.add_edge(item[0], item[1], arrowhead='vee')
                 except:
                     pass
         buffer_ = StringIO()
