@@ -28,33 +28,43 @@
 
 ###
 
+import time
+import supybot.world as world
 from listingcommons import *
 from listingcommons import _
 import pygraphviz
 from cStringIO import StringIO
 
+if not hasattr(world, 'webStatsCacheLinks'):
+    world.webStatsCacheLinks = {}
+
 def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
+    cache = world.webStatsCacheLinks # The template is often reloaded
     channel = '#' + channel
     items = db.getChanLinks(channel)
     output = ''
-    graph = pygraphviz.AGraph(strict=False, directed=True)
-    insertedNicks = []
-    for item in items:
-        if item[0] not in insertedNicks:
-            try:
-                graph.add_node(item[0])
-                insertedNicks.append(item[0])
-            except: # Probably unicode issue
-                pass
-        for foo in range(0, int(item[2])):
-            try:
-                graph.add_edge(item[0], item[1])
-            except:
-                pass
-    buffer_ = StringIO()
-    graph.draw(buffer_, prog='circo', format='png')
-    buffer_.seek(0)
-    output = buffer_.read()
+    if channel in cache and cache[channel][0] > time.time() - 3600:
+        output = cache[channel][1]
+    else:
+        graph = pygraphviz.AGraph(strict=False, directed=True)
+        insertedNicks = []
+        for item in items:
+            if item[0] not in insertedNicks:
+                try:
+                    graph.add_node(item[0])
+                    insertedNicks.append(item[0])
+                except: # Probably unicode issue
+                    pass
+            for foo in range(0, int(item[2])):
+                try:
+                    graph.add_edge(item[0], item[1])
+                except:
+                    pass
+        buffer_ = StringIO()
+        graph.draw(buffer_, prog='circo', format='png')
+        buffer_.seek(0)
+        output = buffer_.read()
+        cache.update({channel: (time.time(), output)})
 
     #if useSkeleton:
     #    output = ''.join([skeleton.start, output, skeleton.end])
