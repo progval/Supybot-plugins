@@ -56,7 +56,11 @@ def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
     else:
         graph = pygraphviz.AGraph(strict=False, directed=True)
         insertedNicks = {}
+        items = [x for x in items]
+        divideBy = len(items)/25
         for item in items:
+            if item[2] < 3:
+                continue
             for i in (0, 1):
                 if item[i] not in insertedNicks:
                     try:
@@ -65,12 +69,10 @@ def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
                                        fontcolor=insertedNicks[item[i]])
                     except: # Probably unicode issue
                         pass
-            for foo in range(0, int(item[2])):
-                try:
-                    graph.add_edge(item[0], item[1], arrowhead='vee',
-                                   color=insertedNicks[item[1]])
-                except:
-                    pass
+             graph.add_edge(item[0], item[1], arrowhead='vee',
+                            color=insertedNicks[item[1]],
+                            penwidth=int(item[2])/divideBy+1,
+                            arrowsize=int(item[2])/divideBy/2+1)
         buffer_ = StringIO()
         graph.draw(buffer_, prog='circo', format='png')
         buffer_.seek(0)
