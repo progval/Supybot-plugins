@@ -139,7 +139,7 @@ class GitHub(callbacks.Plugin):
             bold = ircutils.bold
             url = commit['url']
             data = urllib.urlencode({'url': url})
-            tiny = self.registryValue('tiny', channel)
+            tiny = instance.registryValue('tiny', channel)
             url = urllib.urlopen(tiny, data).read()
             s = '%s/%s (in %s): %s committed %s %s' % \
                     (payload['repository']['owner']['name'],
