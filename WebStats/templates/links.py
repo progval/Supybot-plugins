@@ -29,6 +29,7 @@
 ###
 
 import time
+import random
 import supybot.world as world
 from listingcommons import *
 from listingcommons import _
@@ -37,6 +38,13 @@ from cStringIO import StringIO
 
 if not hasattr(world, 'webStatsCacheLinks'):
     world.webStatsCacheLinks = {}
+
+colors = ['green', 'red', 'orange', 'blue', 'black', 'gray50', 'indigo',
+          'yellow']
+
+def chooseColor(nick):
+    global colors
+    return random.choice(colors)
 
 def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
     cache = world.webStatsCacheLinks # The template is often reloaded
@@ -47,17 +55,19 @@ def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
         output = cache[channel][1]
     else:
         graph = pygraphviz.AGraph(strict=False, directed=True)
-        insertedNicks = []
+        insertedNicks = {}
         for item in items:
-            if item[0] not in insertedNicks:
-                try:
-                    graph.add_node(item[0])
-                    insertedNicks.append(item[0])
-                except: # Probably unicode issue
-                    pass
+            for i in (0, 1):
+                if item[i] not in insertedNicks:
+                    try:
+                        insertedNicks.update({item[i]: chooseColor(item[i])})
+                        graph.add_node(item[i], color=insertedNicks[item[i]])
+                    except: # Probably unicode issue
+                        pass
             for foo in range(0, int(item[2])):
                 try:
-                    graph.add_edge(item[0], item[1], arrowhead='vee')
+                    graph.add_edge(item[0], item[1], arrowhead='vee',
+                                   color=insertedNicks[item[1]])
                 except:
                     pass
         buffer_ = StringIO()
