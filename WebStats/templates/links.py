@@ -69,10 +69,10 @@ def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
                                        fontcolor=insertedNicks[item[i]])
                     except: # Probably unicode issue
                         pass
-             graph.add_edge(item[0], item[1], arrowhead='vee',
-                            color=insertedNicks[item[1]],
-                            penwidth=int(item[2])/divideBy+1,
-                            arrowsize=int(item[2])/divideBy/2+1)
+            graph.add_edge(item[0], item[1], arrowhead='vee',
+                           color=insertedNicks[item[1]],
+                           penwidth=int(item[2])/divideBy+1,
+                           arrowsize=int(item[2])/divideBy/2+1)
         buffer_ = StringIO()
         graph.draw(buffer_, prog='circo', format='png')
         buffer_.seek(0)
