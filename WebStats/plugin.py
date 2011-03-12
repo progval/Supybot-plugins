@@ -67,6 +67,7 @@ except ImportError:
 
 DEBUG = False
 
+world.webStatsCacheLinks = {}
 testing = world.testing
 
 def getTemplate(name):
