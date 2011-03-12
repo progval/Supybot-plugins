@@ -67,6 +67,7 @@ except ImportError:
 
 DEBUG = False
 
+world.webStatsCacheLinks = {}
 testing = world.testing
 
 def getTemplate(name):
@@ -273,6 +274,8 @@ class WebStatsDB:
         for chan, nicks in tmp_links_cache.items():
             for nick, tos in nicks.items(): # Yes, tos is the plural for to
                 for to, count in tos.items():
+                    if to not in nicks:
+                        continue
                     cursor.execute('INSERT INTO links_cache VALUES(?,?,?,?)',
                                    (chan, nick, to, count))
         cursor.close()
