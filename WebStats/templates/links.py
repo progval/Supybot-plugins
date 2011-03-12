@@ -61,7 +61,8 @@ def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
                 if item[i] not in insertedNicks:
                     try:
                         insertedNicks.update({item[i]: chooseColor(item[i])})
-                        graph.add_node(item[i], color=insertedNicks[item[i]])
+                        graph.add_node(item[i], color=insertedNicks[item[i]],
+                                       fontcolor=insertedNicks[item[i]])
                     except: # Probably unicode issue
                         pass
             for foo in range(0, int(item[2])):
