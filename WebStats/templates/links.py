@@ -57,6 +57,7 @@ def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
         graph = pygraphviz.AGraph(strict=False, directed=True,
                                   start='regular', smoothing='spring',
                                   size='40') # /!\ Size is in inches /!\
+        graph.add_node('#root#', style='invisible')
         insertedNicks = {}
         items = [(x,y,float(z)) for x,y,z in items]
         divideBy = max([z for x,y,z in items])/10
@@ -67,6 +68,8 @@ def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
                         insertedNicks.update({item[i]: chooseColor(item[i])})
                         graph.add_node(item[i], color=insertedNicks[item[i]],
                                        fontcolor=insertedNicks[item[i]])
+                        graph.add_edge(item[i], '#root#', style='invisible',
+                                       arrowsize=0, color='white')
                     except: # Probably unicode issue
                         pass
             graph.add_edge(item[0], item[1], arrowhead='vee',
