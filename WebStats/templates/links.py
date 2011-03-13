@@ -54,13 +54,13 @@ def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
     if channel in cache and cache[channel][0] > time.time() - 3600:
         output = cache[channel][1]
     else:
-        graph = pygraphviz.AGraph(strict=False, directed=True)
+        graph = pygraphviz.AGraph(strict=False, directed=True,
+                                  start='regular', smoothing='spring',
+                                  size='40') # /!\ Size is in inches /!\
         insertedNicks = {}
-        items = [x for x in items]
-        divideBy = len(items)/25
+        items = [(x,y,float(z)) for x,y,z in items]
+        divideBy = max([z for x,y,z in items])/10
         for item in items:
-            if item[2] < 3:
-                continue
             for i in (0, 1):
                 if item[i] not in insertedNicks:
                     try:
@@ -71,8 +71,8 @@ def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
                         pass
             graph.add_edge(item[0], item[1], arrowhead='vee',
                            color=insertedNicks[item[1]],
-                           penwidth=int(item[2])/divideBy+1,
-                           arrowsize=int(item[2])/divideBy/2+1)
+                           penwidth=item[2]/divideBy,
+                           arrowsize=item[2]/divideBy/2+1)
         buffer_ = StringIO()
         graph.draw(buffer_, prog='circo', format='png')
         buffer_.seek(0)
