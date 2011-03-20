@@ -98,7 +98,7 @@ msgid ""
 msgstr ""
 "[<channel>|<user>] [--since <ancien>] [--max <récent>] [--count <nombre>] [--noretweet]\n"
 "\n"
-"Répond avec la timeline de l'<utilisateur>.Si l'<utilisateur> n'est pas donné, il correspond par défaut au compte assoicié au <canal>. Si le <canal> n'est pas donné, il correspond par défaut au canal courant.Si ils sont donnés, --since et --max prennent chacun un ID de tweet, utilisés comme \"frontières\" de la requête de tweets.Si il est donné, --count prend un entier, qui correspond au nombre de tweets à afficher.Si --noretweet est donné, seuls les tweets natifs de l'utilisateur seront affichés."
+"Répond avec la timeline de l'<utilisateur>.Si l'<utilisateur> n'est pas donné, il correspond par défaut au compte associé au <canal>. Si le <canal> n'est pas donné, il correspond par défaut au canal courant.Si ils sont donnés, --since et --max prennent chacun un ID de tweet, utilisés comme \"frontières\" de la requête de tweets.Si il est donné, --count prend un entier, qui correspond au nombre de tweets à afficher.Si --noretweet est donné, seuls les tweets natifs de l'utilisateur seront affichés."
 
 #: plugin.py:149
 msgid "No account is associated with this channel. Ask an op, try with another channel."
