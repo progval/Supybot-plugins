@@ -203,7 +203,7 @@ class SupySandbox(callbacks.Plugin):
     """Add the help for "@plugin help SupySandbox" here
     This should describe *how* to use this plugin."""
 
-    _parser = re.compile(r'([^ ]*sandbox )?(?P<code>.*)')
+    _parser = re.compile(r'(.*sandbox )?(?P<code>.*)')
     def sandbox(self, irc, msg, args):
         """<code>
 
