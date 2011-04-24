@@ -178,7 +178,7 @@ class Sudo(callbacks.Plugin):
             irc.error(_('This name does not exist.'))
             return
         irc.replySuccess()
-    remove = wrap(add, ['owner', 'int'])
+    remove = wrap(remove, ['owner', 'something'])
 
     @internationalizeDocstring
     def sudo(self, irc, msg, args, command):
@@ -187,7 +187,7 @@ class Sudo(callbacks.Plugin):
         Runs the command fellowing the Sudo rules."""
         name, rule = self.db.getRuleMatching(command)
         if name is None:
-            log.info('Sudo not granted to "%s"' % msg.prefix)
+            log.warning('Sudo not granted to "%s"' % msg.prefix)
             irc.error(_('Sudo not granted.'))
         else:
             assert rule is not None
