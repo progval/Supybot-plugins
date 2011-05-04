@@ -23,6 +23,7 @@ content = _(
         <a href="mailto:progval@gmail.com">ProgVal</a>'s
         <a href="http://supybot-fr.tk/WebStats">WebStats plugin for Supybot</a>
     </li>
+</ul>
 """)
 
 def get(useSkeleton):
