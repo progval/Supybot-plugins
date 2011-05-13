@@ -71,10 +71,14 @@ conf.registerChannelValue(LinkRelay, 'includeNetwork',
     registry.Boolean(True, _("""Determines whether the bot will include the
     network in Relayed PRIVMSGs; if you're only Relaying between two networks,
     it's somewhat redundant, and you may wish to save the space.""")))
-conf.registerChannelValue(LinkRelay, 'noticeNonPrivmsgs',
-    registry.Boolean(False, _("""Determines whether the bot will used NOTICEs
-    rather than PRIVMSGs for non-PRIVMSG Relay messages (i.e., joins, parts,
-    nicks, quits, modes, etc.)""")))
+
+class ValidNonPrivmsgsHandling(registry.OnlySomeStrings):
+    validStrings = ('privmsg', 'notice', 'nothing')
+conf.registerChannelValue(LinkRelay, 'nonPrivmsgs',
+    registry.Boolean('privmsg', _("""Determines whether the bot will use
+    PRIVMSGs (privmsg), NOTICEs (notice), for non-PRIVMSG Relay messages
+    (i.e., joins, parts, nicks, quits, modes, etc.), or whether it won't relay
+    such messages (nothing)""")))
 
 conf.registerGlobalValue(LinkRelay, 'relays',
     registry.String('', _("""You shouldn't edit this configuration variable
