@@ -122,12 +122,15 @@ class LinkRelay(callbacks.Plugin):
             text = text.strip('\x01')
             text = text[ 7 : ]
             if colored:
-                s = '\x0314*\x03 %s %s' % (nick, text)
+                s = '\x03%s*\x03 %s %s' % (nick,
+                                           self.registryValue('colors.msg'),
+                                           text)
             else:
                 s = '* %s %s' % (nick, text)
         else:
             if colored:
-                s = '\x0314<%s%s\x0314>\x03 %s' % (color, nick, text)
+                s = '\x03%s<%s%s\x0314>\x03 %s' % \
+                    (self.registryValue('colors.msg'), color, nick, text)
             else:
                 s = '<%s%s> %s' % (color, nick, text)
         return s

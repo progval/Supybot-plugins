@@ -86,6 +86,7 @@ conf.registerGlobalValue(LinkRelay, 'substitutes',
 
 conf.registerGroup(LinkRelay, 'colors')
 for name, color in {'info': '02',
+                    'msg': '14',
                     'truncated': '14',
                     'mode': '14',
                     'join': '14',
