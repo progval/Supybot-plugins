@@ -75,10 +75,10 @@ conf.registerChannelValue(LinkRelay, 'includeNetwork',
 class ValidNonPrivmsgsHandling(registry.OnlySomeStrings):
     validStrings = ('privmsg', 'notice', 'nothing')
 conf.registerChannelValue(LinkRelay, 'nonPrivmsgs',
-    registry.Boolean('privmsg', _("""Determines whether the bot will use
-    PRIVMSGs (privmsg), NOTICEs (notice), for non-PRIVMSG Relay messages
-    (i.e., joins, parts, nicks, quits, modes, etc.), or whether it won't relay
-    such messages (nothing)""")))
+    ValidNonPrivmsgsHandling('privmsg', _("""Determines whether the
+    bot will use PRIVMSGs (privmsg), NOTICEs (notice), for non-PRIVMSG Relay
+    messages (i.e., joins, parts, nicks, quits, modes, etc.), or whether it
+    won't relay such messages (nothing)""")))
 
 conf.registerGlobalValue(LinkRelay, 'relays',
     registry.String('', _("""You shouldn't edit this configuration variable
@@ -90,7 +90,6 @@ conf.registerGlobalValue(LinkRelay, 'substitutes',
 
 conf.registerGroup(LinkRelay, 'colors')
 for name, color in {'info': '02',
-                    'msg': '14',
                     'truncated': '14',
                     'mode': '14',
                     'join': '14',

@@ -129,10 +129,9 @@ class LinkRelay(callbacks.Plugin):
                 s = '* %s %s' % (nick, text)
         else:
             if colored:
-                s = '\x03%s<%s%s\x0314>\x03 %s' % \
-                    (self.registryValue('colors.msg'), color, nick, text)
+                s = '%s<%s%s\x0314>\x03 %s' % (color, nick, text)
             else:
-                s = '<%s%s> %s' % (color, nick, text)
+                s = '<%s> %s' % (nick, text)
         return s
 
 
@@ -155,13 +154,14 @@ class LinkRelay(callbacks.Plugin):
                          relay.sourceNetwork,
                          relay.targetChannel,
                          relay.targetNetwork,
-                         hasIRC)))
+                         hasIRC))
 
     def doPrivmsg(self, irc, msg):
         self.addIRC(irc)
         channel = msg.args[0]
         s = msg.args[1]
-        s = self.formatPrivMsg(msg.nick, s)
+        s = self.formatPrivMsg(msg.nick, s,
+                               self.registryValue('color', channel))
         if channel not in irc.state.channels: # in private
             # cuts off the end of commands, so that passwords
             # won't be revealed in relayed PM's
@@ -181,7 +181,8 @@ class LinkRelay(callbacks.Plugin):
         if msg.command == 'PRIVMSG':
             if not msg.relayedMsg:
                 if msg.args[0] in irc.state.channels:
-                    s = self.formatPrivMsg(irc.nick, msg.args[1])
+                    s = self.formatPrivMsg(irc.nick, msg.args[1],
+                                    self.registryValue('color', msg.args[0]))
                     self.sendToOthers(irc, msg.args[0], s, isPrivmsg=True)
         return msg
 
@@ -274,8 +275,7 @@ class LinkRelay(callbacks.Plugin):
                 elif self.registryValue('nonPrivmsgs', channel) == 'notice':
                     msg = ircmsgs.notice(relay.targetChannel, s)
                 else:
-                    # nothing
-                    pass
+                    return
                 msg.tag('relayedMsg')
                 relay.targetIRC.sendMsg(msg)
 
