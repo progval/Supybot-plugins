@@ -46,9 +46,10 @@ __author__ = supybot.Author('quantumlemur', 'quantumlemur',
 if not hasattr(supybot.authors, 'progval'):
     supybot.authors.progval = supybot.Author('Valentin Lorentz', 'ProgVal',
                                              'progval@gmail.com')
-__contributors__ = {supybot.authors.progval: ['enhance configurabilty',
+__contributors__ = {supybot.authors.progval: ['enhance configurability',
                                               'many bug fixes',
-                                              'code enhancement']}
+                                              'code enhancement',
+                                              'optional colors']}
 
 __url__ = ""
 
