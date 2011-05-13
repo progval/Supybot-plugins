@@ -161,18 +161,19 @@ class LinkRelay(callbacks.Plugin):
         self.addIRC(irc)
         channel = msg.args[0]
         s = msg.args[1]
+        s = self.formatPrivMsg(msg.nick, s)
         if channel not in irc.state.channels: # in private
             # cuts off the end of commands, so that passwords
             # won't be revealed in relayed PM's
             if callbacks.addressed(irc.nick, msg):
                 if self.registryValue('color', channel):
                     color = '\x03' + self.registryValue('colors.truncated')
+                    match = '(>\x03 \w+) .*'
                 else:
                     color = ''
-                s = re.sub('(>\x03 \w+) .*',
-                           '\\1 %s[%s]' % (_('truncated'), color), s)
+                    match = '(> \w+) .*'
+                s = re.sub(match, '\\1 %s[%s]' % (color, _('truncated')), s)
             s = '(via PM) %s' % s
-        s = self.formatPrivMsg(msg.nick, s)
         self.sendToOthers(irc, channel, s, isPrivmsg=True)
 
 
