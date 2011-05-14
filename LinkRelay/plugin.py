@@ -196,7 +196,7 @@ class LinkRelay(callbacks.Plugin):
             s = '\x03%s' % self.registryValue('colors.mode')
         else:
             s = ''
-        s += _('%s changed mode on %s to %s') % (msg.nick,
+        s += _('*/* %s changed mode on %s to %s') % (msg.nick,
                                                msg.args[0],
                                                ' '.join(msg.args[1:]))
         self.sendToOthers(irc, msg.args[0], s)
@@ -207,7 +207,7 @@ class LinkRelay(callbacks.Plugin):
             s = '\x03%s' % self.registryValue('colors.join')
         else:
             s = ''
-        s += _('%s has joined on %s') % (msg.nick, irc.network)
+        s += _('--> %s has joined on %s') % (msg.nick, irc.network)
         self.sendToOthers(irc, msg.args[0], s)
 
     def doPart(self, irc, msg):
@@ -216,7 +216,7 @@ class LinkRelay(callbacks.Plugin):
             s = '\x03%s' % self.registryValue('colors.part')
         else:
             s = ''
-        s += _('%s has left on %s') % (msg.nick, irc.network)
+        s += _('<-- %s has left on %s') % (msg.nick, irc.network)
         self.sendToOthers(irc, msg.args[0], s)
 
     def doKick(self, irc, msg):
@@ -225,7 +225,7 @@ class LinkRelay(callbacks.Plugin):
             s = '\x03%s' % self.registryValue('colors.kick')
         else:
             s = ''
-        s += _('%s has been kicked on %s by %s (%s)') % \
+        s += _('<-- %s has been kicked on %s by %s (%s)') % \
                                                            (msg.args[1],
                                                            irc.network,
                                                            msg.nick,
@@ -238,7 +238,7 @@ class LinkRelay(callbacks.Plugin):
             s = '\x03%s' % self.registryValue('colors.nick')
         else:
             s = ''
-        s += _('%s (%s) changed his nickname to %s') % (msg.nick,
+        s += _('*/* %s (%s) changed his nickname to %s') % (msg.nick,
                                                           irc.network,
                                                           msg.args[0])
         for (channel, c) in irc.state.channels.iteritems():
@@ -250,7 +250,7 @@ class LinkRelay(callbacks.Plugin):
             s = '\x03%s' % self.registryValue('colors.quit')
         else:
             s = ''
-        s += _('%s has quit on %s (%s)') % (msg.nick,
+        s += _('<-- %s has quit on %s (%s)') % (msg.nick,
                                                       irc.network,
                                                       msg.args[0])
         self.sendToOthers(irc, None, s, msg.nick)
