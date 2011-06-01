@@ -130,7 +130,7 @@ class Variables(callbacks.Plugin):
         except VariableDoesNotExist:
             pass
         cursor.execute("""INSERT INTO variables VALUES (?,?,?,?,?)""",
-                          (domainType, domainName, name, value, False))
+                          (domainType, domainName, name, value, True))
         self._connection.commit()
         irc.replySuccess()
     set = wrap(set, [getopts({'domain': ('literal', ('global', 'network', 'channel')),
