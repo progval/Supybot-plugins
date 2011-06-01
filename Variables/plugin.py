@@ -28,6 +28,9 @@
 
 ###
 
+import os
+
+import supybot.conf as conf
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
@@ -35,16 +38,46 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 from supybot.i18n import PluginInternationalization, internationalizeDocstring
 
+try:
+    import sqlite3
+except ImportError:
+    from pysqlite2 import dbapi2 as sqlite3 # for python2.4
+
 _ = PluginInternationalization('Variables')
+
+class VariableDoesNotExist(Exception):
+    pass
 
 @internationalizeDocstring
 class Variables(callbacks.Plugin):
     """Add the help for "@plugin help Variables" here
     This should describe *how* to use this plugin."""
 
-    globalDomains = {}
-    channelDomains = {}
-    networkDomains = {}
+    def __init__(self, irc):
+        callbacks.Plugin.__init__(self, irc)
+        self._filename = os.path.join(conf.supybot.directories.data(),
+                'Variables.db')
+        self._load()
+
+    def _load(self):
+        if hasattr(self, '_connection'):
+            self._connection.close()
+        createDatabase = not os.path.exists(self._filename)
+        self._connection = sqlite3.connect(self._filename)
+        self._connection.text_factory = str
+        if createDatabase:
+            self._makeDb()
+
+    def _makeDb(self):
+        cursor = self._connection.cursor()
+        cursor.execute("""CREATE TABLE variables (
+                          domainType TEXT,
+                          domainName TEXT,
+                          variableName TEXT,
+                          value TEXT,
+                          sticky BOOLEAN
+                          )""")
+        self._connection.commit()
 
     def _getDomain(self, irc, msg, opts):
         opts = dict(opts)
@@ -61,12 +94,18 @@ class Variables(callbacks.Plugin):
                 domainName = irc.network
         else:
             domainName = opts['name']
-        domains = {'global': self.globalDomains,
-                   'channel': self.channelDomains,
-                   'network': self.networkDomains}[domainType]
-        if domainName not in domains:
-            domains[domainName] = {}
-        return domains[domainName]
+        return domainType, domainName
+
+    def _getVariable(self, domainType, domainName, variableName):
+        cursor = self._connection.cursor()
+        cursor.execute("""SELECT value FROM variables WHERE
+                          domainType=? AND domainName=? AND variableName=?""",
+                          (domainType, domainName, variableName))
+        row = cursor.fetchone()
+        if row is None:
+            raise VariableDoesNotExist()
+        else:
+            return row[0]
 
     @internationalizeDocstring
     def set(self, irc, msg, args, opts, name, value):
@@ -80,8 +119,19 @@ class Variables(callbacks.Plugin):
         Valid domain types are 'global', 'channel', and 'network'.
         Note that channel domains are channel-specific, but are cross-network.
         """
-        domain = self._getDomain(irc, msg, opts)
-        domain[name] = value
+        domainType, domainName = self._getDomain(irc, msg, opts)
+        cursor = self._connection.cursor()
+        try:
+            self._getVariable(domainType, domainName, name)
+            cursor.execute("""DELETE FROM variables WHERE
+                              domainType=? AND domainName=? AND
+                              variableName=?""",
+                          (domainType, domainName, name))
+        except VariableDoesNotExist:
+            pass
+        cursor.execute("""INSERT INTO variables VALUES (?,?,?,?,?)""",
+                          (domainType, domainName, name, value, False))
+        self._connection.commit()
         irc.replySuccess()
     set = wrap(set, [getopts({'domain': ('literal', ('global', 'network', 'channel')),
                               'name': 'something'}),
@@ -99,11 +149,11 @@ class Variables(callbacks.Plugin):
         Valid domain types are 'global', 'channel', and 'network'.
         Note that channel domains are channel-specific, but are cross-network.
         """
-        domain = self._getDomain(irc, msg, opts)
-        if name in domain:
-            irc.reply(domain[name])
-        else:
-            irc.error('This variable cannot be found.')
+        domainType, domainName = self._getDomain(irc, msg, opts)
+        try:
+            irc.reply(self._getVariable(domainType, domainName, name))
+        except VariableDoesNotExist:
+            irc.error(_('Variable does not exist.'))
 
     get = wrap(get, [getopts({'domain': ('literal', ('global', 'network', 'channel')),
                               'name': 'something'}),
