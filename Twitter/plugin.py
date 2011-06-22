@@ -75,15 +75,18 @@ class Twitter(callbacks.Plugin):
         if channel is None:
             key = self.registryValue('accounts.bot.key')
             secret = self.registryValue('accounts.bot.secret')
+            url = self.registryValue('accounts.bot.api')
         else:
             key = self.registryValue('accounts.channel.key', channel)
             secret = self.registryValue('accounts.channel.secret', channel)
+            url = self.registryValue('accounts.channel.api')
         if key == '' or secret == '':
-            return twitter.Api()
+            return twitter.Api(base_url=url)
         api = twitter.Api(consumer_key='bItq1HZhBGyx5Y8ardIeQ',
                 consumer_secret='qjC6Ye6xSMM3XPLR3LLeMqOP4ri0rgoYFT2si1RpY',
                 access_token_key=key,
-                access_token_secret=secret)
+                access_token_secret=secret,
+                base_url=url)
         self._apis[channel] = api
         return api
 

@@ -65,6 +65,10 @@ conf.registerGlobalValue(Twitter.accounts.bot, 'key',
 conf.registerGlobalValue(Twitter.accounts.bot, 'secret',
         registry.String('', _("""The Twitter Access Token secret for the bot's
         account (%s)""") % helpGetToken, private=True))
+conf.registerGlobalValue(Twitter.accounts.bot, 'api',
+        registry.String('https://api.twitter.com/1', _("""The URL to the
+        base API URL (by default, it is Twitter.com, but you can use it
+        for twitter-compatible services, such as identica/statusnet.""")))
 
 conf.registerGroup(Twitter.accounts, 'channel')
 conf.registerChannelValue(Twitter.accounts.channel, 'key',
@@ -73,6 +77,10 @@ conf.registerChannelValue(Twitter.accounts.channel, 'key',
 conf.registerChannelValue(Twitter.accounts.channel, 'secret',
         registry.String('', _("""The Twitter Access Token secret for this
         channel's account (%s)""") % helpGetToken, private=True))
+conf.registerGlobalValue(Twitter.accounts.channel, 'api',
+        registry.String('https://api.twitter.com/1', _("""The URL to the
+        base API URL (by default, it is Twitter.com, but you can use it
+        for twitter-compatible services, such as identica/statusnet.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
