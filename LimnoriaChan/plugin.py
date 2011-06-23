@@ -48,6 +48,7 @@ staticFactoids = {
         'wiki':         WEB_REPO + '/wiki',
         'issues':       WEB_REPO + '/issues',
         'issues-pl':    PLUGINS_WEB_REPO + '/issues',
+        'supybook':     'http://supybook.fealdia.org/',
         }
 dynamicFactoids = {
         'git':          WEB_REPO + '/tree/%s',
