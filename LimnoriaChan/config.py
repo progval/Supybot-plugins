@@ -47,6 +47,11 @@ LimnoriaChan = conf.registerPlugin('LimnoriaChan')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(LimnoriaChan, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
+conf.registerGlobalValue(LimnoriaChan, 'login',
+    registry.String('Limnoria', _("Login to GitHub (to post issues)")))
+conf.registerGlobalValue(LimnoriaChan, 'token',
+    registry.String('', _("Auth toket to GitHub (to post issues)"),
+    private=True))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

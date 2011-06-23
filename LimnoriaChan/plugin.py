@@ -29,6 +29,8 @@
 ###
 
 import re
+import json
+import urllib
 
 import supybot.utils as utils
 import supybot.world as world
@@ -66,6 +68,25 @@ dynamicFactoids = {
 class LimnoriaChan(callbacks.Plugin):
     """Add the help for "@plugin help LimnoriaChan" here
     This should describe *how* to use this plugin."""
+
+    def issue(self, irc, msg, args, user, title):
+        """<title>
+
+        Opens an issue called <title>."""
+        if not world.testing and \
+                msg.args[0] not in ('#limnoria', '#limnoria-bots'):
+            irc.error('This command can be run only on #limnoria or '
+                    '#limnoria-bots on Freenode.')
+        body = 'Issue sent from %s at %s by %s (registered as %s)' % \
+                (msg.args[0], irc.network, msg.nick, user.name)
+        login = self.registryValue('login')
+        token = self.registryValue('token')
+        data='title=%s&body=%s&login=%s&token=%s' % (title, body, login, token)
+        url = 'http://github.com/api/v2/json/issues/open/ProgVal/Limnoria'
+        response = json.loads(urllib.urlopen(url, data=data).read())
+        id = response['issue']['number']
+        irc.reply('Issue #%i has been opened.' % id)
+    issue = wrap(issue, ['user', 'text'])
 
     _addressed = re.compile('^([^ :]+):')
     _factoid = re.compile('%%([^ ]+)')
