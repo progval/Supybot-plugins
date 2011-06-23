@@ -51,6 +51,7 @@ staticFactoids = {
         }
 dynamicFactoids = {
         'git':          WEB_REPO + '/tree/%s',
+        'git-pl':       PLUGINS_WEB_REPO + '/tree/%s',
         'commit':       WEB_REPO + '/commit/%s',
         'commit-pl':    PLUGINS_WEB_REPO + '/commit/%s',
         'wiki':         WEB_REPO + '/wiki/%s',
