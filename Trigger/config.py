@@ -61,8 +61,8 @@ for trigger in 'join part privmsg notice'.split(' '):
 
 conf.registerGlobalValue(Trigger.triggers, 'connect',
     registry.String('', _("""Command trigger on connect. This shouldn't be
-    a Supybot command, but an IRC command (as given to ircquote).""",
-    private=True)))
+    a Supybot command, but an IRC command (as given to ircquote)."""),
+    private=True))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
