@@ -31,6 +31,7 @@
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
+import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 try:
@@ -65,6 +66,9 @@ class Trigger(callbacks.Plugin):
         self._run(irc, msg, 'privmsg')
     def doNotice(self, irc, msg):
         self._run(irc, msg, 'notice')
+    def do376(self, irc, msg):
+        command = self.registryValue('triggers.connect')
+        irc.queueMsg(ircmsgs.IrcMsg(command))
 
 
 Class = Trigger
