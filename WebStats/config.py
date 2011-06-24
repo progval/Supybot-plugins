@@ -51,13 +51,6 @@ WebStats = conf.registerPlugin('WebStats')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(WebStats, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
-conf.registerGroup(WebStats, 'server')
-conf.registerGlobalValue(WebStats.server, 'host',
-    registry.String('', _("""Determines the hostname the web server will
-        bind. Empty value is equivalent to 0.0.0.0.""")))
-conf.registerGlobalValue(WebStats.server, 'port',
-    registry.Integer(8080, _("""Determines the port the web server will
-        bind.""")))
 
 conf.registerGroup(WebStats, 'channel')
 conf.registerChannelValue(WebStats.channel, 'enable',

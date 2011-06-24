@@ -35,8 +35,6 @@ import sys
 import time
 import random
 import datetime
-import threading
-import BaseHTTPServer
 import supybot.conf as conf
 import supybot.world as world
 import supybot.log as log
@@ -81,36 +79,34 @@ def getTemplate(name):
 class FooException(Exception):
     pass
 
-class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
-    def log_request(self, code=None, size=None):
-        # By default, it logs the request to stderr
-        pass
-    def do_GET(self):
+class WebStatsServerCallback(utils.httpserver.SupyHTTPServerCallback):
+    name = 'WebStats'
+    def doGet(self, handler, path):
         output = ''
-        splittedPath = self.path.split('/')
+        splittedPath = path.split('/')
         try:
-            if self.path == '/design.css':
+            if path == '/design.css':
                 response = 200
                 content_type = 'text/css'
                 output = getTemplate('design').get(not testing)
-            elif self.path == '/':
+            elif path == '/':
                 response = 200
                 content_type = 'text/html'
                 output = getTemplate('index').get(not testing,
-                                                 self.server.db.getChannels())
-            elif self.path == '/%s/' % _('about'):
+                                                 self.db.getChannels())
+            elif path == '/%s/' % _('about'):
                 response = 200
                 content_type = 'text/html'
                 output = getTemplate('about').get(not testing)
-            elif self.path == '/global/':
+            elif path == '/global/':
                 response = 404
                 content_type = 'text/html'
                 output = """<p style="font-size: 20em">BAM!</p>
                 <p>You played with the URL, you losed.</p>"""
             elif splittedPath[1] in ('nicks', 'global', 'links') \
-                    and self.path[-1]=='/'\
+                    and path[-1]=='/'\
                     or splittedPath[1] == 'nicks' and \
-                    self.path.endswith('.htm'):
+                    path.endswith('.htm'):
                 response = 200
                 content_type = 'text/html'
                 if splittedPath[1] == 'links':
@@ -122,19 +118,19 @@ class HTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 if page == '':
                     page = '0'
                 if len(splittedPath) == 3:
-                    _.loadLocale(self.server.plugin._getLanguage(chanName))
+                    _.loadLocale(self.plugin._getLanguage(chanName))
                     output = getTemplate(splittedPath[1]).get(not testing,
                                                            chanName,
-                                                           self.server.db,
+                                                           self.db,
                                                            len(splittedPath),
                                                            page)
                 else:
                     assert len(splittedPath) > 3
-                    _.loadLocale(self.server.plugin._getLanguage(chanName))
+                    _.loadLocale(self.plugin._getLanguage(chanName))
                     subdir = splittedPath[3]
                     output = getTemplate(splittedPath[1]).get(not testing,
                                                            chanName,
-                                                           self.server.db,
+                                                           self.db,
                                                            len(splittedPath),
                                                            page,
                                                            subdir.lower())
@@ -442,36 +438,6 @@ class WebStatsDB:
                           WHERE chan=?""", (chanName,))
         return cursor
 
-
-class WebStatsHTTPServer(BaseHTTPServer.HTTPServer):
-    """A simple class that set a smaller timeout to the socket"""
-    timeout = 0.3
-
-class Server:
-    """The WebStats HTTP server handler."""
-    def __init__(self, plugin):
-        self.serve = True
-        self._plugin = plugin
-    def run(self):
-        serverAddress = (self._plugin.registryValue('server.host'),
-                          self._plugin.registryValue('server.port'))
-        done = False
-        while not done:
-            time.sleep(1)
-            try:
-                httpd = WebStatsHTTPServer(serverAddress, HTTPHandler)
-                done = True
-            except:
-                pass
-        log.info('WebStats web server launched')
-        httpd.plugin = self._plugin
-        httpd.db = self._plugin.db
-        while self.serve:
-            httpd.handle_request()
-        httpd.server_close()
-        time.sleep(1) # Let the socket be really closed
-
-
 class WebStats(callbacks.Plugin):
     def __init__(self, irc):
         self.__parent = super(WebStats, self)
@@ -479,13 +445,14 @@ class WebStats(callbacks.Plugin):
         self.lastmsg = {}
         self.ircstates = {}
         self.db = WebStatsDB()
-        self._server = Server(self)
-        if not world.testing:
-            threading.Thread(target=self._server.run,
-                             name="WebStats HTTP Server").start()
+
+        callback = WebStatsServerCallback()
+        callback.plugin = self
+        callback.db = self.db
+        utils.httpserver.hook('webstats', callback)
 
     def die(self):
-        self._server.serve = False
+        utils.httpserver.unhook('webstats')
         self.__parent.die()
 
     def doPrivmsg(self, irc, msg):

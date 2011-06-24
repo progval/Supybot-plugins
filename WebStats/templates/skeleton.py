@@ -7,15 +7,15 @@ start = \
     <head>
         <title>Supybot WebStats</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <link rel="stylesheet" media="screen" type="text/css" title="Design" href="/design.css" />
+        <link rel="stylesheet" media="screen" type="text/css" title="Design" href="/webstats/design.css" />
     </head>
     <body>
         <p id="header">
             WebStats
         </p>
         <ul id="menu">
-            <li><a href="/" title="%s">%s</a></li>
-            <li><a href="/%s/" title="%s">%s</a></li>
+            <li><a href="/webstats/" title="%s">%s</a></li>
+            <li><a href="/webstats/%s/" title="%s">%s</a></li>
         </ul>
 """ % (_('Come back to the root page'), _('Home'),
        _('about'), _('Get more informations about this website'), _('About'))
