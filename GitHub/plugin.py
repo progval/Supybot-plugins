@@ -56,37 +56,10 @@ except:
 #####################
 # Server stuff
 #####################
-class ThreadedTCPServer(SocketServer.TCPServer):
-    pass
 
-class RequestHandler(SocketServer.StreamRequestHandler):
-    def handle(self):
-        length = 0
-        currentLine = ''
-        data = ''
-        while self.server.enabled:
-            if not '\r\n' in data:
-                try:
-                    data += self.request.recv(4096)
-                except socket.timeout:
-                    time.sleep(0.1) # in case of odd problem
-                    continue
-            if not data: # Server closed connection
-                return
-            if data.startswith('payload=') and \
-                    len(data) == length:
-                payload = StringIO()
-                payload.write(urllib.unquote(data[len('payload='):]))
-                payload.seek(0)
-                self.server._plugin.announce.onPayload(json.load(payload))
-                return
-            elif '\r\n' in data:
-                splitted = data.split('\r\n')
-                currentLine = splitted[0]
-                data = '\r\n'.join(splitted[1:])
-
-            if currentLine.startswith('Content-Length: '):
-                length = int(currentLine[len('Content-Length: '):])
+class GithubCallback(utils.httpserver.SupyHTTPServerCallback):
+    def doPost(self, handler, path, form):
+        self.plugin.announce.onPayload(json.loads(form['payload'].value))
 
 #####################
 # API access stuff
@@ -115,24 +88,9 @@ class GitHub(callbacks.Plugin):
         callbacks.Plugin.__init__(self, irc)
         instance = self
 
-
-        if not world.testing:
-            host = self.registryValue('server.host')
-            port = self.registryValue('server.port')
-            while True:
-                try:
-                    self._server = ThreadedTCPServer((host, port),
-                                                     RequestHandler)
-                    break
-                except socket.error: # Address already in use
-                    time.sleep(1)
-            self._server.timeout = 0.5
-
-            # Used by request handlers:
-            self._server._plugin = self
-            self._server.enabled = True
-            threading.Thread(target=self._server.serve_forever,
-                             name='GitHub commits listener').start()
+        callback = GithubCallback()
+        callback.plugin = self
+        utils.httpserver.hook('github', callback)
 
     class announce(callbacks.Commands):
         def _createPrivmsg(self, channel, payload, commit):
@@ -294,11 +252,7 @@ class GitHub(callbacks.Plugin):
                                     'disable': 'anything'})])
     def die(self):
         self.__parent.die()
-        if not world.testing:
-            self._server.enabled = False
-            time.sleep(1)
-            self._server.shutdown()
-            del self._server
+        utils.httpserver.unhook('github')
 
 
 Class = GitHub
