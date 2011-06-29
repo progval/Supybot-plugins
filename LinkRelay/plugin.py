@@ -129,7 +129,7 @@ class LinkRelay(callbacks.Plugin):
                 s = '* %s %s' % (nick, text)
         else:
             if colored:
-                s = '%s<%s%s\x0314>\x03 %s' % (color, nick, text)
+                s = '<%s%s\x0314>\x03 %s' % (color, nick, text)
             else:
                 s = '<%s> %s' % (nick, text)
         return s
