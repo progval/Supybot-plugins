@@ -39,8 +39,7 @@ from cStringIO import StringIO
 if not hasattr(world, 'webStatsCacheLinks'):
     world.webStatsCacheLinks = {}
 
-colors = ['green', 'red', 'orange', 'blue', 'black', 'gray50', 'indigo',
-          'yellow']
+colors = ['green', 'red', 'orange', 'blue', 'black', 'gray50', 'indigo']
 
 def chooseColor(nick):
     global colors
