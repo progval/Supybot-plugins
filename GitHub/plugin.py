@@ -57,7 +57,9 @@ except:
 # Server stuff
 #####################
 
-class GithubCallback(utils.httpserver.SupyHTTPServerCallback):
+import supybot.utils.httpserver
+
+class GithubCallback(supybot.utils.httpserver.SupyHTTPServerCallback):
     def doPost(self, handler, path, form):
         self.plugin.announce.onPayload(json.loads(form['payload'].value))
 
@@ -104,7 +106,7 @@ class GitHub(callbacks.Plugin):
                      bold(payload['repository']['name']),
                      bold(payload['ref'].split('/')[-1]),
                      commit['author']['name'],
-                     bold(commit['message']),
+                     bold(commit['message'].split('\n')[0]),
                      url)
             return ircmsgs.privmsg(channel, s)
 
