@@ -144,8 +144,8 @@ class SpellChecker:
                      mask="j'[^' ]+ pas")
         firstPerson = 'un verbe à la première personne ne finit pas par un `t`'
         notAS = 'ce verbe ne devrait pas se finir par un `s` à cette personne.'
-        self._detect(mode='regexp', correct=firstPerson, mask="j'[^ ]*t")
-        self._detect(mode='regexp', correct=firstPerson,mask="je( ne)? [^ ]*t")
+        self._detect(mode='regexp', correct=firstPerson, mask="j'[^ ]*t\W")
+        self._detect(mode='regexp', correct=firstPerson,mask="je( ne)? [^ ]*t\W")
         self._detect(mode='regexp', correct=notAS,
                      mask="(il|elle|on)( ne | n'| )[^ ]*[^u]s\W")
                      # [^u] is added in order to not detect 'il [vn]ous...'
