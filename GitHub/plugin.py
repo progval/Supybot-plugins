@@ -61,7 +61,11 @@ import supybot.utils.httpserver
 
 class GithubCallback(supybot.utils.httpserver.SupyHTTPServerCallback):
     def doPost(self, handler, path, form):
-        self.plugin.announce.onPayload(json.loads(form['payload'].value))
+        if not handler.address_string().endswith('.rs.github.com'):
+            log.warning("""'%s' tryed to act as a web hook for Github,
+            but is not GitHub.""")
+        else:
+            self.plugin.announce.onPayload(json.loads(form['payload'].value))
 
 #####################
 # API access stuff
