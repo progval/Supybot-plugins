@@ -109,15 +109,28 @@ class SpellChecker:
                            (displayedMask, correct))
 
     def checkSMS(self):
-        self._detect(mode='single', correct='tout', mask='tt')
-        self._detect(mode='single', correct='tous', mask='ts')
-        self._detect(mode='single', correct='toute', mask='tte')
-        self._detect(mode='single', correct='toutes', mask='ttes')
-        self._detect(mode='single', correct="c'était", mask='ct')
-        self._detect(mode='single', correct="vais", mask='v')
-        self._detect(mode='single', correct=["aime", "aimes", "aiment"],
-                     mask='m')
-        self._detect(mode='single', correct=['eu', 'eut'], mask='u')
+        bad = {
+                't': 't\'es',
+                'ki': 'qui',
+                'koi': 'quoi',
+                'tqvu': 't\'as vu',
+                'tt': 'tout',
+                'ct': 'c\'était',
+                'v': 'vais',
+                'twa': 'toi',
+                'toa': 'toi',
+                'mwa': 'moi',
+                'moa': 'moi',
+                'tro': 'trop',
+                'bi1': 'bien',
+                'çay': 'c\'est',
+                'fé': ['fais', 'fait'],
+                'm': ['aime', 'aimes', 'aiment'],
+                'u': ['eu', 'eut'],
+            }
+        for mask, correct in bad.items():
+            self._detect(mode='single', correct=correct, mask=mask)
+
         self._detect(mode='regexp', correct="c'est",
                      mask="(?<!(du|Du|le|Le|en|En)) C (?<!c')",
                      displayedMask='C')
@@ -170,7 +183,7 @@ class SpellChecker:
                      "précédé d'un espace",
                      mask="[^ _][:!?;]", wizard='_')
         self._detect(mode='regexp',
-                     correct="Un caractère de ponctuation simple est toujours "
+                     correct="Un caractère de ponctuation double est toujours "
                      "suivi d'un espace",
                      mask="(?<!(tp|ps))[:!?;][^ _]", wizard='_')
         self._detect(mode='regexp',
