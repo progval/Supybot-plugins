@@ -206,7 +206,7 @@ class GoodFrench(callbacks.Plugin):
 
         Cherche des fautes dans le <texte>, en fonction de la valeur locale de
         supybot.plugins.GoodFrench.level."""
-        checker = SpellChecker(text, self.registryValue('level', msg.channel))
+        checker = SpellChecker(text, self.registryValue('level', msg.args[0]))
         errors = checker.getErrors()
         if len(errors) == 0:
             irc.reply('La phrase semble correcte')
