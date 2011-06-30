@@ -175,7 +175,9 @@ class SpellChecker:
     def checkAbbreviation(self):
         pass
     def checkLol(self):
-        self._detect(mode='regexp', correct='mdr', mask='[Ll1][oO0 ]+[lL1]',
+        self._detect(mode='regexp', correct='mdr', mask='[Ll1][oO0iu]+[lL1]',
+                     displayedMask='lol')
+        self._detect(mode='regexp', correct='mdr', mask=' [Ll1][oO0iu ]+[lL1] ',
                      displayedMask='lol')
     def checkTypographic(self):
         self._detect(mode='regexp',
