@@ -76,6 +76,16 @@ class LinkRelay(callbacks.Plugin):
         self.ircstates = {}
         for IRC in world.ircs:
             self.addIRC(IRC)
+        try:
+            conf.supybot.plugins.LinkRelay.substitutes.addCallback(
+                    self._loadFromConfig)
+            conf.supybot.plugins.LinkRelay.relays.addCallback(
+                    self._loadFromConfig)
+        except AttributeError:
+            irc.error("Your version of Supybot is not compatible with "
+                      "configuration hooks. So, LinkRelay won't be able "
+                      "to reload the configuration if you use the Config "
+                      "plugin.")
 
     def _loadFromConfig(self):
         self.relays = []
