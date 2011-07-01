@@ -32,6 +32,7 @@ import re
 import time
 import copy
 import string
+import supybot.log as log
 import supybot.conf as conf
 import supybot.utils as utils
 import supybot.world as world
@@ -39,6 +40,7 @@ from supybot.commands import *
 import supybot.irclib as irclib
 import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
+import supybot.registry as registry
 import supybot.callbacks as callbacks
 try:
     from supybot.i18n import PluginInternationalization
@@ -81,8 +83,8 @@ class LinkRelay(callbacks.Plugin):
                     self._loadFromConfig)
             conf.supybot.plugins.LinkRelay.relays.addCallback(
                     self._loadFromConfig)
-        except AttributeError:
-            irc.error("Your version of Supybot is not compatible with "
+        except registry.NonExistentRegistryEntry:
+            log.error("Your version of Supybot is not compatible with "
                       "configuration hooks. So, LinkRelay won't be able "
                       "to reload the configuration if you use the Config "
                       "plugin.")
