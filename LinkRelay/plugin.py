@@ -122,16 +122,16 @@ class LinkRelay(callbacks.Plugin):
             text = text.strip('\x01')
             text = text[ 7 : ]
             if colored:
-                s = '\x03%s*\x03 %s %s' % (nick,
+                s = '\x03%s*\x03%%s %s %s' % (nick,
                                            self.registryValue('colors.msg'),
                                            text)
             else:
-                s = '* %s %s' % (nick, text)
+                s = '* %s%%s %s' % (nick, text)
         else:
             if colored:
-                s = '<%s%s\x0314>\x03 %s' % (color, nick, text)
+                s = '<%s%s\x0314%%s>\x03 %s' % (color, nick, text)
             else:
-                s = '<%s> %s' % (nick, text)
+                s = '<%s%%s> %s' % (nick, text)
         return s
 
 
@@ -160,6 +160,10 @@ class LinkRelay(callbacks.Plugin):
         self.addIRC(irc)
         channel = msg.args[0]
         s = msg.args[1]
+        if self.registryValue('includeNetwork', msg.args[0]):
+            network = '@' + irc.network
+        else:
+            network = ''
         s = self.formatPrivMsg(msg.nick, s,
                                self.registryValue('color', channel))
         if channel not in irc.state.channels: # in private
@@ -181,6 +185,10 @@ class LinkRelay(callbacks.Plugin):
         if msg.command == 'PRIVMSG':
             if not msg.relayedMsg:
                 if msg.args[0] in irc.state.channels:
+                    if self.registryValue('includeNetwork', msg.args[0]):
+                        network = '@' + irc.network
+                    else:
+                        network = ''
                     s = self.formatPrivMsg(irc.nick, msg.args[1],
                                     self.registryValue('color', msg.args[0]))
                     self.sendToOthers(irc, msg.args[0], s, isPrivmsg=True)
@@ -258,7 +266,7 @@ class LinkRelay(callbacks.Plugin):
 
     def sendToOthers(self, irc, channel, s, nick=None, isPrivmsg=False):
         assert channel is not None or nick is not None
-        def send():
+        def send(s):
             if not relay.hasTargetIRC:
                 self.log.info('LinkRelay:  IRC %s not yet scraped.' %
                               relay.targetNetwork)
@@ -269,6 +277,10 @@ class LinkRelay(callbacks.Plugin):
                 self.log.info('LinkRelay:  I\'m not in in %s on %s' %
                               (relay.targetChannel, relay.targetNetwork))
             else:
+                if self.registryValue('includeNetwork', relay.targetChannel):
+                    s = s % ('@' + irc.network)
+                else:
+                    s = s % ''
                 if isPrivmsg or \
                         self.registryValue('nonPrivmsgs', channel) == 'privmsg':
                     msg = ircmsgs.privmsg(relay.targetChannel, s)
@@ -286,13 +298,13 @@ class LinkRelay(callbacks.Plugin):
                             relay.channelRegex.match(channel) and \
                             relay.networkRegex.match(irc.network)and \
                             relay.messageRegex.search(s):
-                        send()
+                        send(s)
         else:
             for relay in self.relays:
                 if relay.channelRegex.match(channel) and \
                         relay.networkRegex.match(irc.network)and \
                         relay.messageRegex.search(s):
-                    send()
+                    send(s)
 
 
     def addIRC(self, irc):
