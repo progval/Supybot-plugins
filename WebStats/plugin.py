@@ -46,6 +46,7 @@ import supybot.plugins as plugins
 import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
+import supybot.httpserver as httpserver
 
 try:
     import sqlite3
@@ -79,7 +80,7 @@ def getTemplate(name):
 class FooException(Exception):
     pass
 
-class WebStatsServerCallback(utils.httpserver.SupyHTTPServerCallback):
+class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
     name = 'WebStats'
     def doGet(self, handler, path):
         output = ''
@@ -449,10 +450,10 @@ class WebStats(callbacks.Plugin):
         callback = WebStatsServerCallback()
         callback.plugin = self
         callback.db = self.db
-        utils.httpserver.hook('webstats', callback)
+        httpserver.hook('webstats', callback)
 
     def die(self):
-        utils.httpserver.unhook('webstats')
+        httpserver.unhook('webstats')
         self.__parent.die()
 
     def doPrivmsg(self, irc, msg):

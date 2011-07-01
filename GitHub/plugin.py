@@ -43,6 +43,7 @@ import supybot.plugins as plugins
 import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
+import supybot.httpserver as httpserver
 try:
     from supybot.i18n import PluginInternationalization
     from supybot.i18n import internationalizeDocstring
@@ -59,7 +60,7 @@ except:
 
 import supybot.utils.httpserver
 
-class GithubCallback(supybot.utils.httpserver.SupyHTTPServerCallback):
+class GithubCallback(httpserver.SupyHTTPServerCallback):
     def doPost(self, handler, path, form):
         if not handler.address_string().endswith('.rs.github.com'):
             log.warning("""'%s' tryed to act as a web hook for Github,
@@ -96,7 +97,7 @@ class GitHub(callbacks.Plugin):
 
         callback = GithubCallback()
         callback.plugin = self
-        utils.httpserver.hook('github', callback)
+        httpserver.hook('github', callback)
 
     class announce(callbacks.Commands):
         def _createPrivmsg(self, channel, payload, commit):
@@ -258,7 +259,7 @@ class GitHub(callbacks.Plugin):
                                     'disable': 'anything'})])
     def die(self):
         self.__parent.die()
-        utils.httpserver.unhook('github')
+        httpserver.unhook('github')
 
 
 Class = GitHub
