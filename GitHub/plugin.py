@@ -58,8 +58,6 @@ except:
 # Server stuff
 #####################
 
-import supybot.utils.httpserver
-
 class GithubCallback(httpserver.SupyHTTPServerCallback):
     def doPost(self, handler, path, form):
         if not handler.address_string().endswith('.rs.github.com'):
