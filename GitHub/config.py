@@ -58,13 +58,6 @@ conf.registerGlobalValue(GitHub.api, 'url',
         registry.String('http://github.com/api/v2/json', _("""The URL of the
         GitHub API to use. You probably don't need to edit it, but I let it
         there, just in case.""")))
-conf.registerGroup(GitHub, 'server')
-conf.registerGlobalValue(GitHub.server, 'host',
-        registry.String('0.0.0.0', _("""The hostname the socket server will
-        bind. Reload the plugin to apply this setting.""")))
-conf.registerGlobalValue(GitHub.server, 'port',
-        registry.Integer(36987, _("""The port the socket server will
-        bind. Reload the plugin to apply this setting.""")))
 conf.registerGlobalValue(GitHub, 'announces',
         registry.String('', _("""You shouldn't edit this configuration
         variable yourself, unless you know what you do. Use '@Github announce
