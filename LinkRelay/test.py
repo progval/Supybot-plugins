@@ -31,7 +31,7 @@
 from supybot.test import *
 
 class LinkRelayTestCase(ChannelPluginTestCase):
-    plugins = ('LinkRelay','Config')
+    plugins = ('LinkRelay','Config', 'User')
 
     def testAdd(self):
         self.assertNotError('config supybot.plugins.LinkRelay.relays ""')

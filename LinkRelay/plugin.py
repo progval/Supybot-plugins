@@ -289,10 +289,11 @@ class LinkRelay(callbacks.Plugin):
                 self.log.info('LinkRelay:  I\'m not in in %s on %s' %
                               (relay.targetChannel, relay.targetNetwork))
             else:
-                if self.registryValue('includeNetwork', relay.targetChannel):
-                    s = s % ('@' + irc.network)
-                else:
-                    s = s % ''
+                if '%s' in s:
+                    if self.registryValue('includeNetwork', relay.targetChannel):
+                        s = s % ('@' + irc.network)
+                    else:
+                        s = s % ''
                 if isPrivmsg or \
                         self.registryValue('nonPrivmsgs', channel) == 'privmsg':
                     msg = ircmsgs.privmsg(relay.targetChannel, s)
