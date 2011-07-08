@@ -46,6 +46,10 @@ class EurekaTestCase(ChannelPluginTestCase):
             (nick, score) = _unpickleScore.group('nick', 'score')
             scores[nick] = score
         return scores
+    def _clearMsg(self):
+        msg = 1
+        while msg is not None:
+            msg = self.irc.takeMsg()
 
     def setUp(self):
         self.prefix1 = 'test!user@host.domain.tld'
@@ -58,7 +62,7 @@ class EurekaTestCase(ChannelPluginTestCase):
         ChannelPluginTestCase.setUp(self)
         with open(self._path, 'a') as fd:
             fd.write("""
-            1 Who wrote this plugin?
+            2 Who wrote this plugin?
             ---
             r ProgVal
             ---
@@ -67,7 +71,7 @@ class EurekaTestCase(ChannelPluginTestCase):
             2 Pro*Val
             === 5
 
-            1 What is the name of this bot?
+            4 What is the name of this bot?
             ---
             r Limnoria
             r Supybot
@@ -77,10 +81,12 @@ class EurekaTestCase(ChannelPluginTestCase):
             2 Lim**ria
             === 5
 
-            1 Who is the original author of Supybot?
+            3 Who is the original author of Supybot?
             ---
             r jemfinch
             ---
+            1 j*******
+            1 jem*****
             === 1
             """)
         self.prefix = self.prefix1 # Just to be sure
@@ -94,8 +100,10 @@ class EurekaTestCase(ChannelPluginTestCase):
         self.assertError('resume')
 
         self.assertNotError('start')
+        self._clearMsg()
         self.assertNotError('stop')
         self.assertNotError('start')
+        self._clearMsg()
 
         self.assertError('start')
         self.assertNotError('scores')
@@ -106,8 +114,10 @@ class EurekaTestCase(ChannelPluginTestCase):
 
         self.assertNotError('pause')
 
+        self.assertNotError('resume')
         self.assertError('resume')
         self.assertNotError('pause')
+        self.assertError('pause')
         self.assertNotError('skip')
 
         self.assertNotError('stop')
@@ -116,62 +126,69 @@ class EurekaTestCase(ChannelPluginTestCase):
     def testBasics(self):
         msg = ircmsgs.privmsg(self.channel, 'foo', prefix=self.prefix)
         self.irc.feedMsg(msg)
-        self.failUnless(self.irc.takeMsg() is None,
-                'Did answer do a message while the Eureka is off.')
+        self.assertNoResponse(' ')
 
-        msg = self._feedMsg('start')
-        self.failIf(msg is None, 'did not answer to start command.')
-        self.failUnless(msg.args[1] == 'Who wrote this plugin?',
-                'Did ask something that is not the question: %r'%msg.args[1])
+        self.assertResponse('start', 'Who wrote this plugin?')
 
         msg = ircmsgs.privmsg(self.channel, 'foo', prefix=self.prefix)
         self.irc.feedMsg(msg)
-        self.failUnless(self.irc.takeMsg() is None,
-                'Did answer do a message that is not the correct answer.')
+        self.assertNoResponse(' ')
 
         msg = ircmsgs.privmsg(self.channel, 'ProgVal', prefix=self.prefix)
         self.irc.feedMsg(msg)
-        msg = self.irc.takeMsg()
-        self.failIf(msg is None,
-                'Did not reply to correct answer.')
-        self.failUnless(msg.args[1] == 'Congratulations test! The answer was '
-                'ProgVal.',
-                'Did answer %r to a correct answer.' % msg.args[1])
+        self.assertResponse(' ', 'Congratulations test! The answer was '
+                'ProgVal.')
 
-        msg = self.irc.takeMsg()
-        self.failIf(msg is None,
-                'Did not ask another question.')
-        self.failUnless(msg.args[1] == 'What is the name of this bot?',
-                'Did ask something that is not the question.')
+        self.assertResponse(' ', 'What is the name of this bot?')
         msg = ircmsgs.privmsg(self.channel, 'Limnoria', prefix=self.prefix2)
         self.irc.feedMsg(msg)
-        msg = self.irc.takeMsg()
-        self.failIf(msg is None,
-                'Did not reply to correct answer.')
-        self.failUnless(msg.args[1] == 'Congratulations foo! The answer was '
-                'Limnoria. Another valid answer is: \'Supybot\'.',
-                'Did answer %r to a correct answer.' % msg.args[1])
+        self.assertResponse(' ', 'Congratulations foo! The answer was '
+                'Limnoria. Another valid answer is: \'Supybot\'.')
 
-        msg = self.irc.takeMsg()
-        self.failUnless(msg.args[1]=='Who is the original author of Supybot?',
-                'Did ask something that is not the question.')
-        time.sleep(1.5)
-        msg = self.irc.takeMsg()
-        self.failIf(msg is None,
-                'Did not reply after timeout')
-        self.failUnless(msg.args[1] == 'Nobody replied with (one of this) '
+        self.assertResponse(' ', 'Who is the original author of Supybot?')
+        self.timeout = 0.2
+        self.assertNoResponse(' ', 0.9)
+        self.assertResponse(' ', 'Another clue: j*******')
+        self.assertNoResponse(' ', 0.9)
+        self.assertResponse(' ', 'Another clue: jem*****')
+        self.assertNoResponse(' ', 0.9)
+        self.assertResponse(' ', 'Nobody replied with (one of this) '
                 'answer(s): jemfinch.')
 
-    def testClues(self):
-        pass
     def testTimeout(self):
         pass
     def testCaseSensitivity(self):
         pass
     def testAdjust(self):
         pass
-    def testScore(self):
+    def testClue(self):
         pass
-        
+    def testScore(self):
+        self.assertNotError('start')
+        self.assertRegexp('scores', 'noone')
+        self.assertError('score test')
+        msg = ircmsgs.privmsg(self.channel, 'foo', prefix=self.prefix)
+        self.irc.feedMsg(msg)
+        self.assertRegexp('scores', 'noone')
+        self.assertError('score test')
+        msg = ircmsgs.privmsg(self.channel, 'ProgVal', prefix=self.prefix)
+        self.irc.feedMsg(msg)
+        self._clearMsg()
+        self.assertResponse('scores', 'test(2)')
+        msg = ircmsgs.privmsg(self.channel, 'ProgVal', prefix=self.prefix)
+        self.irc.feedMsg(msg)
+        self._clearMsg()
+        self.assertResponse('scores', 'test(2)')
+        self.prefix = self.prefix2
+        msg = ircmsgs.privmsg(self.channel, 'supybot', prefix=self.prefix)
+        self.irc.feedMsg(msg)
+        self._clearMsg()
+        self.assertResponse('scores', 'foo(4), test(2)')
+        self.prefix = self.prefix1
+        msg = ircmsgs.privmsg(self.channel, 'jemfinch', prefix=self.prefix)
+        self.irc.feedMsg(msg)
+        self._clearMsg()
+        self.assertResponse('scores', 'test(5), foo(4)')
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
