@@ -32,6 +32,7 @@ from __future__ import with_statement
 
 from supybot.test import *
 import supybot.conf as conf
+import supybot.schedule as schedule
 
 class EurekaTestCase(ChannelPluginTestCase):
     plugins = ('Eureka', 'User')
@@ -52,6 +53,11 @@ class EurekaTestCase(ChannelPluginTestCase):
             msg = self.irc.takeMsg()
 
     def setUp(self):
+        # Avoid conflicts between tests.
+        # We use .keys() in order to prevent this error:
+        # RuntimeError: dictionary changed size during iteration
+        for name in schedule.schedule.events.keys():
+            schedule.removeEvent(name)
         self.prefix1 = 'test!user@host.domain.tld'
         self.prefix2 = 'foo!bar@baz'
         self.prefix3 = 'toto!titi@tata'
@@ -155,14 +161,38 @@ class EurekaTestCase(ChannelPluginTestCase):
         self.assertResponse(' ', 'Nobody replied with (one of this) '
                 'answer(s): jemfinch.')
 
-    def testTimeout(self):
-        pass
     def testCaseSensitivity(self):
-        pass
+        self.assertNotError('start')
+        self._clearMsg()
+        msg = ircmsgs.privmsg(self.channel, 'PROGVAL', prefix=self.prefix)
+        self.irc.feedMsg(msg)
+        self.assertResponse(' ', 'Congratulations test! The answer was '
+                'ProgVal.')
     def testAdjust(self):
-        pass
+        self.assertNotError('start')
+        self.assertRegexp('scores', 'noone')
+        self.assertError('score foo')
+        self.assertError('score bar')
+        self.assertError('score baz')
+        self.assertNotError('adjust foo 5')
+        self.assertResponse('scores', 'foo(5)')
+        self.assertResponse('score foo', '5')
+        self.assertError('score bar')
+        self.assertError('score baz')
+        self.assertNotError('adjust bar 2')
+        self.assertResponse('scores', 'foo(5), bar(2)')
+        self.assertResponse('score foo', '5')
+        self.assertResponse('score bar', '2')
+        self.assertError('score baz')
+        self.assertNotError('adjust bar 7')
+        self.assertResponse('scores', 'bar(9), foo(5)')
+        self.assertResponse('score foo', '5')
+        self.assertResponse('score bar', '9')
+        self.assertError('score baz')
     def testClue(self):
-        pass
+        self.timeout = 0.2
+        self.assertResponse('start', 'Who wrote this plugin?')
+        self.assertResponse('clue', 'Another clue: P***V**')
     def testScore(self):
         self.assertNotError('start')
         self.assertRegexp('scores', 'noone')
@@ -189,6 +219,7 @@ class EurekaTestCase(ChannelPluginTestCase):
         self.irc.feedMsg(msg)
         self._clearMsg()
         self.assertResponse('scores', 'test(5), foo(4)')
+
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

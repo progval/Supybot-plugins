@@ -181,11 +181,11 @@ class Eureka(callbacks.Plugin):
             else:
                 irc.reply(_('Another clue: %s') % clue, prefixNick=False)
                 self._giveClue(irc, channel)
-        if now:
-            event()
-        else:
-            schedule.addEvent(event, time.time() + delay,
-                    'Eureka-nextClue-%s' % channel)
+        eventName = 'Eureka-nextClue-%s' % channel
+        if now and eventName in schedule.schedule.events:
+            schedule.schedule.events[eventName]()
+            schedule.removeEvent(eventName)
+        schedule.addEvent(event, time.time() + delay, eventName)
 
     def doPrivmsg(self, irc, msg):
         channel = msg.args[0]
@@ -203,7 +203,7 @@ class Eureka(callbacks.Plugin):
         if reply is not None:
             schedule.removeEvent('Eureka-nextClue-%s' % channel)
             otherAnswers = [y for x,y in state.answers
-                    if x == 'r' and y != msg.args[1]]
+                    if x == 'r' and y.lower() != msg.args[1].lower()]
             if len(otherAnswers) == 1:
                 reply += ' ' + _('Another valid answer is: \'%s\'.')
                 reply %= otherAnswers[0]
@@ -323,7 +323,8 @@ class Eureka(callbacks.Plugin):
 
         Increase or decrease the score of <nick> on the <channel>.
         If <channel> is not given, it defaults to the current channel."""
-        irc.error('Not implemented')
+        self.states[channel].adjust(nick, count)
+        irc.replySuccess()
     adjust = wrap(adjust, ['op', 'nick', 'int'])
 
     @internationalizeDocstring
