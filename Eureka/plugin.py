@@ -152,6 +152,7 @@ class Eureka(callbacks.Plugin):
         def event():
             state.loadBlock()
             if state.question is None:
+                state.state = STATE_STOPPED
                 return
             irc.reply(state.question[1], prefixNick=False)
 

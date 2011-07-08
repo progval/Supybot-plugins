@@ -160,6 +160,10 @@ class EurekaTestCase(ChannelPluginTestCase):
         self.assertNoResponse(' ', 0.9)
         self.assertResponse(' ', 'Nobody replied with (one of this) '
                 'answer(s): jemfinch.')
+        self.assertError('stop')
+        self.assertError('pause')
+        self.assertError('resume')
+        self.assertNotError('start')
 
     def testCaseSensitivity(self):
         self.assertNotError('start')
