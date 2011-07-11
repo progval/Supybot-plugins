@@ -126,7 +126,7 @@ class LinkRelay(callbacks.Plugin):
         return colors[num]
 
 
-    def formatPrivMsg(self, nick, text, colored):
+    def formatPrivMsg(self, channel, nick, text, colored):
         color = self.simpleHash(nick)
         if nick in self.nickSubstitutions:
             nick = self.nickSubstitutions[nick]
@@ -135,7 +135,8 @@ class LinkRelay(callbacks.Plugin):
             text = text[ 7 : ]
             if colored:
                 s = '\x03%s*\x03%%s %s %s' % (nick,
-                                           self.registryValue('colors.msg'),
+                                           self.registryValue('colors.msg',
+                                               msg.args[0]),
                                            text)
             else:
                 s = '* %s%%s %s' % (nick, text)
@@ -157,9 +158,9 @@ class LinkRelay(callbacks.Plugin):
                 hasIRC = 'Link healthy!'
             else:
                 hasIRC = '\x03%sIRC object not scraped yet.\x03' % \
-                        self.registryValue('colors.info')
+                        self.registryValue('colors.info', msg.args[0])
             s ='\x02%s\x02 on \x02%s\x02 ==> \x02%s\x02 on \x02%s\x02.  %s'
-            if not self.registryValue('color', msg):
+            if not self.registryValue('color', msg.args[0]):
                 s = s.replace('\x02', '')
             irc.reply(s %
                         (relay.sourceChannel,
@@ -176,14 +177,15 @@ class LinkRelay(callbacks.Plugin):
             network = '@' + irc.network
         else:
             network = ''
-        s = self.formatPrivMsg(msg.nick, s,
+        s = self.formatPrivMsg(channel, msg.nick, s,
                                self.registryValue('color', channel))
         if channel not in irc.state.channels: # in private
             # cuts off the end of commands, so that passwords
             # won't be revealed in relayed PM's
             if callbacks.addressed(irc.nick, msg):
                 if self.registryValue('color', channel):
-                    color = '\x03' + self.registryValue('colors.truncated')
+                    color = '\x03' + self.registryValue('colors.truncated',
+                            channel)
                     match = '(>\x03 \w+) .*'
                 else:
                     color = ''
@@ -201,7 +203,7 @@ class LinkRelay(callbacks.Plugin):
                         network = '@' + irc.network
                     else:
                         network = ''
-                    s = self.formatPrivMsg(irc.nick, msg.args[1],
+                    s = self.formatPrivMsg(msg.args[0], irc.nick, msg.args[1],
                                     self.registryValue('color', msg.args[0]))
                     self.sendToOthers(irc, msg.args[0], s, isPrivmsg=True)
         return msg
@@ -213,7 +215,7 @@ class LinkRelay(callbacks.Plugin):
     def doMode(self, irc, msg):
         self.addIRC(irc)
         if self.registryValue('color', msg.args[0]):
-            s = '\x03%s' % self.registryValue('colors.mode')
+            s = '\x03%s' % self.registryValue('colors.mode', msg.args[0])
         else:
             s = ''
         s += _('*/* %s changed mode on %s to %s') % (msg.nick,
@@ -224,7 +226,7 @@ class LinkRelay(callbacks.Plugin):
     def doJoin(self, irc, msg):
         self.addIRC(irc)
         if self.registryValue('color', msg.args[0]):
-            s = '\x03%s' % self.registryValue('colors.join')
+            s = '\x03%s' % self.registryValue('colors.join', msg.args[0])
         else:
             s = ''
         s += _('--> %s has joined on %s') % (msg.nick, irc.network)
@@ -233,7 +235,7 @@ class LinkRelay(callbacks.Plugin):
     def doPart(self, irc, msg):
         self.addIRC(irc)
         if self.registryValue('color', msg.args[0]):
-            s = '\x03%s' % self.registryValue('colors.part')
+            s = '\x03%s' % self.registryValue('colors.part', msg.args[0])
         else:
             s = ''
         s += _('<-- %s has left on %s') % (msg.nick, irc.network)
@@ -242,7 +244,7 @@ class LinkRelay(callbacks.Plugin):
     def doKick(self, irc, msg):
         self.addIRC(irc)
         if self.registryValue('color', msg.args[0]):
-            s = '\x03%s' % self.registryValue('colors.kick')
+            s = '\x03%s' % self.registryValue('colors.kick', msg.args[0])
         else:
             s = ''
         s += _('<-- %s has been kicked on %s by %s (%s)') % \
@@ -255,7 +257,7 @@ class LinkRelay(callbacks.Plugin):
     def doNick(self, irc, msg):
         self.addIRC(irc)
         if self.registryValue('color', msg.args[0]):
-            s = '\x03%s' % self.registryValue('colors.nick')
+            s = '\x03%s' % self.registryValue('colors.nick', msg.args[0])
         else:
             s = ''
         s += _('*/* %s (%s) changed his nickname to %s') % (msg.nick,
@@ -267,7 +269,7 @@ class LinkRelay(callbacks.Plugin):
 
     def doQuit(self, irc, msg):
         if self.registryValue('color', msg.args[0]):
-            s = '\x03%s' % self.registryValue('colors.quit')
+            s = '\x03%s' % self.registryValue('colors.quit', msg.args[0])
         else:
             s = ''
         s += _('<-- %s has quit on %s (%s)') % (msg.nick,
