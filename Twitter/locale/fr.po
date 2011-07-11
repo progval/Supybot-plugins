@@ -92,7 +92,7 @@ msgstr "Aucun compte n'est associé à ce canal. Demandez à un op, ou essayez a
 
 #: plugin.py:132
 msgid "Sorry, your tweet exceeds 140 characters (%i)"
-msgstr "Désolé, votre tweet excède 140 caractères."
+msgstr "Désolé, votre tweet excède 140 caractères (%i)."
 
 #: plugin.py:141
 msgid ""
