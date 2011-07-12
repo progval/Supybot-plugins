@@ -127,8 +127,13 @@ class Twitter(callbacks.Plugin):
             irc.error(_('No account is associated with this channel. Ask '
                         'an op or try with another channel.'))
             return
-        api.PostUpdate('[%s] %s' % (user.name, message))
-        irc.replySuccess()
+        tweet = '[%s] %s' % (user.name, message)
+        if len(tweet) > 140:
+            irc.error(_('Sorry, your tweet exceeds 140 characters (%i)') %
+                    len(tweet))
+        else:
+            api.PostUpdate(tweet)
+            irc.replySuccess()
     post = wrap(post, ['user', ('checkChannelCapability', 'twitter'), 'text'])
 
     @internationalizeDocstring
