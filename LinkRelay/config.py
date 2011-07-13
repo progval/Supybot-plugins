@@ -97,7 +97,7 @@ for name, color in {'info': '02',
                     'kick': '14',
                     'nick': '14',
                     'quit': '14'}.items():
-    conf.registerGlobalValue(LinkRelay.colors, name,
+    conf.registerChannelValue(LinkRelay.colors, name,
         ColorNumber(color, _("""Color used for relaying %s.""") % color))
 
 
