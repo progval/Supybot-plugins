@@ -136,7 +136,7 @@ class LinkRelay(callbacks.Plugin):
             if colored:
                 s = '\x03%s*\x03%%s %s %s' % (nick,
                                            self.registryValue('colors.msg',
-                                               msg.args[0]),
+                                               channel),
                                            text)
             else:
                 s = '* %s%%s %s' % (nick, text)
