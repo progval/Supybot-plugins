@@ -1,5 +1,5 @@
 ###
-# Copyright (c) 2010, Valentin Lorentz
+# Copyright (c) 2010-2011, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -94,7 +94,7 @@ class Glob2Chan(callbacks.Plugin):
                   'with me ;) If you have questions, bug reports, feature '
                   'requests, ... ask my owner, he is \x02ProgVal\x02. '
                   'You can find stats about this channel '
-                  'at \x02http://stats.supybot.fr.cr/global/glob2/\x02')
+                  'at \x02http://openihs.org:7412/webstats/global/glob2/\x02')
     g2help = wrap(g2help, [optional('somethingWithoutSpaces')])
 
     def nowelcome(self, irc, msg, args):
