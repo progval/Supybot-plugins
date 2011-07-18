@@ -69,19 +69,19 @@ class LimnoriaChan(callbacks.Plugin):
     """Add the help for "@plugin help LimnoriaChan" here
     This should describe *how* to use this plugin."""
 
-    def issue(self, *args, **kwargs):
+    def issue(self, irc, msg, args, user, title):
         """<title>
 
         Opens an issue on Limnoria bugtracker called <title>."""
-        self._issue(*args, **kwargs, 'ProgVal/Limnoria')
+        self._issue(irc, msg, args, user, title, 'ProgVal/Limnoria')
     issue = wrap(issue, ['user', 'text'])
 
-    def issuepl(self, *args, **kwargs):
+    def issuepl(self, irc, msg, args, user, title):
         """<title>
 
         Opens an issue on ProgVal/Supybot-plugins bugtracker called <title>.
         """
-        self._issue(*args, **kwargs, 'ProgVal/Supybot-plugins')
+        self._issue(irc, msg, args, user, title, 'ProgVal/Supybot-plugins')
     issue = wrap(issue, ['user', 'text'])
 
     def _issue(self, irc, msg, args, user, title, repoName):
