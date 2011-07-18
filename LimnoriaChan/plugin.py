@@ -69,10 +69,22 @@ class LimnoriaChan(callbacks.Plugin):
     """Add the help for "@plugin help LimnoriaChan" here
     This should describe *how* to use this plugin."""
 
-    def issue(self, irc, msg, args, user, title):
+    def issue(self, *args, **kwargs):
         """<title>
 
-        Opens an issue called <title>."""
+        Opens an issue on Limnoria bugtracker called <title>."""
+        self._issue(*args, **kwargs, 'ProgVal/Limnoria')
+    issue = wrap(issue, ['user', 'text'])
+
+    def issuepl(self, *args, **kwargs):
+        """<title>
+
+        Opens an issue on ProgVal/Supybot-plugins bugtracker called <title>.
+        """
+        self._issue(*args, **kwargs, 'ProgVal/Supybot-plugins')
+    issue = wrap(issue, ['user', 'text'])
+
+    def _issue(self, irc, msg, args, user, title, repoName):
         if not world.testing and \
                 msg.args[0] not in ('#limnoria', '#limnoria-bots'):
             irc.error('This command can be run only on #limnoria or '
@@ -82,11 +94,10 @@ class LimnoriaChan(callbacks.Plugin):
         login = self.registryValue('login')
         token = self.registryValue('token')
         data='title=%s&body=%s&login=%s&token=%s' % (title, body, login, token)
-        url = 'http://github.com/api/v2/json/issues/open/ProgVal/Limnoria'
+        url = 'http://github.com/api/v2/json/issues/open/' + repoName
         response = json.loads(urllib.urlopen(url, data=data).read())
         id = response['issue']['number']
         irc.reply('Issue #%i has been opened.' % id)
-    issue = wrap(issue, ['user', 'text'])
 
     _addressed = re.compile('^([^ :]+):')
     _factoid = re.compile('%%([^ ]+)')
