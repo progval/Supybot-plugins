@@ -45,9 +45,9 @@ class Glob2Chan(callbacks.Plugin):
         if nick.startswith('[YOG]') and \
                 nick not in self.registryValue('nowelcome').split(' '):
             irc.queueMsg(ircmsgs.privmsg(nick, 'Hi %s, welcome to the '
-                'globulation online game. Some people are connected from '
-                'IRC if you say there name, they may answer you or start '
-                'playing. For more help, type "@g2help" (without the quotes).'%
+                'globulation online game room. Those monitoring this room '
+                'via IRC may awaken and challenge you to a game, if you type '
+                'their name as given in the room participant window.' %
                 nick))
         if nick.startswith('[YOG]'):
             irc.queueMsg(ircmsgs.IrcMsg(s='WHOIS %s' % nick))
