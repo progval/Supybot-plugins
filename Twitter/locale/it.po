@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Supybot-fr\n"
+"POT-Creation-Date: 2011-02-26 09:49+CET\n"
+"PO-Revision-Date: 2011-07-29 18:21+0200\n"
+"Last-Translator: skizzhg <skizzhg@gmx.com>\n"
+"Language-Team: Italian <skizzhg@gmx.com>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+#: config.py:59
+msgid "running get_access_token.py is a way to get it"
+msgstr "eseguire get_access_token.py è un modo per ottenerla"
+
+#: config.py:63
+msgid ""
+"The Twitter Access Token key for the bot's\n"
+"        account (%s)"
+msgstr "La chiave d'accesso Twitter per l'account del bot (%s)"
+
+#: config.py:66
+msgid ""
+"The Twitter Access Token secret for the bot's\n"
+"        account (%s)"
+msgstr "La chiave d'accesso Twitter segreta per l'account del bot (%s)"
+
+#: config.py:69 config.py:81
+msgid ""
+"The URL to the\n"
+"        base API URL (by default, it is Twitter.com, but you can use it\n"
+"        for twitter-compatible services, such as identica/statusnet."
+msgstr ""
+"L'URI dell'URL di base per l'API (per impostazione predefinita è Twitter.com, ma è\n"
+"        utilizzabile per servizi compatibili con Twitter come identica e statusnet."
+
+#: config.py:75
+msgid ""
+"The Twitter Access Token key for this\n"
+"        channel's account (%s)"
+msgstr "La chiave d'accesso Twitter per l'account di questo canale (%s)"
+
+#: config.py:78
+msgid ""
+"The Twitter Access Token secret for this\n"
+"        channel's account (%s)"
+msgstr "La chiave d'accesso Twitter segreta per l'account di questo canale (%s)"
+
+#: plugin.py:58
+#, docstring
+msgid ""
+"Add the help for \"@plugin help Twitter\" here\n"
+"    This should describe *how* to use this plugin."
+msgstr ""
+
+#: plugin.py:68
+msgid "I just woke up. :)"
+msgstr "Mi sono appena svegliato :)"
+
+#: plugin.py:96
+#, docstring
+msgid ""
+"[<channel>] [<user>]\n"
+"\n"
+"        Replies with the friends (i.e. people who one subscribes to) of the\n"
+"        <user>. If <user> is not given, it defaults to the <channel>'s account.\n"
+"        If <channel> is not given, it defaults to the current channel."
+msgstr ""
+"[<canale>] [<utente>]\n"
+"\n"
+"        Risponde agli amici (le persone alle quali ci si iscrive) di <utente>.\n"
+"        Se <utente> non è specificato, il valore predefinito è l'account di <canale>.\n"
+"        Se <canale> non è fornito, usa quello attuale."
+
+#: plugin.py:103
+msgid "No account is associated with this channel. Ask an op, try with another channel, or provide a user name."
+msgstr "Nessun account associato a questo canale. Chiedi a un op, prova un altro canale o fornisci un nome utente."
+
+#: plugin.py:120
+#, docstring
+msgid ""
+"[<channel>] <message>\n"
+"\n"
+"        Updates the status of the account associated with the given <channel>\n"
+"        to the <message>. If <channel> is not given, it defaults to the\n"
+"        current channel."
+msgstr ""
+"[<canale>] <messaggio>\n"
+"\n"
+"        Aggiorna con <messaggio> lo stato dell'account associato a <canale>.\n"
+"        Se <canale> non è fornito, usa quello attuale."
+
+#: plugin.py:127
+msgid "No account is associated with this channel. Ask an op or try with another channel."
+msgstr "Nessun account associato a questo canale. Chiedi a un op o prova un altro canale."
+
+#: plugin.py:132
+msgid "Sorry, your tweet exceeds 140 characters (%i)"
+msgstr "Spiacente, il tuo tweet supera i 140 caratteri (%i)."
+
+#: plugin.py:141
+#, docstring
+msgid ""
+"[<channel>|<user>] [--since <oldest>] [--max <newest>] [--count <number>] [--noretweet]\n"
+"\n"
+"        Replies with the timeline of the <user>.\n"
+"        If <user> is not given, it defaults to the account associated with the\n"
+"        <channel>.\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        If given, --since and --max take tweet IDs, used as boundaries.\n"
+"        If given, --count takes an integer, that stands for the number of\n"
+"        tweets to display.\n"
+"        If --noretweet is given, only native user's tweet will be displayed.\n"
+"        "
+msgstr ""
+"[<canale>|<utente>] [--since <vecchio>] [--max <nuovo>] [--count <numero>] [--noretweet]\n"
+"\n"
+"        Risponde con la timeline di <utente>. Se <utente> non è specificato,\n"
+"        il valore predefinito è l'account associato a <canale>. Se <canale>\n"
+"        non è fornito, usa quello attuale. Se forniti, --since e --max utilizzano\n"
+"        gli ID dei tweet come limite della richiesta. Se --count è specificato,\n"
+"        utilizza un numero intero come numero dei tweet da mostrare. Se viene\n"
+"        usato --noretweet, saranno mostrati solo i tweet originari dell'utente.\n"
+"        "
+
+#: plugin.py:163
+msgid "No account is associated with this channel. Ask an op, try with another channel."
+msgstr "Nessun account associato a questo canale. Chiedi a un op o prova un altro canale."
+
+#: plugin.py:173
+msgid "This user protects his tweets; you need to fetch them from a channel whose associated account can fetch this timeline."
+msgstr "Questo utente protegge i suoi tweet; devi scaricarli da un canale il cui account associato può recuperare questa timeline."
+

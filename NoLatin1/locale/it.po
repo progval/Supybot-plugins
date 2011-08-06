@@ -1,0 +1,53 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Supybot-fr\n"
+"POT-Creation-Date: 2011-02-26 09:49+CET\n"
+"PO-Revision-Date: 2011-07-29 11:11+0200\n"
+"Last-Translator: skizzhg <skizzhg@gmx.com>\n"
+"Language-Team: Italian <skizzhg@gmx.com>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+#: config.py:51
+msgid ""
+"Determines whether or not the bot will\n"
+"        notice chatters they have to use Unicode instead of Latin-1."
+msgstr "Determina se il bot avviserà o meno gli utenti che devono utilizzare Unicode invece di Latin-1."
+
+#: config.py:54
+msgid ""
+"After this time (in seconds), the number\n"
+"        of warnings will be reset."
+msgstr "Dopo questo periodo (in secondi), il numero di avvisi di un utente verrà azzerato."
+
+#: config.py:57
+msgid ""
+"After a certain number of warning, the bot\n"
+"        will call someone (defined in supybot.plugins.NoLatin1.operator)"
+msgstr "Dopo un certo numero di avvisi, il bot chiamerà qualcuno (definito\n"
+"       nella variabile supybot.plugins.NoLatin1.operator)."
+
+#: config.py:60
+msgid ""
+"The person the bot will alert\n"
+"        when a user insists in using Latin-1"
+msgstr "La persona che sarà avvisata dal bot quando un utente continua a utilizzare Latin-1."
+
+#: plugin.py:44
+#, docstring
+msgid ""
+"Add the help for \"@plugin help NoLatin1\" here\n"
+"    This should describe *how* to use this plugin."
+msgstr ""
+
+#: plugin.py:74
+msgid "User %s is still using Latin-1 after %i alerts"
+msgstr "L'utente %s continua a utilizzare Latin-1 dopo %i avvisi."
+
+#: plugin.py:78
+msgid "Please use Unicode/UTF-8 instead of Latin1/ISO-8859-1 on %s."
+msgstr "Su %s si prega di utilizzare Unicode/UTF-8 invece di Latin1/ISO-8859-1."
+

@@ -1,0 +1,243 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Supybot-fr\n"
+"POT-Creation-Date: 2011-02-26 09:49+CET\n"
+"PO-Revision-Date: 2011-07-30 00:17+0200\n"
+"Last-Translator: skizzhg <skizzhg@gmx.com>\n"
+"Language-Team: Italian <skizzhg@gmx.com>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+#: ./config.py:56
+msgid ""
+"Determines the hostname the web server will\n"
+"        bind. Empty value is equivalent to 0.0.0.0."
+msgstr "Determina l'hostname al quale si collegherà il server web. Un valore vuoto equivale a 0.0.0.0. "
+
+#: ./config.py:59
+msgid ""
+"Determines the port the web server will\n"
+"        bind."
+msgstr "Determina la porta alla quale si collegherà il server web."
+
+#: ./config.py:64
+msgid ""
+"Determines whether the stats are enabled\n"
+"        for this channel."
+msgstr "Determina se le statistiche siano abilitate per questo canale."
+
+#: ./config.py:67
+msgid ""
+"Determines what language is used on the\n"
+"        website"
+msgstr "Determina la lingua utilizzata sul sito."
+
+#: ./config.py:67 ./plugin.py:60
+msgid "en"
+msgstr "it"
+
+#: ./plugin.py:98 ./templates/skeleton.py:27
+msgid "about"
+msgstr "a proposito"
+
+#: ./templates/about.py:11
+msgid ""
+"<p>This website is powered by three awesome softwares :\n"
+"<ul>\n"
+"    <li>\n"
+"        The well-known <a href=\"http://python.org\">Python</a> programming\n"
+"        language\n"
+"    </li>\n"
+"    <li>\n"
+"        <a href=\"http://supybot.com\">Supybot</a>, the best Python IRC bot in\n"
+"        existance\n"
+"    </li>\n"
+"    <li>\n"
+"        <a href=\"mailto:progval@gmail.com\">ProgVal</a>'s\n"
+"        <a href=\"http://supybot.fr.cr/WebStats\">WebStats plugin for Supybot</a>\n"
+"    </li>\n"
+msgstr ""
+"<p>Questo sito è alimentato da tre ottimi software:\n"
+"<ul>\n"
+"    <li>\n"
+"        Il ben conosciuto linguaggio di programmazione <a href=\"http://python.org\">Python</a>\n"
+"    </li>\n"
+"    <li>\n"
+"        <a href=\"http://supybot.com\">Supybot</a>, il miglior bot IRC in Python esistente\n"
+"    </li>\n"
+"    <li>\n"
+"        Il <a href=\"http://supybot.fr.cr/WebStats\">plugin WebStats per Supybot</a>\n"
+"        di <a href=\"mailto:progval@gmail.com\">ProgVal</a>\n"
+"    </li>\n"
+
+#: ./templates/design.py:62
+msgid "Menu:"
+msgstr "Menu:"
+
+#: ./templates/global.py:8
+msgid "Stats about %s channel"
+msgstr "Statistiche del canale %s"
+
+#: ./templates/global.py:11
+msgid "View nick-by-nick stats"
+msgstr "Vedi le statistiche nick per nick"
+
+#: ./templates/global.py:12
+msgid "There were %n, %n, %n, %n, %n, %n, %n, and %n."
+msgstr "C'era %n, %n, %n, %n, %n, %n, %n e %n."
+
+#: ./templates/global.py:14
+msgid "line"
+msgstr "riga"
+
+#: ./templates/global.py:14
+msgid "word"
+msgstr "parola"
+
+#: ./templates/global.py:15
+msgid "char"
+msgstr "carattere"
+
+#: ./templates/global.py:15
+msgid "join"
+msgstr "join"
+
+#: ./templates/global.py:16
+msgid "part"
+msgstr "part"
+
+#: ./templates/global.py:16
+msgid "quit"
+msgstr "quit"
+
+#: ./templates/global.py:17
+msgid "nick change"
+msgstr "cambiamento di nick"
+
+#: ./templates/global.py:18
+msgid "kick"
+msgstr "kick"
+
+#: ./templates/global.py:20
+msgid "Hour"
+msgstr "Ora"
+
+#: ./templates/index.py:17
+msgid "Stats available for no channels"
+msgstr "Statistiche disponibili per nessun canale"
+
+#: ./templates/index.py:19
+msgid "Stats available for a channel:"
+msgstr "Statistiche disponibili per un canale"
+
+#: ./templates/index.py:21
+msgid "Stats available for channels:"
+msgstr "Statistiche disponibili per i canali:"
+
+#: ./templates/index.py:26
+msgid "View the stats for the %s channel"
+msgstr "Vedi le statistiche per il canale %s"
+
+#: ./templates/listingcommons.py:60
+msgid "Joins"
+msgstr "Join"
+
+#: ./templates/listingcommons.py:60
+msgid "Lines"
+msgstr "Righe"
+
+#: ./templates/listingcommons.py:60
+msgid "Parts"
+msgstr "Part"
+
+#: ./templates/listingcommons.py:60
+msgid "Words"
+msgstr "Parole"
+
+#: ./templates/listingcommons.py:61
+msgid "Kicked"
+msgstr "Cacciati (kick)"
+
+#: ./templates/listingcommons.py:61
+msgid "Kicks"
+msgstr "Kick"
+
+#: ./templates/listingcommons.py:61
+msgid "Nick changes"
+msgstr "Cambiamenti di nick"
+
+#: ./templates/listingcommons.py:61
+msgid "Quits"
+msgstr "Quit"
+
+#: ./templates/listingcommons.py:68
+msgid "chars"
+msgstr "caratteri"
+
+#: ./templates/listingcommons.py:68
+msgid "joins"
+msgstr "join"
+
+#: ./templates/listingcommons.py:68
+msgid "lines"
+msgstr "righe"
+
+#: ./templates/listingcommons.py:68
+msgid "words"
+msgstr "parole"
+
+#: ./templates/listingcommons.py:69
+msgid "kickers"
+msgstr "\"kicker\""
+
+#: ./templates/listingcommons.py:69
+msgid "nick changes"
+msgstr "cambiamenti di nick"
+
+#: ./templates/listingcommons.py:69
+msgid "parts"
+msgstr "part"
+
+#: ./templates/listingcommons.py:69
+msgid "quits"
+msgstr "quit"
+
+#: ./templates/listingcommons.py:70
+msgid "kicked"
+msgstr "cacciati (kick)"
+
+#: ./templates/listingcommons.py:70
+msgid "kicks"
+msgstr "kick"
+
+#: ./templates/nicks.py:8
+msgid "Stats about %s channel users"
+msgstr "Statistiche sugli utenti del canale %s"
+
+#: ./templates/nicks.py:11
+msgid "View global stats"
+msgstr "Vedi le statistiche globali"
+
+#: ./templates/nicks.py:13
+msgid "Nick"
+msgstr "Nick"
+
+#: ./templates/skeleton.py:26
+msgid "Come back to the root page"
+msgstr "Torna alla pagina principale"
+
+#: ./templates/skeleton.py:26
+msgid "Home"
+msgstr "Home"
+
+#: ./templates/skeleton.py:27
+msgid "About"
+msgstr "A proposito"
+
+#: ./templates/skeleton.py:27
+msgid "Get more informations about this website"
+msgstr "Ottieni maggiori informazioni su questo sito"
+
