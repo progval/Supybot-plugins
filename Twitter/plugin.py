@@ -188,6 +188,111 @@ class Twitter(callbacks.Plugin):
                                         'count': 'int',
                                         'noretweet': ''})])
 
+    @internationalizeDocstring
+    def public(self, irc, msg, args, channel, tupleOptlist):
+        """[<channel>] [--since <oldest>]\
+
+        Replies with the public timeline.
+        If <channel> is not given, it defaults to the current channel.
+        If given, --since takes a tweet ID, used as a boundary
+        """
+        optlist = {}
+        for key, value in tupleOptlist:
+            optlist.update({key: value})
+
+        if 'since' not in optlist:
+            optlist['since'] = None
+
+        api = self._getApi(channel)
+        try:
+            public = api.GetPublicTimeline(since_id=optlist['since'])
+        except twitter.TwitterError:
+            irc.error(_('No tweets'))
+            return
+        reply = ' | '.join([x.text for x in public])
+
+        reply = reply.replace("&lt;", "<")
+        reply = reply.replace("&gt;", ">")
+        reply = reply.replace("&amp;", "&")
+        reply = reply.encode('utf8')
+        irc.reply(reply)
+    public = wrap(public, ['channel', getopts({'since': 'int'})])
+
+    @internationalizeDocstring
+    def replies(self, irc, msg, args, channel, tupleOptlist):
+        """[<channel>] [--since <oldest>]\
+
+        Replies with the replies timeline.
+        If <channel> is not given, it defaults to the current channel.
+        If given, --since takes a tweet ID, used as a boundary
+        """
+        optlist = {}
+        for key, value in tupleOptlist:
+            optlist.update({key: value})
+
+        if 'since' not in optlist:
+            optlist['since'] = None
+
+        api = self._getApi(channel)
+        try:
+            replies = api.GetReplies(since_id=optlist['since'])
+        except twitter.TwitterError:
+            irc.error(_('No tweets'))
+            return
+        reply = ' | '.join([x.text for x in replies])
+
+        reply = reply.replace("&lt;", "<")
+        reply = reply.replace("&gt;", ">")
+        reply = reply.replace("&amp;", "&")
+        reply = reply.encode('utf8')
+        irc.reply(reply)
+    replies = wrap(replies, ['channel', getopts({'since': 'int'})])
+
+    @internationalizeDocstring
+    def follow(self, irc, msg, args, channel, user):
+        """[<channel>|<user>]\
+
+        Follow a specified <user>
+        If <channel> is not given, it defaults to the current channel.
+        """
+
+        api = self._getApi(channel)
+        if not api._oauth_consumer and user is None:
+            irc.error(_('No account is associated with this channel. Ask '
+                        'an op, try with another channel.'))
+            return
+        try:
+            follow = api.CreateFriendship(user)
+        except twitter.TwitterError:
+            irc.error('An error occurred')
+            return
+
+        irc.replySuccess()
+    follow = wrap(follow, ['channel', ('checkChannelCapability', 'twitter'),
+                           optional('somethingWithoutSpaces') ])
+
+    @internationalizeDocstring
+    def unfollow(self, irc, msg, args, channel, user):
+        """[<channel>|<user>]\
+
+        Unfollow a specified <user>
+        If <channel> is not given, it defaults to the current channel.
+        """
+
+        api = self._getApi(channel)
+        if not api._oauth_consumer and user is None:
+            irc.error(_('No account is associated with this channel. Ask '
+                        'an op, try with another channel.'))
+            return
+        try:
+            unfollow = api.DestroyFriendship(user)
+        except twitter.TwitterError:
+            irc.error('An error occurred')
+            return
+
+        irc.replySuccess()
+    unfollow = wrap(unfollow, ['channel', ('checkChannelCapability', 'twitter'),
+                               optional('somethingWithoutSpaces') ])
 
 
     def die(self):
