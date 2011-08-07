@@ -250,14 +250,14 @@ class Twitter(callbacks.Plugin):
 
     @internationalizeDocstring
     def follow(self, irc, msg, args, channel, user):
-        """[<channel>] [<user>]
+        """[<channel>] <user>
 
         Follow a specified <user>
         If <channel> is not given, it defaults to the current channel.
         """
 
         api = self._getApi(channel)
-        if not api._oauth_consumer and user is None:
+        if not api._oauth_consumer:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op, try with another channel.'))
             return
@@ -269,18 +269,18 @@ class Twitter(callbacks.Plugin):
 
         irc.replySuccess()
     follow = wrap(follow, ['channel', ('checkChannelCapability', 'twitteradmin'),
-                           optional('somethingWithoutSpaces') ])
+                           'somethingWithoutSpaces'])
 
     @internationalizeDocstring
     def unfollow(self, irc, msg, args, channel, user):
-        """[<channel>] [<user>]
+        """[<channel>] <user>
 
         Unfollow a specified <user>
         If <channel> is not given, it defaults to the current channel.
         """
 
         api = self._getApi(channel)
-        if not api._oauth_consumer and user is None:
+        if not api._oauth_consumer:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op, try with another channel.'))
             return
@@ -293,7 +293,7 @@ class Twitter(callbacks.Plugin):
         irc.replySuccess()
     unfollow = wrap(unfollow, ['channel',
                                ('checkChannelCapability', 'twitteradmin'),
-                               optional('somethingWithoutSpaces') ])
+                               'somethingWithoutSpaces'])
 
 
     def die(self):
