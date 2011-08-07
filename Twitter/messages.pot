@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2011-07-08 18:32+CEST\n"
+"POT-Creation-Date: 2011-08-07 11:46+CEST\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -96,7 +96,7 @@ msgstr ""
 #: plugin.py:141
 #, docstring
 msgid ""
-"[<channel>|<user>] [--since <oldest>] [--max <newest>] [--count <number>]         [--noretweet]\n"
+"[<channel>] [<user>] [--since <oldest>] [--max <newest>] [--count <number>]         [--noretweet]\n"
 "\n"
 "        Replies with the timeline of the <user>.\n"
 "        If <user> is not given, it defaults to the account associated with the\n"
@@ -109,11 +109,61 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:163
+#: plugin.py:163 plugin.py:261 plugin.py:284
 msgid "No account is associated with this channel. Ask an op, try with another channel."
 msgstr ""
 
 #: plugin.py:173
 msgid "This user protects his tweets; you need to fetch them from a channel whose associated account can fetch this timeline."
+msgstr ""
+
+#: plugin.py:193
+#, docstring
+msgid ""
+"[<channel>] [--since <oldest>]\n"
+"\n"
+"        Replies with the public timeline.\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        If given, --since takes a tweet ID, used as a boundary\n"
+"        "
+msgstr ""
+
+#: plugin.py:210 plugin.py:240
+msgid "No tweets"
+msgstr ""
+
+#: plugin.py:223
+#, docstring
+msgid ""
+"[<channel>] [--since <oldest>]\n"
+"\n"
+"        Replies with the replies timeline.\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        If given, --since takes a tweet ID, used as a boundary\n"
+"        "
+msgstr ""
+
+#: plugin.py:253
+#, docstring
+msgid ""
+"[<channel>] <user>\n"
+"\n"
+"        Follow a specified <user>\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        "
+msgstr ""
+
+#: plugin.py:267 plugin.py:290
+msgid "An error occurred"
+msgstr ""
+
+#: plugin.py:276
+#, docstring
+msgid ""
+"[<channel>] <user>\n"
+"\n"
+"        Unfollow a specified <user>\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        "
 msgstr ""
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Supybot-fr\n"
-"POT-Creation-Date: 2011-07-08 18:32+CEST\n"
+"POT-Creation-Date: 2011-08-07 11:46+CEST\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Valentin Lorentz <progval@gmail.com>\n"
 "Language-Team: ProgVal <progval@gmail.com>\n"
@@ -96,7 +96,7 @@ msgstr "Désolé, votre tweet excède 140 caractères (%i)."
 
 #: plugin.py:141
 msgid ""
-"[<channel>|<user>] [--since <oldest>] [--max <newest>] [--count <number>]         [--noretweet]\n"
+"[<channel>] [<user>] [--since <oldest>] [--max <newest>] [--count <number>]         [--noretweet]\n"
 "\n"
 "        Replies with the timeline of the <user>.\n"
 "        If <user> is not given, it defaults to the account associated with the\n"
@@ -110,13 +110,75 @@ msgid ""
 msgstr ""
 "[<channel>|<user>] [--since <ancien>] [--max <récent>] [--count <nombre>] [--noretweet]\n"
 "\n"
-"Répond avec la timeline de l'<utilisateur>.Si l'<utilisateur> n'est pas donné, il correspond par défaut au compte associé au <canal>. Si le <canal> n'est pas donné, il correspond par défaut au canal courant.Si ils sont donnés, --since et --max prennent chacun un ID de tweet, utilisés comme \"frontières\" de la requête de tweets.Si il est donné, --count prend un entier, qui correspond au nombre de tweets à afficher.Si --noretweet est donné, seuls les tweets natifs de l'utilisateur seront affichés."
+"Répond avec la timeline de l'<utilisateur>.Si l'<utilisateur> n'est pas donné, il correspond par défaut au compte associé au <canal>. Si le <canal> n'est pas donné, il correspond par défaut au canal courant.Si ils sont donnés, --since et --max prennent chacun un ID de tweet, utilisés comme \"frontières\" de la requête de tweets.Si il est donné, --count prend un entier, qui correspond au nombre de tweets à afficher. Si --noretweet est donné, seuls les tweets natifs de l'utilisateur seront affichés."
 
 #: plugin.py:163
+#: plugin.py:261
+#: plugin.py:284
 msgid "No account is associated with this channel. Ask an op, try with another channel."
 msgstr "Aucun compte n'est associé à ce canal. Demandez à un op, ou essayez avec un autre canal."
 
 #: plugin.py:173
 msgid "This user protects his tweets; you need to fetch them from a channel whose associated account can fetch this timeline."
 msgstr "Cet(te) utilisateur(trice) protège ses tweets ; vous devez les récupérer à partir d'un canal dont le compte Twitter associé peut récupérer cette timeline."
+
+#: plugin.py:193
+msgid ""
+"[<channel>] [--since <oldest>]\n"
+"\n"
+"        Replies with the public timeline.\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        If given, --since takes a tweet ID, used as a boundary\n"
+"        "
+msgstr ""
+"[<canal>] [--since <id>]\n"
+"\n"
+"Répond avec la timeline publique, en tant que l'utilisateur associé au <canal>. Si <canal> n'est pas donné, il correspond par défaut au canal courant. Si il est donné, --since prend un ID de tweet, qui est utilisé en tant que borne"
+
+#: plugin.py:210
+#: plugin.py:240
+msgid "No tweets"
+msgstr "Aucun tweet."
+
+#: plugin.py:223
+msgid ""
+"[<channel>] [--since <oldest>]\n"
+"\n"
+"        Replies with the replies timeline.\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        If given, --since takes a tweet ID, used as a boundary\n"
+"        "
+msgstr ""
+"[<canal>] [--since <id>]\n"
+"\n"
+"Répond avec la timeline de réponses, en tant que l'utilisateur associé au <canal>. Si <canal> n'est pas donné, il correspond par défaut au canal courant. Si il est donné, --since prend un ID de tweet, qui est utilisé en tant que borne"
+
+#: plugin.py:253
+msgid ""
+"[<channel>] <user>\n"
+"\n"
+"        Follow a specified <user>\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        "
+msgstr ""
+"[<canal>] <utilisateur>\n"
+"\n"
+"Suit l'<utilisateur> en tant que l'utilisateur associé au <canal>. Si <canal> n'est pas donné, il correspond par défaut au canal courant."
+
+#: plugin.py:267
+#: plugin.py:290
+msgid "An error occurred"
+msgstr "Une erreur est survenue."
+
+#: plugin.py:276
+msgid ""
+"[<channel>] <user>\n"
+"\n"
+"        Unfollow a specified <user>\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        "
+msgstr ""
+"[<canal>] <utilisateur>\n"
+"\n"
+"Cesse de suivre l'<utilisateur> en tant que l'utilisateur associé au <canal>. Si <canal> n'est pas donné, il correspond par défaut au canal courant."
 
