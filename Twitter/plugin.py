@@ -138,7 +138,7 @@ class Twitter(callbacks.Plugin):
 
     @internationalizeDocstring
     def timeline(self, irc, msg, args, channel, user, tupleOptlist):
-        """[<channel>|<user>] [--since <oldest>] [--max <newest>] [--count <number>] \
+        """[<channel>] [<user>] [--since <oldest>] [--max <newest>] [--count <number>] \
         [--noretweet]
 
         Replies with the timeline of the <user>.
@@ -190,7 +190,7 @@ class Twitter(callbacks.Plugin):
 
     @internationalizeDocstring
     def public(self, irc, msg, args, channel, tupleOptlist):
-        """[<channel>] [--since <oldest>]\
+        """[<channel>] [--since <oldest>]
 
         Replies with the public timeline.
         If <channel> is not given, it defaults to the current channel.
@@ -220,7 +220,7 @@ class Twitter(callbacks.Plugin):
 
     @internationalizeDocstring
     def replies(self, irc, msg, args, channel, tupleOptlist):
-        """[<channel>] [--since <oldest>]\
+        """[<channel>] [--since <oldest>]
 
         Replies with the replies timeline.
         If <channel> is not given, it defaults to the current channel.
@@ -250,7 +250,7 @@ class Twitter(callbacks.Plugin):
 
     @internationalizeDocstring
     def follow(self, irc, msg, args, channel, user):
-        """[<channel>|<user>]\
+        """[<channel>] [<user>]
 
         Follow a specified <user>
         If <channel> is not given, it defaults to the current channel.
@@ -264,16 +264,16 @@ class Twitter(callbacks.Plugin):
         try:
             follow = api.CreateFriendship(user)
         except twitter.TwitterError:
-            irc.error('An error occurred')
+            irc.error(_('An error occurred'))
             return
 
         irc.replySuccess()
-    follow = wrap(follow, ['channel', ('checkChannelCapability', 'twitter'),
+    follow = wrap(follow, ['channel', ('checkChannelCapability', 'twitteradmin'),
                            optional('somethingWithoutSpaces') ])
 
     @internationalizeDocstring
     def unfollow(self, irc, msg, args, channel, user):
-        """[<channel>|<user>]\
+        """[<channel>] [<user>]
 
         Unfollow a specified <user>
         If <channel> is not given, it defaults to the current channel.
@@ -287,11 +287,12 @@ class Twitter(callbacks.Plugin):
         try:
             unfollow = api.DestroyFriendship(user)
         except twitter.TwitterError:
-            irc.error('An error occurred')
+            irc.error(_('An error occurred'))
             return
 
         irc.replySuccess()
-    unfollow = wrap(unfollow, ['channel', ('checkChannelCapability', 'twitter'),
+    unfollow = wrap(unfollow, ['channel',
+                               ('checkChannelCapability', 'twitteradmin'),
                                optional('somethingWithoutSpaces') ])
 
 
