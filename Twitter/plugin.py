@@ -135,6 +135,28 @@ class Twitter(callbacks.Plugin):
     followers = wrap(followers, ['channel'])
 
     @internationalizeDocstring
+    def dm(self, irc, msg, args, user, channel, recipient, message):
+        """[<channel>] <recipient> <message>
+
+        Sends a <message> to <recipient> from the account associated with the
+        given <channel>. If <channel> is not given, it defaults to the current
+        channel."""
+        api = self._getApi(channel)
+        if not api._oauth_consumer:
+            irc.error(_('No account is associated with this channel. Ask '
+                        'an op or try with another channel.'))
+            return
+
+        if len(message) > 140:
+            irc.error(_('Sorry, your message exceeds 140 characters (%i)') %
+                    len(message))
+        else:
+            api.PostDirectMessage(recipient, message)
+            irc.replySuccess()
+    dm = wrap(dm, ['user', ('checkChannelCapability', 'twitter'),
+                   'somethingWithoutSpaces', 'text'])
+
+    @internationalizeDocstring
     def post(self, irc, msg, args, user, channel, message):
         """[<channel>] <message>
 
