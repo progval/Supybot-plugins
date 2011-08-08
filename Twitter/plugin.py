@@ -92,27 +92,27 @@ class Twitter(callbacks.Plugin):
 
 
     @internationalizeDocstring
-    def friendslist(self, irc, msg, args, channel, user):
+    def following(self, irc, msg, args, channel, user):
         """[<channel>] [<user>]
 
-        Replies with the friends (i.e. people who one subscribes to) of the
-        <user>. If <user> is not given, it defaults to the <channel>'s account.
-        If <channel> is not given, it defaults to the current channel."""
+        Replies with the people this <user> follows. If <user> is not given, it
+        defaults to the <channel>'s account. If <channel> is not given, it
+        defaults to the current channel."""
         api = self._getApi(channel)
         if not api._oauth_consumer and user is None:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op, try with another channel, or provide '
                         'a user name.'))
             return
-        friends = api.GetFriends(user) # If user is not given, it defaults
+        following = api.GetFriends(user) # If user is not given, it defaults
                                        # to None, and giving None to
                                        # GetFriends() has the expected
                                        # behaviour.
-        reply = utils.str.format("%L", ['%s(%s)' % (x.name, x.screen_name)
-                                        for x in friends])
+        reply = utils.str.format("%L", ['%s (%s)' % (x.name, x.screen_name)
+                                        for x in following])
         reply = reply.encode('utf8')
         irc.reply(reply)
-    friendslist = wrap(friendslist, ['channel',
+    following = wrap(following, ['channel',
                                      optional('somethingWithoutSpaces')])
 
     @internationalizeDocstring
