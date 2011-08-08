@@ -127,7 +127,7 @@ class Twitter(callbacks.Plugin):
             irc.error(_('No account is associated with this channel. Ask '
                         'an op or try with another channel.'))
             return
-        tweet = '[%s] %s' % (user.name, message)
+        tweet = message
         if len(tweet) > 140:
             irc.error(_('Sorry, your tweet exceeds 140 characters (%i)') %
                     len(tweet))
