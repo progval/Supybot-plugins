@@ -116,6 +116,25 @@ class Twitter(callbacks.Plugin):
                                      optional('somethingWithoutSpaces')])
 
     @internationalizeDocstring
+    def followers(self, irc, msg, args, channel):
+        """[<channel>]
+
+        Replies with the people that follow this account. If <channel> is not
+        given, it defaults to the current channel."""
+        api = self._getApi(channel)
+        if not api._oauth_consumer:
+            irc.error(_('No account is associated with this channel. Ask '
+                        'an op, try with another channel, or provide '
+                        'a user name.'))
+            return
+        followers = api.GetFollowers()
+        reply = utils.str.format("%L", ['%s (%s)' % (x.name, x.screen_name)
+                                        for x in followers])
+        reply = reply.encode('utf8')
+        irc.reply(reply)
+    followers = wrap(followers, ['channel'])
+
+    @internationalizeDocstring
     def post(self, irc, msg, args, user, channel, message):
         """[<channel>] <message>
 
