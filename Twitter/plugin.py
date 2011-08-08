@@ -360,6 +360,25 @@ class Twitter(callbacks.Plugin):
                                ('checkChannelCapability', 'twitteradmin'),
                                'somethingWithoutSpaces'])
 
+    @internationalizeDocstring
+    def stats(self, irc, msg, args, channel):
+        """[<channel>]
+
+        Print some stats
+        If <channel> is not given, it defaults to the current channel.
+        """
+        api = self._getApi(channel)
+        try:
+            reply = {}
+            reply['followers'] = len(api.GetFollowers())
+            reply['following'] = len(api.GetFriends(None))
+        except twitter.TwitterError:
+            irc.error(_('An error occurred'))
+            return
+        reply = "I am following %d people and have %d followers" % (reply['following'], reply['followers'])
+        irc.reply(reply)
+    stats = wrap(stats, ['channel'])
+
 
     def die(self):
         self.__parent.die()
