@@ -290,6 +290,25 @@ class Twitter(callbacks.Plugin):
     replies = wrap(replies, ['channel', getopts({'since': 'int'})])
 
     @internationalizeDocstring
+    def trends(self, irc, msg, args, channel):
+        """[<channel>]
+
+        Current trending topics
+        If <channel> is not given, it defaults to the current channel.
+        """
+
+        api = self._getApi(channel)
+        try:
+            trends = api.GetTrendsCurrent()
+        except twitter.TwitterError:
+            irc.error(_('No tweets'))
+            return
+        reply = ' | '.join([x.name for x in trends])
+        reply = reply.encode('utf8')
+        irc.reply(reply)
+    trends = wrap(trends, ['channel'])
+
+    @internationalizeDocstring
     def follow(self, irc, msg, args, channel, user):
         """[<channel>] <user>
 
