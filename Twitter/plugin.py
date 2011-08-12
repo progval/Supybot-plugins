@@ -280,7 +280,7 @@ class Twitter(callbacks.Plugin):
         except twitter.TwitterError:
             irc.error(_('No tweets'))
             return
-        reply = ' | '.join([x.text for x in replies])
+        reply = ' | '.join(["%s: %s" % (x.user.screen_name, x.text) for x in replies])
 
         reply = reply.replace("&lt;", "<")
         reply = reply.replace("&gt;", ">")
