@@ -180,7 +180,7 @@ class Twitter(callbacks.Plugin):
     @internationalizeDocstring
     def timeline(self, irc, msg, args, channel, user, tupleOptlist):
         """[<channel>] [<user>] [--since <oldest>] [--max <newest>] [--count <number>] \
-        [--noretweet]
+        [--noretweet] [--with-id]
 
         Replies with the timeline of the <user>.
         If <user> is not given, it defaults to the account associated with the
@@ -198,6 +198,7 @@ class Twitter(callbacks.Plugin):
             if key not in optlist:
                 optlist[key] = None
         optlist['noretweet'] = 'noretweet' in optlist
+        optlist['with-id'] = 'with-id' in optlist
 
         api = self._getApi(channel)
         if not api._oauth_consumer and user is None:
@@ -215,7 +216,10 @@ class Twitter(callbacks.Plugin):
                         'them from a channel whose associated account can '
                         'fetch this timeline.'))
             return
-        reply = ' | '.join([x.text for x in timeline])
+        if optlist['with-id']:
+            reply = ' | '.join(['[%s] %s' % (x.id, x.text) for x in timeline])
+        else:
+            reply = ' | '.join([x.text for x in timeline])
 
         reply = reply.replace("&lt;", "<")
         reply = reply.replace("&gt;", ">")
@@ -227,7 +231,8 @@ class Twitter(callbacks.Plugin):
                                getopts({'since': 'int',
                                         'max': 'int',
                                         'count': 'int',
-                                        'noretweet': ''})])
+                                        'noretweet': '',
+                                        'with-id': ''})])
 
     @internationalizeDocstring
     def public(self, irc, msg, args, channel, tupleOptlist):
