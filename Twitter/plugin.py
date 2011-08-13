@@ -398,6 +398,28 @@ class Twitter(callbacks.Plugin):
         irc.reply(reply)
     stats = wrap(stats, ['channel'])
 
+    @internationalizeDocstring
+    def profile(self, irc, msg, args, channel, user):
+        """[<channel>] <user>
+
+        Return profile image for a specified <user>
+        If <channel> is not given, it defaults to the current channel.
+        """
+
+        api = self._getApi(channel)
+        if not api._oauth_consumer:
+            irc.error(_('No account is associated with this channel. Ask '
+                        'an op, try with another channel.'))
+            return
+        try:
+            profile = api.GetUser(user)
+        except twitter.TwitterError:
+            irc.error(_('An error occurred'))
+            return
+
+        irc.reply(profile.GetProfileImageUrl().replace('_normal', ''))
+    profile = wrap(profile, ['channel', 'somethingWithoutSpaces'])
+
 
     def die(self):
         self.__parent.die()
