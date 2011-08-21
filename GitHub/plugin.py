@@ -30,6 +30,7 @@
 
 import json
 import time
+import ur1ca
 import urllib
 import socket
 import threading
@@ -101,9 +102,17 @@ class GitHub(callbacks.Plugin):
         def _createPrivmsg(self, channel, payload, commit):
             bold = ircutils.bold
             url = commit['url']
-            data = urllib.urlencode({'url': url})
-            tiny = instance.registryValue('tiny', channel)
-            url = urllib.urlopen(tiny, data).read()
+
+            # ur1.ca
+            post_param = ur1ca.parameterize(url)
+            answerfile = ur1ca.request(post_param)
+            doc = ur1ca.retrievedoc(answerfile)
+            answerfile.close()
+            status, url2 = ur1ca.scrape(doc)
+
+            if status:
+                url = url2
+
             s = '%s/%s (in %s): %s committed %s %s' % \
                     (payload['repository']['owner']['name'],
                      bold(payload['repository']['name']),

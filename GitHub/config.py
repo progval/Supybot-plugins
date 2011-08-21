@@ -62,9 +62,5 @@ conf.registerGlobalValue(GitHub, 'announces',
         registry.String('', _("""You shouldn't edit this configuration
         variable yourself, unless you know what you do. Use '@Github announce
         add' or '@Github announce remove' instead.""")))
-conf.registerChannelValue(GitHub, 'tiny',
-        registry.String('http://tinyurl.com/api-create.php', _("""The URL
-        used to tinyfy the commit link (must be compatible with TinyURL.com
-        """)))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
