@@ -1,0 +1,117 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2011-08-21 02:16+CEST\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: plugin.py:52 plugin.py:69 plugin.py:95
+msgid "This citizen does not exist."
+msgstr ""
+
+#: plugin.py:61 plugin.py:87
+#, docstring
+msgid ""
+"<name|id>\n"
+"\n"
+"        Displays informations on the given citizen."
+msgstr ""
+
+#: plugin.py:75
+#, docstring
+msgid ""
+"<name|id>\n"
+"\n"
+"        Displays the citizen's medals."
+msgstr ""
+
+#: plugin.py:81
+msgid "%s has the fellowing medal(s): %s"
+msgstr ""
+
+#: plugin.py:101
+#, docstring
+msgid ""
+"<name>\n"
+"\n"
+"        Displays money's rates."
+msgstr ""
+
+#: plugin.py:112
+msgid ", "
+msgstr ""
+
+#: plugin.py:117
+#, docstring
+msgid ""
+"<channel>\n"
+"\n"
+"        Calls for invasion of the channel."
+msgstr ""
+
+#: plugin.py:121
+msgid "PREPARE FOR ORGANIZED JUMP INTO THE CHANNEL"
+msgstr ""
+
+#: plugin.py:125
+msgid "Join %s !"
+msgstr ""
+
+#: plugin.py:130
+#, docstring
+msgid ""
+"<user|id>\n"
+"\n"
+"        Returns the link to the user's profile."
+msgstr ""
+
+#: plugin.py:142
+#, docstring
+msgid ""
+"<user|id>\n"
+"\n"
+"        Returns the link to the user's 'donate' page."
+msgstr ""
+
+#: plugin.py:154
+#, docstring
+msgid ""
+"take no arguments\n"
+"\n"
+"        Returns the eRepublik main links."
+msgstr ""
+
+#: plugin.py:166
+#, docstring
+msgid ""
+"take no arguments\n"
+"\n"
+"        Returns the eRepublik land links."
+msgstr ""
+
+#: plugin.py:178 plugin.py:188
+#, docstring
+msgid ""
+"<name|id>\n"
+"\n"
+"        Shows how many damages you can make in one hit."
+msgstr ""
+
+#: plugin.py:184
+msgid "damages: %i"
+msgstr ""
+
+#: plugin.py:194
+msgid "kamikaze attack with full food: %i"
+msgstr ""
+

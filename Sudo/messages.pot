@@ -1,0 +1,80 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2011-08-21 02:16+CEST\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: plugin.py:77
+#, docstring
+msgid "Add a rule with the given ID."
+msgstr ""
+
+#: plugin.py:83
+#, docstring
+msgid "Remove the rule associated with the name, and returns it."
+msgstr ""
+
+#: plugin.py:131
+#, docstring
+msgid "Plugin that allows to run commands as someone else"
+msgstr ""
+
+#: plugin.py:141
+#, docstring
+msgid ""
+"[<priority>] <name> {allow,deny} [<hostmask>] <regexp>\n"
+"\n"
+"        Sets a new Sudo rule, called <name> with the given <priority>\n"
+"        (greatest numbers have precedence),\n"
+"        allowing or denying to run commands matching the pattern <regexp>,\n"
+"        from users to run commands as wearing the <hostmask>.\n"
+"        The <priority> must be a relative integer.\n"
+"        If <priority> is not given, it defaults to 0.\n"
+"        The <hostmask> defaults to your hostmask.\n"
+"        The <hostmask> is only needed if you set an 'allow' rule.\n"
+"        "
+msgstr ""
+
+#: plugin.py:154
+msgid "You don't have to give a hostmask when setting a \"deny\" rule."
+msgstr ""
+
+#: plugin.py:163
+msgid "This name already exists"
+msgstr ""
+
+#: plugin.py:172
+#, docstring
+msgid ""
+"<id>\n"
+"\n"
+"        Remove a Sudo rule."
+msgstr ""
+
+#: plugin.py:178
+msgid "This name does not exist."
+msgstr ""
+
+#: plugin.py:185
+#, docstring
+msgid ""
+"<commande> [<arg1> [<arg2> ...]]\n"
+"\n"
+"        Runs the command fellowing the Sudo rules."
+msgstr ""
+
+#: plugin.py:191
+msgid "Sudo not granted."
+msgstr ""
+
