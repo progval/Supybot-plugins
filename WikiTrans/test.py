@@ -1,3 +1,4 @@
+# -*- encoding: utf8 -*-
 ###
 # Copyright (c) 2011, Valentin Lorentz
 # All rights reserved.
@@ -40,6 +41,9 @@ class WikiTransTestCase(PluginTestCase):
 
         self.assertResponse('translate en fr IRC bot', 'Robot IRC')
         self.assertResponse('translate fr en robot IRC', 'Internet Relay Chat bot')
+
+        self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
+        self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
 
         self.assertError('translate fr de Supybot')
         self.assertError('translate fr en pogjoeregml')

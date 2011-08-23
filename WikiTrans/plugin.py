@@ -37,6 +37,8 @@ from supybot.i18n import PluginInternationalization, internationalizeDocstring
 
 _ = PluginInternationalization('WikiTrans')
 
+import urllib
+
 @internationalizeDocstring
 class WikiTrans(callbacks.Plugin):
     """Add the help for "@plugin help WikiTrans" here
@@ -48,7 +50,7 @@ class WikiTrans(callbacks.Plugin):
         Translates the <word> (also works with expressions) using Wikipedia
         interlanguage links."""
         page = utils.web.getUrlFd('http://%s.wikipedia.org/wiki/%s' %
-                (src, word.replace(' ', '_')))
+                (src, urllib.quote_plus(word.replace(' ', '_'))))
         start = ('\t\t\t\t\t<li class="interwiki-%s"><a '
                 'href="http://%s.wikipedia.org/wiki/') % \
                 (target, target)
