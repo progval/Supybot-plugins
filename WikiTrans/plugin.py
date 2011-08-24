@@ -49,8 +49,12 @@ class WikiTrans(callbacks.Plugin):
 
         Translates the <word> (also works with expressions) using Wikipedia
         interlanguage links."""
-        page = utils.web.getUrlFd('http://%s.wikipedia.org/wiki/%s' %
-                (src, urllib.quote_plus(word.replace(' ', '_'))))
+        try:
+            page = utils.web.getUrlFd('http://%s.wikipedia.org/wiki/%s' %
+                    (src, urllib.quote_plus(word.replace(' ', '_'))))
+        except:
+            irc.error(_('This word can\'t be found on Wikipedia'))
+            return
         start = ('\t\t\t\t\t<li class="interwiki-%s"><a '
                 'href="http://%s.wikipedia.org/wiki/') % \
                 (target, target)
