@@ -78,7 +78,7 @@ class ERepublik(callbacks.Plugin):
         citizen = getCitizen(irc, name)
         if citizen is None:
             return
-        irc.reply(_('%s has the fellowing medal(s): %s') %
+        irc.reply(_('%s has the following medal(s): %s') %
                   (name, citizen.getMedals()))
     medals = wrap(medals, ['text'])
 

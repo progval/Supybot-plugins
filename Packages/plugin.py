@@ -123,7 +123,7 @@ class Packages(callbacks.Plugin):
     def install(self, irc, msg, args, filename, optlist):
         """<filename> [--force]
 
-        Installs the package. If the package has been downloaded with Package,
+        Installs the package. If the package has been downloaded with Packages,
         just give the package name; otherwise, give the full path (including
         the extension).
         If given, --force disables sanity checks (usage is deprecated)."""
@@ -154,7 +154,7 @@ class Packages(callbacks.Plugin):
                     failures.append(_('%s (>=%s needed, but %s available)') %
                             (feature, version, world.features[feature]))
             if failures != []:
-                irc.error(_('Missing dependency(ies) : ') +
+                irc.error(_('Missing dependency(ies): ') +
                           ', '.join(failures))
                 return
         directories = conf.supybot.directories.plugins()
