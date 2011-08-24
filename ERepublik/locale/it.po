@@ -1,0 +1,140 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Supybot-fr\n"
+"POT-Creation-Date: 2011-08-21 02:16+CEST\n"
+"PO-Revision-Date: 2011-08-23 14:13+0200\n"
+"Last-Translator: skizzhg <skizzhg@gmx.com>\n"
+"Language-Team: Italian <skizzhg@gmx.com>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+#: plugin.py:52 plugin.py:69 plugin.py:95
+msgid "This citizen does not exist."
+msgstr "Questo cittadino non esiste."
+
+#: plugin.py:61 plugin.py:87
+#, docstring
+msgid ""
+"<name|id>\n"
+"\n"
+"        Displays informations on the given citizen."
+msgstr ""
+"<nome|id>\n"
+"\n"
+"        Visualizza le informazioni sul cittadino specificato."
+
+#: plugin.py:75
+#, docstring
+msgid ""
+"<name|id>\n"
+"\n"
+"        Displays the citizen's medals."
+msgstr ""
+"<nome|id>\n"
+"\n"
+"        Visualizza le medaglie del cittadino."
+
+#: plugin.py:81
+msgid "%s has the following medal(s): %s"
+msgstr "%s ha le seguenti medaglie: %s"
+
+#: plugin.py:101
+#, docstring
+msgid ""
+"<name>\n"
+"\n"
+"        Displays money's rates."
+msgstr ""
+"<nome>\n"
+"\n"
+"        Visualizza il costo del denaro."
+
+#: plugin.py:112
+msgid ", "
+msgstr ", "
+
+#: plugin.py:117
+#, docstring
+msgid ""
+"<channel>\n"
+"\n"
+"        Calls for invasion of the channel."
+msgstr ""
+"<canale>\n"
+"\n"
+"        Richiede l'invasione del canale."
+
+#: plugin.py:121
+msgid "PREPARE FOR ORGANIZED JUMP INTO THE CHANNEL"
+msgstr "PREPARARSI PER L'ASSALTO ORGANIZZATO AL CANALE"
+
+#: plugin.py:125
+msgid "Join %s !"
+msgstr "Entra in %s !"
+
+#: plugin.py:130
+#, docstring
+msgid ""
+"<user|id>\n"
+"\n"
+"        Returns the link to the user's profile."
+msgstr ""
+"<utente|id>\n"
+"\n"
+"        Riporta il link al profilo dell'utente."
+
+#: plugin.py:142
+#, docstring
+msgid ""
+"<user|id>\n"
+"\n"
+"        Returns the link to the user's 'donate' page."
+msgstr ""
+"<utente|id>\n"
+"\n"
+"        Riporta il link alla pagina \"donazioni\" dell'utente."
+
+#: plugin.py:154
+#, docstring
+msgid ""
+"take no arguments\n"
+"\n"
+"        Returns the eRepublik main links."
+msgstr ""
+"non necessita argomenti\n"
+"\n"
+"        Riporta i collegamenti principali di eRepublik."
+
+#: plugin.py:166
+#, docstring
+msgid ""
+"take no arguments\n"
+"\n"
+"        Returns the eRepublik land links."
+msgstr ""
+"non necessita argomenti\n"
+"\n"
+"        Riporta i collegamenti terrestri di eRepublik."
+
+#: plugin.py:178 plugin.py:188
+#, docstring
+msgid ""
+"<name|id>\n"
+"\n"
+"        Shows how many damages you can make in one hit."
+msgstr ""
+"<nome|id>\n"
+"\n"
+"        Mostra quanti danni puoi fare con un solo colpo."
+
+#: plugin.py:184
+msgid "damages: %i"
+msgstr "danni: %i"
+
+#: plugin.py:194
+msgid "kamikaze attack with full food: %i"
+msgstr "attacco kamikaze con la riserva di cibo piena: %i"
+

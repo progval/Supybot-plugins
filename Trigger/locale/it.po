@@ -1,0 +1,31 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Supybot-fr\n"
+"POT-Creation-Date: 2011-08-21 02:16+CEST\n"
+"PO-Revision-Date: 2011-08-23 23:03+0200\n"
+"Last-Translator: skizzhg <skizzhg@gmx.com>\n"
+"Language-Team: Italian <skizzhg@gmx.com>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+#: config.py:60
+msgid "Command triggered by %s"
+msgstr "Comando attivato da %s"
+
+#: config.py:63
+msgid ""
+"Command triggered on connect. This shouldn't be\n"
+"    a Supybot command, but an IRC command (as given to ircquote)."
+msgstr "Il comando attivato alla connessione, non è un comando di\n"
+     "Supybot ma uno di IRC (come passarlo a \"ircquote\")."
+
+#: plugin.py:50
+#, docstring
+msgid ""
+"Add the help for \"@plugin help Trigger\" here\n"
+"    This should describe *how* to use this plugin."
+msgstr ""
+

@@ -1,0 +1,37 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Supybot-fr\n"
+"POT-Creation-Date: 2011-08-21 02:16+CEST\n"
+"PO-Revision-Date: 2011-08-23 23:15+0200\n"
+"Last-Translator: skizzhg <skizzhg@gmx.com>\n"
+"Language-Team: Italian <skizzhg@gmx.com>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+#: plugin.py:44
+#, docstring
+msgid ""
+"Add the help for \"@plugin help WikiTrans\" here\n"
+"    This should describe *how* to use this plugin."
+msgstr ""
+
+#: plugin.py:48
+#, docstring
+msgid ""
+"<from language> <to language> <word>\n"
+"\n"
+"        Translates the <word> (also works with expressions) using Wikipedia\n"
+"        interlanguage links."
+msgstr ""
+"<da lingua> <a lingua> <parola>\n"
+"\n"
+"        Traduce <parola> (funziona anche con espressioni) utilizzando i link\n"
+"        interlingua di Wikipedia."
+
+#: plugin.py:61
+msgid "No translation found"
+msgstr "Non è stata trovata nessuna traduzione."
+

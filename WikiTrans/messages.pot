@@ -1,0 +1,37 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2011-08-24 17:00+CEST\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: plugin.py:44
+#, docstring
+msgid ""
+"Add the help for \"@plugin help WikiTrans\" here\n"
+"    This should describe *how* to use this plugin."
+msgstr ""
+
+#: plugin.py:48
+#, docstring
+msgid ""
+"<from language> <to language> <word>\n"
+"\n"
+"        Translates the <word> (also works with expressions) using Wikipedia\n"
+"        interlanguage links."
+msgstr ""
+
+#: plugin.py:61
+msgid "No translation found"
+msgstr ""
+
