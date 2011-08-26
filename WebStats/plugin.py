@@ -551,7 +551,6 @@ class WebStats(callbacks.Plugin):
         else:
             return irc.getRealIrc()
 
-
 Class = WebStats
 
 

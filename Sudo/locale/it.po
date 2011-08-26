@@ -1,0 +1,91 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Supybot-fr\n"
+"POT-Creation-Date: 2011-08-21 02:16+CEST\n"
+"PO-Revision-Date: 2011-08-26 15:27+0200\n"
+"Last-Translator: skizzhg <skizzhg@gmx.com>\n"
+"Language-Team: Italian <skizzhg@gmx.com>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+#: plugin.py:77
+#, docstring
+msgid "Add a rule with the given ID."
+msgstr "Aggiunge una regola con l'ID specificato."
+
+#: plugin.py:83
+#, docstring
+msgid "Remove the rule associated with the name, and returns it."
+msgstr "Rimuove la regola associata al nome e la riporta."
+
+#: plugin.py:131
+#, docstring
+msgid "Plugin that allows to run commands as someone else"
+msgstr "Plugin che permette di eseguire comandi come qualcun altro."
+
+#: plugin.py:141
+#, docstring
+msgid ""
+"[<priority>] <name> {allow,deny} [<hostmask>] <regexp>\n"
+"\n"
+"        Sets a new Sudo rule, called <name> with the given <priority>\n"
+"        (greatest numbers have precedence),\n"
+"        allowing or denying to run commands matching the pattern <regexp>,\n"
+"        from users to run commands as wearing the <hostmask>.\n"
+"        The <priority> must be a relative integer.\n"
+"        If <priority> is not given, it defaults to 0.\n"
+"        The <hostmask> defaults to your hostmask.\n"
+"        The <hostmask> is only needed if you set an 'allow' rule.\n"
+"        "
+msgstr ""
+"[<priorità>] <nome> {allow,deny} [<hostmask>] <regexp>\n"
+"\n"
+"        Imposta una nuova regola <nome> per Sudo con la <priorità>\n"
+"        specificata (numeri alti hanno la precedenza), permettendo o negando\n"
+"        l'esecuzione di comandi che corrispondono a <regexp> da utenti che\n"
+"        posseggono <hostmask>. <priorità> deve essere un numero relativo; se\n"
+"        non specificata, il valore predefinito è 0. La <hostmask> predefinita\n"
+"        è la tua ed è necessaria solo se imposti una regola \"allow\".\n"
+"        "
+
+#: plugin.py:154
+msgid "You don't have to give a hostmask when setting a \"deny\" rule."
+msgstr "Quando imposti una regola \"deny\" non devi fornire una hostmask."
+
+#: plugin.py:163
+msgid "This name already exists"
+msgstr "Questo nome esiste già."
+
+#: plugin.py:172
+#, docstring
+msgid ""
+"<id>\n"
+"\n"
+"        Remove a Sudo rule."
+msgstr ""
+"<id>\n"
+"\n"
+"        Rimuove una regola di Sudo."
+
+#: plugin.py:178
+msgid "This name does not exist."
+msgstr "Questo nome non esiste."
+
+#: plugin.py:185
+#, docstring
+msgid ""
+"<command> [<arg1> [<arg2> ...]]\n"
+"\n"
+"        Runs the command following the Sudo rules."
+msgstr ""
+"<comando> [<argomento1> [<argomento2> ...]]\n"
+"\n"
+"        Esegue il comando in base alle regole di Sudo."
+
+#: plugin.py:191
+msgid "Sudo not granted."
+msgstr "Sudo non permesso."
+

@@ -30,8 +30,12 @@
 
 from supybot.test import *
 
-class WebStatsTestCase(PluginTestCase):
+class WebStatsTestCase(ChannelHTTPPluginTestCase):
     plugins = ('WebStats',)
+
+    def testHandling(self):
+        self.assertHTTPResponse('/webstats/', 400, method='POST')
+        self.assertHTTPResponse('/webstats/', 200)
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

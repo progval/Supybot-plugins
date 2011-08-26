@@ -94,6 +94,20 @@ class EurekaTestCase(ChannelPluginTestCase):
             1 j*******
             1 jem*****
             === 1
+
+            1 Give a number.
+            ---
+            r 42
+            m [0-9]+
+            ---
+            === 2
+
+            1 Give another number.
+            ---
+            r 42
+            m [0-9]+
+            ---
+            === 2
             """)
         self.prefix = self.prefix1 # Just to be sure
 
@@ -160,6 +174,27 @@ class EurekaTestCase(ChannelPluginTestCase):
         self.assertNoResponse(' ', 0.9)
         self.assertResponse(' ', 'Nobody replied with (one of this) '
                 'answer(s): jemfinch.')
+
+        self.timeout = 1
+        self.assertResponse(' ', 'Give a number.')
+        msg = ircmsgs.privmsg(self.channel, 'foo', prefix=self.prefix)
+        self.irc.feedMsg(msg)
+        self.assertNoResponse(' ')
+        msg = ircmsgs.privmsg(self.channel, '12', prefix=self.prefix)
+        self.irc.feedMsg(msg)
+        self.assertResponse(' ', 'Congratulations test! The answer was 12. '
+                'Another valid answer is: \'42\'.')
+
+        self.timeout = 1
+        self.assertResponse(' ', 'Give another number.')
+        msg = ircmsgs.privmsg(self.channel, 'foo', prefix=self.prefix)
+        self.irc.feedMsg(msg)
+        self.assertNoResponse(' ')
+        msg = ircmsgs.privmsg(self.channel, '42', prefix=self.prefix)
+        self.irc.feedMsg(msg)
+        self.assertResponse(' ', 'Congratulations test! The answer was '
+                '\'42\'.')
+
         self.assertError('stop')
         self.assertError('pause')
         self.assertError('resume')

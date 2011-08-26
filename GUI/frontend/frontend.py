@@ -53,14 +53,15 @@ _ = lambda x:x
 
 refreshingTree = threading.Lock()
 class ConfigurationTreeRefresh:
-    def __init__(self, eventsManager, configurationTree):
+    def __init__(self, eventsManager, window):
         if not refreshingTree.acquire(False):
             return
         self._eventsManager = eventsManager
 
         parentItem = QtGui.QStandardItemModel()
-        parentItem.name = QtCore.QString(_('configuration variables'))
-        configurationTree.setModel(parentItem)
+        window.connect(parentItem, QtCore.SIGNAL('itemClicked()'),
+                       window.configurationItemActivated)
+        window.configurationTree.setModel(parentItem)
         self.items = {'supybot': parentItem}
 
         hash_ = eventsManager.sendCommand('config search ""')
@@ -80,6 +81,7 @@ class ConfigurationTreeRefresh:
             splitted = child.split('.')
             parent, name = '.'.join(splitted[0:-1]), splitted[-1]
             item = QtGui.QStandardItem(name)
+            item.name = QtCore.QString(child)
             self.items[parent].appendRow(item)
             self.items[child] = item
 
@@ -187,7 +189,11 @@ class Window(QtGui.QTabWidget, window.Ui_window):
     def _refreshConfigurationTree(self):
         """Slot called when the user clicks 'Refresh' under the configuration
         tree."""
-        ConfigurationTreeRefresh(self._eventsManager, self.configurationTree)
+        ConfigurationTreeRefresh(self._eventsManager, self)
+
+    def configurationItemActivated(self, item):
+        print(repr(item))
+
 
 
 

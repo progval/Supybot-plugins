@@ -103,7 +103,11 @@ class State:
                             (self.question, line))
                     continue
                 (mode, answer) = match.group('mode', 'answer')
-                if mode != 'r':
+                if mode == 'r':
+                    pass
+                elif mode == 'm':
+                    answer = re.compile(answer)
+                else:
                     log.error('Unsupported mode: %r. Only \'r\' (raw)'% mode +
                             'is supported for the moment.')
                     continue
@@ -201,6 +205,11 @@ class Eureka(callbacks.Plugin):
                     state.adjust(nick, state.question[0])
                     reply = _('Congratulations %s! The answer was %s.')
                     reply %= (nick, answer)
+            elif mode == 'm':
+                if answer.match(msg.args[1]):
+                    state.adjust(nick, state.question[0])
+                    reply = _('Congratulations %s! The answer was %s.')
+                    reply %= (nick, msg.args[1])
         if reply is not None:
             schedule.removeEvent('Eureka-nextClue-%s' % channel)
             otherAnswers = [y for x,y in state.answers
