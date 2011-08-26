@@ -184,7 +184,7 @@ class Sudo(callbacks.Plugin):
     def sudo(self, irc, msg, args, command):
         """<commande> [<arg1> [<arg2> ...]]
 
-        Runs the command fellowing the Sudo rules."""
+        Runs the command following the Sudo rules."""
         name, rule = self.db.getRuleMatching(command)
         if name is None:
             log.warning('Sudo not granted to "%s"' % msg.prefix)
