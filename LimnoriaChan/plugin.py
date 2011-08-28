@@ -82,7 +82,7 @@ class LimnoriaChan(callbacks.Plugin):
         Opens an issue on ProgVal/Supybot-plugins bugtracker called <title>.
         """
         self._issue(irc, msg, args, user, title, 'ProgVal/Supybot-plugins')
-    issue = wrap(issue, ['user', 'text'])
+    issuepl = wrap(issuepl, ['user', 'text'])
 
     def _issue(self, irc, msg, args, user, title, repoName):
         if not world.testing and \
