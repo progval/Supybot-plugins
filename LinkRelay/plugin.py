@@ -126,7 +126,7 @@ class LinkRelay(callbacks.Plugin):
         return colors[num]
 
 
-    def formatPrivMsg(self, channel, nick, text, colored):
+    def getPrivmsgData(self, channel, nick, text, colored):
         color = self.simpleHash(nick)
         if nick in self.nickSubstitutions:
             nick = self.nickSubstitutions[nick]
@@ -134,14 +134,18 @@ class LinkRelay(callbacks.Plugin):
             text = text.strip('\x01')
             text = text[ 7 : ]
             if colored:
-                s = '\x03%s*\x03%%s %s %s' % (nick, color, text)
+                return ('* \x03%(color)s%(nick)s%(network)s\x03 %(text)s',
+                        {'nick': nick, 'color': color, 'text': text})
             else:
-                s = '* %s%%s %s' % (nick, text)
+                return ('* %(nick)s%(hostmask)s %(text)s',
+                        {'nick': nick, 'text': text})
         else:
             if colored:
-                s = '<%s%s\x0314%%s>\x03 %s' % (color, nick, text)
+                return ('<%(color)s%(nick)s%(network)s>\x03 %(text)s',
+                        {'color': color, 'nick': nick, 'text': text})
             else:
-                s = '<%s%%s> %s' % (nick, text)
+                return ('<%(nick)s%(network)s> %(text)s',
+                        {'nick': nick, 'text': text})
         return s
 
 
@@ -170,11 +174,7 @@ class LinkRelay(callbacks.Plugin):
         self.addIRC(irc)
         channel = msg.args[0]
         s = msg.args[1]
-        if self.registryValue('includeNetwork', msg.args[0]):
-            network = '@' + irc.network
-        else:
-            network = ''
-        s = self.formatPrivMsg(channel, msg.nick, s,
+        s, args = self.getPrivmsgData(channel, msg.nick, s,
                                self.registryValue('color', channel))
         if channel not in irc.state.channels: # in private
             # cuts off the end of commands, so that passwords
@@ -189,20 +189,16 @@ class LinkRelay(callbacks.Plugin):
                     match = '(> \w+) .*'
                 s = re.sub(match, '\\1 %s[%s]' % (color, _('truncated')), s)
             s = '(via PM) %s' % s
-        self.sendToOthers(irc, channel, s, isPrivmsg=True)
+        self.sendToOthers(irc, channel, s, args, isPrivmsg=True)
 
 
     def outFilter(self, irc, msg):
         if msg.command == 'PRIVMSG':
             if not msg.relayedMsg:
                 if msg.args[0] in irc.state.channels:
-                    if self.registryValue('includeNetwork', msg.args[0]):
-                        network = '@' + irc.network
-                    else:
-                        network = ''
-                    s = self.formatPrivMsg(msg.args[0], irc.nick, msg.args[1],
+                    s, args = self.getPrivmsgData(msg.args[0], irc.nick, msg.args[1],
                                     self.registryValue('color', msg.args[0]))
-                    self.sendToOthers(irc, msg.args[0], s, isPrivmsg=True)
+                    self.sendToOthers(irc, msg.args[0], s, args, isPrivmsg=True)
         return msg
 
 
@@ -275,7 +271,7 @@ class LinkRelay(callbacks.Plugin):
         self.sendToOthers(irc, None, s, msg.nick)
         self.addIRC(irc)
 
-    def sendToOthers(self, irc, channel, s, nick=None, isPrivmsg=False):
+    def sendToOthers(self, irc, channel, s, args, nick=None, isPrivmsg=False):
         assert channel is not None or nick is not None
         def send(s):
             if not relay.hasTargetIRC:
@@ -288,11 +284,11 @@ class LinkRelay(callbacks.Plugin):
                 self.log.info('LinkRelay:  I\'m not in in %s on %s' %
                               (relay.targetChannel, relay.targetNetwork))
             else:
-                if '%s' in s:
-                    if self.registryValue('includeNetwork', relay.targetChannel):
-                        s = s % ('@' + irc.network)
-                    else:
-                        s = s % ''
+                if self.registryValue('includeNetwork', relay.targetChannel):
+                    args['network'] = '@' + irc.network
+                else:
+                    args['network'] = ''
+                s %= args
                 if isPrivmsg or \
                         self.registryValue('nonPrivmsgs', channel) == 'privmsg':
                     msg = ircmsgs.privmsg(relay.targetChannel, s)
