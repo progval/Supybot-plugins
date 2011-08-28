@@ -161,6 +161,7 @@ def handleChild(childpid, r):
         time.sleep(.5)
         n += 1
     if not pid:
+        import signal
         os.kill(childpid, signal.SIGKILL)
         raise SandboxError('Timeout')
     elif os.WIFEXITED(status):
