@@ -1,41 +1,39 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Supybot-fr\n"
-"POT-Creation-Date: 2011-02-26 09:49+CET\n"
-"PO-Revision-Date: 2011-07-29 19:57+0200\n"
-"Last-Translator: skizzhg <skizzhg@gmx.com>\n"
+"POT-Creation-Date: 2011-08-29 14:31+UTC\n"
+"PO-Revision-Date: 2011-08-29 14:44-0000\n"
+"Last-Translator: Valentin Lorentz <progval@gmail.com>\n"
 "Language-Team: Italian <skizzhg@gmx.com>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-
-#: config.py:43
-#, docstring
+#: config.py:49
 msgid "Value must be a valid color number (01, 02, 03, 04, ..., 16)"
 msgstr "Il valore deve essere un numero di colore valido (01, 02, 03, 04, ..., 16)."
 
-#: config.py:55
+#: config.py:61
 msgid ""
 "Determines whether the bot will color Relayed\n"
 "    PRIVMSGs so as to make the messages easier to read."
 msgstr "Determina se il bot colorerà i PRIVMSG inoltrati per renderne più semplice la lettura."
 
-#: config.py:58
+#: config.py:64
 msgid ""
 "Determines whether the bot will synchronize\n"
 "    topics between networks in the channels it Relays."
 msgstr "Determina se il bot sincronizzerà i topic tra le reti nei canali in cui inoltra."
 
-#: config.py:61
+#: config.py:67
 msgid ""
 "Determines whether the bot will Relay the\n"
 "    hostmask of the person joining or parting the channel when he or she joins\n"
 "    or parts."
 msgstr "Determina se il bot inoltrerà l'hostmask dell'utente che entra o esce dal canale."
 
-#: config.py:65
+#: config.py:71
 msgid ""
 "Determines whether the bot will include the\n"
 "    network in Relayed PRIVMSGs; if you're only Relaying between two networks,\n"
@@ -44,35 +42,38 @@ msgstr ""
 "Determina se il bot includerà la rete nei PRIVMSG inoltrati; se si trasmette\n"
 "    tra due sole reti è alquanto ridondante e si preferirà risparmiare spazio."
 
-#: config.py:69
+#: config.py:78
+#, fuzzy
 msgid ""
-"Determines whether the bot will used NOTICEs\n"
-"    rather than PRIVMSGs for non-PRIVMSG Relay messages (i.e., joins, parts,\n"
-"    nicks, quits, modes, etc.)"
+"Determines whether the\n"
+"    bot will use PRIVMSGs (privmsg), NOTICEs (notice), for non-PRIVMSG Relay\n"
+"    messages (i.e., joins, parts, nicks, quits, modes, etc.), or whether it\n"
+"    won't relay such messages (nothing)"
 msgstr ""
 "Determina se il bot userà i NOTICE piuttosto che i PRIVMSG per messaggi che non\n"
 "    riguardano le comunicazioni tra utenti (join, part, nick, quit, mode, ecc.)"
 
-#: config.py:74
+#: config.py:84
 msgid ""
 "You shouldn't edit this configuration variable\n"
 "    yourself unless you know what you do. Use @LinkRelay {add|remove} instead."
-msgstr "Non dovresti modificare questa variabile di configurazione a meno che\n"
+msgstr ""
+"Non dovresti modificare questa variabile di configurazione a meno che\n"
 "       non sai cosa fare; usa invece \"@LinkRelay {add|remove}\"."
 
-#: config.py:78
+#: config.py:88
 msgid ""
 "You shouldn't edit this configuration variable\n"
 "    yourself unless you know what you do. Use @LinkRelay (no)substitute instead."
-msgstr "Non dovresti modificare questa variabile di configurazione a meno che\n"
+msgstr ""
+"Non dovresti modificare questa variabile di configurazione a meno che\n"
 "       non sai cosa fare; usa invece \"@LinkRelay (no)substitute\"."
 
-#: config.py:91
+#: config.py:101
 msgid "Color used for relaying %s."
 msgstr "Colore utilizzato per inoltrare le %s."
 
-#: plugin.py:131
-#, docstring
+#: plugin.py:154
 msgid ""
 "takes no arguments\n"
 "\n"
@@ -82,36 +83,35 @@ msgstr ""
 "\n"
 "        Riporta tutti i link di inoltro definiti."
 
-#: plugin.py:158
+#: plugin.py:190
 msgid "truncated"
 msgstr "troncato"
 
-#: plugin.py:181
-msgid "%s changed mode on %s to %s"
-msgstr "%s ha cambiato il mode di %s in %s"
+#: plugin.py:214
+msgid "*/* %(nick)s changed mode on %(channel)s%(network)s to %(mode)s"
+msgstr "*/* %(nick)s ha cambiato il mode di %(channel)s in %(mode)s"
 
-#: plugin.py:189
-msgid "%s has joined on %s"
-msgstr "%s è entrato in %s"
+#: plugin.py:223
+msgid "--> %(nick)s has joined %(channel)s%(network)s"
+msgstr "--> %(nick)s è entrato in %(channel)s%(network)s"
 
-#: plugin.py:195
-msgid "%s has left on %s"
-msgstr "%s ha lasciato %s"
+#: plugin.py:231
+msgid "<-- %(nick)s has left %(channel)s%(network)s"
+msgstr "<-- %(nick)s ha lasciato %(channel)s%(network)s"
 
-#: plugin.py:201
-msgid "%s has been kicked on %s by %s (%s)"
-msgstr "%s è stato cacciato da %s su %s (%s)"
+#: plugin.py:241
+msgid "<-- %(kicked)s has been kicked %(channel)s%(network)s by %(kicker)s (%(message)s)"
+msgstr "<-- %(kicked)s è stato cacciato da %(channel)s%(network)s su %(kicker)s (%(message)s)"
 
-#: plugin.py:211
-msgid "%s (%s) changed his nickname to %s"
-msgstr "%s (%s) ha cambiato nick in %s"
+#: plugin.py:251
+msgid "*/* %(oldnick)s (%(network)s) changed his nickname to %(newnick)s"
+msgstr "*/* %(oldnick)s (%(network)s) ha cambiato nick in %(newnick)s"
 
-#: plugin.py:220
-msgid "%s has quit on %s (%s)"
-msgstr "%s è uscito da %s (%s)"
+#: plugin.py:262
+msgid "<-- %(nick)s has quit on %(network)s (%(message)s)"
+msgstr "<-- %(nick)s è uscito da %(network)s (%(message)s)"
 
-#: plugin.py:273
-#, docstring
+#: plugin.py:324
 msgid ""
 "[<channel>]\n"
 "\n"
@@ -124,28 +124,27 @@ msgstr ""
 "        Riporta i nick degli utenti presenti nei canali collegati. <canale>\n"
 "        è necessario solo se il messaggio non viene inviato nel canale stesso.\n"
 
-#: plugin.py:282
+#: plugin.py:333
 msgid "I haven't scraped the IRC object for %s yet. Try again in a minute or two."
 msgstr "Non ho ancora recuperato gli oggetti IRC per %s. Riprova tra un paio di minuti."
 
-#: plugin.py:322
+#: plugin.py:373
 msgid "%d users in %s on %s:  %s"
 msgstr "%d utenti in %s su %s: %s"
 
-#: plugin.py:361
+#: plugin.py:412
 msgid "You must give at least --from or --to."
 msgstr "Devi fornire almeno --from o --to."
 
-#: plugin.py:373
+#: plugin.py:424
 msgid "--from should be like \"--from #channel@network\""
 msgstr "--from deve essere nella forma \"--from #canale@rete\""
 
-#: plugin.py:376
+#: plugin.py:427
 msgid "--to should be like \"--to #channel@network\""
 msgstr "--to deve essere nella forma \"--to #canale@rete\""
 
-#: plugin.py:382
-#, docstring
+#: plugin.py:433
 msgid ""
 "[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]\n"
 "\n"
@@ -164,12 +163,11 @@ msgstr ""
 "        questa non è fornita verrà inoltrato tutto. Se --reciprocal è specificato\n"
 "        verrà automaticamente aggiunto un inoltro nella direzione opposta."
 
-#: plugin.py:407
+#: plugin.py:458
 msgid "One (or more) relay(s) already exists and has not been added."
 msgstr "Esistono già uno o più inoltri e non sono stati aggiunti."
 
-#: plugin.py:417
-#, docstring
+#: plugin.py:468
 msgid ""
 "[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]\n"
 "\n"
@@ -188,12 +186,11 @@ msgstr ""
 "        questa non è fornita verrà inoltrato tutto. Se --reciprocal è specificato\n"
 "        verrà automaticamente rimosso un inoltro nella direzione opposta."
 
-#: plugin.py:442
+#: plugin.py:493
 msgid "One (or more) relay(s) did not exist and has not been removed."
 msgstr "Esistono già uno o più inoltri e non sono stati rimossi."
 
-#: plugin.py:475
-#, docstring
+#: plugin.py:526
 msgid ""
 "<regexp> <replacement>\n"
 "\n"
@@ -204,8 +201,7 @@ msgstr ""
 "\n"
 "        Sostituisce con la stringa <rimpiazzo> tutti i nick che corrispondono a <regexp>."
 
-#: plugin.py:492
-#, docstring
+#: plugin.py:543
 msgid ""
 "<regexp>\n"
 "\n"
@@ -215,7 +211,15 @@ msgstr ""
 "\n"
 "        Annulla una sostituzione."
 
-#: plugin.py:497
+#: plugin.py:548
 msgid "This regexp was not in the nick substitutions database"
 msgstr "Questa regexp non è nel database delle sostituzioni dei nick."
 
+#~ msgid "%s has joined on %s"
+#~ msgstr "%s è entrato in %s"
+
+#~ msgid "%s has left on %s"
+#~ msgstr "%s ha lasciato %s"
+
+#~ msgid "%s has been kicked on %s by %s (%s)"
+#~ msgstr "%s è stato cacciato da %s su %s (%s)"
