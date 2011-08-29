@@ -167,7 +167,7 @@ class AttackProtector(callbacks.Plugin):
             capability = self.registryValue('exempt')
             if capability:
                 if ircdb.checkCapability(msg.prefix,
-                        ','.join(channel, capability)):
+                        ','.join([channel, capability])):
                     return
         except KeyError:
             pass
