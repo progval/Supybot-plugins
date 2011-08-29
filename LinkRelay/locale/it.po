@@ -101,7 +101,7 @@ msgstr "<-- %(nick)s ha lasciato %(channel)s%(network)s"
 
 #: plugin.py:241
 msgid "<-- %(kicked)s has been kicked %(channel)s%(network)s by %(kicker)s (%(message)s)"
-msgstr "<-- %(kicked)s è stato cacciato da %(channel)s%(network)s su %(kicker)s (%(message)s)"
+msgstr "<-- %(kicked)s è stato cacciato da %(channel)s%(network)s da %(kicker)s (%(message)s)"
 
 #: plugin.py:251
 msgid "*/* %(oldnick)s (%(network)s) changed his nickname to %(newnick)s"
