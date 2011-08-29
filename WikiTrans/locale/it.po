@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Supybot-fr\n"
 "POT-Creation-Date: 2011-08-21 02:16+CEST\n"
-"PO-Revision-Date: 2011-08-23 23:15+0200\n"
+"PO-Revision-Date: 2011-08-28 21:05+0200\n"
 "Last-Translator: skizzhg <skizzhg@gmx.com>\n"
 "Language-Team: Italian <skizzhg@gmx.com>\n"
 "Language: it\n"
@@ -31,7 +31,11 @@ msgstr ""
 "        Traduce <parola> (funziona anche con espressioni) utilizzando i link\n"
 "        interlingua di Wikipedia."
 
+#: plugin.py:56
+msgid "This word can't be found on Wikipedia."
+msgstr "Questa parola non è presente su Wikipedia."
+
 #: plugin.py:61
-msgid "No translation found"
+msgid "No translation found."
 msgstr "Non è stata trovata nessuna traduzione."
 
