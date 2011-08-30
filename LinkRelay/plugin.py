@@ -210,7 +210,7 @@ class LinkRelay(callbacks.Plugin):
         args = {'nick': msg.nick, 'channel': msg.args[0],
                 'mode': ' '.join(msg.args[1:]), 'color': ''}
         if self.registryValue('color', msg.args[0]):
-            args['color'] = self.registryValue('colors.mode', msg.args[0])
+            args['color'] = '\x03%s' % self.registryValue('colors.mode', msg.args[0])
         s = '%(color)s' + _('*/* %(nick)s changed mode on '
                 '%(channel)s%(network)s to %(mode)s')
         self.sendToOthers(irc, msg.args[0], s, args)
