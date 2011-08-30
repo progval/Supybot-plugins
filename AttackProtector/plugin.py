@@ -162,6 +162,9 @@ class AttackProtector(callbacks.Plugin):
         nick = prefix.split('!')[0]
         kind = lastItem.kind
 
+        if not ircutils.isChannel(channel):
+                return
+
         try:
             ircdb.users.getUser(msg.prefix) # May raise KeyError
             capability = self.registryValue('exempt')
