@@ -29,6 +29,8 @@
 ###
 
 import re
+import json
+import urllib
 import supybot.world as world
 import supybot.utils as utils
 from supybot import httpserver
@@ -52,6 +54,11 @@ class WebsiteCallback(httpserver.SupyHTTPServerCallback):
             self.send_response(200)
             self.end_headers()
 
+def query(path, args={}):
+    args = dict([(x,y) for x,y in args.items() if y is not None])
+    url = 'http://supybot.fr.cr/api%s?%s' % (path, urllib.urlencode(args))
+    return json.load(utils.web.getUrlFd(url))
+
 instance = None
 
 bold = ircutils.bold
@@ -71,15 +78,15 @@ class Website(callbacks.Plugin):
         callback = WebsiteCallback()
         callback.plugin = self
         httpserver.hook('website', callback)
-    
+
     class announce(callbacks.Commands):
-        matchers = {
+        _matchers = {
                 'id': re.compile('[a-zA-Z0-9]+'),
                 'author': re.compile('[a-zA-Z0-9]+'),
                 }
         def onPayload(self, form):
             for name in ('id', 'author'):
-                assert self.matchers[name].match(form[name].value), \
+                assert self._matchers[name].match(form[name].value), \
                         '%s is not valid.' % name
             id_ = form['id'].value
             author = form['author'].value
@@ -101,11 +108,24 @@ class Website(callbacks.Plugin):
                     except KeyError:
                         pass
 
+    def plugin(self, irc, msg, args, name):
+        """<name>
+
+        Returns informations about the plugin with that <name> on the
+        website."""
+        results = query('/plugins/view/%s/' % name)
+        if len(results) == 0:
+            irc.error(_('No plugin with that name.'))
+            return
+        irc.reply('%s %s' % (results['short_description'].replace('\r', '')
+                                                         .replace('\n', ' '),
+                             'http://supybot.fr.cr/plugins/view/%s/' % name))
+    plugin = wrap(plugin, ['something'])
+
+
     def die(self):
         self.__parent.die()
         httpserver.unhook('website')
-                    
-                    
 
 Class = Website
 
