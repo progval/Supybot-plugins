@@ -60,6 +60,10 @@ except:
 #####################
 
 class GithubCallback(httpserver.SupyHTTPServerCallback):
+    name = "GitHub announce callback"
+    defaultResponse = _("""
+    You shouldn't be there, this subfolder is not for you. Go back to the
+    index and try out other plugins (if any).""")
     def doPost(self, handler, path, form):
         if not handler.address_string().endswith('.rs.github.com'):
             log.warning("""'%s' tryed to act as a web hook for Github,
