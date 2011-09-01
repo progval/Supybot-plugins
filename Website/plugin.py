@@ -83,9 +83,10 @@ class Website(callbacks.Plugin):
         _matchers = {
                 'id': re.compile('[a-zA-Z0-9]+'),
                 'author': re.compile('[a-zA-Z0-9]+'),
+                'lexer': re.compile('[a-zA-Z0-9 /]+'),
                 }
         def onPayload(self, form):
-            for name in ('id', 'author'):
+            for name in ('id', 'author', 'lexer'):
                 assert self._matchers[name].match(form[name].value), \
                         '%s is not valid.' % name
             id_ = form['id'].value
@@ -95,13 +96,16 @@ class Website(callbacks.Plugin):
             except KeyError:
                 name = 'Unnamed paste'
             channel = form['channel'].value
+            lexer = form['lexer'].value
             assert channel in ('#limnoria', '#progval')
             for irc in world.ircs:
                 if irc.network == 'freenode':
                     assert channel in irc.state.channels
-                    s = '%s just pasted %s: http://supybot.fr.cr/paste/%s' % (
+                    s = ('%s just pasted %s (type: %s): '
+                            'http://supybot.fr.cr/paste/%s') % (
                             bold(author),
                             bold(name),
+                            bold(lexer),
                             id_)
                     try:
                         irc.queueMsg(ircmsgs.privmsg(channel, s))
