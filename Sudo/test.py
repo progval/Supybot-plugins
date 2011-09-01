@@ -95,6 +95,15 @@ class SudoTestCase(PluginTestCase):
         assert repr(db) == '%s\n\n%s\n' % (one, two) or \
                repr(db) == '%s\n\n%s\n' % (two, one), repr(repr(db))
 
+    def testFakehostmask(self):
+        self.assertNotError('register Prog Val')
+        self.assertNotError('capability add Prog owner')
+        self.assertResponse('whoami', 'Prog')
+        self.assertResponse('fakehostmask %s whoami' % self.prefix, 'Prog')
+        self.assertResponse('fakehostmask prog!val@home whoami',
+                'I don\'t recognize you.')
+
+
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

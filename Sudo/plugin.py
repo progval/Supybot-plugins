@@ -197,6 +197,18 @@ class Sudo(callbacks.Plugin):
             self.Proxy(irc.irc, msg, tokens)
     sudo = wrap(sudo, ['text'])
 
+    @internationalizeDocstring
+    def fakehostmask(self, irc, msg, args, hostmask, command):
+        """<hostmask> <command>
+
+        Runs <command> as if you were wearing the <hostmask>. Of course, usage
+        of the command is restricted to the owner."""
+        log.info('fakehostmask used to run "%s" as %s' % (command, hostmask))
+        msg.prefix = hostmask
+        tokens = callbacks.tokenize(command)
+        self.Proxy(irc.irc, msg, tokens)
+    fakehostmask = wrap(fakehostmask, ['owner', 'hostmask', 'text'])
+
     def die(self):
         if not world.testing:
             try:
