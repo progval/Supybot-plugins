@@ -52,7 +52,7 @@ class BrainfuckTestCase(PluginTestCase):
         self.assertResponse('brainfuck "+[]"',
                 'Error: Brainfuck processor timed out.')
 
-    def testTestSyntax(self):
+    def testCheckSyntax(self):
         self.assertResponse('checksyntax "[[["',
                 'Got end of string, expected `]`.')
         self.assertResponse('checksyntax "[[]"',
