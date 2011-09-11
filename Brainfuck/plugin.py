@@ -84,24 +84,24 @@ class BrainfuckProcessor:
         timeout = time.time() + timeLimit
         while programPointer < programLength:
             char = program[programPointer]
-            if char == '>':
+            if char == '>':   # Increment pointer
                 self.memoryPointer += 1
                 if len(self.memory) <= self.memoryPointer:
                     self.memory.append(0)
-            elif char == '<':
+            elif char == '<': # Decrement pointer
                 self.memoryPointer -= 1
-            elif char == '+':
+            elif char == '+': # Increment data
                 self.memory[self.memoryPointer] += 1
-            elif char == '-':
+            elif char == '-': # Decrement data
                 self.memory[self.memoryPointer] -= 1
-            elif char == '.':
+            elif char == '.': # Output data
                 output += chr(self.memory[self.memoryPointer])
-            elif char == ',':
+            elif char == ',': # Input data
                 try:
                     self.memory[self.memoryPointer] = input_.pop(0)
                 except IndexError:
                     raise NotEnoughInput()
-            elif char == '[':
+            elif char == '[': # Loop start
                 if not self.memory[self.memoryPointer]:
                     nesting = 0
                     while programPointer < programLength:
@@ -114,7 +114,7 @@ class BrainfuckProcessor:
                         programPointer += 1
                 else:
                     loopStack.append(programPointer)
-            elif char == ']':
+            elif char == ']': # Loop end
                 programPointer = loopStack.pop() - 1
             programPointer += 1
             if timeout < time.time():
@@ -127,6 +127,7 @@ class Brainfuck(callbacks.Plugin):
     """Add the help for "@plugin help Brainfuck" here
     This should describe *how* to use this plugin."""
     threaded = True
+    latestProcessor = None
 
     @internationalizeDocstring
     def checksyntax(self, irc, msg, args, code):
@@ -145,15 +146,26 @@ class Brainfuck(callbacks.Plugin):
 
     @internationalizeDocstring
     def brainfuck(self, irc, msg, args, opts, code):
-        """[--input <characters>] <command>
+        """[--recover] [--input <characters>] <command>
 
         Interprets the given Brainfuck code. You should quote the code if you
         use brackets, because Supybot would interpret it as nested commands.
+        If --recover is given, the bot will recover the previous processor
+        memory and memory pointer.
         The code will be fed the <characters> when it asks for input."""
         opts = dict(opts)
         if 'input' not in opts:
             opts['input'] = ''
-        processor = BrainfuckProcessor()
+        if 'recover' in opts:
+            if self.latestProcessor is None:
+                irc.error(_('No processor has been run for the moment.'))
+                return
+            else:
+                processor = self.latestProcessor
+        else:
+            processor = BrainfuckProcessor()
+            self.latestProcessor = processor
+
         try:
             output = processor.execute(code, input_=opts['input'])
         except BrainfuckSyntaxError as e:
@@ -166,7 +178,9 @@ class Brainfuck(callbacks.Plugin):
             irc.error(_('Input too short.'))
             return
         irc.reply(output)
-    brainfuck = wrap(brainfuck, [getopts({'input': 'something'}), 'text'])
+    brainfuck = wrap(brainfuck, [getopts({'recover': '',
+                                          'input': 'something'}),
+                                 'text'])
 
 
 
