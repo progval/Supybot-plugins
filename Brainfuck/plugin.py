@@ -45,6 +45,9 @@ class BrainfuckSyntaxError(Exception):
 class BrainfuckTimeout(Exception):
     pass
 
+class NotEnoughInput(Exception):
+    pass
+
 class BrainfuckProcessor:
     def __init__(self):
         self.memory = [0]
@@ -61,13 +64,14 @@ class BrainfuckProcessor:
                     return False
         return nesting == 0
 
-    def execute(self, program, timeLimit=5, checkSyntax=True):
+    def execute(self, program, input_='', timeLimit=5, checkSyntax=True):
         if checkSyntax:
             if not self.checkSyntax(program):
                 raise BrainfuckSyntaxError()
         programPointer = 0
         output = ''
         programLength = len(program)
+        input_ = [ord(x) for x in input_]
         loopStack = []
         timeout = time.time() + timeLimit
         while programPointer < programLength:
@@ -85,7 +89,10 @@ class BrainfuckProcessor:
             elif char == '.':
                 output += chr(self.memory[self.memoryPointer])
             elif char == ',':
-                raise NotImplemented()
+                try:
+                    self.memory[self.memoryPointer] = input_.pop(0)
+                except IndexError:
+                    raise NotEnoughInput()
             elif char == '[':
                 if not self.memory[self.memoryPointer]:
                     nesting = 0
@@ -121,13 +128,20 @@ class Brainfuck(callbacks.Plugin):
         use brackets, because Supybot would interpret it as nested commands.
         The code will be fed the <characters> when it asks for input."""
         opts = dict(opts)
+        if 'input' not in opts:
+            opts['input'] = ''
         processor = BrainfuckProcessor()
         try:
-            output = processor.execute(code)
+            output = processor.execute(code, input_=opts['input'])
         except BrainfuckSyntaxError:
-            irc.error(_('There was an error in your brainfuck syntax'))
+            irc.error(_('Brainfuck syntax error.'))
+            return
         except BrainfuckTimeout:
             irc.error(_('Brainfuck processor timed out.'))
+            return
+        except NotEnoughInput:
+            irc.error(_('Input too short.'))
+            return
         irc.reply(output)
     brainfuck = wrap(brainfuck, [getopts({'input': 'something'}), 'text'])
 

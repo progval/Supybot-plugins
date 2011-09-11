@@ -43,13 +43,19 @@ class BrainfuckTestCase(PluginTestCase):
                             '>++.>+.+++++++..+++.>++.<<+++++++++++++++.'
                             '>.+++.------.--------.>+."', 'Hello World!')
 
+    def testInput(self):
+        self.assertResponse('brainfuck --input b ",++."', 'd')
+        self.assertResponse('brainfuck --input b ",,++."',
+                'Error: Input too short.')
+
     def testTimeout(self):
-        self.assertError('brainfuck +[]')
+        self.assertResponse('brainfuck "+[]"',
+                'Error: Brainfuck processor timed out.')
 
     def testTestSyntax(self):
-        self.assertError('brainfuck [[[')
-        self.assertError('brainfuck [[]')
-        self.assertError('brainfuck [[]]]')
+        self.assertResponse('brainfuck "[[["', 'Error: Brainfuck syntax error.')
+        self.assertResponse('brainfuck "[[]"', 'Error: Brainfuck syntax error.')
+        self.assertResponse('brainfuck "[[]]]"', 'Error: Brainfuck syntax error.')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
