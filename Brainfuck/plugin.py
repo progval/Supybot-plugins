@@ -84,24 +84,24 @@ class BrainfuckProcessor:
         timeout = time.time() + timeLimit
         while programPointer < programLength:
             char = program[programPointer]
-            if char == '>':
+            if char == '>':   # Increment pointer
                 self.memoryPointer += 1
                 if len(self.memory) <= self.memoryPointer:
                     self.memory.append(0)
-            elif char == '<':
+            elif char == '<': # Decrement pointer
                 self.memoryPointer -= 1
-            elif char == '+':
+            elif char == '+': # Increment data
                 self.memory[self.memoryPointer] += 1
-            elif char == '-':
+            elif char == '-': # Decrement data
                 self.memory[self.memoryPointer] -= 1
-            elif char == '.':
+            elif char == '.': # Output data
                 output += chr(self.memory[self.memoryPointer])
-            elif char == ',':
+            elif char == ',': # Input data
                 try:
                     self.memory[self.memoryPointer] = input_.pop(0)
                 except IndexError:
                     raise NotEnoughInput()
-            elif char == '[':
+            elif char == '[': # Loop start
                 if not self.memory[self.memoryPointer]:
                     nesting = 0
                     while programPointer < programLength:
@@ -114,7 +114,7 @@ class BrainfuckProcessor:
                         programPointer += 1
                 else:
                     loopStack.append(programPointer)
-            elif char == ']':
+            elif char == ']': # Loop end
                 programPointer = loopStack.pop() - 1
             programPointer += 1
             if timeout < time.time():
