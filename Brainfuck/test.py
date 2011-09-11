@@ -62,5 +62,11 @@ class BrainfuckTestCase(PluginTestCase):
         self.assertRegexp('brainfuck "[[]]]"',
                 'Error: Brainfuck syntax error: .*whatever.*')
 
+    def testRecover(self):
+        self.assertNotError('brainfuck --input a ,.')
+        self.assertResponse('brainfuck .', "'\\x00'")
+        self.assertNotError('brainfuck --input a ,.')
+        self.assertResponse('brainfuck --recover .', 'a')
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
