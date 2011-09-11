@@ -38,6 +38,10 @@ class BrainfuckTestCase(PluginTestCase):
                             '++++++++++[>+++++++>++++++++++>+++>+<<<<-]'
                             '>++.>+.+++++++..+++.>++.<<+++++++++++++++.'
                             '>.+++.------.--------.>+."', 'Hello World!')
+        self.assertResponse('brainfuck "'
+                            '++++++++++[>+++++++>++++++++++>+++>+<<<<-]'
+                            '>++.>+.+++++++..+++.>++.<<+++++++++++++++.'
+                            '>.+++.------.--------.>+."', 'Hello World!')
 
     def testTimeout(self):
         self.assertError('brainfuck +[]')

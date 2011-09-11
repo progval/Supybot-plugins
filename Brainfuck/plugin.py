@@ -46,8 +46,9 @@ class BrainfuckTimeout(Exception):
     pass
 
 class BrainfuckProcessor:
-    memory = [0]
-    memoryPointer = 0
+    def __init__(self):
+        self.memory = [0]
+        self.memoryPointer = 0
 
     def checkSyntax(self, program):
         nesting = 0
@@ -113,10 +114,13 @@ class Brainfuck(callbacks.Plugin):
     threaded = True
 
     @internationalizeDocstring
-    def brainfuck(self, irc, msg, args, code):
-        """<command>
+    def brainfuck(self, irc, msg, args, opts, code):
+        """[--input <characters>] <command>
 
-        Interprets the given Brainfuck code."""
+        Interprets the given Brainfuck code. You should quote the code if you
+        use brackets, because Supybot would interpret it as nested commands.
+        The code will be fed the <characters> when it asks for input."""
+        opts = dict(opts)
         processor = BrainfuckProcessor()
         try:
             output = processor.execute(code)
@@ -125,7 +129,7 @@ class Brainfuck(callbacks.Plugin):
         except BrainfuckTimeout:
             irc.error(_('Brainfuck processor timed out.'))
         irc.reply(output)
-    brainfuck = wrap(brainfuck, ['text'])
+    brainfuck = wrap(brainfuck, [getopts({'input': 'something'}), 'text'])
 
 
 
