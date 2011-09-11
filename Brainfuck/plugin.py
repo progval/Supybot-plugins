@@ -49,25 +49,33 @@ class NotEnoughInput(Exception):
     pass
 
 class BrainfuckProcessor:
-    def __init__(self):
-        self.memory = [0]
-        self.memoryPointer = 0
+    def __init__(self, dummy=False):
+        self._dummy = dummy
+        if not dummy:
+            self.memory = [0]
+            self.memoryPointer = 0
 
     def checkSyntax(self, program):
         nesting = 0
+        index = 0
         for char in program:
+            index += 1
             if char == '[':
                 nesting += 1
             elif char == ']':
                 nesting -= 1
                 if nesting < 0:
-                    return False
-        return nesting == 0
+                    return _('Got `]` (at index %i), expected whatever you '
+                            'want but not that.') % index
+        if nesting != 0:
+            return _('Got end of string, expected `]`.')
+        return
 
     def execute(self, program, input_='', timeLimit=5, checkSyntax=True):
         if checkSyntax:
-            if not self.checkSyntax(program):
-                raise BrainfuckSyntaxError()
+            syntaxError = self.checkSyntax(program)
+            if syntaxError:
+                raise BrainfuckSyntaxError(syntaxError)
         programPointer = 0
         output = ''
         programLength = len(program)
@@ -121,6 +129,21 @@ class Brainfuck(callbacks.Plugin):
     threaded = True
 
     @internationalizeDocstring
+    def checksyntax(self, irc, msg, args, code):
+        """<command>
+
+        Tests the Brainfuck syntax without running it. You should quote the
+        code if you use brackets, because Supybot would interpret it as nested
+        commands."""
+        syntaxError = BrainfuckProcessor(dummy=True).checkSyntax(code)
+        if syntaxError:
+            irc.reply(syntaxError)
+        else:
+            irc.reply(_('Your code looks ok.'))
+    checksyntax = wrap(checksyntax, ['text'])
+
+
+    @internationalizeDocstring
     def brainfuck(self, irc, msg, args, opts, code):
         """[--input <characters>] <command>
 
@@ -133,8 +156,8 @@ class Brainfuck(callbacks.Plugin):
         processor = BrainfuckProcessor()
         try:
             output = processor.execute(code, input_=opts['input'])
-        except BrainfuckSyntaxError:
-            irc.error(_('Brainfuck syntax error.'))
+        except BrainfuckSyntaxError as e:
+            irc.error(_('Brainfuck syntax error: %s') % e.args[0])
             return
         except BrainfuckTimeout:
             irc.error(_('Brainfuck processor timed out.'))
