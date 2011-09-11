@@ -53,9 +53,14 @@ class BrainfuckTestCase(PluginTestCase):
                 'Error: Brainfuck processor timed out.')
 
     def testTestSyntax(self):
-        self.assertResponse('brainfuck "[[["', 'Error: Brainfuck syntax error.')
-        self.assertResponse('brainfuck "[[]"', 'Error: Brainfuck syntax error.')
-        self.assertResponse('brainfuck "[[]]]"', 'Error: Brainfuck syntax error.')
+        self.assertResponse('checksyntax "[[["',
+                'Got end of string, expected `]`.')
+        self.assertResponse('checksyntax "[[]"',
+                'Got end of string, expected `]`.')
+        self.assertResponse('checksyntax "[[]]]"',
+                'Got `]` (at index 5), expected whatever you want but not that.')
+        self.assertRegexp('brainfuck "[[]]]"',
+                'Error: Brainfuck syntax error: .*whatever.*')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
