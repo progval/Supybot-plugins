@@ -39,13 +39,19 @@ from supybot.i18n import PluginInternationalization, internationalizeDocstring
 
 _ = PluginInternationalization('Brainfuck')
 
-class BrainfuckSyntaxError(Exception):
+class BrainfuckException(Exception):
     pass
 
-class BrainfuckTimeout(Exception):
+class BrainfuckSyntaxError(BrainfuckException):
     pass
 
-class NotEnoughInput(Exception):
+class BrainfuckTimeout(BrainfuckException):
+    pass
+
+class NotEnoughInput(BrainfuckException):
+    pass
+
+class SegmentationFault(BrainfuckException):
     pass
 
 class BrainfuckProcessor:
@@ -90,6 +96,8 @@ class BrainfuckProcessor:
                     self.memory.append(0)
             elif char == '<': # Decrement pointer
                 self.memoryPointer -= 1
+                if self.memoryPointer < 0:
+                    raise SegmentationFault(_('Negative memory pointer.'))
             elif char == '+': # Increment data
                 self.memory[self.memoryPointer] += 1
             elif char == '-': # Decrement data
@@ -176,6 +184,9 @@ class Brainfuck(callbacks.Plugin):
             return
         except NotEnoughInput:
             irc.error(_('Input too short.'))
+            return
+        except SegmentationFault as e:
+            irc.error(_('Segmentation fault: %s') % e.args[0])
             return
         irc.reply(output)
     brainfuck = wrap(brainfuck, [getopts({'recover': '',

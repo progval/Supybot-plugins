@@ -68,5 +68,9 @@ class BrainfuckTestCase(PluginTestCase):
         self.assertNotError('brainfuck --input a ,.')
         self.assertResponse('brainfuck --recover .', 'a')
 
+    def testMemory(self):
+        self.assertResponse('brainfuck <',
+                'Error: Segmentation fault: Negative memory pointer.')
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
