@@ -54,6 +54,9 @@ class NotEnoughInput(BrainfuckException):
 class SegmentationFault(BrainfuckException):
     pass
 
+class InvalidCharacter(BrainfuckException):
+    pass
+
 class BrainfuckProcessor:
     def __init__(self, dummy=False):
         self._dummy = dummy
@@ -103,7 +106,10 @@ class BrainfuckProcessor:
             elif char == '-': # Decrement data
                 self.memory[self.memoryPointer] -= 1
             elif char == '.': # Output data
-                output += chr(self.memory[self.memoryPointer])
+                try:
+                    output += chr(self.memory[self.memoryPointer])
+                except ValueError:
+                    raise InvalidCharacter(str(self.memory[self.memoryPointer]))
             elif char == ',': # Input data
                 try:
                     self.memory[self.memoryPointer] = input_.pop(0)
@@ -187,6 +193,9 @@ class Brainfuck(callbacks.Plugin):
             return
         except SegmentationFault as e:
             irc.error(_('Segmentation fault: %s') % e.args[0])
+            return
+        except InvalidCharacter as e:
+            irc.error(_('Tryed to output invalid character : %s') % e.args[0])
             return
         irc.reply(output)
     brainfuck = wrap(brainfuck, [getopts({'recover': '',
