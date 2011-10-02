@@ -65,6 +65,7 @@ page_template = """
             .command-QUIT { color: maroon; }
             .command-JOIN { color: green; }
             .command-MODE { color: olive; }
+            .command-KICK { color: red; }
         </style>
     </head>
     <body>
@@ -120,6 +121,11 @@ def format_logs(logs):
             new_line = _('*/* %(nick)s has set mode %(modes)s') % \
                     {'nick': format_nick(words[2]),
                     'modes': ' '.join(words[3:])}
+        elif command == 'KICK':
+            new_line = _('<-- %(kicked)s has been kicked by %(kicker)s (%(reason)s)') % \
+                    {'kicked': format_nick(words[2]),
+                    'kicker': format_nick(words[3]),
+                    'reason': cgi.escape(' '.join(words[4:]))}
         if new_line is not None:
             template = """
                 <div class="line command-%(command)s">
@@ -275,6 +281,10 @@ class WebLogs(callbacks.Plugin):
     @check_enabled
     def doMode(self, irc, msg, middleware):
         middleware.write('MODE', msg.nick, msg.args[1], ' '.join(msg.args[2:]))
+
+    @check_enabled
+    def doKick(self, irc, msg, middleware):
+        middleware.write('KICK', msg.nick, ' '.join(msg.args[1:]))
 
     def __call__(self, irc, msg):
         self.__parent.__call__(irc, msg)
