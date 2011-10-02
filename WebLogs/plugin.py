@@ -87,7 +87,6 @@ def format_logs(logs):
         timestamp = words[0]
         command = words[1]
         new_line = None
-        color = 'black'
         if command == 'PRIVMSG' or command == 'NOTICE':
             if command == 'PRIVMSG':
                 nick_delimiters = ('&lt;', '&gt;')
@@ -119,9 +118,9 @@ def format_logs(logs):
                     'modes': ' '.join(words[3:])}
         if new_line is not None:
             template = """
-                <div class="line" class="command-%(command)s">
+                <div class="line command-%(command)s">
                     <span class="timestamp">%(timestamp)s</span>
-                    <span style="color: %(color)s;">%(line)s</span>
+                    %(line)s
                 </div>"""
             gmtime = time.gmtime(int(words[0]))
             gmtime_day = (gmtime.tm_mday, gmtime.tm_mon, gmtime.tm_year)
@@ -130,7 +129,7 @@ def format_logs(logs):
                         gmtime_day
                 old_gmtime_day = gmtime_day
             timestamp = time.strftime('%H:%M:%S', gmtime)
-            html_logs += template % {'color': color, 'line': new_line,
+            html_logs += template % {'line': new_line,
                     'timestamp': timestamp, 'command': command}
     return html_logs
 
