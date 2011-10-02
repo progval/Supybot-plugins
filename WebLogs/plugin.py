@@ -30,6 +30,7 @@
 
 import os
 import cgi
+import time
 import urllib
 
 import supybot.conf as conf
@@ -51,6 +52,19 @@ page_template = """
     <head>
         <title>%(title)s - WebLogs</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <style type="text/css">
+            .line .timestamp {
+                display: none;
+            }
+            .line:hover .timestamp, .line:focus .timestamp {
+                display: inline;
+                float: right;
+            }
+            .command-PART { color: maroon; }
+            .command-QUIT { color: maroon; }
+            .command-JOIN { color: green; }
+            .command-MODE { color: olive; }
+        </style>
     </head>
     <body>
         %(body)s
@@ -64,51 +78,60 @@ def format_logs(logs):
                 'black', 'olive']
         hash_ = sum([ord(x) for x in nick]) % len(colors)
         return template % {'color': colors[hash_], 'nick': nick}
-    html_logs = ''
+    html_logs = '<div>' # Will be closed by the first "Changed day"
+    old_gmtime_day = None
     for line in logs.split('\n'):
         words = line.split(' ')
-        command = words[0]
+        if len(words) < 2:
+            continue
+        timestamp = words[0]
+        command = words[1]
         new_line = None
+        color = 'black'
         if command == 'PRIVMSG' or command == 'NOTICE':
             if command == 'PRIVMSG':
                 nick_delimiters = ('&lt;', '&gt;')
             else:
                 nick_delimiters = ('*', '*')
-            formatted_nick = nick_delimiters[0] + format_nick(words[1]) + \
+            formatted_nick = nick_delimiters[0] + format_nick(words[2]) + \
                     nick_delimiters[1]
             new_line = _('%(formatted_nick)s %(message)s') % {
                     'formatted_nick': formatted_nick,
-                    'message': cgi.escape(' '.join(words[2:]))}
-            color = None
+                    'message': cgi.escape(' '.join(words[3:]))}
         elif command == 'PRIVMSG-ACTION':
             new_line = _('* %(nick)s %(message)s') % {
                     'nick': format_nick(words[1]),
-                    'message': cgi.escape(' '.join(words[2:]))}
+                    'message': cgi.escape(' '.join(words[3:]))}
         elif command == 'PART':
             new_line = _('<-- %(nick)s has left the channel (%(reason)s)') % \
-                    {'nick': format_nick(words[1]),
-                    'reason': cgi.escape(' '.join(words[2:]))}
-            color = 'maroon'
+                    {'nick': format_nick(words[2]),
+                    'reason': cgi.escape(' '.join(words[3:]))}
         elif command == 'QUIT':
             new_line = _('<-- %(nick)s has quit the network (%(reason)s)') % \
-                    {'nick': format_nick(words[1]),
+                    {'nick': format_nick(words[2]),
                     'reason': cgi.escape(' '.join(words[2:]))}
-            color = 'maroon'
         elif command == 'JOIN':
             new_line = _('--> %(nick)s has joined the channel') % \
-                    {'nick': format_nick(words[1])}
-            color = 'green'
+                    {'nick': format_nick(words[2])}
         elif command == 'MODE':
             new_line = _('*/* %(nick)s has set mode %(modes)s') % \
-                    {'nick': format_nick(words[1]),
-                    'modes': ' '.join(words[2:])}
-            color = 'olive'
+                    {'nick': format_nick(words[2]),
+                    'modes': ' '.join(words[3:])}
         if new_line is not None:
-            if color is not None:
-                template = '<div style="color: %(color)s;">%(line)s</div>\n'
-            else:
-                template = '<div>%(line)s</div>\n'
-            html_logs += template % {'color': color, 'line': new_line}
+            template = """
+                <div class="line" class="command-%(command)s">
+                    <span class="timestamp">%(timestamp)s</span>
+                    <span style="color: %(color)s;">%(line)s</span>
+                </div>"""
+            gmtime = time.gmtime(int(words[0]))
+            gmtime_day = (gmtime.tm_mday, gmtime.tm_mon, gmtime.tm_year)
+            if old_gmtime_day != gmtime_day:
+                html_logs += '</div><div class="day"><h1>%i/%i/%i</h1>\n' % \
+                        gmtime_day
+                old_gmtime_day = gmtime_day
+            timestamp = time.strftime('%H:%M:%S', gmtime)
+            html_logs += template % {'color': color, 'line': new_line,
+                    'timestamp': timestamp, 'command': command}
     return html_logs
 
 
@@ -137,7 +160,7 @@ class WebLogsMiddleware(object):
 
     def write(self, *args):
         self.fd.read()
-        self.fd.write(' '.join(args) + '\n')
+        self.fd.write('%i %s\n' % (time.time(), ' '.join(args)))
 
 class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
     name = 'WebLogs'
