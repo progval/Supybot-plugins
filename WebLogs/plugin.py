@@ -112,7 +112,7 @@ def format_logs(logs):
         elif command == 'QUIT':
             new_line = _('<-- %(nick)s has quit the network (%(reason)s)') % \
                     {'nick': format_nick(words[2]),
-                    'reason': cgi.escape(' '.join(words[2:]))}
+                    'reason': cgi.escape(' '.join(words[3:]))}
         elif command == 'JOIN':
             new_line = _('--> %(nick)s has joined the channel') % \
                     {'nick': format_nick(words[2])}
