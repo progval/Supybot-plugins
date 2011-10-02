@@ -190,7 +190,7 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
         else:
             splitted_path = path[1:].split('/')
         if len(splitted_path) == 0:
-            self.send_response(100)
+            self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             page_body = """Here is a list of available logs:<ul>"""
