@@ -28,6 +28,7 @@
 
 ###
 
+import re
 import os
 import cgi
 import time
@@ -70,6 +71,9 @@ page_template = """
         %(body)s
     </body>
 </html>"""
+
+# From http://stackoverflow.com/questions/1071191/detect-urls-in-a-string
+URL_REGEXP = re.compile(r'''((?:mailto:|ftp://|http://)[^ <>'"{}|\\^`[\]]*)''')
 
 def format_logs(logs):
     def format_nick(nick):
@@ -122,6 +126,9 @@ def format_logs(logs):
                     <span class="timestamp">%(timestamp)s</span>
                     %(line)s
                 </div>"""
+            new_line = URL_REGEXP.sub(r'<a href="\1">\1</a>', new_line)
+
+            # Timestamp handling
             gmtime = time.gmtime(int(words[0]))
             gmtime_day = (gmtime.tm_mday, gmtime.tm_mon, gmtime.tm_year)
             if old_gmtime_day != gmtime_day:
@@ -129,6 +136,8 @@ def format_logs(logs):
                         gmtime_day
                 old_gmtime_day = gmtime_day
             timestamp = time.strftime('%H:%M:%S', gmtime)
+
+
             html_logs += template % {'line': new_line,
                     'timestamp': timestamp, 'command': command}
     return html_logs
