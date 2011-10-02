@@ -187,8 +187,9 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
 
 def check_enabled(f):
     def newf(self, irc, msg):
-        if self.registryValue('enabled', msg.args[0]):
-            return f(self, irc, msg, WebLogsMiddleware(msg.args[0]))
+        channel = msg.args[0]
+        if irc.isChannel(channel) and self.registryValue('enabled', channel):
+            return f(self, irc, msg, WebLogsMiddleware(channel))
         return msg
     return newf
 
