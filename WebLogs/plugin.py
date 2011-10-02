@@ -103,7 +103,7 @@ def format_logs(logs):
                     'message': cgi.escape(' '.join(words[3:]))}
         elif command == 'PRIVMSG-ACTION':
             new_line = _('* %(nick)s %(message)s') % {
-                    'nick': format_nick(words[1]),
+                    'nick': format_nick(words[2]),
                     'message': cgi.escape(' '.join(words[3:]))}
         elif command == 'PART':
             new_line = _('<-- %(nick)s has left the channel (%(reason)s)') % \
