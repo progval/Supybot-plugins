@@ -1,0 +1,274 @@
+###
+# Copyright (c) 2011, Valentin Lorentz
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#     this list of conditions, and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#     this list of conditions, and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#   * Neither the name of the author of this software nor the name of
+#     contributors to this software may be used to endorse or promote products
+#     derived from this software without specific prior written consent.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+###
+
+import os
+import cgi
+import urllib
+
+import supybot.conf as conf
+import supybot.utils as utils
+from supybot.commands import *
+import supybot.irclib as irclib
+import supybot.ircmsgs as ircmsgs
+import supybot.plugins as plugins
+import supybot.ircutils as ircutils
+import supybot.callbacks as callbacks
+import supybot.httpserver as httpserver
+from supybot.i18n import PluginInternationalization, internationalizeDocstring
+
+_ = PluginInternationalization('WebLogs')
+
+page_template = """
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" >
+    <head>
+        <title>%(title)s - WebLogs</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    </head>
+    <body>
+        %(body)s
+    </body>
+</html>"""
+
+def format_logs(logs):
+    def format_nick(nick):
+        template = '<span style="color: %(color)s;">%(nick)s</span>'
+        colors = ['red', 'orange', 'blue', 'lime', 'grey', 'green', 'purple',
+                'black', 'olive']
+        hash_ = sum([ord(x) for x in nick]) % len(colors)
+        return template % {'color': colors[hash_], 'nick': nick}
+    html_logs = ''
+    for line in logs.split('\n'):
+        words = line.split(' ')
+        command = words[0]
+        new_line = None
+        if command == 'PRIVMSG' or command == 'NOTICE':
+            if command == 'PRIVMSG':
+                nick_delimiters = ('&lt;', '&gt;')
+            else:
+                nick_delimiters = ('*', '*')
+            formatted_nick = nick_delimiters[0] + format_nick(words[1]) + \
+                    nick_delimiters[1]
+            new_line = _('%(formatted_nick)s %(message)s') % {
+                    'formatted_nick': formatted_nick,
+                    'message': cgi.escape(' '.join(words[2:]))}
+            color = None
+        elif command == 'PRIVMSG-ACTION':
+            new_line = _('* %(nick)s %(message)s') % {
+                    'nick': format_nick(words[1]),
+                    'message': cgi.escape(' '.join(words[2:]))}
+        elif command == 'PART':
+            new_line = _('<-- %(nick)s has left the channel (%(reason)s)') % \
+                    {'nick': format_nick(words[1]),
+                    'reason': cgi.escape(' '.join(words[2:]))}
+            color = 'maroon'
+        elif command == 'QUIT':
+            new_line = _('<-- %(nick)s has quit the network (%(reason)s)') % \
+                    {'nick': format_nick(words[1]),
+                    'reason': cgi.escape(' '.join(words[2:]))}
+            color = 'maroon'
+        elif command == 'JOIN':
+            new_line = _('--> %(nick)s has joined the channel') % \
+                    {'nick': format_nick(words[1])}
+            color = 'green'
+        elif command == 'MODE':
+            new_line = _('*/* %(nick)s has set mode %(modes)s') % \
+                    {'nick': format_nick(words[1]),
+                    'modes': ' '.join(words[2:])}
+            color = 'olive'
+        if new_line is not None:
+            if color is not None:
+                template = '<div style="color: %(color)s;">%(line)s</div>\n'
+            else:
+                template = '<div>%(line)s</div>\n'
+            html_logs += template % {'color': color, 'line': new_line}
+    return html_logs
+
+
+class WebLogsMiddleware(object):
+    """Class for reading and parsing WebLogs data."""
+    __shared_states = {}
+    def __init__(self, channel):
+        if channel in self.__shared_states:
+            self.__dict__ = self.__shared_states[channel]
+        else:
+            self._channel = channel
+            path = conf.supybot.directories.data.dirize('WebLogs_%s.log' %
+                    channel)
+            self.fd = open(path, 'a+')
+            self.__shared_states.update({channel: self.__dict__})
+
+    @staticmethod
+    def get_channel_list():
+        return [x[len('WebLogs_'):-len('.log')]
+                for x in os.listdir(conf.supybot.directories.data())
+                if x.endswith('.log')]
+
+    def get_logs(self):
+        self.fd.seek(0)
+        return self.fd.read()
+
+    def write(self, *args):
+        self.fd.read()
+        self.fd.write(' '.join(args) + '\n')
+
+class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
+    name = 'WebLogs'
+
+    def doGet(self, handler, path):
+        if path == '':
+            self.send_response(301)
+            self.send_header('Location', '/weblogs/')
+            self.end_headers()
+            return
+        elif path == '/':
+            splitted_path = []
+        else:
+            splitted_path = path[1:].split('/')
+        if len(splitted_path) == 0:
+            self.send_response(100)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            page_body = """Here is a list of available logs:<ul>"""
+            for channel in WebLogsMiddleware.get_channel_list():
+                page_body += '<li><a href="./html/%s/">%s</a></li>' % (
+                        urllib.quote(channel), channel)
+            page_body += '</ul>'
+            self.wfile.write(page_template %
+                    {'title': 'Index', 'body': page_body})
+            return
+        elif len(splitted_path) == 3:
+            mode, channel, page = splitted_path
+        else:
+            self.send_response(404)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write('Bad URL.')
+            return
+        assert mode in ('html', 'json')
+        channel = urllib.unquote(channel)
+        assert channel in WebLogsMiddleware.get_channel_list()
+
+        middleware = WebLogsMiddleware(channel)
+        if page == '':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write(page_template % {
+                'title': channel,
+                'body': format_logs(middleware.get_logs())})
+
+def check_enabled(f):
+    def newf(self, irc, msg):
+        if self.registryValue('enabled', msg.args[0]):
+            return f(self, irc, msg, WebLogsMiddleware(msg.args[0]))
+        return msg
+    return newf
+
+@internationalizeDocstring
+class WebLogs(callbacks.Plugin):
+    """Add the help for "@plugin help WebLogs" here
+    This should describe *how* to use this plugin."""
+
+    def __init__(self, irc):
+        # Some stuff needed by Supybot
+        self.__parent = super(WebLogs, self)
+        callbacks.Plugin.__init__(self, irc)
+
+        self.lastStates = {}
+
+        # registering the callback
+        callback = WebLogsServerCallback() # create an instance of the callback
+        httpserver.hook('weblogs', callback)
+
+    @check_enabled
+    def doPrivmsg(self, irc, msg, middleware):
+        if ircmsgs.isAction(msg):
+            middleware.write('PRIVMSG-ACTION', msg.nick,
+                    ircmsgs.unAction(msg))
+        else:
+            middleware.write('PRIVMSG', msg.nick, msg.args[1])
+
+    @check_enabled
+    def outFilter(self, irc, msg, middleware):
+        if msg.command == 'PRIVMSG':
+            middleware.write('PRIVMSG', irc.nick, msg.args[1])
+        elif msg.command == 'NOTICE':
+            middleware.write('NOTICE', irc.nick, msg.args[1])
+        return msg
+
+    @check_enabled
+    def doNotice(self, irc, msg, middleware):
+        middleware.write('NOTICE', msg.nick, msg.args[1])
+
+    @check_enabled
+    def doPart(self, irc, msg, middleware):
+        if len(msg.args) == 1:
+            reason = ''
+        else:
+            reason = msg.args[1]
+        middleware.write('PART', msg.nick, reason)
+
+    @check_enabled
+    def doJoin(self, irc, msg, middleware):
+        middleware.write('JOIN', msg.nick)
+
+    @check_enabled
+    def doMode(self, irc, msg, middleware):
+        middleware.write('MODE', msg.nick, msg.args[1], ' '.join(msg.args[2:]))
+
+    def __call__(self, irc, msg):
+        self.__parent.__call__(irc, msg)
+        self.lastStates[irc] = irc.state.copy()
+    def doQuit(self, irc, msg):
+        if len(msg.args) == 0:
+            reason = ''
+        else:
+            reason = msg.args[0]
+
+        if not isinstance(irc, irclib.Irc):
+            irc = irc.getRealIrc()
+        for (channel, chan) in self.lastStates[irc].channels.iteritems():
+            if msg.nick in chan.users:
+                if self.registryValue('enabled', channel):
+                    middleware = WebLogsMiddleware(channel)
+                    middleware.write('QUIT', msg.nick, reason)
+
+    def die(self):
+        # unregister the callback
+        httpserver.unhook('weblogs')
+
+        # Stuff for Supybot
+        self.__parent.die()
+
+Class = WebLogs
+
+
+# vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
