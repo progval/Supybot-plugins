@@ -162,11 +162,13 @@ class WebLogsMiddleware(object):
             self.fd = open(path, 'a+')
             self.__shared_states.update({channel: self.__dict__})
 
-    @staticmethod
-    def get_channel_list():
-        return [x[len('WebLogs_'):-len('.log')]
+    @classmethod
+    def get_channel_list(cls):
+        channels = [x[len('WebLogs_'):-len('.log')]
                 for x in os.listdir(conf.supybot.directories.data())
                 if x.endswith('.log')]
+        return [x for x in channels
+                if cls._plugin.registryValue('enabled', x)]
 
     def get_logs(self):
         self.fd.seek(0)
@@ -211,7 +213,12 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
             return
         assert mode in ('html', 'json')
         channel = urllib.unquote(channel)
-        assert channel in WebLogsMiddleware.get_channel_list()
+        if channel not in WebLogsMiddleware.get_channel_list():
+            self.send_response(404)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write('This channel is not logged.')
+            return
 
         middleware = WebLogsMiddleware(channel)
         if page == '':
@@ -241,6 +248,7 @@ class WebLogs(callbacks.Plugin):
         callbacks.Plugin.__init__(self, irc)
 
         self.lastStates = {}
+        WebLogsMiddleware._plugin = self
 
         # registering the callback
         callback = WebLogsServerCallback() # create an instance of the callback
