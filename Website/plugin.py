@@ -45,6 +45,9 @@ _ = PluginInternationalization('Website')
 
 class WebsiteCallback(httpserver.SupyHTTPServerCallback):
     name = 'Supybot website callback'
+    defaultResponse = _("""
+    You shouldn't be there, this subfolder is not for you. Go back to the
+    index and try out other plugins (if any).""")
     def doPost(self, handler, path, form):
         try:
             self.plugin.announce.onPayload(form)

@@ -65,6 +65,7 @@ page_template = """
             .command-QUIT { color: maroon; }
             .command-JOIN { color: green; }
             .command-MODE { color: olive; }
+            .command-KICK { color: red; }
         </style>
     </head>
     <body>
@@ -103,7 +104,7 @@ def format_logs(logs):
                     'message': cgi.escape(' '.join(words[3:]))}
         elif command == 'PRIVMSG-ACTION':
             new_line = _('* %(nick)s %(message)s') % {
-                    'nick': format_nick(words[1]),
+                    'nick': format_nick(words[2]),
                     'message': cgi.escape(' '.join(words[3:]))}
         elif command == 'PART':
             new_line = _('<-- %(nick)s has left the channel (%(reason)s)') % \
@@ -112,7 +113,7 @@ def format_logs(logs):
         elif command == 'QUIT':
             new_line = _('<-- %(nick)s has quit the network (%(reason)s)') % \
                     {'nick': format_nick(words[2]),
-                    'reason': cgi.escape(' '.join(words[2:]))}
+                    'reason': cgi.escape(' '.join(words[3:]))}
         elif command == 'JOIN':
             new_line = _('--> %(nick)s has joined the channel') % \
                     {'nick': format_nick(words[2])}
@@ -120,6 +121,11 @@ def format_logs(logs):
             new_line = _('*/* %(nick)s has set mode %(modes)s') % \
                     {'nick': format_nick(words[2]),
                     'modes': ' '.join(words[3:])}
+        elif command == 'KICK':
+            new_line = _('<-- %(kicked)s has been kicked by %(kicker)s (%(reason)s)') % \
+                    {'kicked': format_nick(words[2]),
+                    'kicker': format_nick(words[3]),
+                    'reason': cgi.escape(' '.join(words[4:]))}
         if new_line is not None:
             template = """
                 <div class="line command-%(command)s">
@@ -156,11 +162,13 @@ class WebLogsMiddleware(object):
             self.fd = open(path, 'a+')
             self.__shared_states.update({channel: self.__dict__})
 
-    @staticmethod
-    def get_channel_list():
-        return [x[len('WebLogs_'):-len('.log')]
+    @classmethod
+    def get_channel_list(cls):
+        channels = [x[len('WebLogs_'):-len('.log')]
                 for x in os.listdir(conf.supybot.directories.data())
                 if x.endswith('.log')]
+        return [x for x in channels
+                if cls._plugin.registryValue('enabled', x)]
 
     def get_logs(self):
         self.fd.seek(0)
@@ -184,7 +192,7 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
         else:
             splitted_path = path[1:].split('/')
         if len(splitted_path) == 0:
-            self.send_response(100)
+            self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             page_body = """Here is a list of available logs:<ul>"""
@@ -205,7 +213,12 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
             return
         assert mode in ('html', 'json')
         channel = urllib.unquote(channel)
-        assert channel in WebLogsMiddleware.get_channel_list()
+        if channel not in WebLogsMiddleware.get_channel_list():
+            self.send_response(404)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write('This channel is not logged.')
+            return
 
         middleware = WebLogsMiddleware(channel)
         if page == '':
@@ -235,6 +248,7 @@ class WebLogs(callbacks.Plugin):
         callbacks.Plugin.__init__(self, irc)
 
         self.lastStates = {}
+        WebLogsMiddleware._plugin = self
 
         # registering the callback
         callback = WebLogsServerCallback() # create an instance of the callback
@@ -275,6 +289,10 @@ class WebLogs(callbacks.Plugin):
     @check_enabled
     def doMode(self, irc, msg, middleware):
         middleware.write('MODE', msg.nick, msg.args[1], ' '.join(msg.args[2:]))
+
+    @check_enabled
+    def doKick(self, irc, msg, middleware):
+        middleware.write('KICK', msg.nick, ' '.join(msg.args[1:]))
 
     def __call__(self, irc, msg):
         self.__parent.__call__(irc, msg)
