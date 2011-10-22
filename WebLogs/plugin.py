@@ -54,6 +54,9 @@ page_template = """
         <title>%(title)s - WebLogs</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <style type="text/css">
+            h1 {
+                display: inline;
+            }
             .line .timestamp {
                 display: none;
             }
@@ -67,6 +70,24 @@ page_template = """
             .command-MODE { color: olive; }
             .command-KICK { color: red; }
         </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js">
+        </script>
+        <script>
+            $(document).ready(function() {
+                $("div.day div").hide();
+                $("div.day input.hide").hide();
+                $("input.reveal").click(function() {
+                        $(this).hide();
+                        $(this).parents("div").children("div.day input.hide").fadeIn(600);
+                        $(this).parents("div").children("div.day div").fadeIn(600);
+                });
+                $("input.hide").click(function() {
+                        $(this).hide();
+                        $(this).parents("div").children("div.day input.reveal").fadeIn(600);
+                        $(this).parents("div").children("div.day div").fadeOut(600);
+                });
+            });
+        </script>
     </head>
     <body>
         %(body)s
@@ -138,7 +159,12 @@ def format_logs(logs):
             gmtime = time.gmtime(int(words[0]))
             gmtime_day = (gmtime.tm_mday, gmtime.tm_mon, gmtime.tm_year)
             if old_gmtime_day != gmtime_day:
-                html_logs += '</div><div class="day"><h1>%i/%i/%i</h1>\n' % \
+                html_logs += '</div><div class="day">'
+                html_logs += """
+                    <input type="button" value="reveal" class="reveal" />
+                    <input type="button" value="hide" class="hide" />
+                    """
+                html_logs += '<h1>%i/%i/%i</h1>' % \
                         gmtime_day
                 old_gmtime_day = gmtime_day
             timestamp = time.strftime('%H:%M:%S', gmtime)
