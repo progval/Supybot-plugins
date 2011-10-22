@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2011-08-29 14:31+UTC\n"
-"PO-Revision-Date: 2011-08-29 14:41-0000\n"
+"POT-Creation-Date: 2011-10-22 14:07+CEST\n"
+"PO-Revision-Date: 2011-10-22 14:11+0100\n"
 "Last-Translator: Valentin Lorentz <progval@gmail.com>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -109,7 +109,8 @@ msgid "<-- %(nick)s has left %(channel)s%(network)s"
 msgstr "<-- %(nick)s on poistunut verkossa %(channel)s%(network)s"
 
 #: plugin.py:241
-msgid "<-- %(kicked)s has been kicked %(channel)s%(network)s by %(kicker)s (%(message)s)"
+#, fuzzy
+msgid "<-- %(kicked)s has been kicked from %(channel)s%(network)s by %(kicker)s (%(message)s)"
 msgstr "<-- %(kicked)s on potkittu verkossa %(channel)s%(network)s, potkinut %(kicker)s (%(message)s)"
 
 #: plugin.py:251

@@ -238,8 +238,8 @@ class LinkRelay(callbacks.Plugin):
         if self.registryValue('color', msg.args[0]):
             args['color'] = '\x03%s' % self.registryValue('colors.kick',
                     msg.args[0])
-        s = '%(color)s' + _('<-- %(kicked)s has been kicked %(channel)s%(network)s by '
-                '%(kicker)s (%(message)s)')
+        s = '%(color)s' + _('<-- %(kicked)s has been kicked from '
+                '%(channel)s%(network)s by %(kicker)s (%(message)s)')
         self.sendToOthers(irc, msg.args[0], s, args)
 
     def doNick(self, irc, msg):
