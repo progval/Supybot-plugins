@@ -1,0 +1,39 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2011-10-26 20:53+EEST\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: plugin.py:42
+#, docstring
+msgid ""
+"Add the help for \"@plugin help Coffee\" here\n"
+"    This should describe *how* to use this plugin."
+msgstr ""
+
+#: plugin.py:47
+#, docstring
+msgid ""
+"takes no arguments\n"
+"\n"
+"        Makes coffee using the  Hyper Text Coffee Pot Control Protocol\n"
+"        (HTCPCP/1.0). More info at http://www.ietf.org/rfc/rfc2324.txt\n"
+"        Warning: this command has side effect if no compatible device\n"
+"        is found on the channel."
+msgstr ""
+
+#: plugin.py:73
+msgid "Ahah, you really believed this? Supybot can do mostly everything, but not coffee!"
+msgstr ""
+
