@@ -1,0 +1,42 @@
+# Coffee plugin in ProgVals Supybot-plugins.
+# Copyright (C) 2011 ProgVals Supybot-plugins
+# Mika Suomalainen <mika.henrik.mainio@hotmail.com>, 2011.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2011-10-26 20:53+EEST\n"
+"PO-Revision-Date: 2011-10-26 20:54+0200\n"
+"Last-Translator: Mika Suomalainen <mika.henrik.mainio@hotmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+#: plugin.py:42
+msgid ""
+"Add the help for \"@plugin help Coffee\" here\n"
+"    This should describe *how* to use this plugin."
+msgstr "Lisää ohje komennolle \"@plugin help Coffee\" tähän.\n"
+"    Tämän *pitäisi* kuvata kuinka tätä lisäosaa käytetään."
+
+#: plugin.py:47
+msgid ""
+"takes no arguments\n"
+"\n"
+"        Makes coffee using the  Hyper Text Coffee Pot Control Protocol\n"
+"        (HTCPCP/1.0). More info at http://www.ietf.org/rfc/rfc2324.txt\n"
+"        Warning: this command has side effect if no compatible device\n"
+"        is found on the channel."
+msgstr "ei ota parametrejä\n"
+"\n"
+"        Tekee kahvia käyttäen Hyper Teksti KahviRuukun Hallinta Protokollaa\n"
+"        (HTCPCP/1.0). Lisää tietoa osoitteessa http://www.ietf.org/rfc/rfc2324.txt .\n"
+"        Varoitus: tällä lisäosalla on sivuvaikutuksia. jos\n"
+"        kanavalta ei löydy yhteensopivia laitteita."
+
+#: plugin.py:73
+msgid "Ahah, you really believed this? Supybot can do mostly everything, but not coffee!"
+msgstr "Haha, uskoitko oikeasti tähän? Supybot voi tehdä enimmäkseen kaikkea, muttei kahvia!"
+
