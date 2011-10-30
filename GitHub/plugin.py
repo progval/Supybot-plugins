@@ -103,7 +103,7 @@ class GitHub(callbacks.Plugin):
         httpserver.hook('github', callback)
 
     class announce(callbacks.Commands):
-        def _createPrivmsg(self, channel, payload, commit):
+        def _createPrivmsg(self, channel, payload, commit, hidden=None):
             bold = ircutils.bold
             url = commit['url']
 
@@ -124,6 +124,8 @@ class GitHub(callbacks.Plugin):
                      commit['author']['name'],
                      bold(commit['message'].split('\n')[0]),
                      url)
+            if hidden is not None:
+                s += ' (+ %i hidden commits)' % hidden
             return ircmsgs.privmsg(channel, s)
 
         def onPayload(self, payload):
@@ -138,12 +140,19 @@ class GitHub(callbacks.Plugin):
                     if channel in irc.state.channels:
                         break
                 if channel not in irc.state.channels:
-                    print repr(irc.state.channel)
                     log.info('Cannot announce commit for repo %s on %s' %
                              (repo, channel))
                 else:
+                    hidden = None
+                    commits = payload['commits']
+                    last_commit = commits[-1]
+                    if last_commit['message'].startswith('Merge ') and \
+                            len(commits) > 5:
+                        hidden = len(commits) + 1
+                        payload['commits'] = [last_commit]
                     for commit in payload['commits']:
-                        msg = self._createPrivmsg(channel, payload, commit)
+                        msg = self._createPrivmsg(channel, payload, commit,
+                                hidden)
                         irc.queueMsg(msg)
 
         def _load(self):
