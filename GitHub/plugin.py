@@ -117,7 +117,7 @@ class GitHub(callbacks.Plugin):
             if status:
                 url = url2
 
-            s = '%s/%s (in %s): %s committed %s %s' % \
+            s = _('%s/%s (in %s): %s committed %s %s') % \
                     (payload['repository']['owner']['name'],
                      bold(payload['repository']['name']),
                      bold(payload['ref'].split('/')[-1]),
@@ -125,7 +125,7 @@ class GitHub(callbacks.Plugin):
                      bold(commit['message'].split('\n')[0]),
                      url)
             if hidden is not None:
-                s += ' (+ %i hidden commits)' % hidden
+                s += _(' (+ %i hidden commits)') % hidden
             return ircmsgs.privmsg(channel, s)
 
         def onPayload(self, payload):
