@@ -43,7 +43,8 @@ import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.schedule as schedule
 import supybot.callbacks as callbacks
-
+from supybot.i18n import PluginInternationalization, internationalizeDocstring
+_ = PluginInternationalization('Trivia')
 
 class Trivia(callbacks.Plugin):
     """Add the help for "@plugin help Trivia" here
@@ -126,10 +127,10 @@ class Trivia(callbacks.Plugin):
             if self.num == 0:
                 self.active = False
             elif self.unanswered > inactiveShutoff and inactiveShutoff >= 0:
-                self.reply('Seems like no one\'s playing any more.')
+                self.reply(_('Seems like no one\'s playing any more.'))
                 self.active = False
             elif len(self.questions) == 0:
-                self.reply('Oops!  I ran out of questions!')
+                self.reply(_('Oops!  I ran out of questions!'))
                 self.active = False
             if not self.active:
                 self.stop()
@@ -143,7 +144,7 @@ class Trivia(callbacks.Plugin):
             self.q = q[:q.find(sep)]
             self.a = q[q.find(sep)+len(sep):].split(sep)
             color = self.registryValue('color', self.channel)
-            self.reply('\x03%s#%d of %d: %s' % (color, self.numAsked,
+            self.reply(_('\x03%s#%d of %d: %s') % (color, self.numAsked,
                                                 self.total, self.q))
             def event():
                 self.timedEvent()
@@ -155,7 +156,7 @@ class Trivia(callbacks.Plugin):
 
 
         def stop(self):
-            self.reply('Trivia stopping.')
+            self.reply(_('Trivia stopping.'))
             self.active = False
             try:
                 schedule.removeEvent('next_%s' % self.channel)
@@ -173,20 +174,20 @@ class Trivia(callbacks.Plugin):
             if len(sorted) < max:
                 max = len(sorted)
                 #self.reply('max: %d.  len: %d' % (max, len(sorted)))
-            s = 'Top finishers: '
+            s = _('Top finishers: ')
             if max > 0:
                 recipients = []
                 maxp = sorted[0][1]
                 for i in range(0, max):
                     item = sorted[i]
-                    s = '%s %s %s.' % (s, item[0], item[1])
+                    s = _('%s %s %s.') % (s, item[0], item[1])
                 self.reply(s)
             del self.games[self.channel]
 
 
         def timedEvent(self):
             if self.hints >= self.registryValue('numHints', self.channel):
-                self.reply('No one got the answer!  It was: %s' % self.a[0])
+                self.reply(_('No one got the answer!  It was: %s') % self.a[0])
                 self.unanswered += 1
                 self.newquestion()
             else:
@@ -204,7 +205,7 @@ class Trivia(callbacks.Plugin):
             blank = ans[divider : ]
             blankChar = self.registryValue('blankChar', self.channel)
             blank = re.sub('\w', blankChar, blank)
-            self.reply('HINT: %s%s' % (show, blank))
+            self.reply(_('HINT: %s%s') % (show, blank))
             def event():
                 self.timedEvent()
             timeout = self.registryValue('timeout', self.channel)
@@ -231,7 +232,7 @@ class Trivia(callbacks.Plugin):
                     self.roundscores[msg.nick] = 0
                 self.roundscores[msg.nick] += 1
                 self.unanswered = 0
-                self.reply('%s got it!  The full answer was: %s. Points: %d' %
+                self.reply(_('%s got it!  The full answer was: %s. Points: %d') %
                            (msg.nick, self.a[0], self.scores[msg.nick]))
                 schedule.removeEvent('next_%s' % self.channel)
                 self.writeScores()
@@ -270,7 +271,7 @@ class Trivia(callbacks.Plugin):
                         thisrow[y] = min(thisrow[y], twoago[y - 2] + 1)
             return thisrow[len(seq2) - 1]
 
-
+    @internationalizeDocstring
     def start(self, irc, msg, args, channel, num):
         """[<channel>] [<number of questions>]
 
@@ -290,17 +291,17 @@ class Trivia(callbacks.Plugin):
                     schedule.removeEvent('next_%s' % channel)
                 except KeyError:
                     pass
-                irc.reply('Orphaned trivia game found and removed.')
+                irc.reply(_('Orphaned trivia game found and removed.'))
             else:
                 self.games[channel].num += num
                 self.games[channel].total += num
-                irc.reply('%d questions added to active game!' % num)
+                irc.reply(_('%d questions added to active game!') % num)
         else:
             self.games[channel] = self.Game(irc, channel, num, self)
         irc.noReply()
     start = wrap(start, ['channel', optional('positiveInt')])
 
-
+    @internationalizeDocstring
     def stop(self, irc, msg, args, channel):
         """[<channel>]
 
@@ -310,13 +311,13 @@ class Trivia(callbacks.Plugin):
         try:
             schedule.removeEvent('next_%s' % channel)
         except KeyError:
-            irc.error('No trivia started')
+            irc.error(_('No trivia started'))
         if channel in self.games:
             if self.games[channel].active:
                 self.games[channel].stop()
             else:
                 del self.games[channel]
-                irc.reply('Trivia stopped')
+                irc.reply(_('Trivia stopped'))
         else:
             irc.noReply()
     stop = wrap(stop, ['channel'])

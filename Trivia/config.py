@@ -31,7 +31,8 @@
 
 import supybot.conf as conf
 import supybot.registry as registry
-
+from supybot.i18n import PluginInternationalization, internationalizeDocstring
+_ = PluginInternationalization('Admin')
 def configure(advanced):
     # This will be called by supybot to configure this module.  advanced is
     # a bool that specifies whether the user identified himself as an advanced
@@ -47,47 +48,47 @@ Trivia = conf.registerPlugin('Trivia')
 #     registry.Boolean(False, """Help for someConfigVariableName."""))
 
 conf.registerChannelValue(Trivia, 'blankChar',
-        registry.String('*', """The character used for a blank when
-        displaying hints"""))
+        registry.String('*', _("""The character used for a blank when
+        displaying hints""")))
 
 conf.registerChannelValue(Trivia, 'numHints',
-        registry.PositiveInteger(3, """The number of hints to be given for
-        each question"""))
+        registry.PositiveInteger(3, _("""The number of hints to be given for
+        each question""")))
 
 conf.registerChannelValue(Trivia, 'timeout',
-        registry.PositiveInteger(90, """The number of seconds to allow for
-        each question"""))
+        registry.PositiveInteger(90, _("""The number of seconds to allow for
+        each question""")))
 
 conf.registerChannelValue(Trivia, 'hintPercentage',
-        registry.Probability(0.25, """The fraction of the answer that
-        should be revealed with each hint"""))
+        registry.Probability(0.25, _("""The fraction of the answer that
+        should be revealed with each hint""")))
 
 conf.registerChannelValue(Trivia, 'flexibility',
-        registry.PositiveInteger(8, """The flexibility of the trivia answer
-        checker.  One typo will be allowed for every __ characters."""))
+        registry.PositiveInteger(8, _("""The flexibility of the trivia answer
+        checker.  One typo will be allowed for every __ characters.""")))
 
 conf.registerChannelValue(Trivia, 'color',
-        registry.PositiveInteger(10, """The mIRC color to use for trivia
-        questions"""))
+        registry.PositiveInteger(10, _("""The mIRC color to use for trivia
+        questions""")))
 
 conf.registerChannelValue(Trivia, 'inactiveShutoff',
-        registry.Integer(6, """The number of questions that can go
-        unanswered before the trivia stops automatically."""))
+        registry.Integer(6, _("""The number of questions that can go
+        unanswered before the trivia stops automatically.""")))
 
 conf.registerGlobalValue(Trivia, 'scoreFile',
-        registry.String('scores.txt', """The path to the scores file.
-        If it doesn't exist, it will be created."""))
+        registry.String('scores.txt', _("""The path to the scores file.
+        If it doesn't exist, it will be created.""")))
 
 conf.registerGlobalValue(Trivia, 'questionFile',
-        registry.String('questions.txt', """The path to the questions file.
-        If it doesn't exist, it will be created."""))
+        registry.String('questions.txt', _("""The path to the questions file.
+        If it doesn't exist, it will be created.""")))
 
 conf.registerChannelValue(Trivia, 'defaultRoundLength',
-        registry.PositiveInteger(10, """The default number of questions to
-        be asked in a round of trivia."""))
+        registry.PositiveInteger(10, _("""The default number of questions to
+        be asked in a round of trivia.""")))
 
 conf.registerGlobalValue(Trivia, 'questionFileSeparator',
-        registry.String('*', """The separator used between the questions
-        and answers in your trivia file."""))
+        registry.String('*', _("""The separator used between the questions
+        and answers in your trivia file.""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
