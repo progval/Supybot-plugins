@@ -1,0 +1,160 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2011-11-01 19:21+CET\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: config.py:51
+msgid ""
+"The character used for a blank when\n"
+"        displaying hints"
+msgstr ""
+
+#: config.py:55
+msgid ""
+"The number of hints to be given for\n"
+"        each question"
+msgstr ""
+
+#: config.py:59
+msgid ""
+"The number of seconds to allow for\n"
+"        each question"
+msgstr ""
+
+#: config.py:63
+msgid ""
+"The fraction of the answer that\n"
+"        should be revealed with each hint"
+msgstr ""
+
+#: config.py:67
+msgid ""
+"The flexibility of the trivia answer\n"
+"        checker.  One typo will be allowed for every __ characters."
+msgstr ""
+
+#: config.py:71
+msgid ""
+"The mIRC color to use for trivia\n"
+"        questions"
+msgstr ""
+
+#: config.py:75
+msgid ""
+"The number of questions that can go\n"
+"        unanswered before the trivia stops automatically."
+msgstr ""
+
+#: config.py:79
+msgid ""
+"The path to the scores file.\n"
+"        If it doesn't exist, it will be created."
+msgstr ""
+
+#: config.py:83
+msgid ""
+"The path to the questions file.\n"
+"        If it doesn't exist, it will be created."
+msgstr ""
+
+#: config.py:87
+msgid ""
+"The default number of questions to\n"
+"        be asked in a round of trivia."
+msgstr ""
+
+#: config.py:91
+msgid ""
+"The separator used between the questions\n"
+"        and answers in your trivia file."
+msgstr ""
+
+#: plugin.py:50
+#, docstring
+msgid ""
+"Add the help for \"@plugin help Trivia\" here\n"
+"    This should describe *how* to use this plugin."
+msgstr ""
+
+#: plugin.py:130
+msgid "Seems like no one's playing any more."
+msgstr ""
+
+#: plugin.py:133
+msgid "Oops!  I ran out of questions!"
+msgstr ""
+
+#: plugin.py:147
+msgid "\003%s#%d of %d: %s"
+msgstr ""
+
+#: plugin.py:159
+msgid "Trivia stopping."
+msgstr ""
+
+#: plugin.py:177
+msgid "Top finishers: "
+msgstr ""
+
+#: plugin.py:183
+msgid "%s %s %s."
+msgstr ""
+
+#: plugin.py:190
+msgid "No one got the answer!  It was: %s"
+msgstr ""
+
+#: plugin.py:208
+msgid "HINT: %s%s"
+msgstr ""
+
+#: plugin.py:235
+msgid "%s got it!  The full answer was: %s. Points: %d"
+msgstr ""
+
+#: plugin.py:276
+#, docstring
+msgid ""
+"[<channel>] [<number of questions>]\n"
+"\n"
+"        Starts a game of trivia.  <channel> is only necessary if the message\n"
+"        isn't sent in the channel itself."
+msgstr ""
+
+#: plugin.py:294
+msgid "Orphaned trivia game found and removed."
+msgstr ""
+
+#: plugin.py:298
+msgid "%d questions added to active game!"
+msgstr ""
+
+#: plugin.py:306
+#, docstring
+msgid ""
+"[<channel>]\n"
+"\n"
+"        Stops a running game of trivia.  <channel> is only necessary if the\n"
+"        message isn't sent in the channel itself."
+msgstr ""
+
+#: plugin.py:314
+msgid "No trivia started"
+msgstr ""
+
+#: plugin.py:320
+msgid "Trivia stopped"
+msgstr ""
+
