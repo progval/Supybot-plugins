@@ -1,0 +1,57 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2011-11-07 17:43+EET\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: plugin.py:77
+msgid "Got `]` (at index %i), expected whatever you want but not that."
+msgstr ""
+
+#: plugin.py:80
+msgid "Got end of string, expected `]`."
+msgstr ""
+
+#: plugin.py:103
+msgid "Negative memory pointer."
+msgstr ""
+
+#: plugin.py:157
+msgid "Your code looks ok."
+msgstr ""
+
+#: plugin.py:175
+msgid "No processor has been run for the moment."
+msgstr ""
+
+#: plugin.py:186
+msgid "Brainfuck syntax error: %s"
+msgstr ""
+
+#: plugin.py:189
+msgid "Brainfuck processor timed out."
+msgstr ""
+
+#: plugin.py:192
+msgid "Input too short."
+msgstr ""
+
+#: plugin.py:195
+msgid "Segmentation fault: %s"
+msgstr ""
+
+#: plugin.py:198
+msgid "Tryed to output invalid character : %s"
+msgstr ""
+
