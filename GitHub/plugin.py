@@ -104,18 +104,22 @@ class GitHub(callbacks.Plugin):
 
     class announce(callbacks.Commands):
         def _createPrivmsg(self, channel, payload, commit, hidden=None):
+            print 'announce'
             bold = ircutils.bold
             url = commit['url']
 
             # ur1.ca
-            post_param = ur1ca.parameterize(url)
-            answerfile = ur1ca.request(post_param)
-            doc = ur1ca.retrievedoc(answerfile)
-            answerfile.close()
-            status, url2 = ur1ca.scrape(doc)
+            try:
+                post_param = ur1ca.parameterize(url)
+                answerfile = ur1ca.request(post_param)
+                doc = ur1ca.retrievedoc(answerfile)
+                answerfile.close()
+                status, url2 = ur1ca.scrape(doc)
 
-            if status:
-                url = url2
+                if status:
+                    url = url2
+            except:
+                pass
 
             s = _('%s/%s (in %s): %s committed %s %s') % \
                     (payload['repository']['owner']['name'],
@@ -131,6 +135,7 @@ class GitHub(callbacks.Plugin):
         def onPayload(self, payload):
             repo = '%s/%s' % (payload['repository']['owner']['name'],
                               payload['repository']['name'])
+            print 'payload'
             announces = self._load()
             if repo not in announces:
                 log.info('Commit for repo %s not announced anywhere' % repo)
@@ -151,6 +156,7 @@ class GitHub(callbacks.Plugin):
                         hidden = len(commits) + 1
                         payload['commits'] = [last_commit]
                     for commit in payload['commits']:
+                        print repr(commit)
                         msg = self._createPrivmsg(channel, payload, commit,
                                 hidden)
                         irc.queueMsg(msg)
