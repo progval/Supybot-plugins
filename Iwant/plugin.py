@@ -91,7 +91,7 @@ class Iwant(callbacks.Plugin):
         if len(wishlist) < id:
             irc.error(_('No thing has this id.'))
             return
-        irc.reply(_('Wish #%i is %s.' % (id, wishlist[id - 1])))
+        irc.reply(_('Wish #%i is %s.') % (id, wishlist[id - 1]))
     get = wrap(get, ['channel', 'id'])
 
 
