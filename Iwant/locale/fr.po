@@ -1,0 +1,79 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Limnoria\n"
+"POT-Creation-Date: 2011-11-18 18:46+CET\n"
+"PO-Revision-Date: 2011-11-18 18:49+0100\n"
+"Last-Translator: Valentin Lorentz <progval@gmail.com>\n"
+"Language-Team: Limnoria <progval@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"X-Poedit-Language: Français\n"
+"X-Poedit-Country: France\n"
+
+#: config.py:52
+msgid ""
+"List of wanted things. Don't edit this variable\n"
+"    unless you know what you do."
+msgstr "List de souhaits. N'éditez pas cette variable de configuration à moins de savoir ce que vous faîtes."
+
+#: plugin.py:53
+msgid ""
+"Add the help for \"@plugin help Iwant\" here\n"
+"    This should describe *how* to use this plugin."
+msgstr ""
+
+#: plugin.py:58
+msgid ""
+"[<channel>] <thing>\n"
+"\n"
+"        Tell the bot you want the <thing>. <channel> is only needed if you\n"
+"        don't send the message on the channel itself."
+msgstr ""
+"[<canal>] <chose>\n"
+"\n"
+"Indiquez au bot que vous voulez la chose. <canal> n'est nécessaire que si vous n'envoyez pas le message sur le canal lui-même."
+
+#: plugin.py:64
+msgid "This thing is already wanted."
+msgstr "Cette chose est déjà voulue."
+
+#: plugin.py:73
+msgid ""
+"[<channel>]\n"
+"\n"
+"        Returns the list of wanted things for the <channel>. <channel> defaults\n"
+"        to the current channel."
+msgstr ""
+"[<canal>]\n"
+"\n"
+"Retourne la liste des souhaits pour le <canal>. <canal> correspond par défaut au canal actuel."
+
+#: plugin.py:80
+msgid "#%i: %s"
+msgstr "#%i : %s"
+
+#: plugin.py:86
+msgid ""
+"[<channel>] <id>\n"
+"\n"
+"        Tell you the thing number <id>. <channel> is only needed if you\n"
+"        don't send the message on the channel itself."
+msgstr ""
+"[<canal>] <id>\n"
+"\n"
+"Affiche le souhait numéro <id>. <canal> n'est nécessaire que si vous n'envoyez pas le message sur le canal lui-même."
+
+#: plugin.py:92
+msgid "No thing has this id."
+msgstr "Rien n'a cet id."
+
+#: plugin.py:94
+msgid "Wish #%i is %s."
+msgstr "Le souhait #%i is %s."
+
