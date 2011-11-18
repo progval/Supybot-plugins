@@ -28,6 +28,8 @@
 
 ###
 
+import random
+
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
@@ -75,6 +77,9 @@ class Iwant(callbacks.Plugin):
         Returns the list of wanted things for the <channel>. <channel> defaults
         to the current channel."""
         wishlist = unserialize(self.registryValue('wishlist', channel))
+        if list(wishlist) == 0:
+            irc.error(_('No wish for the moment.'))
+            return
         indexes = range(1, len(wishlist) + 1)
         wishlist_with_index = zip(indexes, wishlist)
         formatted_wishlist = [_('#%i: %s') % x for x in wishlist_with_index]
@@ -93,6 +98,22 @@ class Iwant(callbacks.Plugin):
             return
         irc.reply(_('Wish #%i is %s.') % (id, wishlist[id - 1]))
     get = wrap(get, ['channel', 'id'])
+
+    @internationalizeDocstring
+    def random(self, irc, msg, args, channel):
+        """[<channel>]
+
+        Tell you a random thing. <channel> is only needed if you
+        don't send the message on the channel itself."""
+        wishlist = unserialize(self.registryValue('wishlist', channel))
+        if list(wishlist) == 0:
+            irc.error(_('No wish for the moment.'))
+            return
+        indexes = range(1, len(wishlist) + 1)
+        wishlist_with_index = zip(indexes, wishlist)
+        wish = random.sample(wishlist_with_index, 1)[0]
+        irc.reply(_('Wish #%i is %s.') % wish)
+    random = wrap(random, ['channel'])
 
 
 Class = Iwant
