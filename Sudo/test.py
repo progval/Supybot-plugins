@@ -43,7 +43,7 @@ def fakeStrEqual(first, second):
 ircutils.strEqual = fakeStrEqual
 
 class SudoTestCase(PluginTestCase):
-    plugins = ('Sudo', 'User', 'Admin')
+    plugins = ('Sudo', 'User', 'Admin', 'Alias', 'Utilities')
 
     def testAllow(self):
         self.assertNotError('register Prog Val')
@@ -73,6 +73,21 @@ class SudoTestCase(PluginTestCase):
         self.assertResponse('capabilities', '[owner]')
         self.assertRegexp('sudo capabilities', 'Error: '
                           'You must be registered to use this command.*')
+
+    def testNesting(self):
+        self.assertNotError('register Prog Val')
+        self.assertResponse('whoami', 'Prog')
+        self.assertNotError('sudo add test allow test test')
+        self.assertNotError('alias add test "echo [echo $nick]"')
+        self.assertResponse('echo $nick', self.prefix.split('!')[0])
+        self.assertResponse('sudo test', self.prefix.split('!')[0])
+        self.prefix = '[foo]!' + self.prefix.split('!')[1]
+        self.assertResponse('echo $nick', self.prefix.split('!')[0])
+
+        # This is the main command to test. If there are nesting issues, it
+        # will reply `Error: "foo" is not a valid command.` which is
+        # ***very*** dangerous.
+        self.assertNotRegexp('sudo test', 'valid command')
 
     def testSave(self):
         one = 'spam\n-1\nallow\nfoo!bar@baz\n.*'

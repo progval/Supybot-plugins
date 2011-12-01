@@ -186,9 +186,15 @@ class Sudo(callbacks.Plugin):
 
         Runs the command following the Sudo rules."""
         name, rule = self.db.getRuleMatching(command)
+        bannedChars = conf.supybot.commands.nested.brackets()
         if name is None:
             log.warning('Sudo not granted to "%s"' % msg.prefix)
             irc.error(_('Sudo not granted.'))
+        elif __builtins__['any']([(x in msg.nick) for x in bannedChars]):
+            log.warning(('Prevent "%s" from using Sudo because there are banned'
+                    'characters in his nick.') % msg.prefix)
+            irc.error(_('You are not allowed to use Sudo because you have '
+                    'banned characters in your nick'))
         else:
             assert rule is not None
             log.info('Sudo granted to "%s" with rule %s' % (msg.prefix, name))
