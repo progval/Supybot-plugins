@@ -132,7 +132,7 @@ class BrainfuckProcessor:
                 programPointer = loopStack.pop() - 1
             programPointer += 1
             if timeout < time.time():
-                raise BrainfuckTimeout()
+                raise BrainfuckTimeout(output)
         return output
                     
 
@@ -185,7 +185,8 @@ class Brainfuck(callbacks.Plugin):
         except BrainfuckSyntaxError as e:
             irc.error(_('Brainfuck syntax error: %s') % e.args[0])
             return
-        except BrainfuckTimeout:
+        except BrainfuckTimeout as e:
+            irc.reply(e.args[0])
             irc.error(_('Brainfuck processor timed out.'))
             return
         except NotEnoughInput:
