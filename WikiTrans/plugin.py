@@ -63,9 +63,11 @@ def translate(src, target, word):
     expectedNodes = 'api query pages page langlinks'.split()
     # Iterate while the node is not a langlink
     while node.nodeName != 'langlinks':
+        if not node.hasChildNodes():
+            raise WordNotFound()
         node = node.firstChild
         # If this page is a redirection to another:
-        if node.nodeName == 'redirects':
+        if node.nodeName in ('redirects', 'normalized'):
             newword = node.firstChild.getAttribute('to')
             return translate(src, target, newword)
         expectedNode = expectedNodes.pop(0)

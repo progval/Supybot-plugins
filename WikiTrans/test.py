@@ -48,6 +48,8 @@ class WikiTransTestCase(PluginTestCase):
         self.assertResponse('translate en fr Master (Doctor Who)',
                 'Le Maître (Doctor Who)')
 
+        self.assertRegexp('translate fi en paremmin', 'This word can\'t be found')
+
         self.assertError('translate fr de Supybot')
         self.assertError('translate fr en pogjoeregml')
 
