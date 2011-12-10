@@ -44,7 +44,11 @@ class WordNotFound(Exception):
     pass
 class Untranslatable(Exception):
     pass
+class ApiError(Exception):
+    pass
 
+# lllimit means "langlink limits". If we don't give this parameter, output
+# will be restricted to the ten first links.
 url = 'http://%s.wikipedia.org/w/api.php?action=query&format=xml&' + \
         'prop=langlinks&redirects&lllimit=300&titles=%s'
 def translate(src, target, word):
@@ -52,23 +56,36 @@ def translate(src, target, word):
         node = minidom.parse(utils.web.getUrlFd(url % (src,
                 urllib.quote_plus(word))))
     except:
+        # Usually an urllib error
         raise WordNotFound()
+
+    # The tree containing the langs links
     expectedNodes = 'api query pages page langlinks'.split()
+    # Iterate while the node is not a langlink
     while node.nodeName != 'langlinks':
         node = node.firstChild
+        # If this page is a redirection to another:
         if node.nodeName == 'redirects':
             newword = node.firstChild.getAttribute('to')
             return translate(src, target, newword)
         expectedNode = expectedNodes.pop(0)
+        # Iterate while the node is not valid
         while node.nodeName != expectedNode:
             node = node.nextSibling
+        if node.nodeName != expectedNode:
+            raise ApiError()
+
     link = node.firstChild
+    # Iterate through the links, until we find the one matching the target
+    # language
     while link is not None:
         assert link.tagName == 'll'
         if link.getAttribute('lang') != target:
             link = link.nextSibling
             continue
         return link.firstChild.data.encode('utf-8', 'replace')
+    # Too bad :-(
+    # No lang links available for the target language
     raise Untranslatable()
 
 @internationalizeDocstring
@@ -87,6 +104,8 @@ class WikiTrans(callbacks.Plugin):
             irc.error(_('This word can\'t be found on Wikipedia'))
         except Untranslatable:
             irc.error(_('No translation found'))
+        except ApiError:
+            irc.error(_('Something went wrong with Wikipedia API.'))
 
     translate = wrap(translate, ['something', 'something', 'text'])
 
