@@ -55,12 +55,17 @@ class WikiTrans(callbacks.Plugin):
         except:
             irc.error(_('This word can\'t be found on Wikipedia'))
             return
-        start = ('\t\t\t\t\t<li class="interwiki-%s"><a '
-                'href="http://%s.wikipedia.org/wiki/') % \
+        start = ('\t\t\t<li class="interwiki-%s"><a '
+                'href="//%s.wikipedia.org/wiki/') % \
                 (target, target)
         for line in page:
             if line.startswith(start):
-                irc.reply(line[len(start):].split('"')[2])
+                # Capture the translation:
+                reply = line[len(start):].split('"')[0]
+                # Format translation:
+                reply = urllib.unquote(reply.replace('_', ' '))
+                # Reply with translation:
+                irc.reply(reply)
                 return
         irc.error(_('No translation found'))
     translate = wrap(translate, ['something', 'something', 'text'])
