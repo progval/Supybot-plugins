@@ -45,6 +45,9 @@ class WikiTransTestCase(PluginTestCase):
         self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
         self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
 
+        self.assertResponse('translate en fr Master (Doctor Who)',
+                'Le Maître (Doctor Who)')
+
         self.assertError('translate fr de Supybot')
         self.assertError('translate fr en pogjoeregml')
 

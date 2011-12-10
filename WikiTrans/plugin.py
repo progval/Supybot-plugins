@@ -38,6 +38,38 @@ from supybot.i18n import PluginInternationalization, internationalizeDocstring
 _ = PluginInternationalization('WikiTrans')
 
 import urllib
+from xml.dom import minidom
+
+class WordNotFound(Exception):
+    pass
+class Untranslatable(Exception):
+    pass
+
+url = 'http://%s.wikipedia.org/w/api.php?action=query&format=xml&' + \
+        'prop=langlinks&redirects&lllimit=300&titles=%s'
+def translate(src, target, word):
+    try:
+        node = minidom.parse(utils.web.getUrlFd(url % (src,
+                urllib.quote_plus(word))))
+    except:
+        raise WordNotFound()
+    expectedNodes = 'api query pages page langlinks'.split()
+    while node.nodeName != 'langlinks':
+        node = node.firstChild
+        if node.nodeName == 'redirects':
+            newword = node.firstChild.getAttribute('to')
+            return translate(src, target, newword)
+        expectedNode = expectedNodes.pop(0)
+        while node.nodeName != expectedNode:
+            node = node.nextSibling
+    link = node.firstChild
+    while link is not None:
+        assert link.tagName == 'll'
+        if link.getAttribute('lang') != target:
+            link = link.nextSibling
+            continue
+        return link.firstChild.data.encode('utf-8', 'replace')
+    raise Untranslatable()
 
 @internationalizeDocstring
 class WikiTrans(callbacks.Plugin):
@@ -50,24 +82,12 @@ class WikiTrans(callbacks.Plugin):
         Translates the <word> (also works with expressions) using Wikipedia
         interlanguage links."""
         try:
-            page = utils.web.getUrlFd('http://%s.wikipedia.org/wiki/%s' %
-                    (src, urllib.quote_plus(word.replace(' ', '_'))))
-        except:
+            irc.reply(translate(src, target, word))
+        except WordNotFound:
             irc.error(_('This word can\'t be found on Wikipedia'))
-            return
-        start = ('\t\t\t<li class="interwiki-%s"><a '
-                'href="//%s.wikipedia.org/wiki/') % \
-                (target, target)
-        for line in page:
-            if line.startswith(start):
-                # Capture the translation:
-                reply = line[len(start):].split('"')[0]
-                # Format translation:
-                reply = urllib.unquote(reply.replace('_', ' '))
-                # Reply with translation:
-                irc.reply(reply)
-                return
-        irc.error(_('No translation found'))
+        except Untranslatable:
+            irc.error(_('No translation found'))
+
     translate = wrap(translate, ['something', 'something', 'text'])
 
 
