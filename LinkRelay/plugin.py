@@ -220,6 +220,8 @@ class LinkRelay(callbacks.Plugin):
         args = {'nick': msg.nick, 'channel': msg.args[0], 'color': ''}
         if self.registryValue('color', msg.args[0]):
             args['color'] = '\x03%s' % self.registryValue('colors.join', msg.args[0])
+        if self.registryValue('hostmasks', msg.args[0]):
+            args['nick'] = msg.prefix
         s = '%(color)s' + _('--> %(nick)s has joined %(channel)s%(network)s')
         self.sendToOthers(irc, msg.args[0], s, args)
 
@@ -228,6 +230,8 @@ class LinkRelay(callbacks.Plugin):
         args = {'nick': msg.nick, 'channel': msg.args[0], 'color': ''}
         if self.registryValue('color', msg.args[0]):
             args['color'] = '\x03%s' % self.registryValue('colors.part', msg.args[0])
+        if self.registryValue('hostmasks', msg.args[0]):
+            args['nick'] = msg.prefix
         s = '%(color)s' + _('<-- %(nick)s has left %(channel)s%(network)s')
         self.sendToOthers(irc, msg.args[0], s, args)
 
