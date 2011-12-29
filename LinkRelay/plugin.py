@@ -141,7 +141,7 @@ class LinkRelay(callbacks.Plugin):
                         {'nick': nick, 'text': text})
         else:
             if colored:
-                return ('<%(color)s%(nick)s%(network)s\x03> %(text)s',
+                return ('<\x03%(color)s%(nick)s%(network)s\x03> %(text)s',
                         {'color': color, 'nick': nick, 'text': text})
             else:
                 return ('<%(nick)s%(network)s> %(text)s',
