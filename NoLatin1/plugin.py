@@ -30,6 +30,7 @@
 
 import time
 import chardet
+import supybot.log as log
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
@@ -61,6 +62,7 @@ class NoLatin1(callbacks.Plugin):
             return
         encoding = chardet.detect(content)['encoding']
         if encoding not in ('utf-8', 'ascii'):
+            log.info('Warning %s (using %s)' % (msg.prefix, encoding))
             self._warn(irc, channel, msg.prefix.split('!')[0])
 
     def _warn(self, irc, channel, nick):
