@@ -67,7 +67,7 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
     def doPost(self, handler, path, form):
         if not handler.address_string().endswith('.rs.github.com'):
             log.warning("""'%s' tryed to act as a web hook for Github,
-            but is not GitHub.""")
+            but is not GitHub.""" % handler.address_string())
         else:
             self.plugin.announce.onPayload(json.loads(form['payload'].value))
 
@@ -156,7 +156,6 @@ class GitHub(callbacks.Plugin):
                         hidden = len(commits) + 1
                         payload['commits'] = [last_commit]
                     for commit in payload['commits']:
-                        print repr(commit)
                         msg = self._createPrivmsg(channel, payload, commit,
                                 hidden)
                         irc.queueMsg(msg)
