@@ -134,14 +134,14 @@ class LinkRelay(callbacks.Plugin):
             text = text.strip('\x01')
             text = text[ 7 : ]
             if colored:
-                return ('* \x03%(color)s%(nick)s%(network)s\x03 %(text)s',
+                return ('* \x03%(color)s%(nick)s%(network)s\x17 %(text)s',
                         {'nick': nick, 'color': color, 'text': text})
             else:
                 return ('* %(nick)s%(network)s %(text)s',
                         {'nick': nick, 'text': text})
         else:
             if colored:
-                return ('<\x03%(color)s%(nick)s%(network)s\x03> %(text)s',
+                return ('<\x03%(color)s%(nick)s%(network)s\017> %(text)s',
                         {'color': color, 'nick': nick, 'text': text})
             else:
                 return ('<%(nick)s%(network)s> %(text)s',
@@ -158,7 +158,7 @@ class LinkRelay(callbacks.Plugin):
             if relay.hasTargetIRC:
                 hasIRC = 'Link healthy!'
             else:
-                hasIRC = '\x03%sIRC object not scraped yet.\x03' % \
+                hasIRC = '\x03%sIRC object not scraped yet.\017' % \
                         self.registryValue('colors.info', msg.args[0])
             s ='\x02%s\x02 on \x02%s\x02 ==> \x02%s\x02 on \x02%s\x02.  %s'
             if not self.registryValue('color', msg.args[0]):
@@ -183,7 +183,7 @@ class LinkRelay(callbacks.Plugin):
                 if self.registryValue('color', channel):
                     color = '\x03' + self.registryValue('colors.truncated',
                             channel)
-                    match = '(>\x03 \w+) .*'
+                    match = '(>\017 \w+) .*'
                 else:
                     color = ''
                     match = '(> \w+) .*'
