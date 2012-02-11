@@ -105,7 +105,6 @@ class GitHub(callbacks.Plugin):
 
     class announce(callbacks.Commands):
         def _createPrivmsg(self, channel, payload, commit, hidden=None):
-            print 'announce'
             bold = ircutils.bold
             url = commit['url']
 
@@ -136,7 +135,6 @@ class GitHub(callbacks.Plugin):
         def onPayload(self, payload):
             repo = '%s/%s' % (payload['repository']['owner']['name'],
                               payload['repository']['name'])
-            print 'payload'
             announces = self._load()
             if repo not in announces:
                 log.info('Commit for repo %s not announced anywhere' % repo)
