@@ -65,7 +65,8 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
     You shouldn't be there, this subfolder is not for you. Go back to the
     index and try out other plugins (if any).""")
     def doPost(self, handler, path, form):
-        if not handler.address_string().endswith('.rs.github.com'):
+        if not handler.address_string().endswith('.rs.github.com') and \
+                not handler.address_string().endswith('.cloud-ips.com'):
             log.warning("""'%s' tryed to act as a web hook for Github,
             but is not GitHub.""" % handler.address_string())
         else:

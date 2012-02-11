@@ -41,9 +41,9 @@ def configure(advanced):
     conf.registerPlugin('SupySandbox', True)
 
 
-PySandbox = conf.registerPlugin('SupySandbox')
+SupySandbox = conf.registerPlugin('SupySandbox')
 # This is where your configuration variables (if any) should go.  For example:
-# conf.registerGlobalValue(PySandbox, 'someConfigVariableName',
+# conf.registerGlobalValue(SupySandbox, 'someConfigVariableName',
 #     registry.Boolean(False, """Help for someConfigVariableName."""))
 
 

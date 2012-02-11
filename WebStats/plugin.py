@@ -58,7 +58,10 @@ try:
     class WebStatsInternationalization(_PluginInternationalization):
         def __init__(self):
             self.name = 'WebStats'
-            self.loadLocale(conf.supybot.language())
+            try:
+                self.loadLocale(conf.supybot.language())
+            except:
+                pass
     _ = WebStatsInternationalization()
 except ImportError:
     _ = lambda x:x
