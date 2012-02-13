@@ -144,8 +144,8 @@ def format_logs(logs):
                     'modes': ' '.join(words[3:])}
         elif command == 'KICK':
             new_line = _('<-- %(kicked)s has been kicked by %(kicker)s (%(reason)s)') % \
-                    {'kicked': format_nick(words[2]),
-                    'kicker': format_nick(words[3]),
+                    {'kicked': format_nick(words[3]),
+                    'kicker': format_nick(words[2]),
                     'reason': cgi.escape(' '.join(words[4:]))}
         if new_line is not None:
             template = """
