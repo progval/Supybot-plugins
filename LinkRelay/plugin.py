@@ -269,6 +269,13 @@ class LinkRelay(callbacks.Plugin):
 
     def sendToOthers(self, irc, channel, s, args, nick=None, isPrivmsg=False):
         assert channel is not None or nick is not None
+        def format_(relay, s, args):
+            if 'network' not in args:
+                if self.registryValue('includeNetwork', relay.targetChannel):
+                    args['network'] = '@' + irc.network
+                else:
+                    args['network'] = ''
+            return s % args
         def send(s):
             if not relay.hasTargetIRC:
                 self.log.info('LinkRelay:  IRC %s not yet scraped.' %
@@ -280,12 +287,6 @@ class LinkRelay(callbacks.Plugin):
                 self.log.info('LinkRelay:  I\'m not in in %s on %s' %
                               (relay.targetChannel, relay.targetNetwork))
             else:
-                if 'network' not in args:
-                    if self.registryValue('includeNetwork', relay.targetChannel):
-                        args['network'] = '@' + irc.network
-                    else:
-                        args['network'] = ''
-                s %= args
                 if isPrivmsg or \
                         self.registryValue('nonPrivmsgs', channel) == 'privmsg':
                     msg = ircmsgs.privmsg(relay.targetChannel, s)
@@ -299,17 +300,19 @@ class LinkRelay(callbacks.Plugin):
         if channel is None:
             for relay in self.relays:
                 for channel in relay.sourceIRCChannels:
+                    new_s = format_(relay, s, args)
                     if nick in relay.sourceIRCChannels[channel].users and \
                             relay.channelRegex.match(channel) and \
                             relay.networkRegex.match(irc.network)and \
-                            relay.messageRegex.search(s):
-                        send(s)
+                            relay.messageRegex.search(new_s):
+                        send(new_s)
         else:
             for relay in self.relays:
+                new_s = format_(relay, s, args)
                 if relay.channelRegex.match(channel) and \
                         relay.networkRegex.match(irc.network)and \
-                        relay.messageRegex.search(s):
-                    send(s)
+                        relay.messageRegex.search(new_s):
+                    send(new_s)
 
 
     def addIRC(self, irc):
@@ -464,7 +467,7 @@ class LinkRelay(callbacks.Plugin):
     add = wrap(add, [('checkCapability', 'admin'),
                      getopts({'from': 'something',
                               'to': 'something',
-                              'regexp': 'regexpMatcher',
+                              'regexp': 'something',
                               'reciprocal': ''})])
 
     @internationalizeDocstring
