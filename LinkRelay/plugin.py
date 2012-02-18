@@ -502,7 +502,7 @@ class LinkRelay(callbacks.Plugin):
     remove = wrap(remove, [('checkCapability', 'admin'),
                      getopts({'from': 'something',
                               'to': 'something',
-                              'regexp': 'regexpMatcher',
+                              'regexp': 'something',
                               'reciprocal': ''})])
 
     def _getSubstitutes(self):
