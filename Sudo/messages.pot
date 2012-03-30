@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2011-08-21 02:16+CEST\n"
+"POT-Creation-Date: 2012-03-30 22:24+UTC\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,12 +69,21 @@ msgstr ""
 #: plugin.py:185
 #, docstring
 msgid ""
-"<commande> [<arg1> [<arg2> ...]]\n"
+"<command> [<arg1> [<arg2> ...]]\n"
 "\n"
-"        Runs the command fellowing the Sudo rules."
+"        Runs the command following the Sudo rules."
 msgstr ""
 
-#: plugin.py:191
+#: plugin.py:192
 msgid "Sudo not granted."
+msgstr ""
+
+#: plugin.py:204
+#, docstring
+msgid ""
+"<hostmask> <command>\n"
+"\n"
+"        Runs <command> as if you were wearing the <hostmask>. Of course, usage\n"
+"        of the command is restricted to the owner."
 msgstr ""
 

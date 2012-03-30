@@ -182,7 +182,7 @@ class Sudo(callbacks.Plugin):
 
     @internationalizeDocstring
     def sudo(self, irc, msg, args, command):
-        """<commande> [<arg1> [<arg2> ...]]
+        """<command> [<arg1> [<arg2> ...]]
 
         Runs the command following the Sudo rules."""
         name, rule = self.db.getRuleMatching(command)
