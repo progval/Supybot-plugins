@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2012-04-17 15:19+EEST\n"
+"POT-Creation-Date: 2012-04-17 15:29+EEST\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,7 +48,7 @@ msgstr ""
 
 #: config.py:102
 msgid ""
-"Determines the pushiment applyed when a\n"
+"Determines the punishment applied when a\n"
 "        %s flood is detected."
 msgstr ""
 
