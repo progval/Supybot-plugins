@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2010-11-02 11:32+CET\n"
+"POT-Creation-Date: 2012-04-17 15:19+EEST\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,31 +20,44 @@ msgstr ""
 msgid "Value must be in the format <number>p<seconds>."
 msgstr ""
 
-#: config.py:73
+#: config.py:64
+#, docstring
+msgid ""
+"Value must be a valid punishment ('ban', 'kick', 'kban', 'mode+X',\n"
+"    'mode-X', 'command XXX', ...)"
+msgstr ""
+
+#: config.py:80
+msgid ""
+"If a user has this capability, he won't be\n"
+"        punished by AttackProtector"
+msgstr ""
+
+#: config.py:83
 msgid ""
 "Determines how long (in seconds) the plugin will\n"
 "    wait before being enabled. A too low value makes the bot believe that\n"
 "    its incoming messages 'flood' on connection is an attack."
 msgstr ""
 
-#: config.py:85
+#: config.py:99
 msgid ""
 "In the format XpY, where X is the number of %s per\n"
 "        Y seconds that triggers the punishment."
 msgstr ""
 
-#: config.py:88
+#: config.py:102
 msgid ""
 "Determines the pushiment applyed when a\n"
 "        %s flood is detected."
 msgstr ""
 
-#: plugin.py:100
+#: plugin.py:107
 #, docstring
 msgid "This plugin protects channels against spam and flood"
 msgstr ""
 
-#: plugin.py:143
+#: plugin.py:178
 msgid "%s flood detected"
 msgstr ""
 
