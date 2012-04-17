@@ -146,6 +146,8 @@ class GitHub(callbacks.Plugin):
                 if channel not in irc.state.channels:
                     log.info('Cannot announce commit for repo %s on %s' %
                              (repo, channel))
+                elif len(commits) == 0:
+                    log.warning('GitHub callback called without any commit.')
                 else:
                     hidden = None
                     commits = payload['commits']
