@@ -1,0 +1,96 @@
+# Brainfuck plugin for Limnoria
+# Copyright (C) 2012 ProgVal
+# Mika Suomalainen <mika.henrik.mainio@hotmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2012-04-17 15:44+EEST\n"
+"PO-Revision-Date: 2012-04-17 15:44+0200\n"
+"Last-Translator: Mika Suomalainen <mika.henrik.mainio@hotmail.com>\n"
+"Language-Team: Finnish <>\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: plugin.py:77
+msgid "Got `]` (at index %i), expected whatever you want but not that."
+msgstr "Saatiin `]` (indeksissä %i), oleta mitä tahansa, mutta et tahdo sitä."
+
+#: plugin.py:80
+msgid "Got end of string, expected `]`."
+msgstr "Saatiin merkkiketjun loppu, oletettu `[`."
+
+#: plugin.py:103
+msgid "Negative memory pointer."
+msgstr "Negatiivinen muisti osoittaja."
+
+#: plugin.py:141
+msgid ""
+"Add the help for \"@plugin help Brainfuck\" here\n"
+"    This should describe *how* to use this plugin."
+msgstr ""
+"Lisää ohje komennolle \"@plugin help Brainfuck\" tähän.\n"
+"    Tämän pitäisi kuvata *kuinka* tätä lisäosaa käytetään."
+
+#: plugin.py:148
+msgid ""
+"<command>\n"
+"\n"
+"        Tests the Brainfuck syntax without running it. You should quote the\n"
+"        code if you use brackets, because Supybot would interpret it as nested\n"
+"        commands."
+msgstr ""
+"<komento>\n"
+"\n"
+" Kokeilee Brainfuck syntaksia suorittamatta sitä. Koodi pitäisi pitää lainausmerkeissä,\n"
+" ettei Supybot tulkitse sitä sisäkkäiseksi komennoksi."
+
+#: plugin.py:157
+msgid "Your code looks ok."
+msgstr "Koodisi näyttää kelvolliselta."
+
+#: plugin.py:163
+msgid ""
+"[--recover] [--input <characters>] <command>\n"
+"\n"
+"        Interprets the given Brainfuck code. You should quote the code if you\n"
+"        use brackets, because Supybot would interpret it as nested commands.\n"
+"        If --recover is given, the bot will recover the previous processor\n"
+"        memory and memory pointer.\n"
+"        The code will be fed the <characters> when it asks for input."
+msgstr ""
+"[--recover] [--input <merkkejä>] <komento>\n"
+"\n"
+" Tulkkaa annetun Brainfuck koodin. Koodin pitäisi olla lainausmerkeissä, koska muuten\n"
+" Supybot voi tulkita sen sisäkkäisiksi komennoiksi.\n"
+" Jos --recover on annettu, botti palauttaa edellisen suorituksen muistista ja muisti\n"
+" osoittajasta. Koodi syötetään <merkkeinä>, kun se pyytää sisääntuloa."
+
+#: plugin.py:175
+msgid "No processor has been run for the moment."
+msgstr "Käsittelyä ei ole suoritettu hetkeen."
+
+#: plugin.py:186
+msgid "Brainfuck syntax error: %s"
+msgstr "Brainfuck syntaksi virhe: %s"
+
+#: plugin.py:190
+msgid "Brainfuck processor timed out."
+msgstr "Brainfuck käsittely aikakatkaistu."
+
+#: plugin.py:193
+msgid "Input too short."
+msgstr "Sisääntulo on liian lyhyt."
+
+#: plugin.py:196
+msgid "Segmentation fault: %s"
+msgstr "Segmentointi vika: %s"
+
+#: plugin.py:199
+msgid "Tried to output invalid character: %s"
+msgstr "Yritettiin tulostaa virheellinen merkki : %s"
+

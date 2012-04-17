@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2011-11-07 17:43+EET\n"
+"POT-Creation-Date: 2012-04-17 15:44+EEST\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,8 +27,37 @@ msgstr ""
 msgid "Negative memory pointer."
 msgstr ""
 
+#: plugin.py:141
+#, docstring
+msgid ""
+"Add the help for \"@plugin help Brainfuck\" here\n"
+"    This should describe *how* to use this plugin."
+msgstr ""
+
+#: plugin.py:148
+#, docstring
+msgid ""
+"<command>\n"
+"\n"
+"        Tests the Brainfuck syntax without running it. You should quote the\n"
+"        code if you use brackets, because Supybot would interpret it as nested\n"
+"        commands."
+msgstr ""
+
 #: plugin.py:157
 msgid "Your code looks ok."
+msgstr ""
+
+#: plugin.py:163
+#, docstring
+msgid ""
+"[--recover] [--input <characters>] <command>\n"
+"\n"
+"        Interprets the given Brainfuck code. You should quote the code if you\n"
+"        use brackets, because Supybot would interpret it as nested commands.\n"
+"        If --recover is given, the bot will recover the previous processor\n"
+"        memory and memory pointer.\n"
+"        The code will be fed the <characters> when it asks for input."
 msgstr ""
 
 #: plugin.py:175
@@ -39,19 +68,19 @@ msgstr ""
 msgid "Brainfuck syntax error: %s"
 msgstr ""
 
-#: plugin.py:189
+#: plugin.py:190
 msgid "Brainfuck processor timed out."
 msgstr ""
 
-#: plugin.py:192
+#: plugin.py:193
 msgid "Input too short."
 msgstr ""
 
-#: plugin.py:195
+#: plugin.py:196
 msgid "Segmentation fault: %s"
 msgstr ""
 
-#: plugin.py:198
-msgid "Tryed to output invalid character : %s"
+#: plugin.py:199
+msgid "Tried to output invalid character: %s"
 msgstr ""
 
