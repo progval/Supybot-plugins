@@ -196,7 +196,7 @@ class Brainfuck(callbacks.Plugin):
             irc.error(_('Segmentation fault: %s') % e.args[0])
             return
         except InvalidCharacter as e:
-            irc.error(_('Tryed to output invalid character : %s') % e.args[0])
+            irc.error(_('Tried to output invalid character: %s') % e.args[0])
             return
         irc.reply(output)
     brainfuck = wrap(brainfuck, [getopts({'recover': '',
