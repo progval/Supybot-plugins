@@ -1,0 +1,132 @@
+# ERepublik plugin for Limnoria
+# Copyright (C) 2012 ProgVal
+# Mika Suomalainen <mika.henrik.mainio@hotmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2011-08-21 02:16+CEST\n"
+"PO-Revision-Date: 2012-04-17 16:21+0300\n"
+"Last-Translator: Mika Suomalainen <mika.henrik.mainio@hotmail.com>\n"
+"Language-Team: Finnish <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: plugin.py:52 plugin.py:69 plugin.py:95
+msgid "This citizen does not exist."
+msgstr "Kyseinen kansalainen ei ole olemassa."
+
+#: plugin.py:61 plugin.py:87
+msgid ""
+"<name|id>\n"
+"\n"
+"        Displays informations on the given citizen."
+msgstr ""
+"<nimi|id>\n"
+" Näyttää tiedot annetusta kansalaisesta."
+
+#: plugin.py:75
+msgid ""
+"<name|id>\n"
+"\n"
+"        Displays the citizen's medals."
+msgstr ""
+"<nimi|id>\n"
+"\n"
+" Näyttää kansalaisen arvomerkit."
+
+#: plugin.py:81
+msgid "%s has the fellowing medal(s): %s"
+msgstr "%s omistaa seuraavat mitali(n/s): %s"
+
+#: plugin.py:101
+msgid ""
+"<name>\n"
+"\n"
+"        Displays money's rates."
+msgstr ""
+"<nimi>\n"
+" Näyttää rahan korot."
+
+#: plugin.py:112
+msgid ", "
+msgstr ","
+
+#: plugin.py:117
+msgid ""
+"<channel>\n"
+"\n"
+"        Calls for invasion of the channel."
+msgstr ""
+"<kanava>\n"
+"\n"
+" Kutsuu kanavan invaasion."
+
+#: plugin.py:121
+msgid "PREPARE FOR ORGANIZED JUMP INTO THE CHANNEL"
+msgstr "VALMISTAUDU ORGANISOITUUN HYPPYYN KANAVALLE"
+
+#: plugin.py:125
+msgid "Join %s !"
+msgstr "Liity %s !"
+
+#: plugin.py:130
+msgid ""
+"<user|id>\n"
+"\n"
+"        Returns the link to the user's profile."
+msgstr ""
+"<käyttäjä|id>\n"
+"\n"
+" Palauttaa linkin käyttäjän profiiliin."
+
+#: plugin.py:142
+msgid ""
+"<user|id>\n"
+"\n"
+"        Returns the link to the user's 'donate' page."
+msgstr ""
+"<käyttäjä|id>\n"
+"\n"
+" Palauttaa linkin käyttäjän 'lahjoitus' sivulle."
+
+#: plugin.py:154
+msgid ""
+"take no arguments\n"
+"\n"
+"        Returns the eRepublik main links."
+msgstr ""
+"ei ota parametrejä\n"
+"\n"
+" Palauttaa eRepublikin päälinkit."
+
+#: plugin.py:166
+msgid ""
+"take no arguments\n"
+"\n"
+"        Returns the eRepublik land links."
+msgstr ""
+"ei ota parametrejä\n"
+"\n"
+" Palauttaa eRepublikin maalinkit."
+
+#: plugin.py:178 plugin.py:188
+msgid ""
+"<name|id>\n"
+"\n"
+"        Shows how many damages you can make in one hit."
+msgstr ""
+"<nimi|id>\n"
+"\n"
+" Näyttää kuinka paljon vahinkoa voit tehdä yhdellä lyönnillä."
+
+#: plugin.py:184
+msgid "damages: %i"
+msgstr "vahingot: %i"
+
+#: plugin.py:194
+msgid "kamikaze attack with full food: %i"
+msgstr "kamikaze hyökkäys täydellä ruualla: %i"
