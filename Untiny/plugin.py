@@ -46,6 +46,9 @@ class Untiny(callbacks.Plugin):
     This should describe *how* to use this plugin."""
     @internationalizeDocstring
     def untiny(self, irc, msg, args, url):
+        """<url>
+
+        Return the whole URL for a tiny URL."""
         data = json.load(getUrlFd(self.registryValue('service') % url))
         if 'org_url' in data:
             irc.reply(data['org_url'])
