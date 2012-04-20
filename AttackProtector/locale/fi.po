@@ -1,0 +1,67 @@
+# AttackProtector plugin for Limnoria.
+# Copyright (C) 2012 ProgVal
+# Mika Suomalainen <mika.henrik.mainio@hotmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2012-04-17 15:29+EEST\n"
+"PO-Revision-Date: 2012-04-17 15:30+0200\n"
+"Last-Translator: Mika Suomalainen <mika.henrik.mainio@hotmail.com>\n"
+"Language-Team: Finnish <>\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: config.py:54
+msgid "Value must be in the format <number>p<seconds>."
+msgstr "Arvon täytyy olla muodossa <numero>p<sekunteja>"
+
+#: config.py:64
+msgid ""
+"Value must be a valid punishment ('ban', 'kick', 'kban', 'mode+X',\n"
+"    'mode-X', 'command XXX', ...)"
+msgstr ""
+"Arvon täytyy olla kelvollinen rangaistus ('ban', 'kick', 'kban', 'mode+X',\n"
+" 'mode-X', 'command XXX', ...)"
+
+#: config.py:80
+msgid ""
+"If a user has this capability, he won't be\n"
+"        punished by AttackProtector"
+msgstr "Jos käyttäjällä on tämä valtuus, hän ei tule AttackProtectorin rangaisemaksi."
+
+#: config.py:83
+msgid ""
+"Determines how long (in seconds) the plugin will\n"
+"    wait before being enabled. A too low value makes the bot believe that\n"
+"    its incoming messages 'flood' on connection is an attack."
+msgstr ""
+"Määrittää kuinka pitkään (sekunteissa) lisäosa odottaa ennen käyttöön ottoaan. Liian\n"
+" alhainen arvo saa botin olettamaan, että sen sisääntulevat viestit 'tulva' yhdistäessä\n"
+" on hyökkäys."
+
+#: config.py:99
+msgid ""
+"In the format XpY, where X is the number of %s per\n"
+"        Y seconds that triggers the punishment."
+msgstr "Muodossa XpY, missä X on numero %s per Y sekunteja, joka laukaisee rangaistuksen."
+
+#: config.py:102
+#, fuzzy
+msgid ""
+"Determines the punishment applied when a\n"
+"        %s flood is detected."
+msgstr "Määrittää rangaistuksen, joka otetaan käyttöön, kun %s tulva on havaittu."
+
+#: plugin.py:107
+msgid "This plugin protects channels against spam and flood"
+msgstr "Tämä lisäosa suojelee kanavaa spämmiä ja tulvaa vastaan"
+
+#: plugin.py:178
+msgid "%s flood detected"
+msgstr "%s tulva havaittu."
+
