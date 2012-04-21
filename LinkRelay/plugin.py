@@ -134,7 +134,7 @@ class LinkRelay(callbacks.Plugin):
             text = text.strip('\x01')
             text = text[ 7 : ]
             if colored:
-                return ('* \x03%(color)s%(nick)s%(network)s\x17 %(text)s',
+                return ('* \x03%(color)s%(nick)s%(network)s\017 %(text)s',
                         {'nick': nick, 'color': color, 'text': text})
             else:
                 return ('* %(nick)s%(network)s %(text)s',
