@@ -143,6 +143,7 @@ class GitHub(callbacks.Plugin):
                 for irc in world.ircs:
                     if channel in irc.state.channels:
                         break
+                commits = payload['commits']
                 if channel not in irc.state.channels:
                     log.info('Cannot announce commit for repo %s on %s' %
                              (repo, channel))
@@ -150,7 +151,6 @@ class GitHub(callbacks.Plugin):
                     log.warning('GitHub callback called without any commit.')
                 else:
                     hidden = None
-                    commits = payload['commits']
                     last_commit = commits[-1]
                     if last_commit['message'].startswith('Merge ') and \
                             len(commits) > 5:
