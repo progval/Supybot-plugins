@@ -164,6 +164,8 @@ class AttackProtector(callbacks.Plugin):
 
         if not ircutils.isChannel(channel):
                 return
+        if not self.registryValue('enable', channel):
+            return
 
         try:
             ircdb.users.getUser(msg.prefix) # May raise KeyError

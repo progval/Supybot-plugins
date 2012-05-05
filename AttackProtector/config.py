@@ -76,6 +76,9 @@ AttackProtector = conf.registerPlugin('AttackProtector')
 # conf.registerGlobalValue(AttackProtector, 'someConfigVariableName',
 #     registry.Boolean(False, """Help for someConfigVariableName."""))
 
+conf.registerChannelValue(AttackProtector, 'enable',
+    registry.Boolean(True, _("""Determines whether or not AttackProtector
+    is enabled on this channel.""")))
 conf.registerGlobalValue(AttackProtector, 'exempt',
     registry.String('nopunish', _("""If a user has this capability, he won't be
         punished by AttackProtector""")))
