@@ -202,7 +202,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
                                   prefix=self.prefix)
             self.irc.feedMsg(msg)
         self.assertNotError('config plugin.AttackProtector.message.punishment '
-                'umode +b')
+                'umode+b')
         return self._getIfAnswerIsEqual(ircmsgs.IrcMsg(prefix="", command="MODE",
             args=(self.channel, mode, self.nick)))
 

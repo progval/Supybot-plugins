@@ -62,10 +62,11 @@ XpY = internationalizeDocstring(XpY)
 
 class Punishment(registry.String):
     """Value must be a valid punishment ('ban', 'kick', 'kban', 'mode+X',
-    'mode-X', 'command XXX', ...)"""
+    'mode-X', 'umode-X', 'command XXX', ...)"""
     def set(self, s):
         if s not in ('ban', 'kick', 'kban') and not s.startswith('mode+') and \
-                not s.startswith('mode-') and not s.startswith('command '):
+                not s.startswith('mode-') and not s.startswith('umode-') and \
+                not s.startswith('umode+') and not s.startswith('command '):
             self.error()
             return
         self.setValue(s)
