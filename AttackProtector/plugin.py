@@ -192,6 +192,9 @@ class AttackProtector(callbacks.Plugin):
         elif punishment.startswith('mode'):
             msg = ircmsgs.mode(channel, punishment[len('mode'):])
             irc.queueMsg(msg)
+        elif punishment.startswith('umode'):
+            msg = ircmsgs.mode(channel, (punishment[len('umode'):], nick))
+            irc.queueMsg(msg)
         elif punishment.startswith('command '):
             tokens = callbacks.tokenize(punishment[len('command '):])
             self.Proxy(irc, msg, tokens)

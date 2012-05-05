@@ -194,6 +194,19 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             self.assertError('capabilities')
 
     #################################
+    # Test punishments
+
+    def testDisable(self):
+        for i in range(1, 11):
+            msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
+                                  prefix=self.prefix)
+            self.irc.feedMsg(msg)
+        self.assertNotError('config plugin.AttackProtector.message.punishment '
+                'umode +b')
+        return self._getIfAnswerIsEqual(ircmsgs.IrcMsg(prefix="", command="MODE",
+            args=(self.channel, mode, self.nick)))
+
+    #################################
     # Global tests
     def testCleanCollection(self):
         for i in range(1, 4):

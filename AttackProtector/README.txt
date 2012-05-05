@@ -14,5 +14,6 @@ individual flood's.
 For each flood type, you can define a punishment. More common are 'ban',
 'kick', 'kban'. You also can define modes, such as the default punishment
 for group joins: 'mode+i' (it defines the mode +i). You also can remove
-a mode, with the syntax 'mode-i'.
+a mode, with the syntax 'mode-i', or set/unset modes to the user, with
+'mode-v' or 'mode+v'.
 For a complete list of available modes, checkout the network's help pages.
