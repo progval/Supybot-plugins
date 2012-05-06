@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2012-04-17 15:29+EEST\n"
-"PO-Revision-Date: 2012-04-17 15:30+0200\n"
+"POT-Creation-Date: 2012-05-06 18:51+EEST\n"
+"PO-Revision-Date: 2012-05-06 18:53+0200\n"
 "Last-Translator: Mika Suomalainen <mika.henrik.mainio@hotmail.com>\n"
 "Language-Team: Finnish <>\n"
 "Language: fi\n"
@@ -23,18 +23,24 @@ msgstr "Arvon täytyy olla muodossa <numero>p<sekunteja>"
 #: config.py:64
 msgid ""
 "Value must be a valid punishment ('ban', 'kick', 'kban', 'mode+X',\n"
-"    'mode-X', 'command XXX', ...)"
+"    'mode-X', 'umode-X', 'command XXX', ...)"
 msgstr ""
 "Arvon täytyy olla kelvollinen rangaistus ('ban', 'kick', 'kban', 'mode+X',\n"
-" 'mode-X', 'command XXX', ...)"
+" 'mode-X', 'umode-X', 'komento XXX', ...)"
 
-#: config.py:80
+#: config.py:81
+msgid ""
+"Determines whether or not AttackProtector\n"
+"    is enabled on this channel."
+msgstr "Määrittää onko AttackProtector käytössä tällä kanavalla."
+
+#: config.py:84
 msgid ""
 "If a user has this capability, he won't be\n"
 "        punished by AttackProtector"
 msgstr "Jos käyttäjällä on tämä valtuus, hän ei tule AttackProtectorin rangaisemaksi."
 
-#: config.py:83
+#: config.py:87
 msgid ""
 "Determines how long (in seconds) the plugin will\n"
 "    wait before being enabled. A too low value makes the bot believe that\n"
@@ -44,24 +50,24 @@ msgstr ""
 " alhainen arvo saa botin olettamaan, että sen sisääntulevat viestit 'tulva' yhdistäessä\n"
 " on hyökkäys."
 
-#: config.py:99
+#: config.py:103
 msgid ""
 "In the format XpY, where X is the number of %s per\n"
 "        Y seconds that triggers the punishment."
 msgstr "Muodossa XpY, missä X on numero %s per Y sekunteja, joka laukaisee rangaistuksen."
 
-#: config.py:102
+#: config.py:106
 #, fuzzy
 msgid ""
 "Determines the punishment applied when a\n"
 "        %s flood is detected."
-msgstr "Määrittää rangaistuksen, joka otetaan käyttöön, kun %s tulva on havaittu."
+msgstr "Määrittää rangaistuksen, joka toteutetaan, kun %s tulva on havaittu."
 
 #: plugin.py:107
 msgid "This plugin protects channels against spam and flood"
 msgstr "Tämä lisäosa suojelee kanavaa spämmiä ja tulvaa vastaan"
 
-#: plugin.py:178
+#: plugin.py:180
 msgid "%s flood detected"
 msgstr "%s tulva havaittu."
 
