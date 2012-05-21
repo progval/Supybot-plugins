@@ -68,7 +68,8 @@ class Trigger(callbacks.Plugin):
         self._run(irc, msg, 'notice')
     def do376(self, irc, msg):
         command = self.registryValue('triggers.connect')
-        irc.queueMsg(ircmsgs.IrcMsg(command))
+        if command != '':
+            irc.queueMsg(ircmsgs.IrcMsg(command))
 
 
 Class = Trigger
