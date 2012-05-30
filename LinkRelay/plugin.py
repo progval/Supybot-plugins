@@ -283,7 +283,8 @@ class LinkRelay(callbacks.Plugin):
             elif relay.targetIRC.zombie:
                 self.log.info('LinkRelay:  IRC %s appears to be a zombie'%
                               relay.targetNetwork)
-            elif relay.targetChannel not in relay.targetIRC.state.channels:
+            elif irc.isChannel(relay.targetChannel) and \
+                    relay.targetChannel not in relay.targetIRC.state.channels:
                 self.log.info('LinkRelay:  I\'m not in in %s on %s' %
                               (relay.targetChannel, relay.targetNetwork))
             else:
