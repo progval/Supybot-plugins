@@ -97,13 +97,16 @@ class LinkRelay(callbacks.Plugin):
             relay = relay.split(' | ')
             if not len(relay) == 5:
                 continue
-            self.relays.append(self.Relay(relay[0],
+            try:
+                self.relays.append(self.Relay(relay[0],
                                           relay[1],
                                           relay[2],
                                           relay[3],
                                           re.compile('^%s$' % relay[0], re.I),
                                           re.compile('^%s$' % relay[1]),
                                           re.compile(relay[4])))
+            except:
+                log.error('Failed adding relay: %r' % relay)
 
         self.nickSubstitutions = {}
         for substitute in self.registryValue('substitutes').split(' || '):
