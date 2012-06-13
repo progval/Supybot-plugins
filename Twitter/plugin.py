@@ -178,9 +178,9 @@ class Twitter(callbacks.Plugin):
     post = wrap(post, ['user', ('checkChannelCapability', 'twitter'), 'text'])
 
     @internationalizeDocstring
-    def timeline(self, irc, msg, args, channel, user, tupleOptlist):
-        """[<channel>] [<user>] [--since <oldest>] [--max <newest>] [--count <number>] \
-        [--noretweet] [--with-id]
+    def timeline(self, irc, msg, args, channel, tupleOptlist, user):
+        """[<channel>] [--since <oldest>] [--max <newest>] [--count <number>] \
+        [--noretweet] [--with-id] [<user>]
 
         Replies with the timeline of the <user>.
         If <user> is not given, it defaults to the account associated with the
@@ -227,12 +227,12 @@ class Twitter(callbacks.Plugin):
         reply = reply.encode('utf8')
         irc.reply(reply)
     timeline = wrap(timeline, ['channel',
-                               optional('somethingWithoutSpaces'),
                                getopts({'since': 'int',
                                         'max': 'int',
                                         'count': 'int',
                                         'noretweet': '',
-                                        'with-id': ''})])
+                                        'with-id': ''}),
+                               optional('somethingWithoutSpaces')])
 
     @internationalizeDocstring
     def public(self, irc, msg, args, channel, tupleOptlist):
