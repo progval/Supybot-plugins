@@ -49,7 +49,7 @@ class I18nPlaceholder(callbacks.Plugin):
     def __init__(self, *args, **kwargs):
         super(I18nPlaceholder, self).__init__(*args, **kwargs)
 
-        if 'supybot.18n' not in sys.modules:
+        if 'supybot.i18n' not in sys.modules:
             sys.modules['supybot.i18n'] = Placeholder()
 
 
