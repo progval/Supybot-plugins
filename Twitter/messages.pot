@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2011-08-07 11:46+CEST\n"
+"POT-Creation-Date: 2012-06-13 16:28+CEST\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,16 +66,43 @@ msgstr ""
 msgid ""
 "[<channel>] [<user>]\n"
 "\n"
-"        Replies with the friends (i.e. people who one subscribes to) of the\n"
-"        <user>. If <user> is not given, it defaults to the <channel>'s account.\n"
-"        If <channel> is not given, it defaults to the current channel."
+"        Replies with the people this <user> follows. If <user> is not given, it\n"
+"        defaults to the <channel>'s account. If <channel> is not given, it\n"
+"        defaults to the current channel."
 msgstr ""
 
-#: plugin.py:103
+#: plugin.py:103 plugin.py:126
 msgid "No account is associated with this channel. Ask an op, try with another channel, or provide a user name."
 msgstr ""
 
 #: plugin.py:120
+#, docstring
+msgid ""
+"[<channel>]\n"
+"\n"
+"        Replies with the people that follow this account. If <channel> is not\n"
+"        given, it defaults to the current channel."
+msgstr ""
+
+#: plugin.py:139
+#, docstring
+msgid ""
+"[<channel>] <recipient> <message>\n"
+"\n"
+"        Sends a <message> to <recipient> from the account associated with the\n"
+"        given <channel>. If <channel> is not given, it defaults to the current\n"
+"        channel."
+msgstr ""
+
+#: plugin.py:146 plugin.py:168
+msgid "No account is associated with this channel. Ask an op or try with another channel."
+msgstr ""
+
+#: plugin.py:151
+msgid "Sorry, your message exceeds 140 characters (%i)"
+msgstr ""
+
+#: plugin.py:161
 #, docstring
 msgid ""
 "[<channel>] <message>\n"
@@ -85,18 +112,14 @@ msgid ""
 "        current channel."
 msgstr ""
 
-#: plugin.py:127
-msgid "No account is associated with this channel. Ask an op or try with another channel."
-msgstr ""
-
-#: plugin.py:132
+#: plugin.py:173
 msgid "Sorry, your tweet exceeds 140 characters (%i)"
 msgstr ""
 
-#: plugin.py:141
+#: plugin.py:182
 #, docstring
 msgid ""
-"[<channel>] [<user>] [--since <oldest>] [--max <newest>] [--count <number>]         [--noretweet]\n"
+"[<channel>] [<user>] [--since <oldest>] [--max <newest>] [--count <number>]         [--noretweet] [--with-id]\n"
 "\n"
 "        Replies with the timeline of the <user>.\n"
 "        If <user> is not given, it defaults to the account associated with the\n"
@@ -109,15 +132,15 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:163 plugin.py:261 plugin.py:284
+#: plugin.py:205 plugin.py:326 plugin.py:349 plugin.py:373 plugin.py:416
 msgid "No account is associated with this channel. Ask an op, try with another channel."
 msgstr ""
 
-#: plugin.py:173
+#: plugin.py:215
 msgid "This user protects his tweets; you need to fetch them from a channel whose associated account can fetch this timeline."
 msgstr ""
 
-#: plugin.py:193
+#: plugin.py:239
 #, docstring
 msgid ""
 "[<channel>] [--since <oldest>]\n"
@@ -128,11 +151,11 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:210 plugin.py:240
+#: plugin.py:256 plugin.py:286 plugin.py:309
 msgid "No tweets"
 msgstr ""
 
-#: plugin.py:223
+#: plugin.py:269
 #, docstring
 msgid ""
 "[<channel>] [--since <oldest>]\n"
@@ -143,7 +166,17 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:253
+#: plugin.py:299
+#, docstring
+msgid ""
+"[<channel>]\n"
+"\n"
+"        Current trending topics\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        "
+msgstr ""
+
+#: plugin.py:318
 #, docstring
 msgid ""
 "[<channel>] <user>\n"
@@ -153,16 +186,46 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:267 plugin.py:290
+#: plugin.py:332 plugin.py:355 plugin.py:379 plugin.py:400 plugin.py:422
 msgid "An error occurred"
 msgstr ""
 
-#: plugin.py:276
+#: plugin.py:341
 #, docstring
 msgid ""
 "[<channel>] <user>\n"
 "\n"
 "        Unfollow a specified <user>\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        "
+msgstr ""
+
+#: plugin.py:365
+#, docstring
+msgid ""
+"[<channel>] <id>\n"
+"\n"
+"        Delete a specified status with id <id>\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        "
+msgstr ""
+
+#: plugin.py:389
+#, docstring
+msgid ""
+"[<channel>]\n"
+"\n"
+"        Print some stats\n"
+"        If <channel> is not given, it defaults to the current channel.\n"
+"        "
+msgstr ""
+
+#: plugin.py:408
+#, docstring
+msgid ""
+"[<channel>] <user>\n"
+"\n"
+"        Return profile image for a specified <user>\n"
 "        If <channel> is not given, it defaults to the current channel.\n"
 "        "
 msgstr ""
