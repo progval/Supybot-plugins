@@ -29,6 +29,7 @@
 ###
 
 import twitter
+import simplejson
 import supybot.utils as utils
 import supybot.world as world
 from supybot.commands import *
@@ -50,6 +51,33 @@ if twitter.__version__.split('.') < ['0', '8', '0']:
     raise ImportError('You current version of python-twitter is to old, '
                       'you need at least version 0.8.0, because older '
                       'versions do not support OAuth authentication.')
+
+class ExtendedApi(twitter.Api):
+    """Api with retweet support."""
+
+    def PostRetweet(self, id):
+        '''Retweet a tweet with the Retweet API
+
+        The twitter.Api instance must be authenticated.
+
+        Args:
+        id: The numerical ID of the tweet you are retweeting
+
+        Returns:
+        A twitter.Status instance representing the retweet posted
+        '''
+        if not self._oauth_consumer:
+            raise TwitterError("The twitter.Api instance must be authenticated.")
+        try:
+            if int(id) <= 0:
+                raise TwitterError("'id' must be a positive number")
+        except ValueError:
+            raise TwitterError("'id' must be an integer")
+        url = 'http://api.twitter.com/1/statuses/retweet/%s.json' % id
+        json = self._FetchUrl(url, post_data={'dummy': None})
+        data = simplejson.loads(json)
+        self._CheckForTwitterError(data)
+        return twitter.Status.NewFromJsonDict(data)
 
 
 
@@ -82,7 +110,7 @@ class Twitter(callbacks.Plugin):
             url = self.registryValue('accounts.channel.api')
         if key == '' or secret == '':
             return twitter.Api(base_url=url)
-        api = twitter.Api(consumer_key='bItq1HZhBGyx5Y8ardIeQ',
+        api = ExtendedApi(consumer_key='bItq1HZhBGyx5Y8ardIeQ',
                 consumer_secret='qjC6Ye6xSMM3XPLR3LLeMqOP4ri0rgoYFT2si1RpY',
                 access_token_key=key,
                 access_token_secret=secret,
@@ -176,6 +204,20 @@ class Twitter(callbacks.Plugin):
             api.PostUpdate(tweet)
             irc.replySuccess()
     post = wrap(post, ['user', ('checkChannelCapability', 'twitterpost'), 'text'])
+
+    @internationalizeDocstring
+    def retweet(self, irc, msg, args, user, channel, id_):
+        """[<channel>] <id>
+
+        Retweets the message with the given ID."""
+        api = self._getApi(channel)
+        try:
+            api.PostRetweet(id_)
+            irc.replySuccess()
+        except twitter.TwitterError as e:
+            irc.error(e.args[0])
+    retweet = wrap(retweet, ['user', ('checkChannelCapability', 'twitterpost'),
+            'int'])
 
     @internationalizeDocstring
     def timeline(self, irc, msg, args, channel, tupleOptlist, user):
