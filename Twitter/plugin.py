@@ -153,7 +153,7 @@ class Twitter(callbacks.Plugin):
         else:
             api.PostDirectMessage(recipient, message)
             irc.replySuccess()
-    dm = wrap(dm, ['user', ('checkChannelCapability', 'twitter'),
+    dm = wrap(dm, ['user', ('checkChannelCapability', 'twitteradmin'),
                    'somethingWithoutSpaces', 'text'])
 
     @internationalizeDocstring
@@ -175,7 +175,7 @@ class Twitter(callbacks.Plugin):
         else:
             api.PostUpdate(tweet)
             irc.replySuccess()
-    post = wrap(post, ['user', ('checkChannelCapability', 'twitter'), 'text'])
+    post = wrap(post, ['user', ('checkChannelCapability', 'twitterpost'), 'text'])
 
     @internationalizeDocstring
     def timeline(self, irc, msg, args, channel, tupleOptlist, user):
