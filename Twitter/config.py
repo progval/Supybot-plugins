@@ -58,21 +58,21 @@ conf.registerGroup(Twitter, 'accounts')
 
 helpGetToken = _('running get_access_token.py is a way to get it')
 
-conf.registergroup(twitter, 'consumer')
-conf.registerglobalvalue(twitter.consumer, 'key',
-        registry.string('bItq1HZhBGyx5Y8ardIeQ',
+conf.registerGroup(Twitter, 'consumer')
+conf.registerGlobalValue(Twitter.consumer, 'key',
+        registry.String('bItq1HZhBGyx5Y8ardIeQ',
             _("""The consumer key of the application.""")))
-conf.registerglobalvalue(twitter.consumer, 'secret',
-        registry.string('qjC6Ye6xSMM3XPLR3LLeMqOP4ri0rgoYFT2si1RpY',
-            _("""The consumer secret of the application."""), private=true))
+conf.registerGlobalValue(Twitter.consumer, 'secret',
+        registry.String('qjC6Ye6xSMM3XPLR3LLeMqOP4ri0rgoYFT2si1RpY',
+            _("""The consumer secret of the application."""), private=True))
 
-conf.registergroup(twitter.accounts, 'bot')
-conf.registerglobalvalue(twitter.accounts.bot, 'key',
-        registry.string('', _("""the twitter access token key for the bot's
-        account (%s)""") % helpgettoken))
-conf.registerglobalvalue(twitter.accounts.bot, 'secret',
-        registry.string('', _("""the twitter access token secret for the bot's
-        account (%s)""") % helpgettoken, private=true))
+conf.registerGroup(Twitter.accounts, 'bot')
+conf.registerGlobalValue(Twitter.accounts.bot, 'key',
+        registry.String('', _("""the twitter access token key for the bot's
+        account (%s)""") % helpGetToken))
+conf.registerGlobalValue(Twitter.accounts.bot, 'secret',
+        registry.String('', _("""the twitter access token secret for the bot's
+        account (%s)""") % helpGetToken, private=True))
 conf.registerGlobalValue(Twitter.accounts.bot, 'api',
         registry.String('https://api.twitter.com/1', _("""The URL to the
         base API URL (by default, it is Twitter.com, but you can use it
