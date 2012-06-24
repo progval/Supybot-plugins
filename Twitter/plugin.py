@@ -110,8 +110,8 @@ class Twitter(callbacks.Plugin):
             url = self.registryValue('accounts.channel.api')
         if key == '' or secret == '':
             return twitter.Api(base_url=url)
-        api = ExtendedApi(consumer_key='bItq1HZhBGyx5Y8ardIeQ',
-                consumer_secret='qjC6Ye6xSMM3XPLR3LLeMqOP4ri0rgoYFT2si1RpY',
+        api = ExtendedApi(consumer_key=self.registryValue('consumer.key'),
+                consumer_secret=self.registryValue('consumer.secret'),
                 access_token_key=key,
                 access_token_secret=secret,
                 base_url=url)
