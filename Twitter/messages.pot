@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2012-06-13 16:28+CEST\n"
+"POT-Creation-Date: 2012-06-17 19:21+CEST\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,18 +50,38 @@ msgid ""
 "        channel's account (%s)"
 msgstr ""
 
-#: plugin.py:58
+#: plugin.py:56
+#, docstring
+msgid "Api with retweet support."
+msgstr ""
+
+#: plugin.py:59
+#, docstring
+msgid ""
+"Retweet a tweet with the Retweet API\n"
+"\n"
+"        The twitter.Api instance must be authenticated.\n"
+"\n"
+"        Args:\n"
+"        id: The numerical ID of the tweet you are retweeting\n"
+"\n"
+"        Returns:\n"
+"        A twitter.Status instance representing the retweet posted\n"
+"        "
+msgstr ""
+
+#: plugin.py:86
 #, docstring
 msgid ""
 "Add the help for \"@plugin help Twitter\" here\n"
 "    This should describe *how* to use this plugin."
 msgstr ""
 
-#: plugin.py:68
+#: plugin.py:96
 msgid "I just woke up. :)"
 msgstr ""
 
-#: plugin.py:96
+#: plugin.py:124
 #, docstring
 msgid ""
 "[<channel>] [<user>]\n"
@@ -71,11 +91,11 @@ msgid ""
 "        defaults to the current channel."
 msgstr ""
 
-#: plugin.py:103 plugin.py:126
+#: plugin.py:131 plugin.py:154
 msgid "No account is associated with this channel. Ask an op, try with another channel, or provide a user name."
 msgstr ""
 
-#: plugin.py:120
+#: plugin.py:148
 #, docstring
 msgid ""
 "[<channel>]\n"
@@ -84,7 +104,7 @@ msgid ""
 "        given, it defaults to the current channel."
 msgstr ""
 
-#: plugin.py:139
+#: plugin.py:167
 #, docstring
 msgid ""
 "[<channel>] <recipient> <message>\n"
@@ -94,15 +114,15 @@ msgid ""
 "        channel."
 msgstr ""
 
-#: plugin.py:146 plugin.py:168
+#: plugin.py:174 plugin.py:196
 msgid "No account is associated with this channel. Ask an op or try with another channel."
 msgstr ""
 
-#: plugin.py:151
+#: plugin.py:179
 msgid "Sorry, your message exceeds 140 characters (%i)"
 msgstr ""
 
-#: plugin.py:161
+#: plugin.py:189
 #, docstring
 msgid ""
 "[<channel>] <message>\n"
@@ -112,14 +132,22 @@ msgid ""
 "        current channel."
 msgstr ""
 
-#: plugin.py:173
+#: plugin.py:201
 msgid "Sorry, your tweet exceeds 140 characters (%i)"
 msgstr ""
 
-#: plugin.py:182
+#: plugin.py:210
 #, docstring
 msgid ""
-"[<channel>] [<user>] [--since <oldest>] [--max <newest>] [--count <number>]         [--noretweet] [--with-id]\n"
+"[<channel>] <id>\n"
+"\n"
+"        Retweets the message with the given ID."
+msgstr ""
+
+#: plugin.py:224
+#, docstring
+msgid ""
+"[<channel>] [--since <oldest>] [--max <newest>] [--count <number>]         [--noretweet] [--with-id] [<user>]\n"
 "\n"
 "        Replies with the timeline of the <user>.\n"
 "        If <user> is not given, it defaults to the account associated with the\n"
@@ -132,15 +160,15 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:205 plugin.py:326 plugin.py:349 plugin.py:373 plugin.py:416
+#: plugin.py:247 plugin.py:368 plugin.py:391 plugin.py:415 plugin.py:458
 msgid "No account is associated with this channel. Ask an op, try with another channel."
 msgstr ""
 
-#: plugin.py:215
+#: plugin.py:257
 msgid "This user protects his tweets; you need to fetch them from a channel whose associated account can fetch this timeline."
 msgstr ""
 
-#: plugin.py:239
+#: plugin.py:281
 #, docstring
 msgid ""
 "[<channel>] [--since <oldest>]\n"
@@ -151,11 +179,11 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:256 plugin.py:286 plugin.py:309
+#: plugin.py:298 plugin.py:328 plugin.py:351
 msgid "No tweets"
 msgstr ""
 
-#: plugin.py:269
+#: plugin.py:311
 #, docstring
 msgid ""
 "[<channel>] [--since <oldest>]\n"
@@ -166,7 +194,7 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:299
+#: plugin.py:341
 #, docstring
 msgid ""
 "[<channel>]\n"
@@ -176,7 +204,7 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:318
+#: plugin.py:360
 #, docstring
 msgid ""
 "[<channel>] <user>\n"
@@ -186,11 +214,11 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:332 plugin.py:355 plugin.py:379 plugin.py:400 plugin.py:422
+#: plugin.py:374 plugin.py:397 plugin.py:421 plugin.py:442 plugin.py:464
 msgid "An error occurred"
 msgstr ""
 
-#: plugin.py:341
+#: plugin.py:383
 #, docstring
 msgid ""
 "[<channel>] <user>\n"
@@ -200,7 +228,7 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:365
+#: plugin.py:407
 #, docstring
 msgid ""
 "[<channel>] <id>\n"
@@ -210,7 +238,7 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:389
+#: plugin.py:431
 #, docstring
 msgid ""
 "[<channel>]\n"
@@ -220,7 +248,7 @@ msgid ""
 "        "
 msgstr ""
 
-#: plugin.py:408
+#: plugin.py:450
 #, docstring
 msgid ""
 "[<channel>] <user>\n"
