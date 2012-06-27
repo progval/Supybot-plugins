@@ -68,10 +68,10 @@ conf.registerGlobalValue(Twitter.consumer, 'secret',
 
 conf.registerGroup(Twitter.accounts, 'bot')
 conf.registerGlobalValue(Twitter.accounts.bot, 'key',
-        registry.String('', _("""the twitter access token key for the bot's
+        registry.String('', _("""The Twitter Access Token key for the bot's
         account (%s)""") % helpGetToken))
 conf.registerGlobalValue(Twitter.accounts.bot, 'secret',
-        registry.String('', _("""the twitter access token secret for the bot's
+        registry.String('', _("""The Twitter Access Token secret for the bot's
         account (%s)""") % helpGetToken, private=True))
 conf.registerGlobalValue(Twitter.accounts.bot, 'api',
         registry.String('https://api.twitter.com/1', _("""The URL to the

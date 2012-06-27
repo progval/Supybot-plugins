@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Supybot-fr\n"
 "POT-Creation-Date: 2011-02-26 09:49+CET\n"
-"PO-Revision-Date: 2012-06-17 19:65+0200\n"
-"Last-Translator: skizzhg <skizzhg@	mx.com>\n"
+"PO-Revision-Date: 2012-06-26 17:29+0200\n"
+"Last-Translator: skizzhg <skizzhg@gmx.com>\n"
 "Language-Team: Italian <skizzhg@gmx.com>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -15,19 +15,27 @@ msgstr ""
 msgid "running get_access_token.py is a way to get it"
 msgstr "eseguire get_access_token.py è un modo per ottenerla"
 
-#: config.py:63
+#: config.py:64
+msgid "The consumer key of the application."
+msgstr "La chiave pubblica dell'applicazione (consumer key)."
+
+#: config.py:67
+msgid "The consumer secret of the application."
+msgstr "La chiave privata dell'applicazione (consumer secret)."
+
+#: config.py:71
 msgid ""
 "The Twitter Access Token key for the bot's\n"
 "        account (%s)"
 msgstr "La chiave d'accesso Twitter per l'account del bot (%s)"
 
-#: config.py:66
+#: config.py:74
 msgid ""
 "The Twitter Access Token secret for the bot's\n"
 "        account (%s)"
 msgstr "La chiave d'accesso Twitter segreta per l'account del bot (%s)"
 
-#: config.py:69 config.py:81
+#: config.py:77 config.py:89
 msgid ""
 "The URL to the\n"
 "        base API URL (by default, it is Twitter.com, but you can use it\n"
@@ -36,13 +44,13 @@ msgstr ""
 "L'URI dell'URL di base per l'API (per impostazione predefinita è Twitter.com, ma è\n"
 "        utilizzabile per servizi compatibili con Twitter come identica e statusnet."
 
-#: config.py:75
+#: config.py:83
 msgid ""
 "The Twitter Access Token key for this\n"
 "        channel's account (%s)"
 msgstr "La chiave d'accesso Twitter per l'account di questo canale (%s)"
 
-#: config.py:78
+#: config.py:86
 msgid ""
 "The Twitter Access Token secret for this\n"
 "        channel's account (%s)"
