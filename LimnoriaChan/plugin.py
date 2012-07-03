@@ -94,9 +94,9 @@ class LimnoriaChan(callbacks.Plugin):
         login = self.registryValue('login')
         token = self.registryValue('token')
         data='title=%s&body=%s&login=%s&token=%s' % (title, body, login, token)
-        url = 'http://github.com/api/v2/json/issues/open/' + repoName
+        url = 'https://api.github.com/repos/' + repoName + '/issues'
         response = json.loads(urllib.urlopen(url, data=data).read())
-        id = response['issue']['number']
+        id = response['number']
         irc.reply('Issue #%i has been opened.' % id)
 
     _addressed = re.compile('^([^ :]+):')
