@@ -183,7 +183,7 @@ class SpellChecker:
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation double est toujours "
                      "précédé d'un espace",
-                     mask="[^ _][:!?;]", wizard='_')
+                     mask="[^ _][:!?;][^/]", wizard='_')
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation double est toujours "
                      "suivi d'un espace",
