@@ -139,7 +139,7 @@ class SpellChecker:
         pass
     def checkConjugaison(self):
         self._detect(mode='regexp', correct="t'as oublié un `ne` ou un `n'`",
-                     mask="(je|tu|on|il|elle|nous|vous|ils|elles) [^' ]+ pas")
+                     mask="(je|tu|on|il|elle|nous|vous|ils|elles) [^' ]+ pas ")
         self._detect(mode='regexp', correct="t'as oublié un `ne` ou un `n'`",
                      mask="j'[^' ]+ pas")
         firstPerson = 'un verbe à la première personne ne finit pas par un `t`'
