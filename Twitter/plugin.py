@@ -28,7 +28,9 @@
 
 ###
 
+import time
 import twitter
+import threading
 import simplejson
 import supybot.utils as utils
 import supybot.world as world
@@ -91,14 +93,18 @@ class Twitter(callbacks.Plugin):
         self.__parent = super(Twitter, self)
         callbacks.Plugin.__init__(self, irc)
         self._apis = {}
+        self._died = False
         if world.starting:
             try:
                 self._getApi().PostUpdate(_('I just woke up. :)'))
             except:
                 pass
+        self._runningAnnounces = []
+
 
     def _getApi(self, channel):
         if channel in self._apis:
+            # TODO: handle configuration changes (using Limnoria's config hooks)
             return self._apis[channel]
         if channel is None:
             key = self.registryValue('accounts.bot.key')
@@ -117,6 +123,62 @@ class Twitter(callbacks.Plugin):
                 base_url=url)
         self._apis[channel] = api
         return api
+
+    def __call__(self, irc, msg):
+        super(Twitter, self).__call__(irc, msg)
+        irc = callbacks.SimpleProxy(irc, msg)
+        for channel in irc.state.channels:
+            if self.registryValue('announce.interval', channel) != 0 and \
+                    channel not in self._runningAnnounces:
+                threading.Thread(target=self._fetchTimeline,
+                        args=(irc, channel)).start()
+
+    def _fetchTimeline(self, irc, channel):
+        lastRun = time.time()
+        maxId = None
+        assert channel not in self._runningAnnounces
+        self._runningAnnounces.append(channel)
+        try:
+            while not irc.zombie and not self._died and \
+                    self.registryValue('announce.interval', channel) != 0:
+                lastRun = time.time()
+                self.log.debug(_('Fetching tweets for channel %s') % channel)
+                api = self._getApi(channel) # Reload it from conf everytime
+                if not api._oauth_consumer and user is None:
+                    return
+                if maxId is None:
+                    timeline = api.GetFriendsTimeline()
+                else:
+                    timeline = api.GetFriendsTimeline(since_id=maxId)
+                if timeline is None or timeline == []:
+                    continue
+                print repr(timeline)
+                timeline.reverse()
+                if maxId is None:
+                    maxId = timeline[-1].id
+                    continue
+                else:
+                    maxId = timeline[-1].id
+                if self.registryValue('announce.withid', channel):
+                    replies = ['[%s] @%s> %s' % (x.id, x.user.screen_name, x.text) for x in timeline]
+                else:
+                    replies = ['@%s> %s' % (x.user.screen_name, x.text) for x in timeline]
+                print repr(replies)
+
+                replies = [x.replace("&lt;", "<").replace("&gt;", ">")
+                        .replace("&amp;", "&").encode('utf8') for x in replies]
+                if self.registryValue('announce.oneline', channel):
+                    irc.replies(replies, prefixNick=False, joiner=' | ')
+                else:
+                    for reply in replies:
+                        irc.reply(reply, prefixNick=False)
+                while lastRun+self.registryValue('announce.interval', channel)>\
+                        time.time():
+                    time.sleep(5)
+        finally:
+            assert channel in self._runningAnnounces
+            self._runningAnnounces.remove(channel)
+
 
 
     @internationalizeDocstring
@@ -470,6 +532,7 @@ class Twitter(callbacks.Plugin):
 
     def die(self):
         self.__parent.die()
+        self._died = True
 
 Class = Twitter
 

@@ -85,10 +85,22 @@ conf.registerChannelValue(Twitter.accounts.channel, 'key',
 conf.registerChannelValue(Twitter.accounts.channel, 'secret',
         registry.String('', _("""The Twitter Access Token secret for this
         channel's account (%s)""") % helpGetToken, private=True))
-conf.registerGlobalValue(Twitter.accounts.channel, 'api',
+conf.registerChannelValue(Twitter.accounts.channel, 'api',
         registry.String('https://api.twitter.com/1', _("""The URL to the
         base API URL (by default, it is Twitter.com, but you can use it
         for twitter-compatible services, such as identica/statusnet.""")))
+
+conf.registerGroup(Twitter, 'announce')
+conf.registerChannelValue(Twitter.announce, 'interval',
+        registry.NonNegativeInteger(0, _("""The interval (in seconds) between
+        two fetches of new tweets from the timeline. 0 (zero) disables this
+        feature.""")))
+conf.registerChannelValue(Twitter.announce, 'withid',
+        registry.Boolean(True, _("""Determines whether or not the ID of
+        announced tweets will be displayed.""")))
+conf.registerChannelValue(Twitter.announce, 'oneline',
+        registry.Boolean(True, _("""Determines whether or not all tweets will
+        be shown in one line.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
