@@ -66,7 +66,6 @@ import twisted.conch.ssh.userauth as userauth
 import twisted.conch.checkers as conchcheckers
 import twisted.cred.credentials as credentials
 import twisted.conch.ssh.connection as connection
-import twisted.conch.credentials as conchcredentials
 
 # Standard library imports
 import os
@@ -487,7 +486,7 @@ class SupybotPortal(portal.Portal):
     class PublicKeyChecker(object):
         """ Public key checker """
         __implements__ = (checkers.ICredentialsChecker,)
-        credentialInterfaces = (conchcredentials.ISSHPrivateKey,)
+        credentialInterfaces = (credentials.ISSHPrivateKey,)
 
         def requestAvatarId(self, cr):
             a = self.cbPlugin.getUser(protocol=self.cbServer.NAME,
