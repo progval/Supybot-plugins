@@ -254,7 +254,10 @@ class Sshd(callbacks.Plugin):
         Displays a list of available protocols.
         """
         L = [s.NAME for s in self.available.values()]
-        irc.reply(format('%L', L))
+        if L == []:
+            irc.reply('No protocols available.')
+        else:
+            irc.reply(format('%L', L))
     available = wrap(protocols, ['sshdCapable'])
 
     def running(self, irc, msg, args):
@@ -276,7 +279,7 @@ class Sshd(callbacks.Plugin):
 
         Start the server named by <protocol>. If the optional [port]
         parameter is provided, the server is started listening on that port.
-        Otherwise the autoStart registry value for that protocol is used.
+        Otherwise the defaultPort registry value for that protocol is used.
         """
         # needs changing
         p = protocol
@@ -289,6 +292,8 @@ class Sshd(callbacks.Plugin):
                 irc.replySuccess()
             else:
                 irc.reply('Error: Already running')
+        else:
+            irc.error('Protocol not available')
     start = wrap(start, ['owner', 'something', optional('int')])
 
     def stop(self, irc, msg, args, protocol):
@@ -1137,9 +1142,9 @@ class SshServer:
             raise Exception, 'The SSH public key is missing'
         self.debug('Loading RSA keys')
         self.Fact.publicKeys = \
-            {'ssh-rsa':keys.getPublicKeyString(filename=pubpath)}
+            {'ssh-rsa':keys.Key.fromFile(filename=pubpath).blob()}
         self.Fact.privateKeys = \
-            {'ssh-rsa':keys.getPrivateKeyObject(filename=privpath)}
+            {'ssh-rsa':keys.Key.fromFile(filename=pubpath).blob()}
 
 class PyUser(SshUser):
     def sendReply(self, reply, **kw):
