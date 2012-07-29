@@ -28,6 +28,9 @@
 
 ###
 
+import config
+reload(config)
+
 import time
 import twitter
 import threading
@@ -168,10 +171,11 @@ class Twitter(callbacks.Plugin):
                 replies = [x.replace("&lt;", "<").replace("&gt;", ">")
                         .replace("&amp;", "&").encode('utf8') for x in replies]
                 if self.registryValue('announce.oneline', channel):
-                    irc.replies(replies, prefixNick=False, joiner=' | ')
+                    irc.replies(replies, prefixNick=False, joiner=' | ',
+                            to=channel)
                 else:
                     for reply in replies:
-                        irc.reply(reply, prefixNick=False)
+                        irc.reply(reply, prefixNick=False, to=channel)
                 while lastRun+self.registryValue('announce.interval', channel)>\
                         time.time():
                     time.sleep(5)
