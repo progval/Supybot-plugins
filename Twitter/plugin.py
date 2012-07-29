@@ -144,18 +144,24 @@ class Twitter(callbacks.Plugin):
         try:
             while not irc.zombie and not self._died and \
                     self.registryValue('announce.interval', channel) != 0:
+                while lastRun is not None and \
+                        lastRun+self.registryValue('announce.interval', channel)>time.time():
+                    time.sleep(5)
                 lastRun = time.time()
                 self.log.debug(_('Fetching tweets for channel %s') % channel)
                 api = self._getApi(channel) # Reload it from conf everytime
                 if not api._oauth_consumer and user is None:
                     return
-                if maxId is None:
-                    timeline = api.GetFriendsTimeline()
-                else:
-                    timeline = api.GetFriendsTimeline(since_id=maxId)
+                try:
+                    if maxId is None:
+                        timeline = api.GetFriendsTimeline()
+                    else:
+                        timeline = api.GetFriendsTimeline(since_id=maxId)
+                except twitter.TwitterError as e:
+                    self.log.error('Could not fetch timeline: %s' % e)
+                    continue
                 if timeline is None or timeline == []:
                     continue
-                print repr(timeline)
                 timeline.reverse()
                 if maxId is None:
                     maxId = timeline[-1].id
@@ -166,19 +172,15 @@ class Twitter(callbacks.Plugin):
                     replies = ['[%s] @%s> %s' % (x.id, x.user.screen_name, x.text) for x in timeline]
                 else:
                     replies = ['@%s> %s' % (x.user.screen_name, x.text) for x in timeline]
-                print repr(replies)
 
                 replies = [x.replace("&lt;", "<").replace("&gt;", ">")
-                        .replace("&amp;", "&").encode('utf8') for x in replies]
+                        .replace("&amp;", "&") for x in replies]
                 if self.registryValue('announce.oneline', channel):
                     irc.replies(replies, prefixNick=False, joiner=' | ',
                             to=channel)
                 else:
                     for reply in replies:
                         irc.reply(reply, prefixNick=False, to=channel)
-                while lastRun+self.registryValue('announce.interval', channel)>\
-                        time.time():
-                    time.sleep(5)
         finally:
             assert channel in self._runningAnnounces
             self._runningAnnounces.remove(channel)
@@ -263,6 +265,8 @@ class Twitter(callbacks.Plugin):
                         'an op or try with another channel.'))
             return
         tweet = message
+        if self.registryValue('prefixusername', channel):
+            tweet = '[%s] %s' % (user.name, tweet)
         if len(tweet) > 140:
             irc.error(_('Sorry, your tweet exceeds 140 characters (%i)') %
                     len(tweet))
