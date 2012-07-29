@@ -54,6 +54,11 @@ Twitter = conf.registerPlugin('Twitter')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(Twitter, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
+
+conf.registerChannelValue(Twitter, 'prefixusername',
+        registry.Boolean(True, _("""Determines whether or not the name of the
+        user posting a tweet will be shown prefixed.""")))
+
 conf.registerGroup(Twitter, 'accounts')
 
 helpGetToken = _('running get_access_token.py is a way to get it')
