@@ -168,7 +168,7 @@ class GitHub(callbacks.Plugin):
             announces = [x.split(' | ') for x in announces]
             output = {}
             for repo, chan in announces:
-                if chan not in output:
+                if repo not in output:
                     output[repo] = []
                 output[repo].append(chan)
             return output
