@@ -35,11 +35,13 @@ import time
 import twitter
 import threading
 import simplejson
+import supybot.conf as conf
 import supybot.utils as utils
 import supybot.world as world
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
+import supybot.registry as registry
 import supybot.callbacks as callbacks
 try:
     from supybot.i18n import PluginInternationalization
@@ -103,6 +105,23 @@ class Twitter(callbacks.Plugin):
             except:
                 pass
         self._runningAnnounces = []
+        try:
+            conf.supybot.plugins.Twitter.consumer.key.addCallback(
+                    self._dropApiObjects)
+            conf.supybot.plugins.Twitter.consumer.secret.addCallback(
+                    self._dropApiObjects)
+            conf.supybot.plugins.Twitter.accounts.channel.key.addCallback(
+                    self._dropApiObjects)
+            conf.supybot.plugins.Twitter.accounts.channel.secret.addCallback(
+                    self._dropApiObjects)
+        except registry.NonExistentRegistryEntry:
+            log.error('Your version of Supybot is not compatible with '
+                      'configuration hooks. So, Twitter won\'t be able '
+                      'to apply changes to the consumer key/secret '
+                      'and token key/secret unless you reload it.')
+
+    def _dropApiObjects(self):
+        self._apis = {}
 
 
     def _getApi(self, channel):
@@ -137,9 +156,11 @@ class Twitter(callbacks.Plugin):
                         args=(irc, channel)).start()
 
     def _fetchTimeline(self, irc, channel):
+        if channel in self._runningAnnounces:
+            # Prevent race conditions
+            return
         lastRun = time.time()
         maxId = None
-        assert channel not in self._runningAnnounces
         self._runningAnnounces.append(channel)
         try:
             while not irc.zombie and not self._died and \
