@@ -45,6 +45,9 @@ GoodFrench = conf.registerPlugin('GoodFrench')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(GoodFrench, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
+conf.registerChannelValue(GoodFrench, 'kick',
+    registry.Boolean(False, """Détermine si un utilisateur faisant une faute
+    de Français sera kické (au lieu de recevoir un avertissement)."""))
 conf.registerChannelValue(GoodFrench, 'level',
     registry.Integer(0, """Le niveau de filtrage. Le niveau N filtre
     ce que le niveau N-1 filtrait, avec des choses en plus.

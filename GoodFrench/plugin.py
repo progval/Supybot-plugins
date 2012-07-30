@@ -29,6 +29,9 @@
 
 ###
 
+import config
+reload(config)
+
 import re
 import supybot.world as world
 import supybot.ircmsgs as ircmsgs
@@ -183,11 +186,11 @@ class SpellChecker:
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation double est toujours "
                      "précédé d'un espace",
-                     mask="[^ _][:!?;][^/]", wizard='_')
+                     mask="[^ _D()][:!?;][^/]", wizard='_')
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation double est toujours "
                      "suivi d'un espace",
-                     mask="(?<!(tp|ps))[:!?;][^ _]", wizard='_')
+                     mask="(?<!(tp|ps|.[^a-zA-Z]))[:!?;][^ _'D()]", wizard='_')
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation simple n'est jamais "
                      "précédé d'un espace",
@@ -231,8 +234,11 @@ class GoodFrench(callbacks.Plugin):
             reason = 'Erreur : %s' % errors[0]
         else:
             reason = 'Erreurs : %s' % ' | '.join(errors)
-        msg = ircmsgs.kick(channel, nick, reason)
-        irc.queueMsg(msg)
+        if self.registryValue('kick'):
+            msg = ircmsgs.kick(channel, nick, reason)
+            irc.queueMsg(msg)
+        else:
+            irc.reply(reason)
 
     detect = wrap(detect, ['text'])
 
