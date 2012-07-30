@@ -186,7 +186,8 @@ class Brainfuck(callbacks.Plugin):
             irc.error(_('Brainfuck syntax error: %s') % e.args[0])
             return
         except BrainfuckTimeout as e:
-            irc.reply(e.args[0])
+            if e.args[0] != '':
+                irc.reply(e.args[0])
             irc.error(_('Brainfuck processor timed out.'))
             return
         except NotEnoughInput:
