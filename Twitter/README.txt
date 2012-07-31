@@ -7,8 +7,8 @@ This is called the consumer. You have two choices:
   be "sent via Supybot // Limnoria".
 * Create your own consumer at https://dev.twitter.com/ . If you choosed
   this way, you will have to set supybot.plugins.Twitter.consumer.key
-  and supybot.plugins.Twitter.secret with the consumer key/secret given
-  by Twitter.
+  and supybot.plugins.Twitter.consumer.secret with the consumer
+  key/secret given by Twitter.
 
 
 Now, you have to set the accounts credentials (called access token)
