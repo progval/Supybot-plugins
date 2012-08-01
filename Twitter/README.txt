@@ -1,6 +1,10 @@
 Advanced Twitter plugin for Supybot, with capabilities handling, and
 per-channel user account.
 
+First, you have to install the python-twitter library, at least version 0.8.
+If it is not available in your distribution, you can use
+"sudo pip install twitter" (pip is a Python package manager).
+
 Ever noticed a text "sent from web" or "sent via Android" under a tweet?
 This is called the consumer. You have two choices:
 * Keep the default consumer. This is the easier way; and the text will
