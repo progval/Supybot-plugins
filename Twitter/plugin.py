@@ -32,7 +32,6 @@ import config
 reload(config)
 
 import time
-import twitter
 import threading
 import simplejson
 import supybot.conf as conf
@@ -53,6 +52,10 @@ except:
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
 
+try:
+    import twitter
+except ImportError:
+    raise callbacks.Error, 'You need the python-twitter library.'
 reload(twitter)
 if twitter.__version__.split('.') < ['0', '8', '0']:
     raise ImportError('You current version of python-twitter is to old, '
