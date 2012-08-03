@@ -35,6 +35,7 @@ class TriggerTestCase(ChannelPluginTestCase):
     plugins = ('Trigger', 'Utilities')
     config = {'supybot.plugins.Trigger.triggers.join': 'echo Hi $nick',
               'supybot.plugins.Trigger.triggers.part': 'echo foo',
+              'supybot.plugins.Trigger.triggers.highlight': 'echo foobar',
               'supybot.plugins.Trigger.triggers.privmsg': 'echo bar',
               'supybot.plugins.Trigger.triggers.notice': 'echo baz'}
 
@@ -57,6 +58,15 @@ class TriggerTestCase(ChannelPluginTestCase):
         msg = ircmsgs.privmsg(self.channel, 'bar')
         self.failIf(not self._getIfAnswerIsEqual(msg), 'Does not reply to '
                 'triggered echo on privmsg')
+
+        self.irc.feedMsg(ircmsgs.privmsg(self.channel,'lol %s test' % self.nick,
+            prefix=self.prefix))
+        msg = ircmsgs.privmsg(self.channel, 'bar')
+        self.failIf(not self._getIfAnswerIsEqual(msg), 'Does not reply to '
+                'triggered echo on privmsg')
+        msg = ircmsgs.privmsg(self.channel, 'foobar')
+        self.failIf(not self._getIfAnswerIsEqual(msg), 'Does not reply to '
+                'triggered echo on highlight')
 
         self.irc.feedMsg(ircmsgs.notice(self.channel,'lol',prefix=self.prefix))
         msg = ircmsgs.privmsg(self.channel, 'baz')

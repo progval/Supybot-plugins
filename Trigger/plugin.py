@@ -64,6 +64,8 @@ class Trigger(callbacks.Plugin):
         self._run(irc, msg, 'part')
     def doPrivmsg(self, irc, msg):
         self._run(irc, msg, 'privmsg')
+        if irc.nick in msg.args[1]:
+            self._run(irc, msg, 'highlight')
     def doNotice(self, irc, msg):
         self._run(irc, msg, 'notice')
     def do376(self, irc, msg):
