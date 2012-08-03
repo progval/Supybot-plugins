@@ -118,8 +118,8 @@ class GitHub(callbacks.Plugin):
 
                 if status:
                     url = url2
-            except:
-                pass
+            except Exception as e:
+                log.error('Cannot connect to ur1.ca: %s' % e)
 
             s = _('%s/%s (in %s): %s committed %s %s') % \
                     (payload['repository']['owner']['name'],
