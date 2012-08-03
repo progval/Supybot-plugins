@@ -123,7 +123,7 @@ class Twitter(callbacks.Plugin):
                       'to apply changes to the consumer key/secret '
                       'and token key/secret unless you reload it.')
 
-    def _dropApiObjects(self):
+    def _dropApiObjects(self, name=None):
         self._apis = {}
 
 

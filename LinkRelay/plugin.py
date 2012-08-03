@@ -89,7 +89,7 @@ class LinkRelay(callbacks.Plugin):
                       "to reload the configuration if you use the Config "
                       "plugin.")
 
-    def _loadFromConfig(self):
+    def _loadFromConfig(self, name=None):
         self.relays = []
         for relay in self.registryValue('relays').split(' || '):
             if relay.endswith('|'):
