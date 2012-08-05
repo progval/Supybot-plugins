@@ -176,11 +176,13 @@ class Twitter(callbacks.Plugin):
                 api = self._getApi(channel) # Reload it from conf everytime
                 if not api._oauth_consumer and user is None:
                     return
+                retweets = self.registryValue('announce.retweets', channel)
                 try:
                     if maxId is None:
-                        timeline = api.GetFriendsTimeline()
+                        timeline = api.GetFriendsTimeline(retweets=retweets)
                     else:
-                        timeline = api.GetFriendsTimeline(since_id=maxId)
+                        timeline = api.GetFriendsTimeline(retweets=retweets,
+                                since_id=maxId)
                 except twitter.TwitterError as e:
                     self.log.error('Could not fetch timeline: %s' % e)
                     continue

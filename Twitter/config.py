@@ -106,6 +106,9 @@ conf.registerChannelValue(Twitter.announce, 'withid',
 conf.registerChannelValue(Twitter.announce, 'oneline',
         registry.Boolean(True, _("""Determines whether or not all tweets will
         be shown in one line.""")))
+conf.registerChannelValue(Twitter.announce, 'retweets',
+        registry.Boolean(True, _("""Determines whether or not the bot will
+        show retweets in addition to native tweets.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
