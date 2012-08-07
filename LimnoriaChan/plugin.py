@@ -55,10 +55,10 @@ staticFactoids = {
         'supybook':     'http://supybook.fealdia.org/',
         }
 dynamicFactoids = {
-        'gh':           WEB_REPO + '/tree/%s',
-        'gh-pl':        PLUGINS_WEB_REPO + '/tree/%s',
-        'file':         WEB_REPO + '/blob/%s',
-        'file-pl':      PLUGINS_WEB_REPO + '/blob/%s',
+        'gh':           WEB_REPO + '/tree/master/%s',
+        'gh-pl':        PLUGINS_WEB_REPO + '/tree/master/%s',
+        'file':         WEB_REPO + '/blob/master/%s',
+        'file-pl':      PLUGINS_WEB_REPO + '/blob/master/%s',
         'commit':       WEB_REPO + '/commit/%s',
         'commit-pl':    PLUGINS_WEB_REPO + '/commit/%s',
         'wiki':         WEB_REPO + '/wiki/%s',
