@@ -55,7 +55,7 @@ class MeditationExcuses(callbacks.Plugin):
         """takes no arguments.
 
         Fetch a mediation excuse from http://meditationexcus.es/"""
-        html = utils.web.getUrl('http://meditationexcus.es/')
+        html = utils.web.getUrl('http://meditationexcus.es/').decode()
         found = False
         for line in html.split('\n'):
             if found:
