@@ -157,13 +157,13 @@ class EurekaTestCase(ChannelPluginTestCase):
         msg = ircmsgs.privmsg(self.channel, 'ProgVal', prefix=self.prefix)
         self.irc.feedMsg(msg)
         self.assertResponse(' ', 'Congratulations test! The answer was '
-                'ProgVal.')
+                '\'ProgVal\'.')
 
         self.assertResponse(' ', 'What is the name of this bot?')
         msg = ircmsgs.privmsg(self.channel, 'Limnoria', prefix=self.prefix2)
         self.irc.feedMsg(msg)
         self.assertResponse(' ', 'Congratulations foo! The answer was '
-                'Limnoria. Another valid answer is: \'Supybot\'.')
+                '\'Limnoria\'. Another valid answer is: \'Supybot\'.')
 
         self.assertResponse(' ', 'Who is the original author of Supybot?')
         self.timeout = 0.2
@@ -173,7 +173,7 @@ class EurekaTestCase(ChannelPluginTestCase):
         self.assertResponse(' ', 'Another clue: jem*****')
         self.assertNoResponse(' ', 0.9)
         self.assertResponse(' ', 'Nobody replied with (one of this) '
-                'answer(s): jemfinch.')
+                'answer(s): \'jemfinch\'.')
 
         self.timeout = 1
         self.assertResponse(' ', 'Give a number.')
@@ -182,7 +182,7 @@ class EurekaTestCase(ChannelPluginTestCase):
         self.assertNoResponse(' ')
         msg = ircmsgs.privmsg(self.channel, '12', prefix=self.prefix)
         self.irc.feedMsg(msg)
-        self.assertResponse(' ', 'Congratulations test! The answer was 12. '
+        self.assertResponse(' ', 'Congratulations test! The answer was \'12\'. '
                 'Another valid answer is: \'42\'.')
 
         self.timeout = 1
@@ -206,7 +206,7 @@ class EurekaTestCase(ChannelPluginTestCase):
         msg = ircmsgs.privmsg(self.channel, 'PROGVAL', prefix=self.prefix)
         self.irc.feedMsg(msg)
         self.assertResponse(' ', 'Congratulations test! The answer was '
-                'ProgVal.')
+                '\'ProgVal\'.')
     def testAdjust(self):
         self.assertNotError('start')
         self.assertRegexp('scores', 'noone')

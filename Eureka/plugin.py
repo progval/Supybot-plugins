@@ -178,7 +178,7 @@ class Eureka(callbacks.Plugin):
             if clue is None:
                 assert valid is None
                 irc.reply(_('Nobody replied with (one of this) '
-                    'answer(s): %s.') %
+                    'answer(s): %r.') %
                     ', '.join([y for x,y in state.answers
                                if x == 'r']),
                     prefixNick=False)
@@ -203,12 +203,12 @@ class Eureka(callbacks.Plugin):
             if mode == 'r':
                 if msg.args[1].lower() == answer.lower():
                     state.adjust(nick, state.question[0])
-                    reply = _('Congratulations %s! The answer was %s.')
+                    reply = _('Congratulations %s! The answer was %r.')
                     reply %= (nick, answer)
             elif mode == 'm':
                 if answer.match(msg.args[1]):
                     state.adjust(nick, state.question[0])
-                    reply = _('Congratulations %s! The answer was %s.')
+                    reply = _('Congratulations %s! The answer was %r.')
                     reply %= (nick, msg.args[1])
         if reply is not None:
             schedule.removeEvent('Eureka-nextClue-%s' % channel)
