@@ -34,7 +34,7 @@ import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
-from supybot.utils.web import getUrlFd
+from supybot.utils.web import getUrl
 import supybot.callbacks as callbacks
 from supybot.i18n import PluginInternationalization, internationalizeDocstring
 
@@ -49,7 +49,7 @@ class Untiny(callbacks.Plugin):
         """<url>
 
         Return the whole URL for a tiny URL."""
-        data = json.load(getUrlFd(self.registryValue('service') % url))
+        data = json.loads(getUrl(self.registryValue('service') % url).decode())
         if 'org_url' in data:
             irc.reply(data['org_url'])
         elif 'error' in data:
