@@ -43,5 +43,4 @@ conf.registerChannelValue(Debian, 'bold',
     registry.Boolean(True, """Determines whether the plugin will use bold in
     the responses to some of its commands."""))
 
-
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

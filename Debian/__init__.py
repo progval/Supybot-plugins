@@ -34,6 +34,9 @@ This is a module to contain Debian-specific commands.
 import supybot
 import supybot.world as world
 
+if 'reload' not in globals():
+    from imp import reload
+
 # Use this for the version of this plugin.  You may wish to put a CVS keyword
 # in here if you're keeping the plugin in CVS or some similar system.
 __version__ = "0.1"
@@ -56,8 +59,6 @@ import plugin
 reload(plugin) # In case we're being reloaded.
 # Add more reloads here if you add third-party modules and want them to be
 # reloaded when this plugin is reloaded.  Don't forget to import them as well!
-import BeautifulSoup
-reload(BeautifulSoup)
 
 if world.testing:
     import test

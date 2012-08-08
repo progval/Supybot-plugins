@@ -34,7 +34,7 @@ import time
 import urllib
 import fnmatch
 
-import BeautifulSoup
+import bs4 as BeautifulSoup
 
 import supybot.conf as conf
 import supybot.utils as utils
@@ -43,7 +43,7 @@ from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
-from supybot.utils.iter import all, imap, ifilter
+from supybot.utils.iter import all
 
 class Debian(callbacks.Plugin):
     threaded = True
@@ -79,8 +79,8 @@ class Debian(callbacks.Plugin):
         args['keywords'] = urllib.quote(filename, '')
         url %= args
         try:
-            html = utils.web.getUrl(url)
-        except utils.web.Error, e:
+            html = utils.web.getUrl(url).decode()
+        except utils.web.Error as e:
             irc.error(format('I couldn\'t reach the search page (%s).', e),
                       Raise=True)
         if 'is down at the moment' in html:
@@ -146,8 +146,8 @@ class Debian(callbacks.Plugin):
         args['keywords'] = utils.web.urlquote(package)
         url %= args
         try:
-            html = utils.web.getUrl(url)
-        except utils.web.Error, e:
+            html = utils.web.getUrl(url).decode()
+        except utils.web.Error as e:
             irc.error(format('I couldn\'t reach the search page (%s).', e),
                       Raise=True)
         if 'is down at the moment' in html:
@@ -160,9 +160,8 @@ class Debian(callbacks.Plugin):
         else:
             for pkg in pkgs:
                 pkgMatch = pkg[0]
-                soup = BeautifulSoup.BeautifulSoup()
-                soup.feed(pkg[1])
-                liBranches = soup.fetch('li')
+                soup = BeautifulSoup.BeautifulSoup(pkg[1])
+                liBranches = soup.find_all('li')
                 branches = []
                 versions = []
                 def branchVers(br):
@@ -170,7 +169,7 @@ class Debian(callbacks.Plugin):
                     return [utils.str.rsplit(v, ':', 1)[0] for v in vers]
                 for li in liBranches:
                     branches.append(li.a.string)
-                    versions.append(branchVers(li.fetch('br')))
+                    versions.append(branchVers(li.find_all('br')))
                 if branches and versions:
                     for pairs in  zip(branches, versions):
                         branch = pairs[0]
@@ -219,13 +218,13 @@ class Debian(callbacks.Plugin):
         packages = []
         try:
             fd = utils.web.getUrlFd('http://incoming.debian.org/')
-        except utils.web.Error, e:
+        except utils.web.Error as e:
             irc.error(str(e), Raise=True)
         for line in fd:
-            m = self._incomingRe.search(line)
+            m = self._incomingRe.search(line.decode())
             if m:
                 name = m.group(1)
-                if all(None, imap(lambda p: p(name), predicates)):
+                if all(None, map(lambda p: p(name), predicates)):
                     realname = utils.str.rsplit(name, '_', 1)[0]
                     packages.append(realname)
         if len(packages) == 0:
@@ -257,7 +256,7 @@ class Debian(callbacks.Plugin):
         pkg = pkg.lower()
         try:
             text = utils.web.getUrl('http://packages.qa.debian.org/%s/%s.html' %
-                                    (pkg[0], pkg))
+                                    (pkg[0], pkg)).decode()
         except utils.web.Error:
             irc.errorInvalid('source package name')
         for line in text.split('\n'):
@@ -271,10 +270,9 @@ class Debian(callbacks.Plugin):
         m = self._update.search(text)
         if m:
             updated = m.group(1)
-        soup = BeautifulSoup.BeautifulSoup()
-        soup.feed(text)
-        pairs = zip(soup.fetch('dt'),
-                    soup.fetch('dd'))
+        soup = BeautifulSoup.BeautifulSoup(text)
+        pairs = zip(soup.find_all('dt'),
+                    soup.find_all('dd'))
         for (label, content) in pairs:
             try:
                 title = self._bugsCategoryTitle.search(str(label)).group(1)
@@ -292,18 +290,18 @@ class Debian(callbacks.Plugin):
                 maintainer = format('%s: %s %u', self.bold('Maintainer'),
                                     name, utils.web.mungeEmail(email))
             elif title == 'All bugs':
-                bugsAll = format('%i Total', content.first('span').string)
+                bugsAll = format('%i Total', content.span.string)
             elif title == 'Release Critical':
-                bugsRC = format('%i RC', content.first('span').string)
+                bugsRC = format('%i RC', content.span.string)
             elif title == 'Important and Normal':
                 bugs = format('%i Important/Normal',
-                              content.first('span').string)
+                              content.span.string)
             elif title == 'Minor and Wishlist':
                 bugsMinor = format('%i Minor/Wishlist',
-                                   content.first('span').string)
+                                   content.span.string)
             elif title == 'Fixed and Pending':
                 bugsFixed = format('%i Fixed/Pending',
-                                   content.first('span').string)
+                                   content.span.string)
         bugL = (bugsAll, bugsRC, bugs, bugsMinor, bugsFixed)
         s = '.  '.join((version, maintainer,
                         '%s: %s' % (self.bold('Bugs'), '; '.join(bugL))))
@@ -323,13 +321,13 @@ class Debian(callbacks.Plugin):
         if version is None:
             version = 'unstable'
         try:
-            fd = utils.web.getUrlFd(
-                'http://packages.debian.org/%s/%s/newpkg' % (version, section))
-        except utils.web.Error, e:
+            fd = utils.web.getUrlFd('http://packages.debian.org/%s/%s/newpkg' %
+                    (version, section))
+        except utils.web.Error as e:
             irc.error(str(e), Raise=True)
         packages = []
         for line in fd:
-            m = self._newpkgre.search(line)
+            m = self._newpkgre.search(line.decode())
             if m:
                 m = m.group(1)
                 if fnmatch.fnmatch(m, glob):
@@ -359,8 +357,8 @@ class Debian(callbacks.Plugin):
         """
         url = 'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=%s' % bug
         try:
-            text = utils.web.getUrl(url)
-        except utils.web.Error, e:
+            text = utils.web.getUrl(url).decode()
+        except utils.web.Error as e:
             irc.error(str(e), Raise=True)
         if "There is no record of Bug" in text:
             irc.error('I could not find a bug report matching that number.',
