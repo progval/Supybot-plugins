@@ -28,6 +28,8 @@
 
 ###
 
+import sys
+
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
@@ -85,7 +87,10 @@ def translate(src, target, word):
         if link.getAttribute('lang') != target:
             link = link.nextSibling
             continue
-        return link.firstChild.data.encode('utf-8', 'replace')
+        if sys.version_info[0] < 3:
+            return link.firstChild.data.encode('utf-8', 'replace')
+        else:
+            return link.firstChild.data
     # Too bad :-(
     # No lang links available for the target language
     raise Untranslatable()
