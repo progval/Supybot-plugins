@@ -174,7 +174,7 @@ class Twitter(callbacks.Plugin):
                 lastRun = time.time()
                 self.log.debug(_('Fetching tweets for channel %s') % channel)
                 api = self._getApi(channel) # Reload it from conf everytime
-                if not api._oauth_consumer and user is None:
+                if not api._oauth_consumer:
                     return
                 retweets = self.registryValue('announce.retweets', channel)
                 try:
