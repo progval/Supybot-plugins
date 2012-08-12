@@ -542,8 +542,8 @@ class Twitter(callbacks.Plugin):
     stats = wrap(stats, ['channel'])
 
     @internationalizeDocstring
-    def profile(self, irc, msg, args, channel, user):
-        """[<channel>] <user>
+    def profile(self, irc, msg, args, channel, user=None):
+        """[<channel>] [<user>]
 
         Return profile image for a specified <user>
         If <channel> is not given, it defaults to the current channel.
@@ -555,13 +555,20 @@ class Twitter(callbacks.Plugin):
                         'an op, try with another channel.'))
             return
         try:
-            profile = api.GetUser(user)
+            if user:
+                profile = api.GetUser(user)
+            else:
+                profile = api.VerifyCredentials()
         except twitter.TwitterError:
             irc.error(_('An error occurred'))
             return
 
-        irc.reply(profile.GetProfileImageUrl().replace('_normal', ''))
-    profile = wrap(profile, ['channel', 'somethingWithoutSpaces'])
+        irc.reply(('Name: @%s (%s). Profile picture: %s. Biography: %s') %
+                (profile.screen_name,
+                 profile.name,
+                 profile.GetProfileImageUrl().replace('_normal', ''),
+                 profile.description))
+    profile = wrap(profile, ['channel', optional('somethingWithoutSpaces')])
 
 
     def die(self):
