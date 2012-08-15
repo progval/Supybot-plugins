@@ -103,6 +103,9 @@ conf.registerChannelValue(Twitter.announce, 'interval',
 conf.registerChannelValue(Twitter.announce, 'withid',
         registry.Boolean(True, _("""Determines whether or not the ID of
         announced tweets will be displayed.""")))
+conf.registerChannelValue(Twitter.announce, 'withshortid',
+        registry.Boolean(True, _("""Determines whether or not the ID of
+        announced tweets will be displayed.""")))
 conf.registerChannelValue(Twitter.announce, 'oneline',
         registry.Boolean(True, _("""Determines whether or not all tweets will
         be shown in one line.""")))

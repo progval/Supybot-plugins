@@ -28,6 +28,8 @@
 
 ###
 
+from __future__ import division
+
 import config
 reload(config)
 
@@ -122,6 +124,8 @@ class Twitter(callbacks.Plugin):
                       'configuration hooks. So, Twitter won\'t be able '
                       'to apply changes to the consumer key/secret '
                       'and token key/secret unless you reload it.')
+        self._shortids = {}
+        self._current_shortid = 0
 
     def _dropApiObjects(self, name=None):
         self._apis = {}
@@ -140,7 +144,7 @@ class Twitter(callbacks.Plugin):
             secret = self.registryValue('accounts.channel.secret', channel)
             url = self.registryValue('accounts.channel.api')
         if key == '' or secret == '':
-            return twitter.Api(base_url=url)
+            return ExtendedApi(base_url=url)
         api = ExtendedApi(consumer_key=self.registryValue('consumer.key'),
                 consumer_secret=self.registryValue('consumer.secret'),
                 access_token_key=key,
@@ -148,6 +152,22 @@ class Twitter(callbacks.Plugin):
                 base_url=url)
         self._apis[channel] = api
         return api
+
+    def _get_shortid(self, longid):
+        characters = '0123456789abcdefghijklmnopwrstuvwyz'
+        id_ = self._current_shortid + 1
+        id_ %= (36**4)
+        self._current_shortid = id_
+        shortid = ''
+        while len(shortid) < 3:
+            quotient, remainder = divmod(id_, 36)
+            shortid = characters[remainder] + shortid
+            id_ = quotient // 36
+        print(repr(self._shortids))
+        self._shortids[shortid] = longid
+        print(repr(self._shortids))
+        return shortid
+        
 
     def __call__(self, irc, msg):
         super(Twitter, self).__call__(irc, msg)
@@ -194,10 +214,16 @@ class Twitter(callbacks.Plugin):
                     continue
                 else:
                     maxId = timeline[-1].id
+                format_ = '@%(user)s> %(msg)s'
                 if self.registryValue('announce.withid', channel):
-                    replies = ['[%s] @%s> %s' % (x.id, x.user.screen_name, x.text) for x in timeline]
-                else:
-                    replies = ['@%s> %s' % (x.user.screen_name, x.text) for x in timeline]
+                    format_ = '[%(longid)s] ' + format_
+                if self.registryValue('announce.withshortid', channel):
+                    format_ = '(%(shortid)s) ' + format_
+                replies = [format_ % {'longid': x.id,
+                                      'shortid': self._get_shortid(x.id),
+                                      'user': x.user.screen_name,
+                                      'msg': x.text
+                                     } for x in timeline]
 
                 replies = [x.replace("&lt;", "<").replace("&gt;", ">")
                         .replace("&amp;", "&") for x in replies]
@@ -308,12 +334,24 @@ class Twitter(callbacks.Plugin):
         Retweets the message with the given ID."""
         api = self._getApi(channel)
         try:
+            if len(id_) <= 3:
+                try:
+                    id_ = self._shortids[id_]
+                except KeyError:
+                    irc.error(_('This is not a valid ID.'))
+                    return
+            else:
+                try:
+                    id_ = int(id_)
+                except ValueError:
+                    irc.error(_('This is not a valid ID.'))
+                    return
             api.PostRetweet(id_)
             irc.replySuccess()
         except twitter.TwitterError as e:
             irc.error(e.args[0])
     retweet = wrap(retweet, ['user', ('checkChannelCapability', 'twitterpost'),
-            'int'])
+            'somethingWithoutSpaces'])
 
     @internationalizeDocstring
     def timeline(self, irc, msg, args, channel, tupleOptlist, user):
@@ -410,6 +448,18 @@ class Twitter(callbacks.Plugin):
         If <channel> is not given, it defaults to the current channel.
         If given, --since takes a tweet ID, used as a boundary
         """
+        if len(id_) <= 3:
+            try:
+                id_ = self._shortids[id_]
+            except KeyError:
+                irc.error(_('This is not a valid ID.'))
+                return
+        else:
+            try:
+                id_ = int(id_)
+            except ValueError:
+                irc.error(_('This is not a valid ID.'))
+                return
         optlist = {}
         for key, value in tupleOptlist:
             optlist.update({key: value})
@@ -430,7 +480,8 @@ class Twitter(callbacks.Plugin):
         reply = reply.replace("&amp;", "&")
         reply = reply.encode('utf8')
         irc.reply(reply)
-    replies = wrap(replies, ['channel', getopts({'since': 'int'})])
+    replies = wrap(replies, ['channel',
+        getopts({'since': 'somethingWithoutSpaces'})])
 
     @internationalizeDocstring
     def trends(self, irc, msg, args, channel):
@@ -505,6 +556,18 @@ class Twitter(callbacks.Plugin):
         Delete a specified status with id <id>
         If <channel> is not given, it defaults to the current channel.
         """
+        if len(id_) <= 3:
+            try:
+                id_ = self._shortids[id_]
+            except KeyError:
+                irc.error(_('This is not a valid ID.'))
+                return
+        else:
+            try:
+                id_ = int(id_)
+            except ValueError:
+                irc.error(_('This is not a valid ID.'))
+                return
 
         api = self._getApi(channel)
         if not api._oauth_consumer:
