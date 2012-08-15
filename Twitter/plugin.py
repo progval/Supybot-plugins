@@ -448,6 +448,14 @@ class Twitter(callbacks.Plugin):
         If <channel> is not given, it defaults to the current channel.
         If given, --since takes a tweet ID, used as a boundary
         """
+        optlist = {}
+        for key, value in tupleOptlist:
+            optlist.update({key: value})
+
+        if 'since' not in optlist:
+            optlist['since'] = None
+        id_ = optlist['since']
+
         if len(id_) <= 3:
             try:
                 id_ = self._shortids[id_]
@@ -460,16 +468,10 @@ class Twitter(callbacks.Plugin):
             except ValueError:
                 irc.error(_('This is not a valid ID.'))
                 return
-        optlist = {}
-        for key, value in tupleOptlist:
-            optlist.update({key: value})
-
-        if 'since' not in optlist:
-            optlist['since'] = None
 
         api = self._getApi(channel)
         try:
-            replies = api.GetReplies(since_id=optlist['since'])
+            replies = api.GetReplies(since_id=id_)
         except twitter.TwitterError:
             irc.error(_('No tweets'))
             return
@@ -550,7 +552,7 @@ class Twitter(callbacks.Plugin):
                                'somethingWithoutSpaces'])
 
     @internationalizeDocstring
-    def delete(self, irc, msg, args, channel, id):
+    def delete(self, irc, msg, args, channel, id_):
         """[<channel>] <id>
 
         Delete a specified status with id <id>
@@ -575,7 +577,7 @@ class Twitter(callbacks.Plugin):
                         'an op, try with another channel.'))
             return
         try:
-            delete = api.DestroyStatus(id)
+            delete = api.DestroyStatus(id_)
         except twitter.TwitterError:
             irc.error(_('An error occurred'))
             return
