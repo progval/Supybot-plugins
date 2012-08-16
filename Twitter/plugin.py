@@ -162,10 +162,8 @@ class Twitter(callbacks.Plugin):
         while len(shortid) < 3:
             quotient, remainder = divmod(id_, 36)
             shortid = characters[remainder] + shortid
-            id_ = quotient // 36
-        print(repr(self._shortids))
+            id_ = quotient
         self._shortids[shortid] = longid
-        print(repr(self._shortids))
         return shortid
         
 
