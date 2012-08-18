@@ -106,11 +106,12 @@ class SupyMLParser:
         if self.nodesCount >= self._maxNodes:
             raise MaximumNodesNumberExceeded()
 
-    def _run(self, code):
+    def _run(self, code, nested):
         """Runs the command using Supybot engine"""
         tokens = callbacks.tokenize(str(code))
         fakeIrc = FakeIrc(self._irc)
-        self._plugin.Proxy(fakeIrc, self._msg, tokens)
+        callbacks.NestedCommandsIrcProxy(fakeIrc, self._msg, tokens,
+                nested=(1 if nested else 0))
         self.rawData = fakeIrc._rawData
         # TODO : don't wait if the plugin is not threaded
         time.sleep(0.1)
@@ -127,10 +128,10 @@ class SupyMLParser:
         """Handles the root node and call child nodes"""
         for childNode in dom.childNodes:
             if isinstance(childNode, minidom.Element):
-                output = self._processNode(childNode, variables)
+                output = self._processNode(childNode, variables, nested=False)
         return output
 
-    def _processNode(self, node, variables):
+    def _processNode(self, node, variables, nested=True):
         """Returns the value of an internapreted node."""
 
         if isinstance(node, minidom.Text):
@@ -150,7 +151,7 @@ class SupyMLParser:
                 output += self._processSet(childNode, variables)
             else:
                 output += self._processNode(childNode, variables) or ''
-        value = self._run(output)
+        value = self._run(output, nested)
         return value
 
     def _processSet(self, node, variables):

@@ -137,7 +137,7 @@ class SupyMLTestCase(ChannelPluginTestCase):
                             '</echo>',
                             '45')
 
-    def testMaxNesting(self):
+    def testNesting(self):
         self.assertNotError('SupyML eval ' +
                          '<echo>'*30+
                             'foo' +
@@ -148,6 +148,8 @@ class SupyMLTestCase(ChannelPluginTestCase):
                             'foo' +
                          '</echo>'*31
                         )
+        self.assertResponse('SupyML eval <echo>foo <tell>bar baz</tell></echo>',
+                'foo This command cannot be nested.')
 
     def testWarnings(self):
         self.assertResponse('SupyML eval <echo>'
