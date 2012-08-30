@@ -45,6 +45,9 @@ class IwantTestCase(ChannelPluginTestCase):
                             '#3: be cool')
         self.assertResponse('iwant get 2', 'Wish #2 is a working plugin.')
         self.assertNotError('iwant random')
+        self.assertResponse('delete 1', 'Successfully deleted: you')
+        self.assertResponse('iwant list', '#1: a working plugin and '
+                            '#2: be cool')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
