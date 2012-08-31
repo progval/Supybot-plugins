@@ -31,6 +31,10 @@
 import supybot.conf as conf
 import supybot.registry as registry
 
+from supybot.i18n import PluginInternationalization
+from supybot.i18n import internationalizeDocstring
+_ = PluginInternationalization('Listener')
+
 def configure(advanced):
     # This will be called by supybot to configure this module.  advanced is
     # a bool that specifies whether the user identified himself as an advanced
@@ -45,5 +49,8 @@ Listener = conf.registerPlugin('Listener')
 # conf.registerGlobalValue(Listener, 'someConfigVariableName',
 #     registry.Boolean(False, """Help for someConfigVariableName."""))
 
+conf.registerGlobalValue(Listener, 'relays',
+    registry.String('[]', _("""JSON-formatted relays. Do not edit this
+    configuration variable unless you know what you are doing.""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
