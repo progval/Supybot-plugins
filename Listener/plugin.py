@@ -109,7 +109,7 @@ class Listener(callbacks.Plugin):
             while self.active:
                 try:
                     conn, addr = self.listener.accept()
-                    self.buffer = conn.recv(4092)
+                    self.buffer = conn.recv(4092).split('\n')[0].rstrip('\r')
                     conn.close()
                 except IOError:
                     pass
