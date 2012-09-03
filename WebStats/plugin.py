@@ -505,6 +505,9 @@ class WebStats(callbacks.Plugin):
             return
         content = msg.args[1]
         nick = msg.prefix.split('!')[0]
+        if nick in self.registryValue('channel.excludenicks', channel) \
+                .split(' '):
+            return
         self.db.recordMessage(channel, nick, content)
     doNotice = doPrivmsg
 
@@ -513,6 +516,9 @@ class WebStats(callbacks.Plugin):
         if not self.registryValue('channel.enable', channel):
             return
         nick = msg.prefix.split('!')[0]
+        if nick in self.registryValue('channel.excludenicks', channel) \
+                .split(' '):
+            return
         self.db.recordMove(channel, nick, 'join')
 
     def doPart(self, irc, msg):
@@ -524,6 +530,9 @@ class WebStats(callbacks.Plugin):
         else:
             message = ''
         nick = msg.prefix.split('!')[0]
+        if nick in self.registryValue('channel.excludenicks', channel) \
+                .split(' '):
+            return
         self.db.recordMove(channel, nick, 'part', message)
 
     def doQuit(self, irc, msg):
@@ -533,6 +542,9 @@ class WebStats(callbacks.Plugin):
         else:
             message = ''
         for channel in self.ircstates[irc].channels:
+            if nick in self.registryValue('channel.excludenicks', channel) \
+                    .split(' '):
+                continue
             if self.registryValue('channel.enable', channel) and \
                 msg.nick in self.ircstates[irc].channels[channel].users:
                 self.db.recordMove(channel, nick, 'quit', message)
@@ -543,6 +555,9 @@ class WebStats(callbacks.Plugin):
         else:
             message = ''
         for channel in self.ircstates[irc].channels:
+            if nick in self.registryValue('channel.excludenicks', channel) \
+                    .split(' '):
+                continue
             if self.registryValue('channel.enable', channel) and \
                 msg.nick in self.ircstates[irc].channels[channel].users:
                 self.db.recordMove(channel, nick, 'nick', message)
@@ -553,6 +568,9 @@ class WebStats(callbacks.Plugin):
         else:
             message = ''
         for channel in self.ircstates[irc].channels:
+            if nick in self.registryValue('channel.excludenicks', channel) \
+                    .split(' '):
+                continue
             if self.registryValue('channel.enable', channel) and \
                 msg.nick in self.ircstates[irc].channels[channel].users:
                 self.db.recordMove(channel, nick, 'kicker', message)

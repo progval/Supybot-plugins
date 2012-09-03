@@ -59,5 +59,8 @@ conf.registerChannelValue(WebStats.channel, 'enable',
 conf.registerChannelValue(WebStats.channel, 'language',
     registry.String(_('en'), _("""Determines what language is used on the
         website""")))
+conf.registerChannelValue(WebStats.channel, 'excludenicks',
+    registry.String('', _("""Space-separated list of nicks excluded from
+        stats.""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
