@@ -259,7 +259,7 @@ class WebStatsDB:
         if DEBUG or random.randint(0,50) == 10:
             self.refreshCache()
 
-    _regexpAddressedTo = re.compile('^(?P<nick>[^: ]+):')
+    _regexpAddressedTo = re.compile('^(?P<nick>[^:, ]+):')
     def refreshCache(self):
         """Clears the cache tables, and populate them"""
         self._truncateCache()
