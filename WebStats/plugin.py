@@ -40,6 +40,7 @@ import supybot.world as world
 import supybot.log as log
 import supybot.conf as conf
 import supybot.utils as utils
+import supybot.ircdb as ircdb
 from supybot.commands import *
 import supybot.irclib as irclib
 import supybot.plugins as plugins
@@ -106,7 +107,7 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                 response = 404
                 content_type = 'text/html'
                 output = """<p style="font-size: 20em">BAM!</p>
-                <p>You played with the URL, you losed.</p>"""
+                <p>You played with the URL, you lost.</p>"""
             elif splittedPath[1] in ('nicks', 'global', 'links') \
                     and path[-1]=='/'\
                     or splittedPath[1] == 'nicks' and \
@@ -454,6 +455,12 @@ class WebStatsDB:
                           WHERE chan=?""", (chanName,))
         return cursor
 
+    def clearChannel(self, channel):
+        cursor = self._conn.cursor()
+        for table in ('messages', 'moves', 'links_cache', 'chans_cache',
+                'nicks_cache'):
+            cursor.execute('DELETE FROM %s WHERE chan=?' % table, (channel,))
+
 class WebStats(callbacks.Plugin):
     def __init__(self, irc):
         self.__parent = super(WebStats, self)
@@ -470,6 +477,23 @@ class WebStats(callbacks.Plugin):
     def die(self):
         httpserver.unhook('webstats')
         self.__parent.die()
+
+    def clear(self, irc, msg, args, channel, optlist):
+        """[<channel>]
+
+        Clear database for the <channel>. If <channel> is not given,
+        it defaults to the current channel."""
+        capability = ircdb.makeChannelCapability(channel, 'op')
+        if not ircdb.checkCapability(msg.prefix, capability):
+            irc.errorNoCapability(capability, Raise=True)
+        if not optlist:
+            irc.reply(_('Running this command will wipe all webstats data '
+                'for the channel. If you are sure you want to do this, '
+                'add the --confirm switch.'))
+            return
+        self.db.clearChannel(channel)
+        irc.replySuccess()
+    clear = wrap(clear, ['channel', getopts({'confirm': ''})])
 
     def doPrivmsg(self, irc, msg):
         channel = msg.args[0]
