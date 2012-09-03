@@ -114,7 +114,19 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                 response = 200
                 content_type = 'text/html'
                 if splittedPath[1] == 'links':
-                    content_type = 'image/png'
+                    try:
+                        import pygraphviz
+                        content_type = 'image/png'
+                    except ImportError:
+                        content_type = 'text/plain'
+                        response = 501
+                        self.send_response(response)
+                        self.send_header('Content-type', content_type)
+                        self.end_headers()
+                        self.wfile.write('Links cannot be displayed; ask '
+                                'the bot owner to install python-pygraphviz.')
+                        self.wfile.close()
+                        return
                 assert len(splittedPath) > 2
                 chanName = splittedPath[2].replace('%20', '#')
                 getTemplate('listingcommons') # Reload
