@@ -56,9 +56,16 @@ def get(useSkeleton, channel, db, urlLevel, page, orderBy=None):
         graph = pygraphviz.AGraph(strict=False, directed=True,
                                   start='regular', smoothing='spring',
                                   size='40') # /!\ Size is in inches /!\
+        items = [(x,y,float(z)) for x,y,z in items]
+        if not items:
+            graph.add_node('No links for the moment.')
+            buffer_ = StringIO()
+            graph.draw(buffer_, prog='circo', format='png')
+            buffer_.seek(0)
+            output = buffer_.read()
+            return output
         graph.add_node('#root#', style='invisible')
         insertedNicks = {}
-        items = [(x,y,float(z)) for x,y,z in items]
         divideBy = max([z for x,y,z in items])/10
         for item in items:
             for i in (0, 1):
