@@ -226,7 +226,11 @@ class GitHub(callbacks.Plugin):
 
     class repo(callbacks.Commands):
         def _url(self):
-            return instance.registryValue('api.url')
+            url = instance.registryValue('api.url')
+            if url == 'http://github.com/api/v2/json': # old api
+                url = 'https://api.github.com'
+                instance.setRegistryValue('api.url', value=url)
+            return url
 
         @internationalizeDocstring
         def search(self, irc, msg, args, search, optlist):
@@ -239,12 +243,12 @@ class GitHub(callbacks.Plugin):
             for name, value in optlist:
                 if name in args:
                     args[name] = value
-            results = query(self,'repos/search',urllib.quote_plus(search),args)
+            results = query(self, 'legacy/repos/search',
+                    urllib.quote_plus(search), args)
             reply = ' & '.join('%s/%s' % (x['owner'], x['name'])
                                for x in results['repositories'])
             if reply == '':
-                irc.error(_('No repositories matches your search. Try to '
-                            'develop this software yourself ;)'))
+                irc.error(_('No repositories matches your search.'))
             else:
                 irc.reply(reply.encode('utf8'))
         search = wrap(search, ['something',
@@ -273,8 +277,7 @@ class GitHub(callbacks.Plugin):
                             # 1. it wouldn't break anything
                             # 2. it enhances cross-compatiblity
                             pass
-            results = query(self, 'repos/show', '%s/%s' % (owner, name), {})
-            results = results['repository']
+            results = query(self, 'repos', '%s/%s' % (owner, name), {})
             output = []
             for key, value in results.items():
                 if key in enabled:

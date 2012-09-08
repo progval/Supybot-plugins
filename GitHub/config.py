@@ -55,7 +55,7 @@ GitHub = conf.registerPlugin('GitHub')
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
 conf.registerGroup(GitHub, 'api')
 conf.registerGlobalValue(GitHub.api, 'url',
-        registry.String('http://github.com/api/v2/json', _("""The URL of the
+        registry.String('https://api.github.com', _("""The URL of the
         GitHub API to use. You probably don't need to edit it, but I let it
         there, just in case.""")))
 conf.registerGlobalValue(GitHub, 'announces',
