@@ -4,7 +4,7 @@ LimnoriaChan is meant for use on [#Limnoria] and is loaded on Limnoria there.
 
 # Usage
 
-LimnoriaChan has two commands called "issue" and "issuepl". Issue opens an issue to [Limnorias issue traker] and issuepl to [issue tracker of ProgVals Supybot-plugins].
+LimnoriaChan has two commands called "issue" and "issuepl". Issue opens an issue to [Limnorias issue tracker] and issuepl to [issue tracker of ProgVals Supybot-plugins].
 
 [#Limnoria]:irc://irc.freenode.net/#Limnoria
 [Limnorias issue tracker]:https://github.com/ProgVal/Limnoria/issues
