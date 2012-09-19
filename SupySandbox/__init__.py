@@ -37,6 +37,8 @@ Ce plugin est un portage du robot IRC Fschfsch, servant à fournir un accès
 import supybot
 import supybot.world as world
 
+deprecated = True
+
 # Use this for the version of this plugin.  You may wish to put a CVS keyword
 # in here if you're keeping the plugin in CVS or some similar system.
 __version__ = "0.1"

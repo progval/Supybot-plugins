@@ -1,3 +1,7 @@
+SupySandbox is currently deprecated, do not use this plugin.
+
+
+
 SupySandbox provides a safe way to allow everybody to run Python code from IRC
 thanks to haypo's pysandbox.
 
