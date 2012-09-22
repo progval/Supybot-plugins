@@ -105,6 +105,9 @@ class AttackProtectorDatabase:
 
 class AttackProtector(callbacks.Plugin):
     """This plugin protects channels against spam and flood"""
+
+    noIgnore = True
+
     def __init__(self, irc):
         self.__parent = super(AttackProtector, self)
         self.__parent.__init__(irc)
