@@ -1,4 +1,4 @@
-<strong>SupySandbox is currently deprecated, do not use this plugin.</strong>
+SupySandbox is currently deprecated, do not use this plugin.
 
 # SupySandbox
 
