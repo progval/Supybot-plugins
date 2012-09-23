@@ -1,4 +1,4 @@
-<title>LimnoriaChan - #Limnoria factoids, Limnoria issues linker etc.</title>
+LimnoriaChan - #Limnoria factoids, Limnoria issues linker etc.
 
 # LimnoriaChan
 
