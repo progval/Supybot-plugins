@@ -1,3 +1,5 @@
+LimnoriaChan - #Limnoria factoids, Limnoria issues linker etc.
+
 # LimnoriaChan
 
 LimnoriaChan is meant for use on [#Limnoria] and is loaded on Limnoria there.
