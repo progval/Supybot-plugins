@@ -303,6 +303,8 @@ class LinkRelay(callbacks.Plugin):
 
         if channel is None:
             for relay in self.relays:
+                if not relay.hasSourceIRCChannels:
+                    continue
                 for channel in relay.sourceIRCChannels:
                     new_s = format_(relay, s, args)
                     if nick in relay.sourceIRCChannels[channel].users and \
