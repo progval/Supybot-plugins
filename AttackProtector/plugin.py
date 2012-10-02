@@ -31,6 +31,7 @@
 import re
 import time
 
+import supybot.conf as conf
 import supybot.utils as utils
 import supybot.ircdb as ircdb
 from supybot.commands import *
@@ -181,14 +182,17 @@ class AttackProtector(callbacks.Plugin):
             pass
         punishment = self.registryValue('%s.punishment' % kind, channel)
         reason = _('%s flood detected') % kind
+
+        banmaskstyle = conf.supybot.protocols.irc.banmask
+        banmask = banmaskstyle.makeBanmask(prefix)
         if punishment == 'kick':
             msg = ircmsgs.kick(channel, nick, reason)
             irc.queueMsg(msg)
         elif punishment == 'ban':
-            msg = ircmsgs.ban(channel, prefix)
+            msg = ircmsgs.ban(channel, banmask)
             irc.queueMsg(msg)
         elif punishment == 'kban':
-            msg = ircmsgs.ban(channel, prefix)
+            msg = ircmsgs.ban(channel, banmask)
             irc.queueMsg(msg)
             msg = ircmsgs.kick(channel, nick, reason)
             irc.queueMsg(msg)
