@@ -49,15 +49,32 @@ except:
 class Trigger(callbacks.Plugin):
     """Add the help for "@plugin help Trigger" here
     This should describe *how* to use this plugin."""
-    def _run(self, irc, msg, triggerName):
-        command = self.registryValue('triggers.%s' % triggerName, msg.args[0])
+    def __init__(self, irc):
+        super(Trigger, self).__init__(irc)
+        self.lastMsgs = {}
+        self.lastStates = {}
+    def __call__(self, irc, msg):
+        try:
+            super(Trigger, self).__call__(irc, msg)
+            if irc in self.lastMsgs:
+                if irc not in self.lastStates:
+                    self.lastStates[irc] = irc.state.copy()
+                self.lastStates[irc].addMsg(irc, self.lastMsgs[irc])
+        finally:
+            # We must make sure this always gets updated.
+            self.lastMsgs[irc] = msg
+    def _run(self, irc, msg, triggerName, channel=None):
+        if channel is None:
+            channel = msg.args[0]
+        command = self.registryValue('triggers.%s' % triggerName, channel)
         if command == '':
             return
         tokens = callbacks.tokenize(command)
         try:
+            msg.args = (channel,) + msg.args[1:]
             self.Proxy(irc.irc, msg, tokens)
         except Exception, e:
-            log.exception('Error occured while running triggered command:')
+            self.log.exception('Error occured while running triggered command:')
     def doJoin(self, irc, msg):
         self._run(irc, msg, 'join')
     def doPart(self, irc, msg):
@@ -68,6 +85,14 @@ class Trigger(callbacks.Plugin):
             self._run(irc, msg, 'highlight')
     def doNotice(self, irc, msg):
         self._run(irc, msg, 'notice')
+    def doQuit(self, irc, msg):
+        for (channel, c) in self.lastStates[irc].channels.iteritems():
+            if msg.nick in c.users:
+                self._run(irc, msg, 'quit', channel)
+    def doNick(self, irc, msg):
+        for (channel, c) in irc.state.channels.iteritems():
+            if msg.args[0] in c.users:
+                self._run(irc, msg, 'nick', channel)
     def do376(self, irc, msg):
         command = self.registryValue('triggers.connect')
         if command != '':

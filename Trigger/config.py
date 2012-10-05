@@ -55,7 +55,7 @@ Trigger = conf.registerPlugin('Trigger')
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
 conf.registerGroup(Trigger, 'triggers')
 
-for trigger in 'join part privmsg notice highlight'.split(' '):
+for trigger in 'join part privmsg notice highlight nick quit'.split(' '):
     conf.registerChannelValue(Trigger.triggers, trigger,
         registry.String('', _("""Command triggered by %s""")))
 
