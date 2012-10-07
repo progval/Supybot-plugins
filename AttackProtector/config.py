@@ -88,22 +88,24 @@ conf.registerGlobalValue(AttackProtector, 'delay',
     wait before being enabled. A too low value makes the bot believe that
     its incoming messages 'flood' on connection is an attack.""")))
 
-kinds = {'join': ['5p10', 'ban'],
-         'part': ['4p5', 'ban'],
-         'nick': ['7p300', 'ban'],
-         'message': ['10p20', 'kick'],
-         'groupjoin': ['20p10', 'mode+i'],
-         'grouppart': ['20p10', 'mode+i'],
-         'groupnick': ['20p10', 'mode+N'],
-         'groupmessage': ['100p10', 'mode+m']}
-for kind in kinds:
-    data = kinds[kind]
+kinds = {'join': ['5p10', 'ban', ''],
+         'part': ['4p5', 'ban', ''],
+         'nick': ['7p300', 'ban', ''],
+         'message': ['10p20', 'kick', ''],
+         'kicked': ['5p60', 'kban', _('user has been kicked multiple times')],
+         'groupjoin': ['20p10', 'mode+i', ''],
+         'grouppart': ['20p10', 'mode+i', ''],
+         'groupnick': ['20p10', 'mode+N', ''],
+         'groupmessage': ['100p10', 'mode+m', '']}
+for kind, data in kinds.items():
+    detection, punishment, help_ = data
+    help_ = help_ or (_('a %s flood is detected') % kind)
     conf.registerGroup(AttackProtector, kind)
     conf.registerChannelValue(getattr(AttackProtector, kind), 'detection',
-        XpY(data[0], _("""In the format XpY, where X is the number of %s per
+        XpY(detection, _("""In the format XpY, where X is the number of %s per
         Y seconds that triggers the punishment.""") % kind))
     conf.registerChannelValue(getattr(AttackProtector, kind), 'punishment',
-        Punishment(data[1], _("""Determines the punishment applied when a
-        %s flood is detected.""") % kind))
+        Punishment(punishment, _("""Determines the punishment applied when
+        %s.""") % help_))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

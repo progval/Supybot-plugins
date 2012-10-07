@@ -207,6 +207,23 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             args=(self.channel, mode, self.nick)))
 
     #################################
+    # 'Kicked' tests
+    def testKbanAfterKicks(self):
+        prefix = 'testing!Attack@Protector'
+        for i in range(1, 5):
+            for i in range(1, 11):
+                msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
+                                      prefix=prefix)
+                self.irc.feedMsg(msg)
+            m = self.irc.takeMsg()
+            self.assertEqual(m.command, 'KICK')
+        for i in range(1, 11):
+            msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
+                                  prefix=prefix)
+            self.irc.feedMsg(msg)
+        self.assertEqual(self.irc.takeMsg().command, 'MODE')
+
+    #################################
     # Global tests
     def testCleanCollection(self):
         for i in range(1, 4):

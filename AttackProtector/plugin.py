@@ -115,7 +115,7 @@ class AttackProtector(callbacks.Plugin):
         self._enableOn = time.time() + self.registryValue('delay')
         self._database = AttackProtectorDatabase()
 
-    def _eventCatcher(self, irc, msg, kind):
+    def _eventCatcher(self, irc, msg, kind, **kwargs):
         if kind in ['part', 'join', 'message']:
             channels = [msg.args[0]]
             prefix = msg.prefix
@@ -126,6 +126,11 @@ class AttackProtector(callbacks.Plugin):
                 if newNick in c.users:
                     channels.append(channel)
             prefix = '*!' + msg.prefix.split('!')[1]
+        elif kind in ['kicked']:
+            assert 'kicked_prefix' in kwargs
+            channel = msg.args[0]
+            channels = [channel]
+            prefix = kwargs['kicked_prefix']
         try:
             for channel in channels:
                 item = None
@@ -182,6 +187,11 @@ class AttackProtector(callbacks.Plugin):
             pass
         punishment = self.registryValue('%s.punishment' % kind, channel)
         reason = _('%s flood detected') % kind
+
+        if punishment == 'kick':
+            self._eventCatcher(irc, msg, 'kicked', kicked_prefix=prefix)
+        if kind == 'kicked':
+            reason = _('You exceeded your kick quota.')
 
         banmaskstyle = conf.supybot.protocols.irc.banmask
         banmask = banmaskstyle.makeBanmask(prefix)
