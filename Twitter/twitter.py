@@ -17,7 +17,7 @@
 '''A library that provides a Python interface to the Twitter API'''
 
 __author__ = 'python-twitter@googlegroups.com'
-__version__ = '0.8.2'
+__version__ = '0.8.3'
 
 
 import base64
@@ -588,6 +588,10 @@ class Status(object):
       data['retweeted_status'] = self.retweeted_status.AsDict()
     if self.retweet_count:
       data['retweet_count'] = self.retweet_count
+    if self.urls:
+      data['urls'] = dict([(url.url, url.expanded_url) for url in self.urls])
+    if self.user_mentions:
+      data['user_mentions'] = [um.AsDict() for um in self.user_mentions]                                                                                                                                       
     return data
 
   @staticmethod
@@ -2040,6 +2044,18 @@ class Trend(object):
   def __str__(self):
     return 'Name: %s\nQuery: %s\nTimestamp: %s\n' % (self.name, self.query, self.timestamp)
 
+  def __ne__(self, other):
+    return not self.__eq__(other)
+
+  def __eq__(self, other):
+    try:
+      return other and \
+          self.name == other.name and \
+          self.query == other.query and \
+          self.timestamp == other.timestamp
+    except AttributeError:
+      return False
+
   @staticmethod
   def NewFromJsonDict(data, timestamp = None):
     '''Create a new instance based on a JSON dict
@@ -2184,7 +2200,7 @@ class Api(object):
         See shorten_url.py for an example shortner. [Optional]
       base_url:
         The base URL to use to contact the Twitter API.
-        Defaults to https://twitter.com. [Optional]
+        Defaults to https://api.twitter.com. [Optional]
       use_gzip_compression:
         Set to True to tell enable gzip compression for any call
         made to Twitter.  Defaults to False. [Optional]
@@ -2199,6 +2215,7 @@ class Api(object):
     self._use_gzip       = use_gzip_compression
     self._debugHTTP      = debugHTTP
     self._oauth_consumer = None
+    self._shortlink_size = 19
 
     self._InitializeRequestHeaders(request_headers)
     self._InitializeUserAgent()
@@ -2437,6 +2454,34 @@ class Api(object):
         trends.append(Trend.NewFromJsonDict(item, timestamp = t))
     return trends
 
+  def GetTrendsWoeid(self, woeid, exclude=None):
+    '''Return the top 10 trending topics for a specific WOEID, if trending
+    information is available for it.
+
+    Args:
+      woeid:
+        the Yahoo! Where On Earth ID for a location.
+      exclude:
+        Appends the exclude parameter as a request parameter.
+        Currently only exclude=hashtags is supported. [Optional]
+
+    Returns:
+      A list with 10 entries. Each entry contains a Trend.
+    '''
+    parameters = {}
+    if exclude:
+      parameters['exclude'] = exclude
+    url  = '%s/trends/%s.json' % (self.base_url, woeid)
+    json = self._FetchUrl(url, parameters=parameters)
+    data = self._ParseAndCheckTwitter(json)
+
+    trends = []
+    timestamp = data[0]['as_of']
+
+    for trend in data[0]['trends']:
+        trends.append(Trend.NewFromJsonDict(trend, timestamp = timestamp))
+    return trends
+
   def GetTrendsDaily(self, exclude=None, startdate=None):
     '''Get the current top trending topics for each hour in a given day
 
@@ -2589,7 +2634,8 @@ class Api(object):
                       count=None,
                       page=None,
                       include_rts=None,
-                      include_entities=None):
+                      include_entities=None,
+                      exclude_replies=None):
     '''Fetch the sequence of public Status messages for a single user.
 
     The twitter.Api instance must be authenticated if the user is private.
@@ -2629,6 +2675,12 @@ class Api(object):
         This node offers a variety of metadata about the tweet in a
         discreet structure, including: user_mentions, urls, and
         hashtags. [Optional]
+       exclude_replies:
+        If True, this will prevent replies from appearing in the returned
+        timeline. Using exclude_replies with the count parameter will mean you
+        will receive up-to count tweets - this is because the count parameter
+        retrieves that many tweets before filtering out retweets and replies.
+        This parameter is only supported for JSON and XML responses. [Optional]
 
     Returns:
       A sequence of Status instances, one for each message up to count
@@ -2677,11 +2729,14 @@ class Api(object):
     if include_entities:
       parameters['include_entities'] = 1
 
+    if exclude_replies:
+      parameters['exclude_replies'] = 1
+
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
     return [Status.NewFromJsonDict(x) for x in data]
 
-  def GetStatus(self, id):
+  def GetStatus(self, id, include_entities=None):
     '''Returns a single status message.
 
     The twitter.Api instance must be authenticated if the
@@ -2690,7 +2745,11 @@ class Api(object):
     Args:
       id:
         The numeric ID of the status you are trying to retrieve.
-
+      include_entities:
+        If True, each tweet will include a node called "entities".
+        This node offers a variety of metadata about the tweet in a
+        discreet structure, including: user_mentions, urls, and
+        hashtags. [Optional]
     Returns:
       A twitter.Status instance representing that status message
     '''
@@ -2699,8 +2758,13 @@ class Api(object):
         long(id)
     except:
       raise TwitterError("id must be an long integer")
+
+    parameters = {}
+    if include_entities:
+      parameters['include_entities'] = 1
+
     url  = '%s/statuses/show/%s.json' % (self.base_url, id)
-    json = self._FetchUrl(url)
+    json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
 
@@ -2726,6 +2790,16 @@ class Api(object):
     json = self._FetchUrl(url, post_data={'id': id})
     data = self._ParseAndCheckTwitter(json)
     return Status.NewFromJsonDict(data)
+
+  @classmethod
+  def _calculate_status_length(cls, status, linksize=19):
+    dummy_link_replacement = 'https://-%d-chars%s/' % (linksize, '-'*(linksize - 18))
+    shortened = ' '.join([x if not (x.startswith('http://') or
+                                    x.startswith('https://'))
+                            else
+                                dummy_link_replacement
+                            for x in status.split(' ')])
+    return len(shortened)
 
   def PostUpdate(self, status, in_reply_to_status_id=None):
     '''Post a twitter status message from the authenticated user.
@@ -2755,7 +2829,7 @@ class Api(object):
     else:
       u_status = unicode(status, self._input_encoding)
 
-    if len(u_status) > CHARACTER_LIMIT:
+    if self._calculate_status_length(u_status, self._shortlink_size) > CHARACTER_LIMIT:
       raise TwitterError("Text must be less than or equal to %d characters. "
                          "Consider using PostUpdates." % CHARACTER_LIMIT)
 
@@ -2960,7 +3034,7 @@ class Api(object):
     Returns:
       A sequence of twitter.User instances, one for each follower
     '''
-    url = 'http://twitter.com/followers/ids.json'
+    url = '%s/followers/ids.json' % self.base_url
     parameters = {}
     parameters['cursor'] = cursor
     if userid:
@@ -2969,15 +3043,15 @@ class Api(object):
     data = self._ParseAndCheckTwitter(json)
     return data
 
-  def GetFollowers(self, page=None):
+  def GetFollowers(self, cursor=-1):
     '''Fetch the sequence of twitter.User instances, one for each follower
 
     The twitter.Api instance must be authenticated.
 
     Args:
-      page:
-        Specifies the page of results to retrieve.
-        Note: there are pagination limits. [Optional]
+      cursor:
+        Specifies the Twitter API Cursor location to start at. [Optional]
+        Note: there are pagination limits.
 
     Returns:
       A sequence of twitter.User instances, one for each follower
@@ -2985,12 +3059,18 @@ class Api(object):
     if not self._oauth_consumer:
       raise TwitterError("twitter.Api instance must be authenticated")
     url = '%s/statuses/followers.json' % self.base_url
-    parameters = {}
-    if page:
-      parameters['page'] = page
-    json = self._FetchUrl(url, parameters=parameters)
-    data = self._ParseAndCheckTwitter(json)
-    return [User.NewFromJsonDict(x) for x in data]
+    result = []
+    while True:
+      parameters = { 'cursor': cursor }
+      json = self._FetchUrl(url, parameters=parameters)
+      data = self._ParseAndCheckTwitter(json)
+      result += [User.NewFromJsonDict(x) for x in data['users']]
+      if 'next_cursor' in data:
+        if data['next_cursor'] == 0 or data['next_cursor'] == data['previous_cursor']:
+          break
+      else:
+        break
+    return result
 
   def GetFeatured(self):
     '''Fetch the sequence of twitter.User instances featured on twitter.com
@@ -3266,7 +3346,10 @@ class Api(object):
     if since_id:
       parameters['since_id'] = since_id
     if max_id:
-      parameters['max_id'] = max_id
+      try:
+        parameters['max_id'] = long(max_id)
+      except:
+        raise TwitterError("max_id must be an integer")
     if page:
       parameters['page'] = page
 
@@ -3689,6 +3772,8 @@ class Api(object):
     # to check first, rather than try and catch the exception
     if 'error' in data:
       raise TwitterError(data['error'])
+    if 'errors' in data:
+      raise TwitterError(data['errors'])
 
   def _FetchUrl(self,
                 url,
@@ -3861,7 +3946,7 @@ class _FileCache(object):
              os.getenv('USERNAME') or \
              os.getlogin() or \
              'nobody'
-    except (IOError, OSError), e:
+    except (AttributeError, IOError, OSError), e:
       return 'nobody'
 
   def _GetTmpCachePath(self):
