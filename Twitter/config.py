@@ -79,7 +79,7 @@ conf.registerGlobalValue(Twitter.accounts.bot, 'secret',
         registry.String('', _("""The Twitter Access Token secret for the bot's
         account (%s)""") % helpGetToken, private=True))
 conf.registerGlobalValue(Twitter.accounts.bot, 'api',
-        registry.String('https://api.twitter.com/1', _("""The URL to the
+        registry.String('https://api.twitter.com/1.1', _("""The URL to the
         base API URL (by default, it is Twitter.com, but you can use it
         for twitter-compatible services, such as identica/statusnet.""")))
 
@@ -91,7 +91,7 @@ conf.registerChannelValue(Twitter.accounts.channel, 'secret',
         registry.String('', _("""The Twitter Access Token secret for this
         channel's account (%s)""") % helpGetToken, private=True))
 conf.registerChannelValue(Twitter.accounts.channel, 'api',
-        registry.String('https://api.twitter.com/1', _("""The URL to the
+        registry.String('https://api.twitter.com/1.1', _("""The URL to the
         base API URL (by default, it is Twitter.com, but you can use it
         for twitter-compatible services, such as identica/statusnet.""")))
 
