@@ -30,8 +30,15 @@
 
 from supybot.test import *
 
+import plugin
+
 class TwitterTestCase(ChannelPluginTestCase):
-    plugins = ('Twitter',)
+    plugins = ('Twitter', 'Untiny')
+
+    if network:
+        def testExpandLinks(self):
+            self.assertEqual(plugin.expandLinks('foo http://t.co/zIgJjeBV bar'),
+                    'foo http://osteele.com/posts/2004/11/ides bar')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
