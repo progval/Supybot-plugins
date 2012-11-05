@@ -466,7 +466,7 @@ class Twitter(callbacks.Plugin):
 
         if 'since' not in optlist:
             optlist['since'] = None
-        id_ = optlist['since']
+        id_ = optlist['since'] or '0000'
 
         if len(id_) <= 3:
             try:
