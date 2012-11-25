@@ -130,6 +130,8 @@ class Twitter(callbacks.Plugin):
                     self._dropApiObjects)
             conf.supybot.plugins.Twitter.accounts.channel.secret.addCallback(
                     self._dropApiObjects)
+            conf.supybot.plugins.Twitter.accounts.channel.api.addCallback(
+                    self._dropApiObjects)
         except registry.NonExistentRegistryEntry:
             log.error('Your version of Supybot is not compatible with '
                       'configuration hooks. So, Twitter won\'t be able '
