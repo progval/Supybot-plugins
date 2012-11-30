@@ -66,8 +66,9 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
     index and try out other plugins (if any).""")
     def doPost(self, handler, path, form):
         if not handler.address_string().endswith('.rs.github.com') and \
-                not handler.address_string().endswith('.cloud-ips.com'):
-            log.warning("""'%s' tryed to act as a web hook for Github,
+                not handler.address_string().endswith('.cloud-ips.com') and \
+                not handler.address_string() == 'localhost':
+            log.warning("""'%s' tried to act as a web hook for Github,
             but is not GitHub.""" % handler.address_string())
         else:
             self.plugin.announce.onPayload(json.loads(form['payload'].value))

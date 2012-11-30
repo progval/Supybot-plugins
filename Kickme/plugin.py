@@ -46,7 +46,7 @@ class Kickme(callbacks.Plugin):
         """[<reason>]
 
         Kick yourself."""
-        irc.queueMsg(ircmsgs.kick(msg.args[0], msg.nick, reason))
+        irc.queueMsg(ircmsgs.kick(msg.args[0], msg.nick, reason or ''))
     kickme = wrap(kickme, [optional('text')])
 
 
