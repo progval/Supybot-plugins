@@ -28,6 +28,8 @@
 
 ###
 
+from django.contrib.gis.geoip import GeoIP
+
 import supybot.utils as utils
 import supybot.world as world
 from supybot.commands import *
@@ -71,6 +73,7 @@ class Glob2Chan(callbacks.Plugin):
         callback = Glob2ChanCallback()
         callback.plugin = self
         httpserver.hook('glob2', callback)
+        self._users = {}
     def die(self):
         self.__parent.die()
         httpserver.unhook('glob2')
@@ -87,6 +90,7 @@ class Glob2Chan(callbacks.Plugin):
         if channel != '#glob2':
             return
         nick = msg.nick
+        self._users.update({msg.nick: msg.prefix.split('@')[1]})
         if nick.startswith('[YOG]') and \
                 nick not in self.registryValue('nowelcome').split(' '):
             irc.queueMsg(ircmsgs.privmsg(nick, 'Hi %s, welcome to the '
@@ -100,12 +104,15 @@ class Glob2Chan(callbacks.Plugin):
     def do311(self, irc, msg):
         nick = msg.args[1]
         realname = msg.args[5]
+        hostname = self._users.pop(nick)
         try:
             version = 'Glob2 version %s' % realname.split('-')[1]
         except:
             version = 'unknown version'
-        irc.queueMsg(ircmsgs.privmsg('#glob2', 'Welcome to %s, running %s' % \
-            (nick, version)))
+        g = GeoIP()
+        country = g.country(hostname)['country_name']
+        irc.queueMsg(ircmsgs.privmsg('#glob2', ('Welcome to %s, running %s '
+            'and connecting from %s.') % (nick, version, country)))
 
     def g2help(self, irc, msg, args, mode):
         """[{irc|yog}]

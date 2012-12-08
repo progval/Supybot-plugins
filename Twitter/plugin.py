@@ -33,6 +33,8 @@ from __future__ import division
 import config
 reload(config)
 
+import re
+import sys
 import time
 import threading
 import simplejson
@@ -40,6 +42,7 @@ import supybot.conf as conf
 import supybot.utils as utils
 import supybot.world as world
 from supybot.commands import *
+import supybot.ircmsgs as ircmsgs
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.registry as registry
@@ -91,7 +94,15 @@ class ExtendedApi(twitter.Api):
         self._CheckForTwitterError(data)
         return twitter.Status.NewFromJsonDict(data)
 
-
+_tco_link_re = re.compile(u'http://t.co/[a-zA-Z0-9]+')
+def expandLinks(tweet):
+    if 'Untiny.plugin' in sys.modules:
+        def repl(link):
+            return sys.modules['Untiny.plugin'].Untiny(None) \
+                    ._untiny(None, link.group(0))
+        return _tco_link_re.sub(repl, tweet)
+    else:
+        return tweet
 
 @internationalizeDocstring
 class Twitter(callbacks.Plugin):
@@ -118,6 +129,8 @@ class Twitter(callbacks.Plugin):
             conf.supybot.plugins.Twitter.accounts.channel.key.addCallback(
                     self._dropApiObjects)
             conf.supybot.plugins.Twitter.accounts.channel.secret.addCallback(
+                    self._dropApiObjects)
+            conf.supybot.plugins.Twitter.accounts.channel.api.addCallback(
                     self._dropApiObjects)
         except registry.NonExistentRegistryEntry:
             log.error('Your version of Supybot is not compatible with '
@@ -224,7 +237,9 @@ class Twitter(callbacks.Plugin):
                                      } for x in timeline]
 
                 replies = [x.replace("&lt;", "<").replace("&gt;", ">")
-                        .replace("&amp;", "&") for x in replies]
+                        .replace("&amp;", "&").replace('\n', ' ')
+                        for x in replies]
+                replies = map(expandLinks, replies)
                 if self.registryValue('announce.oneline', channel):
                     irc.replies(replies, prefixNick=False, joiner=' | ',
                             to=channel)
@@ -391,9 +406,10 @@ class Twitter(callbacks.Plugin):
                         'fetch this timeline.'))
             return
         if optlist['with-id']:
-            reply = ' | '.join(['[%s] %s' % (x.id, x.text) for x in timeline])
+            reply = ' | '.join(['[%s] %s' % (x.id, expandLinks(x.text))
+                    for x in timeline])
         else:
-            reply = ' | '.join([x.text for x in timeline])
+            reply = ' | '.join([expandLinks(x.text) for x in timeline])
 
         reply = reply.replace("&lt;", "<")
         reply = reply.replace("&gt;", ">")
@@ -429,7 +445,7 @@ class Twitter(callbacks.Plugin):
         except twitter.TwitterError:
             irc.error(_('No tweets'))
             return
-        reply = ' | '.join([x.text for x in public])
+        reply = ' | '.join([expandLinks(x.text) for x in public])
 
         reply = reply.replace("&lt;", "<")
         reply = reply.replace("&gt;", ">")
@@ -452,7 +468,7 @@ class Twitter(callbacks.Plugin):
 
         if 'since' not in optlist:
             optlist['since'] = None
-        id_ = optlist['since']
+        id_ = optlist['since'] or '0000'
 
         if len(id_) <= 3:
             try:
@@ -473,7 +489,8 @@ class Twitter(callbacks.Plugin):
         except twitter.TwitterError:
             irc.error(_('No tweets'))
             return
-        reply = ' | '.join(["%s: %s" % (x.user.screen_name, x.text) for x in replies])
+        reply = ' | '.join(["%s: %s" % (x.user.screen_name, expandLinks(x.text))
+                for x in replies])
 
         reply = reply.replace("&lt;", "<")
         reply = reply.replace("&gt;", ">")
@@ -497,7 +514,7 @@ class Twitter(callbacks.Plugin):
         except twitter.TwitterError:
             irc.error(_('No tweets'))
             return
-        reply = ' | '.join([x.name for x in trends])
+        reply = ' | '.join([expandLinks(x.name) for x in trends])
         reply = reply.encode('utf8')
         irc.reply(reply)
     trends = wrap(trends, ['channel'])

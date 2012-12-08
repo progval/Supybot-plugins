@@ -44,14 +44,14 @@ _ = PluginInternationalization('Untiny')
 class Untiny(callbacks.Plugin):
     """Add the help for "@plugin help Untiny" here
     This should describe *how* to use this plugin."""
-    @internationalizeDocstring
-    def untiny(self, irc, msg, args, url):
-        """<url>
 
-        Return the whole URL for a tiny URL."""
+    def _untiny(self, irc, url):
         data = json.loads(getUrl(self.registryValue('service') % url).decode())
         if 'org_url' in data:
-            irc.reply(data['org_url'])
+            if irc:
+                irc.reply(data['org_url'])
+            else:
+                return data['org_url'] # Used by other plugins
         elif 'error' in data:
             num, msg = data['error']
             messages = {
@@ -60,7 +60,17 @@ class Untiny(callbacks.Plugin):
                     '2': _('Connection to tinyurl service failed'),
                     '3': _('Unable to get the original URL'),
                     }
-            irc.error(messages[num])
+            if irc:
+                irc.error(messages[num])
+            else:
+                return url
+
+    @internationalizeDocstring
+    def untiny(self, irc, msg, args, url):
+        """<url>
+
+        Return the whole URL for a tiny URL."""
+        self._untiny(irc, url)
     untiny = wrap(untiny, ['text'])
 
 

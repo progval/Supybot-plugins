@@ -1,6 +1,9 @@
 Advanced Twitter plugin for Supybot, with capabilities handling, and
 per-channel user account.
 
+Configuration
+=============
+
 Ever noticed a text "sent from web" or "sent via Android" under a tweet?
 This is called the consumer. You have two choices:
 * Keep the default consumer. This is the easier way; and the text will
@@ -25,3 +28,9 @@ Once you got the token key/secret, set it _as a channel-specific variable_
 to supybot.plugins.Twitter.accounts.channel.key and 
 supybot.plugins.Twitter.accounts.channel.secret.
 
+
+Extra features
+==============
+
+If the Untiny plugin is loaded, this plugin will automaticaly extract original
+links from t.co ones.

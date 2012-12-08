@@ -97,6 +97,8 @@ class Debian(callbacks.Plugin):
             irc.reply(format('No filename found for %s (%s)',
                       utils.web.urlunquote(filename), args['suite']))
         else:
+            # Filter duplicated
+            pkgs = dict(map(lambda x:(x, None), pkgs)).keys()
             irc.reply(format('%i matches found: %s (%s)',
                           len(pkgs), '; '.join(pkgs), args['suite']))
     file = wrap(file, [getopts({'exact': '',
