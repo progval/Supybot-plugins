@@ -57,7 +57,9 @@ class RedmineTestCase(PluginTestCase):
 
     @init
     def testIssues(self):
-        self.assertRegexp('issues lqdn campagne', '^\x02.*\x02 \(last.*\)')
+        self.assertRegexp('issues lqdn --project campagne', '^\x02.*\x02 \(last.*\)')
+        self.assertRegexp('issues lqdn --author 19', '^\x02.*\x02 \(last.*\)')
+        self.assertRegexp('issues lqdn --assignee 19', '^\x02.*\x02 \(last.*\)')
 
 if not network:
     del RedmineTestCase

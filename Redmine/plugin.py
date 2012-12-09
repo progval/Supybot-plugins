@@ -46,10 +46,13 @@ def fetch(site, uri, **kwargs):
         url += '?' + utils.web.urlencode(kwargs)
     return json.load(utils.web.getUrlFd(url))
 
-class ProjectNotFound(Exception):
+class ResourceNotFound(Exception):
     pass
 
-class AmbiguousProject(Exception):
+class AmbiguousResource(Exception):
+    pass
+
+class AccessDenied(Exception):
     pass
 
 def get_project(site, project):
@@ -60,11 +63,37 @@ def get_project(site, project):
         if projects:
             break
     if not projects:
-        raise ProjectNotFound()
+        raise ResourceNotFound()
     elif len(projects) > 1:
-        raise AmbiguousProject()
+        raise AmbiguousResource()
     else:
         return projects[0]
+
+def get_project_or_error(irc, site, project):
+    try:
+        return get_project(site, project)
+    except ResourceNotFound:
+        irc.error(_('Project not found.'), Raise=True)
+    except AmbiguousResource:
+        irc.error(_('Ambiguous project name.'), Raise=True)
+
+def get_user(site, user):
+    if user.isdigit():
+        return fetch(site, 'users/%s' % user)
+    else:
+        # TODO: Find a way to get user data from their name...
+        # (authenticating as admin seems the only way)
+        raise AccessDenied()
+
+def get_user_or_error(irc, site, user):
+    try:
+        return get_user(site, user)
+    except ResourceNotFound:
+        irc.error(_('User not found.'), Raise=True)
+    except AmbiguousResource:
+        irc.error(_('Ambiguous user name.'), Raise=True)
+    except AccessDenied:
+        irc.error(_('Cannot get a user id from their name.'), Raise=True)
 
 def handle_site_arg(wrap_args):
     """Decorator for handling the <site> argument of all commands, because
@@ -88,15 +117,6 @@ def handle_site_arg(wrap_args):
             if site_name not in sites:
                 irc.error(_('Invalid site name.'), Raise=True)
             site = sites[site_name]
-
-            # Handle project converter
-            if project:
-                try:
-                    args2 = (get_project(site, args2[0]),) + tuple(args[1:])
-                except ProjectNotFound:
-                    irc.error(_('Project not found.'), Raise=True)
-                except AmbiguousProject:
-                    irc.error(_('Ambiguous project name.'), Raise=True)
 
             return f(self, irc, msg, args, site, *args2)
             
@@ -172,13 +192,28 @@ class Redmine(callbacks.Plugin):
         irc.reply(format('%L', projects))
 
     @internationalizeDocstring
-    @handle_site_arg(['project'])
-    def issues(self, irc, msg, args, site, project):
-        """<project>
+    @handle_site_arg([getopts({'project': 'something',
+                               'author': 'something',
+                               'assignee': 'something',
+                              })])
+    def issues(self, irc, msg, args, site, optlist):
+        """[--project <project>] [--author <username>] \
+        [--assignee <username>]
 
-        Return the list of issues of the <project> on the Redmine <site>."""
-        issues = fetch(site, 'issues', project_id=project['id'],
-                sort='updated_on:desc')['issues']
+        Return a list of issues on the Redmine <site>, filtered with
+        given parameters."""
+        fetch_args = {}
+        for (key, value) in optlist:
+            if key == 'project':
+                fetch_args['project_id'] = get_project_or_error(irc, site, value)['id']
+            elif key == 'author':
+                fetch_args['author_id'] = get_user_or_error(irc, site, value)['user']['id']
+            elif key == 'assignee':
+                fetch_args['assigned_to_id'] = get_user_or_error(irc, site, value)['user']['id']
+            else:
+                raise AssertionError((key, value))
+        issues = fetch(site, 'issues', sort='updated_on:desc', **fetch_args)
+        issues = issues['issues']
         new_issues = []
         for issue in issues:
             new_issue = {}
