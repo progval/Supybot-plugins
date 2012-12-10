@@ -61,6 +61,11 @@ class RedmineTestCase(PluginTestCase):
         self.assertRegexp('issues lqdn --author 19', '^\x02.*\x02 \(last.*\)')
         self.assertRegexp('issues lqdn --assignee 19', '^\x02.*\x02 \(last.*\)')
 
+    @init
+    def testIssue(self):
+        self.assertNotError('issue lqdn 130')
+        self.assertResponse('issue lqdn 999999', 'Error: Issue not found.')
+
 if not network:
     del RedmineTestCase
 

@@ -40,12 +40,6 @@ from supybot.i18n import PluginInternationalization, internationalizeDocstring
 
 _ = PluginInternationalization('Redmine')
 
-def fetch(site, uri, **kwargs):
-    url = site['url'] + uri + '.json'
-    if kwargs:
-        url += '?' + utils.web.urlencode(kwargs)
-    return json.load(utils.web.getUrlFd(url))
-
 class ResourceNotFound(Exception):
     pass
 
@@ -54,6 +48,27 @@ class AmbiguousResource(Exception):
 
 class AccessDenied(Exception):
     pass
+
+def fetch(site, uri, **kwargs):
+    url = site['url'] + uri + '.json'
+    if kwargs:
+        url += '?' + utils.web.urlencode(kwargs)
+    try:
+        return json.load(utils.web.getUrlFd(url))
+    except utils.web.Error:
+        raise ResourceNotFound()
+
+def flatten_subdicts(dicts):
+    """Change dict of dicts into a dict of strings/integers. Useful for
+    using in string formatting."""
+    flat = {}
+    for key, value in dicts.items():
+        if isinstance(value, dict):
+            for subkey, subvalue in value.items():
+                flat['%s__%s' % (key, subkey)] = subvalue
+        else:
+            flat[key] = value
+    return flat
 
 def get_project(site, project):
     projects = []
@@ -216,17 +231,27 @@ class Redmine(callbacks.Plugin):
         issues = issues['issues']
         new_issues = []
         for issue in issues:
-            new_issue = {}
-            for key, value in issue.items():
-                if isinstance(value, dict):
-                    for subkey, subvalue in value.items():
-                        new_issue['%s__%s' % (key, subkey)] = subvalue
-                else:
-                    new_issue[key] = value
-            new_issues.append(new_issue)
+            new_issues.append(flatten_subdicts(issue))
         issues = map(lambda x:self.registryValue('format.issues') % x,
                 new_issues)
         irc.reply(format('%L', issues))
+
+    @internationalizeDocstring
+    @handle_site_arg(['positiveInt'])
+    def issue(self, irc, msg, args, site, issueid):
+        """<issue id>
+
+        Return informations on an issue."""
+        try:
+            issue = fetch(site, 'issues/%i' % issueid)['issue']
+            issue = flatten_subdicts(issue)
+            irc.reply(self.registryValue('format.issue') % issue)
+        except ResourceNotFound:
+            irc.error(_('Issue not found.'), Raise=True)
+        except KeyError as e:
+            irc.error(_('Bad format in plugins.Redmine.format.issue: '
+                '%r is an unknown key.') % e.args[0])
+
 
 Class = Redmine
 

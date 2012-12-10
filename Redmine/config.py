@@ -62,5 +62,11 @@ conf.registerChannelValue(Redmine.format, 'issues',
     registry.String('\x02#%(id)i: %(subject)s\x02 (last update: '
     '%(updated_on)s / status: %(status__name)s)',
     _("""Format of issues displayed by @issues.""")))
+conf.registerChannelValue(Redmine.format, 'issue',
+    registry.String('\x02#%(id)i (%(status__name)s)\x02: \x02%(subject)s\x02 '
+    'in \x02%(project__name)s\x02 (%(project__id)i). Created by '
+    '\x02%(author__name)s\x02 (%(author__id)i) on \x02%(created_on)s\x02, '
+    'last updated on \x02%(updated_on)s', 
+    _("""Format of issues displayed by @issue.""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
