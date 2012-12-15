@@ -28,6 +28,9 @@
 
 ###
 
+import time
+
+import supybot.conf as conf
 from supybot.test import *
 
 def init(f):
@@ -39,8 +42,8 @@ def init(f):
             self.assertNotError('site remove lqdn')
     return newf
 
-class RedmineTestCase(PluginTestCase):
-    plugins = ('Redmine',)
+class RedmineTestCase(ChannelPluginTestCase):
+    plugins = ('Redmine', 'Config', 'Utilities')
 
     def testSite(self):
         self.assertRegexp('site list', 'No registered')
@@ -65,6 +68,40 @@ class RedmineTestCase(PluginTestCase):
     def testIssue(self):
         self.assertNotError('issue lqdn 130')
         self.assertResponse('issue lqdn 999999', 'Error: Issue not found.')
+
+    @init
+    def testAnnounce(self):
+        pl = self.irc.getCallback('Redmine')
+
+        self.assertNotError('ping')
+        self.assertNotError('config plugins.Redmine.announce.sites lqdn')
+        with conf.supybot.plugins.Redmine.sites.editable() as sites:
+            sites['lqdn']['interval'] = 1
+
+        # Make sure it does not update everytime a message is received
+        self.assertNotError('ping')
+        self.assertIs(self.irc.takeMsg(), None)
+        last_fetch = pl._last_fetch.copy()
+        self.assertNotError('ping')
+        self.assertEqual(last_fetch, pl._last_fetch)
+        self.assertIs(self.irc.takeMsg(), None)
+
+        # Make sure it updates after the interval is finished, but there is
+        # nothing new
+        time.sleep(1.1)
+        self.assertNotError('ping')
+        self.assertNotEqual(last_fetch, pl._last_fetch)
+        self.assertIs(self.irc.takeMsg(), None)
+
+        # Let's cheat a little and "olderize" the latest issue.
+        pl._last_fetch['lqdn'][1]['issues'][0]['updated_on'] = \
+                '2012/12/09 20:37:27 +0100'
+        time.sleep(1.1)
+        self.assertNotError('ping')
+        self.assertNotEqual(last_fetch, pl._last_fetch)
+        m = self.irc.takeMsg()
+        self.assertIsNot(m, None)
+
 
 if not network:
     del RedmineTestCase

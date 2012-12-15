@@ -28,12 +28,15 @@
 
 ###
 
+import sys
 import json
+import time
 
 import supybot.conf as conf
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
+import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 from supybot.i18n import PluginInternationalization, internationalizeDocstring
@@ -149,6 +152,47 @@ class Redmine(callbacks.Plugin):
     This should describe *how* to use this plugin."""
     threaded = True
 
+    _last_fetch = {} # {site: (time, data)}
+    def __call__(self, irc, msg):
+        super(Redmine, self).__call__(irc, msg)
+        with self.registryValue('sites', value=False).editable() as sites:
+            assert isinstance(sites, dict), repr(sites)
+            for site_name, site in sites.items():
+                if 'interval' not in site:
+                    site['interval'] = 60
+                if site_name in self._last_fetch:
+                    last_time, last_data = self._last_fetch[site_name]
+                    if last_time>time.time()-site['interval']:
+                        continue
+                data = fetch(site, 'issues', sort='updated_on:desc')
+                self._last_fetch[site_name] = (time.time(), data)
+                if 'last_time' not in locals():
+                    continue
+                try:
+                    last_update = last_data['issues'][0]['updated_on']
+                except IndexError:
+                    # There was no issue submitted before
+                    last_update = ''
+
+                announces = []
+                for issue in data['issues']:
+                    if issue['updated_on'] <= last_update:
+                        break
+                    announces.append(issue)
+                for channel in irc.state.channels:
+                    if site_name in self.registryValue('announce.sites',
+                            channel):
+                        format_ = self.registryValue('format.announces.issue',
+                                channel)
+                        for issue in announces:
+                            s = format_ % flatten_subdicts(issue)
+                            if sys.version_info[0] < 3:
+                                s = s.encode('utf8', errors='replace')
+                            msg = ircmsgs.privmsg(channel, s)
+                            irc.sendMsg(msg)
+
+
+
     class site(callbacks.Commands):
         conf = conf.supybot.plugins.Redmine
         @internationalizeDocstring
@@ -158,7 +202,7 @@ class Redmine(callbacks.Plugin):
             Add a site to the list of known redmine sites."""
             if not url.endswith('/'):
                 url += '/'
-            if name == '':
+            if not name:
                 irc.error(_('Invalid site name.'), Raise=True)
             if name in self.conf.sites():
                 irc.error(_('This site name is already registered.'), Raise=True)

@@ -68,5 +68,15 @@ conf.registerChannelValue(Redmine.format, 'issue',
     '\x02%(author__name)s\x02 (%(author__id)i) on \x02%(created_on)s\x02, '
     'last updated on \x02%(updated_on)s', 
     _("""Format of issues displayed by @issue.""")))
+conf.registerGroup(Redmine.format, 'announces')
+conf.registerChannelValue(Redmine.format.announces, 'issue',
+    registry.String('Updated issue: \x02#%(id)i (%(status__name)s)\x02: '
+    '\x02%(subject)s\x02 in \x02%(project__name)s\x02 (%(project__id)i).',
+    _("""Format of issues displayed by @issue.""")))
+
+conf.registerGroup(Redmine, 'announce')
+conf.registerChannelValue(Redmine.announce, 'sites',
+    registry.SpaceSeparatedListOfStrings([],
+    _("""List of sites announced on this channel.""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
