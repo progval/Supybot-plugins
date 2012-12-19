@@ -57,7 +57,7 @@ conf.registerGroup(Trigger, 'triggers')
 
 for trigger in 'join part privmsg notice highlight nick quit'.split(' '):
     conf.registerChannelValue(Trigger.triggers, trigger,
-        registry.String('', _("""Command triggered by %s""")))
+        registry.String('', _("""Command triggered by %s"""), private=True))
 
 conf.registerGlobalValue(Trigger.triggers, 'connect',
     registry.String('', _("""Command triggered on connect. This shouldn't be
