@@ -39,6 +39,7 @@ import sys
 import time
 import threading
 import simplejson
+import supybot.log as log
 import supybot.conf as conf
 import supybot.utils as utils
 import supybot.world as world
