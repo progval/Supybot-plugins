@@ -31,6 +31,7 @@
 from __future__ import division
 
 import config
+import htmlentitydefs
 reload(config)
 
 import re
@@ -178,7 +179,29 @@ class Twitter(callbacks.Plugin):
             id_ = quotient
         self._shortids[shortid] = longid
         return shortid
-        
+
+    def _unescape(self, text):
+        """Created by Fredrik Lundh (http://effbot.org/zone/re-sub.htm#unescape-html)"""
+        text = text.replace("\n", " ")
+        def fixup(m):
+            text = m.group(0)
+            if text[:2] == "&#":
+                # character reference
+                try:
+                    if text[:3] == "&#x":
+                        return unichr(int(text[3:-1], 16))
+                    else:
+                        return unichr(int(text[2:-1]))
+                except (ValueError, OverflowError):
+                    pass
+            else:
+                # named entity
+                try:
+                    text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+                except KeyError:
+                    pass
+            return text # leave as is
+        return re.sub("&#?\w+;", fixup, text)
 
     def __call__(self, irc, msg):
         super(Twitter, self).__call__(irc, msg)
@@ -236,9 +259,7 @@ class Twitter(callbacks.Plugin):
                                       'msg': x.text
                                      } for x in timeline]
 
-                replies = [x.replace("&lt;", "<").replace("&gt;", ">")
-                        .replace("&amp;", "&").replace('\n', ' ')
-                        for x in replies]
+                replies = map(self._unescape, replies)
                 replies = map(expandLinks, replies)
                 if self.registryValue('announce.oneline', channel):
                     irc.replies(replies, prefixNick=False, joiner=' | ',
@@ -271,7 +292,7 @@ class Twitter(callbacks.Plugin):
                                        # behaviour.
         reply = utils.str.format("%L", ['%s (%s)' % (x.name, x.screen_name)
                                         for x in following])
-        reply = reply.encode('utf8')
+        reply = self._unescape(reply)
         irc.reply(reply)
     following = wrap(following, ['channel',
                                      optional('somethingWithoutSpaces')])
@@ -291,7 +312,7 @@ class Twitter(callbacks.Plugin):
         followers = api.GetFollowers()
         reply = utils.str.format("%L", ['%s (%s)' % (x.name, x.screen_name)
                                         for x in followers])
-        reply = reply.encode('utf8')
+        reply = self._unescape(reply)
         irc.reply(reply)
     followers = wrap(followers, ['channel'])
 
@@ -411,10 +432,7 @@ class Twitter(callbacks.Plugin):
         else:
             reply = ' | '.join([expandLinks(x.text) for x in timeline])
 
-        reply = reply.replace("&lt;", "<")
-        reply = reply.replace("&gt;", ">")
-        reply = reply.replace("&amp;", "&")
-        reply = reply.encode('utf8')
+        reply = self._unescape(reply)
         irc.reply(reply)
     timeline = wrap(timeline, ['channel',
                                getopts({'since': 'int',
@@ -447,10 +465,7 @@ class Twitter(callbacks.Plugin):
             return
         reply = ' | '.join([expandLinks(x.text) for x in public])
 
-        reply = reply.replace("&lt;", "<")
-        reply = reply.replace("&gt;", ">")
-        reply = reply.replace("&amp;", "&")
-        reply = reply.encode('utf8')
+        reply = self._unescape(reply)
         irc.reply(reply)
     public = wrap(public, ['channel', getopts({'since': 'int'})])
 
@@ -492,10 +507,7 @@ class Twitter(callbacks.Plugin):
         reply = ' | '.join(["%s: %s" % (x.user.screen_name, expandLinks(x.text))
                 for x in replies])
 
-        reply = reply.replace("&lt;", "<")
-        reply = reply.replace("&gt;", ">")
-        reply = reply.replace("&amp;", "&")
-        reply = reply.encode('utf8')
+        reply = self._unescape(reply)
         irc.reply(reply)
     replies = wrap(replies, ['channel',
         getopts({'since': 'somethingWithoutSpaces'})])
@@ -514,8 +526,7 @@ class Twitter(callbacks.Plugin):
         except twitter.TwitterError:
             irc.error(_('No tweets'))
             return
-        reply = ' | '.join([expandLinks(x.name) for x in trends])
-        reply = reply.encode('utf8')
+        reply = self._unescape(reply)
         irc.reply(reply)
     trends = wrap(trends, ['channel'])
 
