@@ -395,7 +395,7 @@ class Twitter(callbacks.Plugin):
                         'an op, try with another channel.'))
             return
         try:
-            timeline = api.GetUserTimeline(id=user,
+            timeline = api.GetUserTimeline(screen_name=user,
                                            since_id=optlist['since'],
                                            max_id=optlist['max'],
                                            count=optlist['count'],
