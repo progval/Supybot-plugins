@@ -2594,8 +2594,8 @@ class Api(object):
     Returns:
       A sequence of twitter.Status instances, one for each message
     '''
-    if not user and not self._oauth_consumer:
-      raise TwitterError("User must be specified if API is not authenticated.")
+    if not self._oauth_consumer:
+      raise TwitterError("API is not authenticated.")
     url = '%s/statuses/home_timeline.json' % self.base_url
     parameters = {}
     if count is not None:
