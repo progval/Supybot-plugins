@@ -2557,7 +2557,6 @@ class Api(object):
     return trends
 
   def GetFriendsTimeline(self,
-                         user=None,
                          count=None,
                          page=None,
                          since_id=None,
@@ -2597,11 +2596,7 @@ class Api(object):
     '''
     if not user and not self._oauth_consumer:
       raise TwitterError("User must be specified if API is not authenticated.")
-    url = '%s/statuses/friends_timeline' % self.base_url
-    if user:
-      url = '%s/%s.json' % (url, user)
-    else:
-      url = '%s.json' % url
+    url = '%s/statuses/home_timeline.json' % self.base_url
     parameters = {}
     if count is not None:
       try:
