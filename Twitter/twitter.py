@@ -2987,11 +2987,10 @@ class Api(object):
     '''
     if not user and not self._oauth_consumer:
       raise TwitterError("twitter.Api instance must be authenticated")
-    if user:
-      url = '%s/statuses/friends/%s.json' % (self.base_url, user)
-    else:
-      url = '%s/statuses/friends.json' % self.base_url
+    url = '%s/friends/list.json' % self.base_url
     parameters = {}
+    if user:
+        parameters['screen_name'] = user
     parameters['cursor'] = cursor
     json = self._FetchUrl(url, parameters=parameters)
     data = self._ParseAndCheckTwitter(json)
@@ -3053,7 +3052,7 @@ class Api(object):
     '''
     if not self._oauth_consumer:
       raise TwitterError("twitter.Api instance must be authenticated")
-    url = '%s/statuses/followers.json' % self.base_url
+    url = '%s/followers/list.json' % self.base_url
     result = []
     while True:
       parameters = { 'cursor': cursor }

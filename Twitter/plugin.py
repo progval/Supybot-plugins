@@ -69,6 +69,7 @@ if twitter.__version__.split('.') < ['0', '8', '0']:
                       'you need at least version 0.8.0, because older '
                       'versions do not support OAuth authentication.')
 
+
 class ExtendedApi(twitter.Api):
     """Api with retweet support."""
 
