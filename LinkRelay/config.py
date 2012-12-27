@@ -67,6 +67,9 @@ conf.registerChannelValue(LinkRelay, 'hostmasks',
     registry.Boolean(False, _("""Determines whether the bot will Relay the
     hostmask of the person joining or parting the channel when he or she joins
     or parts.""")))
+conf.registerChannelValue(LinkRelay, 'nicks',
+    registry.Boolean(True, _("""Determines whether the bot will relay the
+    nick of the person sending a message.""")))
 conf.registerChannelValue(LinkRelay, 'includeNetwork',
     registry.Boolean(True, _("""Determines whether the bot will include the
     network in Relayed PRIVMSGs; if you're only Relaying between two networks,

@@ -133,6 +133,8 @@ class LinkRelay(callbacks.Plugin):
         color = self.simpleHash(nick)
         if nick in self.nickSubstitutions:
             nick = self.nickSubstitutions[nick]
+        if not self.registryValue('nicks', channel):
+            nick = ''
         if re.match('^\x01ACTION .*\x01$', text):
             text = text.strip('\x01')
             text = text[ 7 : ]
