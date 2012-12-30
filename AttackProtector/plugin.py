@@ -182,6 +182,8 @@ class AttackProtector(callbacks.Plugin):
             if capability:
                 if ircdb.checkCapability(msg.prefix,
                         ','.join([channel, capability])):
+                    self.log.info('Not punishing %s: they are immune.' %
+                            prefix)
                     return
         except KeyError:
             pass
