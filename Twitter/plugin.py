@@ -212,7 +212,8 @@ class Twitter(callbacks.Plugin):
             if self.registryValue('announce.interval', channel) != 0 and \
                     channel not in self._runningAnnounces:
                 threading.Thread(target=self._fetchTimeline,
-                        args=(irc, channel)).start()
+                        args=(irc, channel),
+                        name='Twitter timeline for %s' % channel).start()
 
     def _fetchTimeline(self, irc, channel):
         if channel in self._runningAnnounces:
@@ -672,3 +673,4 @@ Class = Twitter
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
+
