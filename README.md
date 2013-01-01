@@ -57,6 +57,11 @@ List empty channels (or with few people) the bot is on.
 
 Run a telnet server and announce messages to a channel.
 
+##Pinglist
+
+Keeps a list of people attending a meeting/game, and provides a `pingall`
+command to ping them all.
+
 ##Seeks
 
 Plugin for the Seeks search engine.
