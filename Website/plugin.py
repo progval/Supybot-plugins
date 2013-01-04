@@ -100,7 +100,7 @@ class Website(callbacks.Plugin):
                 name = 'Unnamed paste'
             channel = form['channel'].value
             lexer = form['lexer'].value
-            assert channel in ('#limnoria', '#progval')
+            assert channel in ('#limnoria', '#progval', '#supybot')
             for irc in world.ircs:
                 if irc.network == 'freenode':
                     assert channel in irc.state.channels
