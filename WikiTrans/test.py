@@ -41,7 +41,7 @@ class WikiTransTestCase(PluginTestCase):
         self.assertResponse('translate en fr IRC bot', 'Robot IRC')
         self.assertResponse('translate fr en robot IRC', 'Internet Relay Chat bot')
 
-        self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
+        self.assertResponse(u'translate fr en Chef-d\'œuvre', 'Masterpiece')
         self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
 
         self.assertResponse('translate en fr Master (Doctor Who)',
