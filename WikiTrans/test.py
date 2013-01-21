@@ -35,8 +35,7 @@ class WikiTransTestCase(PluginTestCase):
     plugins = ('WikiTrans',)
 
     def testTranslate(self):
-        self.assertResponse('translate fr en IRC', 'Internet Relay Chat')
-        self.assertResponse('translate fr be IRC', 'IRC')
+        self.assertResponse('translate en be IRC', 'IRC')
         self.assertResponse('translate en fr IRC', 'Internet Relay Chat')
 
         self.assertResponse('translate en fr IRC bot', 'Robot IRC')
