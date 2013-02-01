@@ -77,9 +77,9 @@ class DebianTestCase(PluginTestCase):
             self.assertRegexp('debian file --branch unstable alkdjfad',
                 r'^No filename.*\(unstable\)')
             self.assertRegexp('debian file --exact --branch stable /bin/sh',
-                              r'2 matches found:.*bash.*dash.*\(stable')
+                    r'2 matches found:.*(?:bash.*|dash.*)\(stable')
             self.assertRegexp('debian file --branch stable /bin/sh',
-                              r'3 matches found:.*bash.*dash.*klibc-utils')
+                              r'3 matches found:.*(?:bash.*|dash.*|klibc-utils.*)')
 
         def testDebincoming(self):
             self.assertNotError('incoming')
