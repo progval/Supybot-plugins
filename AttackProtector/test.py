@@ -49,7 +49,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
         return False
     def _getIfAnswerIsThisBan(self, banmask=None):
         if banmask is None:
-            banmask = self.prefix
+            banmask = '*!' + (self.prefix.split('!')[1])
         return self._getIfAnswerIsEqual(ircmsgs.ban(self.channel, banmask))
     def _getIfAnswerIsThisKick(self, kind):
         reason = '%s flood detected' % kind
