@@ -33,7 +33,7 @@ from supybot.test import *
 
 class GoodFrenchTestCase(ChannelPluginTestCase):
     plugins = ('GoodFrench',)
-    config = {'plugins.GoodFrench.level': 7}
+    config = {'plugins.GoodFrench.level': 7, 'plugins.GoodFrench.kick': True}
 
     def _isKicked(self):
         m = self.irc.takeMsg()
@@ -73,7 +73,7 @@ class GoodFrenchTestCase(ChannelPluginTestCase):
                      "il es", "quel est la", "quelle est le",
                      "C'est bon; il est parti", "C'est bon , il est parti",
                      "C'est bon ,il est parti", "C'est bon ;il est parti",
-                     "lol", "loooool", "l00oo ol", "LOOO00ool", "10001"]:
+                     "lol", "loooool", "LOOO00ool", "10001"]:
             self.assertMistake(text)
 
     def assertNoMistake(self, text):
