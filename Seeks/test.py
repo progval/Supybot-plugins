@@ -34,8 +34,8 @@ class SeeksTestCase(PluginTestCase):
     plugins = ('Seeks',)
 
     def testSearch(self):
-        self.assertRegexp('seeks search supybot', 'supybot.com')
-        # If supybot.com is not the first result, it is a major problem ;)
+        self.assertRegexp('seeks search supybot',
+                'http://sourceforge.net/projects/supybot/')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
