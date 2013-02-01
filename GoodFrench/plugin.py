@@ -190,7 +190,7 @@ class SpellChecker:
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation double est toujours "
                      "suivi d'un espace",
-                     mask="(?<!(tp|ps|.[^a-zA-Z]))[:!?;][^ _'D()]", wizard='_')
+                     mask="(?<!(tp|ps|.[^ a-zA-Z]))[:!?;][^ _'D()]", wizard='_')
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation simple n'est jamais "
                      "précédé d'un espace",
