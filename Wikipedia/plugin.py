@@ -126,7 +126,7 @@ class Wikipedia(callbacks.Plugin):
                       'don\'t expect anything useful...') % (search, search)
         else:
             ##### etree!
-            p = tree.xpath("//div[@id='bodyContent']/p[1]")
+            p = tree.xpath("//div[@id='mw-content-text']/p[1]")
             if len(p) == 0:
                 reply += _('Not found, or page bad formed.')
             else:
