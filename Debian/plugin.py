@@ -258,7 +258,7 @@ class Debian(callbacks.Plugin):
         pkg = pkg.lower()
         try:
             text = utils.web.getUrl('http://packages.qa.debian.org/%s/%s.html' %
-                                    (pkg[0], pkg)).decode()
+                                    (pkg[0], pkg)).decode('utf8')
         except utils.web.Error:
             irc.errorInvalid('source package name')
         for line in text.split('\n'):
