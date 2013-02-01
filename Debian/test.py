@@ -46,7 +46,7 @@ class DebianTestCase(PluginTestCase):
                                 '\x02Subject\x02: configurable error in '
                                 'ShrinkUrl; '
                                 '\x02Reported\x02: by Clint Adams '
-                                'clintATdebian.org on '
+                                '<clintATdebian.org> on '
                                 'Tue, 4 Aug 2009 03:39:37 +0000; '
                                 '\x02Severity\x02: wishlist; '
                                 '\x02Tags\x02: fixed-upstream; '
