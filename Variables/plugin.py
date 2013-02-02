@@ -119,7 +119,6 @@ class Variables(callbacks.Plugin):
         Valid domain types are 'global', 'channel', and 'network'.
         Note that channel domains are channel-specific, but are cross-network.
         """
-        print 'set : ' + name
         domainType, domainName = self._getDomain(irc, msg, opts)
         cursor = self._connection.cursor()
         try:
