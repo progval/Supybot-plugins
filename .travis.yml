@@ -11,3 +11,4 @@ install:
 script:
   - echo $TRAVIS_PYTHON_VERSION
   - supybot-test test --plugins-dir=.
+  - cat test-logs/messages.log
