@@ -45,5 +45,6 @@ class SchemeTestCase(PluginTestCase):
     def testEval(self):
         self.assertResponse('scheme (+ 11 12)', '23')
         self.assertResponse('scheme (+ 5 4 2)', '11')
+        self.assertResponse('scheme (+ 5 (* 5 2))', '15')
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

@@ -30,6 +30,7 @@
 
 import ast
 import operator
+import functools
 import collections
 
 import supybot.utils as utils
@@ -44,6 +45,12 @@ _ = PluginInternationalization('Scheme')
 class SchemeException(Exception):
     pass
 
+def eval_argument(arg, env):
+    if isinstance(arg, list):
+        return eval_scheme(arg, env)
+    else:
+        return env[arg] if arg in env else ast.literal_eval(arg)
+
 def schemify_math(f):
     # Makes a two-arguments function an *args function, with correct
     # type parsing.
@@ -53,8 +60,7 @@ def schemify_math(f):
         else:
             return f(args[0], args[1])
     def newf(tree, env):
-        return rec(map(lambda x:(env[x] if x in env else ast.literal_eval(x)),
-            tree[1:]))
+        return rec(map(functools.partial(eval_argument, env=env), tree[1:]))
     return newf
 
 # Add some math operators
