@@ -20,8 +20,8 @@ content = _(
         existance
     </li>
     <li>
-        <a href="mailto:progval@gmail.com">ProgVal</a>'s
-        <a href="http://supybot-fr.tk/WebStats">WebStats plugin for Supybot</a>
+        <a href="https://github.com/ProgVal">ProgVal</a>'s
+        <a href="https://github.com/ProgVal/Supybot-plugins/tree/master/WebStats/">WebStats plugin for Supybot</a>
     </li>
 </ul>
 """)

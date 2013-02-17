@@ -24,7 +24,7 @@ end = \
 """
         <p id="footer">
             <a href="http://supybot.com">Supybot</a> and
-            <a href="http://supybot-fr.tk/WebStats">WebStats</a> powered.<br />
+            <a href="https://github.com/ProgVal/Supybot-plugins/tree/master/WebStats/">WebStats</a> powered.<br />
             Libre software available under BSD licence.<br />
             Page generated at %s.
         </p>
