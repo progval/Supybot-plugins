@@ -10,5 +10,5 @@ install:
 # command to run tests, e.g. python setup.py test
 script:
   - echo $TRAVIS_PYTHON_VERSION
-  - supybot-test test --plugins-dir=.
+  - supybot-test test --plugins-dir=. --exclude=WebStats
   - cat test-logs/messages.log
