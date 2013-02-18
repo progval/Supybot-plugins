@@ -36,15 +36,23 @@ class SchemeTestCase(PluginTestCase):
     plugins = ('Scheme',)
 
     def testParse(self):
-        self.assertEqual(plugin.parse_scheme('(+ 11 12)')[0],
+        self.assertEqual(plugin.parse_scheme('(+ 11 12)'),
                 ['+', '11', '12'])
-        self.assertEqual(plugin.parse_scheme('(+ 5 4)')[0],
+        self.assertEqual(plugin.parse_scheme('(+ 5 4)'),
                 ['+', '5', '4'])
-        self.assertEqual(plugin.parse_scheme('(+ 5 (* 4 6))')[0],
+        self.assertEqual(plugin.parse_scheme('(+ 5 (* 4 6))'),
             ['+', '5', ['*', '4', '6']])
+        self.assertEqual(plugin.parse_scheme('((lambda x x) 1 2 3)')[1:],
+                ['1', '2', '3'])
+        self.assertEqual(plugin.parse_scheme('((lambda (x y) (+ x y)) 11 12)'),
+                [['lambda', ['x', 'y'], ['+', 'x', 'y']], '11', '12'])
     def testEval(self):
         self.assertResponse('scheme (+ 11 12)', '23')
         self.assertResponse('scheme (+ 5 4 2)', '11')
         self.assertResponse('scheme (+ 5 (* 5 2))', '15')
+
+    def testLambda(self):
+        self.assertResponse('scheme ((lambda x x) 1 2 3)', '(1 2 3)')
+        self.assertResponse('scheme ((lambda (x y) (+ x y)) 11 12)', '23')
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
