@@ -55,4 +55,7 @@ class SchemeTestCase(PluginTestCase):
         self.assertResponse('scheme ((lambda x x) 1 2 3)', '(1 2 3)')
         self.assertResponse('scheme ((lambda (x y) (+ x y)) 11 12)', '23')
 
+    def testSet(self):
+        self.assertResponse('scheme (begin (set! x 42) x)', '42')
+
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

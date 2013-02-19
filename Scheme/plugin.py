@@ -55,10 +55,15 @@ NUMBER_TYPES = (
 class SchemeException(Exception):
     pass
 
+def no_edge_effect(f):
+    def newf(tree, env):
+        return f(tree, env.copy())
+    return newf
+
 def eval_argument(arg, env):
     if isinstance(arg, list):
         return eval_scheme(arg, env)
-    else:
+    elif isinstance(arg, str):
         if arg in env:
             return eval_argument(env[arg], {})
         else:
@@ -69,6 +74,8 @@ def eval_argument(arg, env):
                     pass
             # You shall not pass
             raise SchemeException(_('Unbound variable: %s') % arg)
+    else:
+        return arg
 
 def py2scheme(tree):
     if isinstance(tree, list):
@@ -90,22 +97,24 @@ def schemify_math(f):
     return newf
 
 ARGUMENTS_ERROR = _('%s takes %s %i arguments not %i (in (%s))')
+@no_edge_effect
 def scm_lambda(tree, env):
     try:
         self, args, expr = tree
     except ValueError:
         raise SchemeException(ARGUMENTS_ERROR %
-            ('lambda', _('exactly'), 2, len(tree)-1, ' '.join(tree)))
+            ('lambda', _('exactly'), 2, len(tree)-1, py2scheme(tree)))
     if not isinstance(args, list):
         args = ['.', args]
     try:
         if args.index('.') != len(args)-2:
-            raise SchemeException(_('Invalid arguments list: (%s)') %
-                ' '.join(args))
+            raise SchemeException(_('Invalid arguments list: %s') %
+                py2scheme(args))
         rest = args[-1]
         args = args[0:-2]
     except ValueError: # No rest
         rest = None
+    @no_edge_effect
     def f(tree2, env2):
         self2, args2 = tree2[0], tree2[1:]
         arguments_error = ARGUMENTS_ERROR % \
@@ -124,8 +133,23 @@ def scm_lambda(tree, env):
     f.__name__ = 'scheme_%s' % py2scheme(tree)
     return f
 
+def scm_begin(tree, env):
+    for arg in tree[1:-1]:
+        eval_scheme(arg)
+    return eval_scheme(tree[-1])
+
+def scm_set(tree, env):
+    try:
+        self, name, value = tree
+    except ValueError:
+        raise SchemeException(ARGUMENTS_ERROR %
+            ('set!', _('exactly'), 2, len(tree)-1, py2scheme(tree)))
+    env[name] = value
+
 DEFAULT_ENV = [
     ('lambda', scm_lambda),
+    ('begin', scm_begin),
+    ('set!', scm_set),
     ]
 # Add some math operators
 DEFAULT_ENV += map(lambda (x,y):(x, schemify_math(y)), (
@@ -188,11 +212,15 @@ def parse_scheme(code, start=0, end=None, unpack=False):
     return tokens
 
 def eval_scheme(tree, env=DEFAULT_ENV):
-    if isinstance(tree, str) and tree in env:
-        return env[tree]
+    if isinstance(tree, str):
+        if tree in env:
+            return env[tree]
+        else:
+            print repr(env)
+            raise SchemeException(_('Undefined keyword %s.') % tree)
     first = eval_scheme(tree[0])
     if callable(first):
-        return first(tree, env.copy())
+        return first(tree, env)
     else:
         return tree
 
