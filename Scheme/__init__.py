@@ -36,6 +36,8 @@ here.  This should describe *what* the plugin does.
 import supybot
 import supybot.world as world
 
+deprecated = True
+
 # Use this for the version of this plugin.  You may wish to put a CVS keyword
 # in here if you're keeping the plugin in CVS or some similar system.
 __version__ = ""
