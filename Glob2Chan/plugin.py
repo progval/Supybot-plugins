@@ -93,11 +93,11 @@ class Glob2Chan(callbacks.Plugin):
         self._users.update({msg.nick: msg.prefix.split('@')[1]})
         if nick.startswith('[YOG]') and \
                 nick not in self.registryValue('nowelcome').split(' '):
-            irc.queueMsg(ircmsgs.privmsg(nick, 'Hi %s, welcome to the '
-                'globulation online game room. Those monitoring this room '
-                'via IRC may awaken and challenge you to a game, if you type '
-                'their name as given in the room participant window.' %
-                nick))
+            irc.queueMsg(ircmsgs.privmsg(nick, ('Hi %s, welcome to the '
+                'globulation online game room. There are currently %i '
+                'people connected via IRC, they may awaken and challenge '
+                'you to a game.') %
+                (nick, len(irc.state.channels[channel].users))))
         if nick.startswith('[YOG]'):
             irc.queueMsg(ircmsgs.IrcMsg(s='WHOIS %s' % nick))
 
