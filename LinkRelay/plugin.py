@@ -159,6 +159,10 @@ class LinkRelay(callbacks.Plugin):
         """takes no arguments
 
         Returns all the defined relay links"""
+        if not self.relays:
+            irc.reply(_('This is no relay enabled. Use "linkrelay add" to '
+                'add one.'))
+            return
         for relay in self.relays:
             if relay.hasTargetIRC:
                 hasIRC = 'Link healthy!'
