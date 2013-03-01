@@ -56,7 +56,7 @@ Iwant = conf.registerPlugin('Iwant')
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
 
 conf.registerChannelValue(Iwant, 'wishlist',
-    registry.String('', _("""List of wanted things. Don't edit this variable
+    registry.Json([], _("""List of wanted things. Don't edit this variable
     unless you know what you do.""")))
 
 

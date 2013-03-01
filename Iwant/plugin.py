@@ -47,15 +47,10 @@ except:
     internationalizeDocstring = lambda x:x
 
 def unserialize(string):
-    list = string.replace('||', '|').split(' | ')
-    if '' in list:
-        list.remove('')
-    return list
+    return string
 
 def serialize(list):
-    if '' in list:
-        list.remove('')
-    return ' | '.join([x.replace('|', '||') for x in list])
+    return list
 
 @internationalizeDocstring
 class Iwant(callbacks.Plugin):
