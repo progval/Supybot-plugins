@@ -28,23 +28,27 @@
 
 ###
 
+import sys
 import json
 import time
-import ur1ca
 import urllib
 import socket
 import threading
-import SocketServer
 import supybot.log as log
 import supybot.utils as utils
 import supybot.world as world
-from cStringIO import StringIO
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import supybot.httpserver as httpserver
+
+from . import ur1ca
+if sys.version_info[0] < 3:
+    from cStringIO import StringIO
+else:
+    from io import StringIO
 try:
     from supybot.i18n import PluginInternationalization
     from supybot.i18n import internationalizeDocstring

@@ -71,7 +71,7 @@ class AttackProtectorDatabase:
         self._collections = {}
 
     def add(self, item):
-        if not self._collections.has_key(item.kind):
+        if item.kind not in self._collections:
             self._collections.update({item.kind: []})
         self._collections[item.kind].append(item)
         self.refresh()
@@ -122,7 +122,7 @@ class AttackProtector(callbacks.Plugin):
         elif kind in ['nick']:
             newNick = msg.args[0]
             channels = []
-            for (channel, c) in irc.state.channels.iteritems():
+            for (channel, c) in irc.state.channels.items():
                 if newNick in c.users:
                     channels.append(channel)
             prefix = '*!' + msg.prefix.split('!')[1]

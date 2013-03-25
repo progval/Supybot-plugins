@@ -73,7 +73,7 @@ class Trigger(callbacks.Plugin):
         try:
             msg.args = (channel,) + msg.args[1:]
             self.Proxy(irc.irc, msg, tokens)
-        except Exception, e:
+        except Exception as  e:
             self.log.exception('Error occured while running triggered command:')
     def doJoin(self, irc, msg):
         self._run(irc, msg, 'join')

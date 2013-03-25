@@ -30,15 +30,12 @@
 
 from __future__ import division
 
-import config
-import htmlentitydefs
-reload(config)
 
 import re
 import sys
 import time
+import json
 import threading
-import simplejson
 import supybot.log as log
 import supybot.conf as conf
 import supybot.utils as utils
@@ -49,6 +46,11 @@ import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.registry as registry
 import supybot.callbacks as callbacks
+if sys.version_info[0] < 3:
+    import htmlentitydefs
+else:
+    import html.entities as htmlentitydefs
+    from imp import reload
 try:
     from supybot.i18n import PluginInternationalization
     from supybot.i18n import internationalizeDocstring
@@ -62,9 +64,10 @@ except:
 try:
     import twitter
 except ImportError:
-    raise callbacks.Error, 'You need the python-twitter library.'
+    raise callbacks.Error('You need the python-twitter library.')
 reload(twitter)
-if twitter.__version__.split('.') < ['0', '8', '0']:
+if not hasattr(twitter, '__version__') or \
+        twitter.__version__.split('.') < ['0', '8', '0']:
     raise ImportError('You current version of python-twitter is to old, '
                       'you need at least version 0.8.0, because older '
                       'versions do not support OAuth authentication.')
@@ -93,11 +96,11 @@ class ExtendedApi(twitter.Api):
             raise TwitterError("'id' must be an integer")
         url = 'http://api.twitter.com/1/statuses/retweet/%s.json' % id
         json = self._FetchUrl(url, post_data={'dummy': None})
-        data = simplejson.loads(json)
+        data = json.loads(json)
         self._CheckForTwitterError(data)
         return twitter.Status.NewFromJsonDict(data)
 
-_tco_link_re = re.compile(u'http://t.co/[a-zA-Z0-9]+')
+_tco_link_re = re.compile('http://t.co/[a-zA-Z0-9]+')
 def expandLinks(tweet):
     if 'Untiny.plugin' in sys.modules:
         def repl(link):

@@ -25,9 +25,12 @@ RETURN STATUS:
 
 import sys
 import urllib
-import urlparse
 import re
 
+if sys.version_info[0] < 3:
+    import urlparse
+else:
+    import urllib.parse as urlparse
 
 UR1CA = "http://ur1.ca/"
 ESUCCESS = 0
@@ -136,10 +139,10 @@ def __do_main():
     status, msg = scrape(doc)
 
     if status:
-        print msg
+        print(msg)
         sys.exit(ESUCCESS)
     else:
-        print >> sys.stderr, msg
+        sys.stderr.write(msg + '\n')
         sys.exit(EFAIL)
 
 

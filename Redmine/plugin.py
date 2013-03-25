@@ -55,9 +55,12 @@ class AccessDenied(Exception):
 def fetch(site, uri, **kwargs):
     url = site['url'] + uri + '.json'
     if kwargs:
-        url += '?' + utils.web.urlencode(kwargs)
+        url += '?' + utils.web.urlencode(kwargs).decode()
     try:
-        return json.load(utils.web.getUrlFd(url))
+        data = utils.web.getUrl(url)
+        if sys.version_info[0] >= 3:
+            data = data.decode('utf8')
+        return json.loads(data)
     except utils.web.Error:
         raise ResourceNotFound()
 
@@ -76,10 +79,11 @@ def flatten_subdicts(dicts):
 def get_project(site, project):
     projects = []
     for variable in ('id', 'identifier', 'name'):
-        projects = filter(lambda x:x[variable] == project,
-                fetch(site, 'projects')['projects'])
+        projects = list(filter(lambda x:x[variable] == project,
+                fetch(site, 'projects')['projects']))
         if projects:
             break
+    projects = list(projects)
     if not projects:
         raise ResourceNotFound()
     elif len(projects) > 1:
@@ -206,11 +210,16 @@ class Redmine(callbacks.Plugin):
                 irc.error(_('Invalid site name.'), Raise=True)
             if name in self.conf.sites():
                 irc.error(_('This site name is already registered.'), Raise=True)
-            try:
-                data = json.load(utils.web.getUrlFd(url + 'projects.json'))
-                assert 'total_count' in data
-            except:
-                irc.error(_('This is not a valid Redmine site.'), Raise=True)
+            data = utils.web.getUrl(url + 'projects.json')
+            if sys.version_info[0] >= 3:
+                data = data.decode('utf8')
+            data = json.loads(data)
+            assert 'total_count' in data
+            #try:
+            #    data = json.load(utils.web.getUrlFd(url + 'projects.json'))
+            #    assert 'total_count' in data
+            #except:
+            #    irc.error(_('This is not a valid Redmine site.'), Raise=True)
             with self.conf.sites.editable() as sites:
                 sites[name] = {'url': url}
             irc.replySuccess()
@@ -235,7 +244,7 @@ class Redmine(callbacks.Plugin):
             Return the list of known redmine sites."""
             sites = self.conf.sites().keys()
             if sites:
-                irc.reply(format('%L', sites))
+                irc.reply(format('%L', list(sites)))
             else:
                 irc.reply(_('No registered Redmine site.'))
         list = wrap(list, [])

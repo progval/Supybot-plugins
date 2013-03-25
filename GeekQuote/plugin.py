@@ -62,7 +62,7 @@ class GeekQuote(callbacks.PluginRegexp):
     def callCommand(self, method, irc, msg, *L, **kwargs):
         try:
             self.__parent.callCommand(method, irc, msg, *L, **kwargs)
-        except utils.web.Error, e:
+        except utils.web.Error as  e:
             irc.error(str(e))
 
     _joiner = ' // '
@@ -120,7 +120,7 @@ class GeekQuote(callbacks.PluginRegexp):
                 url = 'http://%s/' % site
                 try:
                     html = utils.web.getUrl(url)
-                except utils.web.Error, e:
+                except utils.web.Error as  e:
                     self.log.info('%u server returned the error: %s',
                                   site, utils.web.strError(e))
                 last = re.search(r'<li class="last"><a href="(\d+)">', html)
@@ -133,7 +133,7 @@ class GeekQuote(callbacks.PluginRegexp):
         html = ''
         try:
             html = utils.web.getUrl(url)
-        except utils.web.Error, e:
+        except utils.web.Error as  e:
             self.log.info('%u server returned the error: %s',
                           site, utils.web.strError(e))
         s = None

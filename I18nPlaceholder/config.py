@@ -33,7 +33,7 @@ import sys
 import supybot.conf as conf
 import supybot.registry as registry
 
-from plugin import Placeholder
+from .plugin import Placeholder as Placeholder
 
 if 'supybot.i18n' not in sys.modules:
     sys.modules['supybot.i18n'] = Placeholder()

@@ -1,4 +1,4 @@
-import skeleton
+from . import skeleton
 from WebStats.plugin import _
 
 content = """

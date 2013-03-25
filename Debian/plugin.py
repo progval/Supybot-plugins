@@ -76,7 +76,7 @@ class Debian(callbacks.Plugin):
         responses = []
         if '*' in filename:
             irc.error('Wildcard characters can not be specified.', Raise=True)
-        args['keywords'] = urllib.quote(filename, '')
+        args['keywords'] = utils.web.urlquote(filename, '')
         url %= args
         try:
             html = utils.web.getUrl(url).decode()
@@ -365,7 +365,7 @@ class Debian(callbacks.Plugin):
         if "There is no record of Bug" in text:
             irc.error('I could not find a bug report matching that number.',
                       Raise=True)
-        searches = map(lambda p: p.search(text), self._searches)
+        searches = list(map(lambda p: p.search(text), self._searches))
         sev = self._severity.search(text)
         tags = self._tags.search(text)
         # This section should be cleaned up to ease future modifications

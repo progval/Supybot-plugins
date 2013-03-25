@@ -152,11 +152,11 @@ DEFAULT_ENV = [
     ('set!', scm_set),
     ]
 # Add some math operators
-DEFAULT_ENV += map(lambda (x,y):(x, schemify_math(y)), (
+DEFAULT_ENV += map(lambda x:(x[0], schemify_math(x[1])), (
     ('+', operator.add),
     ('-', operator.sub),
     ('*', operator.mul),
-    ('/', operator.div),
+    ('/', operator.truediv),
     ))
 
 DEFAULT_ENV = dict(DEFAULT_ENV)
@@ -216,7 +216,7 @@ def eval_scheme(tree, env=DEFAULT_ENV):
         if tree in env:
             return env[tree]
         else:
-            print repr(env)
+            print(repr(env))
             raise SchemeException(_('Undefined keyword %s.') % tree)
     first = eval_scheme(tree[0])
     if callable(first):

@@ -56,7 +56,7 @@ class EurekaTestCase(ChannelPluginTestCase):
         # Avoid conflicts between tests.
         # We use .keys() in order to prevent this error:
         # RuntimeError: dictionary changed size during iteration
-        for name in schedule.schedule.events.keys():
+        for name in list(schedule.schedule.events.keys()):
             schedule.removeEvent(name)
         self.prefix1 = 'test!user@host.domain.tld'
         self.prefix2 = 'foo!bar@baz'

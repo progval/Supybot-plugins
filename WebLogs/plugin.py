@@ -224,7 +224,7 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
             page_body = """Here is a list of available logs:<ul>"""
             for channel in WebLogsMiddleware.get_channel_list():
                 page_body += '<li><a href="./html/%s/">%s</a></li>' % (
-                        urllib.quote(channel), channel)
+                        utils.web.urlquote(channel), channel)
             page_body += '</ul>'
             self.wfile.write(page_template %
                     {'title': 'Index', 'body': page_body})
@@ -238,7 +238,7 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
             self.wfile.write('Bad URL.')
             return
         assert mode in ('html', 'json')
-        channel = urllib.unquote(channel)
+        channel = utils.web.urlunquote(channel)
         if channel not in WebLogsMiddleware.get_channel_list():
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')

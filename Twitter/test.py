@@ -30,7 +30,7 @@
 
 from supybot.test import *
 
-import plugin
+from . import plugin
 
 class TwitterTestCase(ChannelPluginTestCase):
     plugins = ('Twitter', 'Untiny')

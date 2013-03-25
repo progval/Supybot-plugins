@@ -29,8 +29,8 @@
 ###
 
 import re
+import sys
 import json
-import urllib
 import supybot.world as world
 import supybot.utils as utils
 from supybot import httpserver
@@ -40,6 +40,11 @@ import supybot.ircmsgs as ircmsgs
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 from supybot.i18n import PluginInternationalization, internationalizeDocstring
+
+if sys.version_info[0] < 3:
+    from urllib import urlencode
+else:
+    from urllib.parse import urlencode
 
 _ = PluginInternationalization('Website')
 
@@ -59,8 +64,11 @@ class WebsiteCallback(httpserver.SupyHTTPServerCallback):
 
 def query(path, args={}):
     args = dict([(x,y) for x,y in args.items() if y is not None])
-    url = 'http://supybot.fr.cr/api%s?%s' % (path, urllib.urlencode(args))
-    return json.load(utils.web.getUrlFd(url))
+    url = 'http://supybot.fr.cr/api%s?%s' % (path, urlencode(args))
+    data = utils.web.getUrl(url)
+    if sys.version_info[0] >= 3:
+        data = data.decode()
+    return json.loads(data)
 
 instance = None
 

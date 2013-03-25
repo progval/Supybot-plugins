@@ -34,19 +34,23 @@ import sys
 import random
 import supybot.conf as conf
 import supybot.utils as utils
-from cStringIO import StringIO
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 
+if sys.version_info[0] < 3:
+    from cStringIO import StringIO
+else:
+    from io import StringIO
+
 try:
     import mh_python as megahal
 except ImportError:
-    raise callbacks.Error, 'You need to have MegaHAL installed to use this ' \
-                           'plugin.  Download it at ' \
-                           '<http://megahal.alioth.debian.org/>' \
-                           'or with <apt-get install megahal>'
+    raise callbacks.Error('You need to have MegaHAL installed to use this '
+                          'plugin.  Download it at '
+                          '<http://megahal.alioth.debian.org/>'
+                          'or with <apt-get install megahal>')
 
 try:
     from supybot.i18n import PluginInternationalization
@@ -133,7 +137,6 @@ class MegaHAL(callbacks.Plugin):
             message = parsed.group('message')
             usedToStartWithNick = True
         if self.registryValue('answer.commands') or usedToStartWithNick:
-            print msg.args[0]
             self._response(message,
                         self.registryValue('answer.probabilityWhenAddressed',
                                            msg.args[0]),

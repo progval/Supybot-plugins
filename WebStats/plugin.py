@@ -74,9 +74,9 @@ world.webStatsCacheLinks = {}
 testing = world.testing
 
 def getTemplate(name):
-    if sys.modules.has_key('WebStats.templates.skeleton'):
+    if 'WebStats.templates.skeleton' in sys.modules:
         reload(sys.modules['WebStats.templates.skeleton'])
-    if sys.modules.has_key('WebStats.templates.%s' % name):
+    if 'WebStats.templates.%s' % name in sys.modules:
         reload(sys.modules['WebStats.templates.%s' % name])
     module = __import__('WebStats.templates.%s' % name)
     return getattr(getattr(module, 'templates'), name)
@@ -155,7 +155,7 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                 response = 404
                 content_type = 'text/html'
                 output = getTemplate('error404').get(not testing)
-        except FooException, e:
+        except FooException as  e:
             response = 500
             content_type = 'text/html'
             if output == '':
@@ -167,7 +167,7 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
             self.send_response(response)
             self.send_header('Content-type', content_type)
             self.end_headers()
-            self.wfile.write(output)
+            self.wfile.write(output.encode())
 
 class WebStatsDB:
     def __init__(self):

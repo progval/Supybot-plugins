@@ -31,9 +31,9 @@
 
 
 import re
+import sys
 import string
 import urllib
-import StringIO
 import lxml.html
 from lxml import etree
 import supybot.utils as utils
@@ -41,6 +41,10 @@ from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
+if sys.version_info[0] < 3:
+    import StringIO
+else:
+    from io import StringIO
 try:
     from supybot.i18n import PluginInternationalization
     from supybot.i18n import internationalizeDocstring

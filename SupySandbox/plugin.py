@@ -41,8 +41,8 @@ EVAL_MAXMEMORYBYTES = 75 * 1024 * 1024 # 10 MiB
 try:
     import sandbox as S
 except ImportError:
-    print 'You need pysandbox in order to run SupySandbox plugin ' + \
-          '[http://github.com/haypo/pysandbox].'
+    print('You need pysandbox in order to run SupySandbox plugin '
+          '[http://github.com/haypo/pysandbox].')
     raise
 import re
 import os
@@ -106,10 +106,10 @@ def evalPython(line, locals=None):
         sandbox.execute(
             evalPythonInSandbox,
             locals={'namespace': locals, 'line': line})
-    except BaseException, e:
-        print 'Error: [%s] %s' % (e.__class__.__name__, str(e))
+    except BaseException as  e:
+        print('Error: [%s] %s' % (e.__class__.__name__, str(e)))
     except:
-        print 'Error: <unknown exception>'
+        print('Error: <unknown exception>')
     sys.stdout.flush()
 
 @contextlib.contextmanager
@@ -162,7 +162,7 @@ class SupySandbox(callbacks.Plugin):
         Runs Python code safely thanks to pysandbox"""
         try:
             irc.reply(handle_line(code.replace(' $$ ', '\n')))
-        except SandboxError, e:
+        except SandboxError as  e:
             irc.error('; '.join(e.args))
     sandbox = wrap(sandbox, ['text'])
         

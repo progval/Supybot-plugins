@@ -112,7 +112,7 @@ class Iwant(callbacks.Plugin):
             irc.error(_('No wish for the moment.'))
             return
         indexes = range(1, len(wishlist) + 1)
-        wishlist_with_index = zip(indexes, wishlist)
+        wishlist_with_index = list(zip(indexes, wishlist))
         wish = random.sample(wishlist_with_index, 1)[0]
         irc.reply(_('Wish #%i is %s.') % wish)
     random = wrap(random, ['channel'])

@@ -29,9 +29,9 @@
 ###
 
 import re
+import sys
 import copy
 import time
-import Queue
 import supybot.conf as conf
 from xml.dom import minidom
 import supybot.world as world

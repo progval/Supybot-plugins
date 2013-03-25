@@ -233,7 +233,7 @@ class Eureka(callbacks.Plugin):
         if channel not in self.states:
             irc.error(_('Eureka is not enabled on this channel'))
             return
-        scores = self.states[channel].scores.items()
+        scores = list(self.states[channel].scores.items())
         if scores == []:
             irc.reply(_('Noone played yet.'))
         else:
