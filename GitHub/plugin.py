@@ -74,7 +74,15 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
                 not handler.address_string() == 'localhost':
             log.warning("""'%s' tried to act as a web hook for Github,
             but is not GitHub.""" % handler.address_string())
+            self.send_response(403)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write('Error: you are not a GitHub server.')
         else:
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write('Thanks.')
             self.plugin.announce.onPayload(json.loads(form['payload'].value))
 
 #####################
