@@ -261,7 +261,7 @@ class LinkRelay(callbacks.Plugin):
                 'newnick': msg.args[0], 'color': ''}
         if self.registryValue('color', msg.args[0]):
             args['color'] = '\x03%s' % self.registryValue('colors.nick', msg.args[0])
-        s = _('*/* %(oldnick)s (%(network)s) changed his nickname to '
+        s = _('*/* %(oldnick)s (%(network)s) changed their nickname to '
                 '%(newnick)s')
         for (channel, c) in irc.state.channels.iteritems():
             if msg.args[0] in c.users:
