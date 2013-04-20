@@ -44,10 +44,16 @@ class WikiTransTestCase(PluginTestCase):
         self.assertResponse('translate fr en robot IRC', 'Internet Relay Chat bot')
 
         self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
-        self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
+        try:
+            self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
+            self.assertResponse('translate en fr Master (Doctor Who)',
+                    'Le Maître (Doctor Who)')
+        except AssertionError:
+            self.assertResponse('translate en fr Masterpiece',
+                    'Chef-d\'œuvre'.encode('utf8'))
+            self.assertResponse('translate en fr Master (Doctor Who)',
+                    'Le Maître (Doctor Who)'.encode('utf8'))
 
-        self.assertResponse('translate en fr Master (Doctor Who)',
-                'Le Maître (Doctor Who)')
 
         self.assertRegexp('translate fi en paremmin', 'This word can\'t be found')
 
