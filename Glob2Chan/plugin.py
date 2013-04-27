@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 ###
 # Copyright (c) 2010-2011, Valentin Lorentz
 # All rights reserved.
@@ -27,6 +28,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 ###
+
+from __future__ import unicode_literals
 
 from django.contrib.gis.geoip import GeoIP
 
@@ -91,19 +94,13 @@ class Glob2Chan(callbacks.Plugin):
             return
         nick = msg.nick
         self._users.update({msg.nick: msg.prefix.split('@')[1]})
-        if nick.startswith('[YOG]') and \
-                nick not in self.registryValue('nowelcome').split(' '):
-            irc.queueMsg(ircmsgs.privmsg(nick, ('Hi %s, welcome to the '
-                'globulation online game room. There are currently %i '
-                'people connected via IRC, they may awaken and challenge '
-                'you to a game. Please stay here a few minutes, someone '
-                'may connect in the meantime.') %
-                (nick, len(irc.state.channels[channel].users))))
         if nick.startswith('[YOG]'):
             irc.queueMsg(ircmsgs.IrcMsg(s='WHOIS %s' % nick))
 
     def do311(self, irc, msg):
         nick = msg.args[1]
+        if not nick.startswith('[YOG]') or nick in self.registryValue('nowelcome').split(' '):
+            return
         realname = msg.args[5]
         hostname = self._users.pop(nick)
         try:
@@ -112,6 +109,20 @@ class Glob2Chan(callbacks.Plugin):
             version = 'unknown version'
         g = GeoIP()
         country = g.country(hostname)['country_name']
+        if country == 'France':
+            irc.queueMsg(ircmsgs.privmsg(nick, ('Bonjour %s, bienvenue dans le '
+                'salon de jeu Globulation2 en ligne. Il y a actuellement %i '
+                'personnes connectées via IRC, elles pourraient se réveiller et '
+                'jouer avec vous. Attendez ici au moins quelques minutes, '
+                'quelqu\'un pourrait se connecter d\'ici là.') %
+                (nick, len(irc.state.channels['#glob2'].users))))
+        else:
+            irc.queueMsg(ircmsgs.privmsg(nick, ('Hi %s, welcome to the '
+                'globulation online game room. There are currently %i '
+                'people connected via IRC, they may awaken and challenge '
+                'you to a game. Please stay here at least a few minutes, '
+                'someone may connect in the meantime.') %
+                (nick, len(irc.state.channels['#glob2'].users))))
         irc.queueMsg(ircmsgs.privmsg('#glob2', ('Welcome to %s, running %s '
             'and connecting from %s.') % (nick, version, country)))
 
