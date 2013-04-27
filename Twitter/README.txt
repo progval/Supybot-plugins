@@ -29,6 +29,16 @@ to supybot.plugins.Twitter.accounts.channel.key and
 supybot.plugins.Twitter.accounts.channel.secret.
 
 
+Capabilities
+============
+
+All users are allowed to use all commands by default! Use this command to
+disable account administration (follow, unfollow, ...) by default:
+@defaultcapability add -twitteradmin
+
+To disable posts and retweets by default, use this one:
+@defaultcapability add -twitterpost
+
 Extra features
 ==============
 
