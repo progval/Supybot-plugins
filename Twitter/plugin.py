@@ -238,11 +238,17 @@ class Twitter(callbacks.Plugin):
                     return
                 retweets = self.registryValue('announce.retweets', channel)
                 try:
-                    if maxId is None:
-                        timeline = api.GetFriendsTimeline(retweets=retweets)
-                    else:
-                        timeline = api.GetFriendsTimeline(retweets=retweets,
-                                since_id=maxId)
+                    if self.registryValue('announce.timeline', channel):
+                        if maxId is None:
+                            timeline = api.GetFriendsTimeline(retweets=retweets)
+                        else:
+                            timeline = api.GetFriendsTimeline(retweets=retweets,
+                                    since_id=maxId)
+                    if self.registryValue('announce.mentions', channel):
+                        if maxId is None:
+                            timeline = api.GetReplies()
+                        else:
+                            timeline = api.GetReplies(since_id=maxId)
                 except twitter.TwitterError as e:
                     self.log.error('Could not fetch timeline: %s' % e)
                     continue

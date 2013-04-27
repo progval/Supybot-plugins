@@ -112,6 +112,14 @@ conf.registerChannelValue(Twitter.announce, 'oneline',
 conf.registerChannelValue(Twitter.announce, 'retweets',
         registry.Boolean(True, _("""Determines whether or not the bot will
         show retweets in addition to native tweets.""")))
+conf.registerChannelValue(Twitter.announce, 'timeline',
+        registry.Boolean(True, _("""Determines whether the bot will stream
+        the timeline of the linked account on the channel (only if
+        supybot.plugins.Twitter.announce.interval is greater than 0).""")))
+conf.registerChannelValue(Twitter.announce, 'mentions',
+        registry.Boolean(True, _("""Determines whether the bot will stream
+        mentions to the linked account on the channel (only if
+        supybot.plugins.Twitter.announce.interval is greater than 0).""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
