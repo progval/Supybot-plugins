@@ -35,6 +35,8 @@ import re
 import sys
 import time
 import json
+import operator
+import functools
 import threading
 import supybot.log as log
 import supybot.conf as conf
@@ -109,6 +111,24 @@ def expandLinks(tweet):
         return _tco_link_re.sub(repl, tweet)
     else:
         return tweet
+
+def fetch(method, maxIds, name):
+    if name not in maxIds:
+        maxIds[name] = None
+    if maxIds[name] is None:
+        tweets = method()
+    else:
+        tweets = method(since_id=maxIds[name])
+    if not tweets:
+        return []
+    tweets.sort(key=operator.attrgetter('id'))
+    if maxIds[name] is None:
+        maxIds[name] = tweets[-1].id
+        return []
+    else:
+        maxIds[name] = tweets[-1].id
+        return tweets
+
 
 @internationalizeDocstring
 class Twitter(callbacks.Plugin):
@@ -223,7 +243,7 @@ class Twitter(callbacks.Plugin):
             # Prevent race conditions
             return
         lastRun = time.time()
-        maxId = None
+        maxIds = {}
         self._runningAnnounces.append(channel)
         try:
             while not irc.zombie and not self._died and \
@@ -238,28 +258,28 @@ class Twitter(callbacks.Plugin):
                     return
                 retweets = self.registryValue('announce.retweets', channel)
                 try:
+                    tweets = []
                     if self.registryValue('announce.timeline', channel):
-                        if maxId is None:
-                            timeline = api.GetFriendsTimeline(retweets=retweets)
-                        else:
-                            timeline = api.GetFriendsTimeline(retweets=retweets,
-                                    since_id=maxId)
+                        tweets.extend(fetch(
+                            functools.partial(api.GetFriendsTimeline,
+                                              retweets=retweets),
+                            maxIds, 'timeline'))
                     if self.registryValue('announce.mentions', channel):
-                        if maxId is None:
-                            timeline = api.GetReplies()
-                        else:
-                            timeline = api.GetReplies(since_id=maxId)
+                        tweets.extend(fetch(api.GetReplies,
+                            maxIds, 'mentions'))
+                    for user in self.registryValue('announce.users', channel):
+                        if not user.startswith('@'):
+                            user = '@' + user
+                        tweets.extend(fetch(
+                            functools.partial(api.GetUserTimeline,
+                                screen_name=user[1:]),
+                            maxIds, user))
                 except twitter.TwitterError as e:
                     self.log.error('Could not fetch timeline: %s' % e)
                     continue
-                if timeline is None or timeline == []:
+                if not tweets:
                     continue
-                timeline.reverse()
-                if maxId is None:
-                    maxId = timeline[-1].id
-                    continue
-                else:
-                    maxId = timeline[-1].id
+                tweets.sort(key=operator.attrgetter('id'))
                 format_ = '@%(user)s> %(msg)s'
                 if self.registryValue('announce.withid', channel):
                     format_ = '[%(longid)s] ' + format_
@@ -269,7 +289,7 @@ class Twitter(callbacks.Plugin):
                                       'shortid': self._get_shortid(x.id),
                                       'user': x.user.screen_name,
                                       'msg': x.text
-                                     } for x in timeline]
+                                     } for x in tweets]
 
                 replies = map(self._unescape, replies)
                 replies = map(expandLinks, replies)

@@ -2685,7 +2685,7 @@ class Api(object):
     if id:
       url = '%s/statuses/user_timeline/%s.json' % (self.base_url, id)
     elif user_id:
-      url = '%s/statuses/user_timeline.json?user_id=%d' % (self.base_url, user_id)
+      url = '%s/statuses/user_timeline.json?user_id=%s' % (self.base_url, user_id)
     elif screen_name:
       url = ('%s/statuses/user_timeline.json?screen_name=%s' % (self.base_url,
              screen_name))
@@ -2939,7 +2939,7 @@ class Api(object):
     Returns:
       A sequence of twitter.Status instances, one for each reply to the user.
     '''
-    url = '%s/statuses/replies.json' % self.base_url
+    url = '%s/statuses/mentions_timeline.json' % self.base_url
     if not self._oauth_consumer:
       raise TwitterError("The twitter.Api instance must be authenticated.")
     parameters = {}
