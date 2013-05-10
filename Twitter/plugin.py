@@ -121,7 +121,7 @@ def fetch(method, maxIds, name):
         tweets = method(since_id=maxIds[name])
     if not tweets:
         return []
-    tweets.sort(key=operator.attrgetter('id'))
+
     if maxIds[name] is None:
         maxIds[name] = tweets[-1].id
         return []
