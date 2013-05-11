@@ -263,7 +263,7 @@ class LinkRelay(callbacks.Plugin):
             args['color'] = '\x03%s' % self.registryValue('colors.nick', msg.args[0])
         s = _('*/* %(oldnick)s (%(network)s) changed their nickname to '
                 '%(newnick)s')
-        for (channel, c) in irc.state.channels.iteritems():
+        for (channel, c) in irc.state.channels.items():
             if msg.args[0] in c.users:
                 self.sendToOthers(irc, channel, s, args)
 
