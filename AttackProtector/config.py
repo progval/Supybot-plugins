@@ -83,6 +83,10 @@ conf.registerChannelValue(AttackProtector, 'enable',
 conf.registerGlobalValue(AttackProtector, 'exempt',
     registry.String('nopunish', _("""If a user has this capability, he won't be
         punished by AttackProtector""")))
+conf.registerGlobalValue(AttackProtector, 'kickmessage',
+    registry.String(_('$kind flood detected'), _("""The kick message used
+    when a user abuses the channel. $kind will be replaced with the kind
+    of attack.""")))
 conf.registerGlobalValue(AttackProtector, 'delay',
     registry.Integer(10, _("""Determines how long (in seconds) the plugin will
     wait before being enabled. A too low value makes the bot believe that

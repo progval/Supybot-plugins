@@ -188,7 +188,7 @@ class AttackProtector(callbacks.Plugin):
         except KeyError:
             pass
         punishment = self.registryValue('%s.punishment' % kind, channel)
-        reason = _('%s flood detected') % kind
+        reason = self.registryValue('kickmessage').replace('$kind', kind)
 
         if punishment == 'kick':
             self._eventCatcher(irc, msg, 'kicked', kicked_prefix=prefix)
