@@ -67,12 +67,13 @@ class Punishment(registry.String):
         if s not in ('ban', 'kick', 'kban') and not s.startswith('mode+') and \
                 not s.startswith('mode-') and not s.startswith('umode-') and \
                 not s.startswith('umode+') and \
-                not s.startswith('command ') and not s.startswith('kban+'):
+                not s.startswith('command ') and \
+                not s.startswith('kban+') and not s.startswith('ban+') :
             self.error()
             return
-        if s.startswith('kban+'):
+        if s.startswith('kban+') or s.startswith('ban+'):
             try:
-                int(s[5:])
+                int(s.split('+', 1)[1])
             except ValueError:
                 self.error()
                 return
