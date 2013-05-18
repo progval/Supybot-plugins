@@ -75,6 +75,7 @@ class Punishment(registry.String):
                 int(s[5:])
             except ValueError:
                 self.error()
+                return
         self.setValue(s)
 Punishment = internationalizeDocstring(Punishment)
 
