@@ -204,7 +204,7 @@ class AttackProtector(callbacks.Plugin):
         if punishment == 'kick':
             msg = ircmsgs.kick(channel, nick, reason)
             irc.queueMsg(msg)
-        elif punishment == 'ban':
+        elif punishment.startswith('ban'):
             msg = ircmsgs.ban(channel, banmask)
             irc.queueMsg(msg)
 
