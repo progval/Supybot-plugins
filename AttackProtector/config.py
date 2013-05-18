@@ -111,5 +111,9 @@ for kind, data in kinds.items():
     conf.registerChannelValue(getattr(AttackProtector, kind), 'punishment',
         Punishment(punishment, _("""Determines the punishment applied when
         %s.""") % help_))
+    conf.registerChannelValue(getattr(AttackProtector, kind), 'kickmessage',
+        registry.String('', _("""The kick message used
+        when a user abuses the channel with this kind of flood. If empty,
+        defaults to supybot.plugins.AttackProtector.kickmessage.""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
