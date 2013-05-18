@@ -30,7 +30,9 @@
 
 import time
 from supybot.test import *
+import supybot.conf as conf
 import supybot.ircdb as ircdb
+import supybot.schedule as schedule
 
 class AttackProtectorTestCase(ChannelPluginTestCase):
     plugins = ('AttackProtector', 'Config', 'Utilities', 'User')
@@ -201,10 +203,27 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
                                   prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.assertNotError('config plugin.AttackProtector.message.punishment '
+        self.assertNotError('config plugins.AttackProtector.message.punishment '
                 'umode+b')
         return self._getIfAnswerIsEqual(ircmsgs.IrcMsg(prefix="", command="MODE",
             args=(self.channel, mode, self.nick)))
+
+    def testKban(self):
+        with conf.supybot.plugins.AttackProtector.message.punishment.context(
+                'kban+1'):
+            for i in range(1, 11):
+                msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
+                                      prefix=self.prefix)
+                self.irc.feedMsg(msg)
+            m = self.irc.takeMsg()
+            self.assertEqual(m.command, 'MODE')
+            m = self.irc.takeMsg()
+            self.assertEqual(m.command, 'KICK')
+            self.assertEqual(self.irc.takeMsg(), None)
+            schedule.run()
+            time.sleep(2)
+            m = self.irc.takeMsg()
+            self.assertEqual(m.command, 'MODE')
 
     #################################
     # 'Kicked' tests

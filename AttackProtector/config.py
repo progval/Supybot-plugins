@@ -66,9 +66,15 @@ class Punishment(registry.String):
     def set(self, s):
         if s not in ('ban', 'kick', 'kban') and not s.startswith('mode+') and \
                 not s.startswith('mode-') and not s.startswith('umode-') and \
-                not s.startswith('umode+') and not s.startswith('command '):
+                not s.startswith('umode+') and \
+                not s.startswith('command ') and not s.startswith('kban+'):
             self.error()
             return
+        if s.startswith('kban+'):
+            try:
+                int(s[5:])
+            except ValueError:
+                self.error()
         self.setValue(s)
 Punishment = internationalizeDocstring(Punishment)
 

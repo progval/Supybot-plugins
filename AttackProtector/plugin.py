@@ -30,6 +30,7 @@
 
 import re
 import time
+import functools
 
 import supybot.conf as conf
 import supybot.utils as utils
@@ -37,6 +38,7 @@ import supybot.ircdb as ircdb
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircmsgs as ircmsgs
+import supybot.schedule as schedule
 import supybot.registry as registry
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
@@ -205,11 +207,18 @@ class AttackProtector(callbacks.Plugin):
         elif punishment == 'ban':
             msg = ircmsgs.ban(channel, banmask)
             irc.queueMsg(msg)
-        elif punishment == 'kban':
+        elif punishment.startswith('kban'):
             msg = ircmsgs.ban(channel, banmask)
             irc.queueMsg(msg)
             msg = ircmsgs.kick(channel, nick, reason)
             irc.queueMsg(msg)
+
+            if punishment.startswith('kban+'):
+                time = int(punishment[5:])
+                unban = functools.partial(irc.queueMsg,
+                        ircmsgs.unban(channel, banmask))
+                schedule.addEvent(unban, time)
+
         elif punishment.startswith('mode'):
             msg = ircmsgs.mode(channel, punishment[len('mode'):])
             irc.queueMsg(msg)
