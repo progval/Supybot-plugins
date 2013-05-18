@@ -209,10 +209,10 @@ class AttackProtector(callbacks.Plugin):
             irc.queueMsg(msg)
 
             if punishment.startswith('ban+'):
-                time = int(punishment[4:])
+                delay = int(punishment[4:])
                 unban = functools.partial(irc.queueMsg,
                         ircmsgs.unban(channel, banmask))
-                schedule.addEvent(unban, time)
+                schedule.addEvent(unban, delay + time.time())
 
         elif punishment.startswith('kban'):
             msg = ircmsgs.ban(channel, banmask)
@@ -221,10 +221,10 @@ class AttackProtector(callbacks.Plugin):
             irc.queueMsg(msg)
 
             if punishment.startswith('kban+'):
-                time = int(punishment[5:])
+                delay = int(punishment[5:])
                 unban = functools.partial(irc.queueMsg,
                         ircmsgs.unban(channel, banmask))
-                schedule.addEvent(unban, time)
+                schedule.addEvent(unban, delay + time.time())
 
         elif punishment.startswith('mode'):
             msg = ircmsgs.mode(channel, punishment[len('mode'):])

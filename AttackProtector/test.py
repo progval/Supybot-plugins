@@ -209,8 +209,11 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             args=(self.channel, mode, self.nick)))
 
     def testKban(self):
+        def run_schedule():
+            while schedule.schedule.schedule:
+                schedule.run()
         with conf.supybot.plugins.AttackProtector.message.punishment.context(
-                'kban+1'):
+                'kban+2'):
             for i in range(1, 11):
                 msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
                                       prefix=self.prefix)
@@ -220,10 +223,14 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             m = self.irc.takeMsg()
             self.assertEqual(m.command, 'KICK')
             self.assertEqual(self.irc.takeMsg(), None)
-            schedule.run()
+            threading.Thread(target=run_schedule).start()
+            self.assertEqual(self.irc.takeMsg(), None)
+            time.sleep(1)
+            self.assertEqual(self.irc.takeMsg(), None)
             time.sleep(2)
             m = self.irc.takeMsg()
             self.assertEqual(m.command, 'MODE')
+        schedule.schedule.schedule = False
 
     #################################
     # 'Kicked' tests
