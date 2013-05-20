@@ -32,6 +32,7 @@ from supybot.test import *
 
 class RblsTestCase(ChannelPluginTestCase):
     plugins = ('Rbls',)
+    config = {'supybot.plugins.Rbls.enable': 'True'}
 
     if network:
         def testBan(self):

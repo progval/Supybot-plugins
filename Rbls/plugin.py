@@ -49,6 +49,8 @@ class Rbls(callbacks.Plugin):
 
     def doJoin(self, irc, msg):
         channel = msg.args[0]
+        if not self.registryValue('enable', channel):
+            return
         nick, ident, host = ircutils.splitHostmask(msg.prefix)
 
         fd = utils.web.getUrlFd('http://rbls.org/%s' % host)

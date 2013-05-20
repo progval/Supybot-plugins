@@ -53,6 +53,9 @@ Rbls = conf.registerPlugin('Rbls')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(Rbls, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
+conf.registerChannelValue(Rbls, 'enable',
+    registry.Boolean(False, _("""Determines whether or not this plugin will
+    kickban users blacklisted with Rbls.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
