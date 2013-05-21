@@ -121,6 +121,9 @@ class AttackProtector(callbacks.Plugin):
         if kind in ['part', 'join', 'message']:
             channels = [msg.args[0]]
             prefix = msg.prefix
+        elif kind in ['knock']:
+            channels = [msg.args[0]]
+            prefix = msg.args[2]
         elif kind in ['nick']:
             newNick = msg.args[0]
             channels = []
@@ -156,6 +159,8 @@ class AttackProtector(callbacks.Plugin):
 
     def doJoin(self, irc, msg):
         self._eventCatcher(irc, msg, 'join')
+    def do710(self, irc, msg):
+        self._eventCatcher(irc, msg, 'knock')
     def doPart(self, irc, msg):
         self._eventCatcher(irc, msg, 'part')
     def doNick(self, irc, msg):

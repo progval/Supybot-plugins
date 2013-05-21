@@ -101,11 +101,13 @@ conf.registerGlobalValue(AttackProtector, 'delay',
     its incoming messages 'flood' on connection is an attack.""")))
 
 kinds = {'join': ['5p10', 'ban', ''],
+         'knock': ['5p20', 'mode+K', ''],
          'part': ['4p5', 'ban', ''],
          'nick': ['7p300', 'ban', ''],
          'message': ['10p20', 'kick', ''],
          'kicked': ['5p60', 'kban', _('user has been kicked multiple times')],
          'groupjoin': ['20p10', 'mode+i', ''],
+         'groupknock': ['7p20', 'mode+K', ''],
          'grouppart': ['20p10', 'mode+i', ''],
          'groupnick': ['20p10', 'mode+N', ''],
          'groupmessage': ['100p10', 'mode+m', '']}
