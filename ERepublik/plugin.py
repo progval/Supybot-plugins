@@ -94,7 +94,7 @@ class ERepublik(callbacks.Plugin):
         if string is None:
             irc.error(_('This citizen does not exist.'))
         irc.reply(string)
-    info = wrap(info, ['text'])
+    see = wrap(see, ['text'])
 
     @internationalizeDocstring
     def money(self, irc, msg, args, name):
