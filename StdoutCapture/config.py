@@ -51,6 +51,9 @@ StdoutCapture = conf.registerPlugin('StdoutCapture')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(StdoutCapture, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
+conf.registerChannelValue(StdoutCapture, 'pastebin',
+    registry.String('http://paste.progval.net/', _("""Default pastebin.
+    The pastebin has to support the LodgeIt API.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

@@ -29,6 +29,7 @@
 ###
 
 import sys
+import json
 import logging
 
 import supybot.utils as utils
@@ -90,7 +91,26 @@ class StdoutCapture(callbacks.Plugin):
 
         Return the last lines displayed in the console."""
         irc.replies(StdoutBuffer._buffer[-number:])
-    history = wrap(history, ['positiveInt'])
+    history = wrap(history, ['positiveInt', 'owner'])
+
+    def pastebin(self, irc, msg, args, number, url=None):
+        """<number> [<pastebin url>]
+
+        Paste the last lines displayed in the console on a pastebin and
+        returns the URL.
+        The pastebin has to support the LodgeIt API."""
+        base = url or self.registryValue('pastebin', msg.args[0])
+        if base.endswith('/'):
+            base = base[0:-1]
+        fd = utils.web.getUrlFd(base+'/json/?method=pastes.newPaste',
+                data=json.dumps({
+                    'language': 'text',
+                    'code': ''.join(StdoutBuffer._buffer[-number:]),
+                    }),
+                headers={'Content-Type': 'application/json'})
+        irc.reply('%s/show/%s' % (base, json.load(fd)['data']))
+
+    pastebin = wrap(pastebin, ['owner', 'positiveInt', optional('text')])
 
 
 Class = StdoutCapture
