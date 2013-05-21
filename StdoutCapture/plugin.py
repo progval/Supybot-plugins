@@ -38,7 +38,7 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 try:
     from supybot.i18n import PluginInternationalization
-    _ = PluginInternationalization('StdoutToIrc')
+    _ = PluginInternationalization('StdoutCapture')
 except:
     # Placeholder that allows to run the plugin on a bot
     # without the i18n module
@@ -57,11 +57,11 @@ class StdoutBuffer:
     def __getattr_(self, name):
         sys.stderr.write(repr(name))
 
-class StdoutToIrc(callbacks.Plugin):
-    """Add the help for "@plugin help StdoutToIrc" here
+class StdoutCapture(callbacks.Plugin):
+    """Add the help for "@plugin help StdoutCapture" here
     This should describe *how* to use this plugin."""
     def __init__(self, irc):
-        super(StdoutToIrc, self).__init__(irc)
+        super(StdoutCapture, self).__init__(irc)
         self.StdoutBuffer = StdoutBuffer
         sys.stdout = self.StdoutBuffer(sys.stdout)
         sys.stderr = self.StdoutBuffer(sys.stderr)
@@ -93,7 +93,7 @@ class StdoutToIrc(callbacks.Plugin):
     history = wrap(history, ['positiveInt'])
 
 
-Class = StdoutToIrc
+Class = StdoutCapture
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
