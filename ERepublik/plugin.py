@@ -64,7 +64,11 @@ def getCitizen(irc, name):
 def flatten_subdicts(dicts):
     """Change dict of dicts into a dict of strings/integers. Useful for
     using in string formatting."""
-    flat = {}
+    flat = {
+            'party__name': 'none',
+            'party__id': 0,
+            'party__role': 'N/A',
+            }
     for key, value in dicts.items():
         if isinstance(value, dict):
             for subkey, subvalue in value.items():
