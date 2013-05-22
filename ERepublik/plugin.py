@@ -109,19 +109,19 @@ class ERepublik(callbacks.Plugin):
         %s""" % doc
         return wrap(f, ['text'], name=name)
 
-    info = _gen("""\x02\x031Name: $name (ID:\x0310 $id\x031)\x0310, \x031Level: \x0310$level, \x031Strength:\x0310 $strength, \x031Residence:
-    \x0310$residence__region__name, \x0310$residence__country__name, \x031Citizenship:
-    \x0310$citizenship__name, \x031Rank: \x0310$rank__name, \x031Party: \x0310$party__name, \x031MU:
+    info = _gen("""\x02Name: $name (ID:\x0310 $id)\x0310, Level: \x0310$level, Strength:\x0310 $strength, \x031Residence:
+    \x0310$residence__region__name, \x0310$residence__country__name, Citizenship:
+    \x0310$citizenship__name, Rank: \x0310$rank__name, Party: \x0310$party__name, MU:
     \x0310$army__name.
     """,
     'info',
     'Returns general informations about a citizen.')
 
-    link = _gen("""\x02\x034$name's\x0310 <-> \x031http://www.erepublik.com/sq/citizen/profile/$id    """,
+    link = _gen("""\x02\x034$name's\x0310 <-> http://www.erepublik.com/sq/citizen/profile/$id    """,
     'link',
     'Returns link informations about a citizen.')
 
-    avatar = _gen("""\x02\x034$name's\x0310 <-> \x031$avatar    """,
+    avatar = _gen("""\x02\x034$name's\x0310 <-> $avatar    """,
     'avatar',
     'Returns avatar link informations about a citizen.')
 
