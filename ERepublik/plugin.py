@@ -109,6 +109,10 @@ class ERepublik(callbacks.Plugin):
     """,
     'info',
     'Returns general informations about a citizen.')
+    
+    link = _gen("""\x02\x034$name's\x0310 <-> \x031http://www.erepublik.com/sq/citizen/profile/$id    """,
+    'link',
+    'Returns link informations about a citizen.')
 
     @internationalizeDocstring
     def medals(self, irc, msg, args, name):
