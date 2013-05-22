@@ -51,13 +51,13 @@ except:
 def getCitizen(irc, name):
     try:
         if name.isdigit():
-            base = 'http://api.erpk.org/citizen/profile/%s.json?key=nIKh0F7U'
+            base = 'http://api.erpk.org/citizen/profile/%s.json?key=APIKEY'
             data = json.load(utils.web.getUrlFd(base % name))
             color = 3 if data['online'] else 4
-            data['name'] = '\x030%i%s\x0f' % (color, data['name'])
+            data['name'] = '\x030%i%s\x03' % (color, data['name'])
             return data
         else:
-            base = 'http://api.erpk.org/citizen/search/%s/1.json?key=nIKh0F7U'
+            base = 'http://api.erpk.org/citizen/search/%s/1.json?key=APIKEY'
             data = json.load(utils.web.getUrlFd(base % name))
             return getCitizen(irc, str(data[0]['id']))
     except:
@@ -68,9 +68,12 @@ def flatten_subdicts(dicts):
     """Change dict of dicts into a dict of strings/integers. Useful for
     using in string formatting."""
     flat = {
-            'party__name': 'none',
+            'party__name': 'None',
             'party__id': 0,
             'party__role': 'N/A',
+            'army__name': 'None',
+            'army__id': 0,
+            'army__role': 'N/A',
             }
     for key, value in dicts.items():
         if isinstance(value, dict):
@@ -109,21 +112,25 @@ class ERepublik(callbacks.Plugin):
         %s""" % doc
         return wrap(f, ['text'], name=name)
 
-    info = _gen("""\x02Name: $name (ID:\x0310 $id)\x0310, Level: \x0310$level, Strength:\x0310 $strength, \x031Residence:
-    \x0310$residence__region__name, \x0310$residence__country__name, Citizenship:
-    \x0310$citizenship__name, Rank: \x0310$rank__name, Party: \x0310$party__name, MU:
+    info = _gen("""\x02Name: $name (ID:\x0310 $id\x03)\x0310,\x03 Level: \x0310$level,\x03 Strength:\x0310 $strength,\x03 Residence:
+    \x0310$residence__region__name, $residence__country__name,\x03 Citizenship:
+    \x0310$citizenship__name,\x03 Rank: \x0310$rank__name,\x03 Party: \x0310$party__name,\x03 MU:
     \x0310$army__name.
     """,
     'info',
     'Returns general informations about a citizen.')
 
-    link = _gen("""\x02\x034$name's\x0310 <-> http://www.erepublik.com/sq/citizen/profile/$id    """,
+    link = _gen("""\x02$name's link\x0310 <->\x03 http://www.erepublik.com/sq/citizen/profile/$id    """,
     'link',
     'Returns link informations about a citizen.')
 
-    avatar = _gen("""\x02\x034$name's\x0310 <-> $avatar    """,
+    donate = _gen("""\x02$name's donate link\x0310 <->\x03 http://www.erepublik.com/sq/economy/donate-items/$id    """,
+    'donate',
+    'Returns link to danate.')
+
+    avatar = _gen("""\x02$name's avatar link\x0310 <->\x03 $avatar    """,
     'avatar',
-    'Returns avatar link informations about a citizen.')
+    'Returns avatar link of citizen.')
 
     @internationalizeDocstring
     def medals(self, irc, msg, args, name):
