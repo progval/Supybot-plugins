@@ -56,22 +56,22 @@ conf.registerChannelValue(Redmine, 'defaultsite',
     registry.String('', _("""Default site for this channel.""")))
 conf.registerGroup(Redmine, 'format')
 conf.registerChannelValue(Redmine.format, 'projects',
-    registry.String('%(name)s (%(identifier)s)',
+    registry.String('$name ($identifier)',
     _("""Format of projects displayed by @projects.""")))
 conf.registerChannelValue(Redmine.format, 'issues',
-    registry.String('\x02#%(id)i: %(subject)s\x02 (last update: '
-    '%(updated_on)s / status: %(status__name)s)',
+    registry.String('\x02#$id)i: $subject\x02 (last update: '
+    '$updated_on / status: $status__name)',
     _("""Format of issues displayed by @issues.""")))
 conf.registerChannelValue(Redmine.format, 'issue',
-    registry.String('\x02#%(id)i (%(status__name)s)\x02: \x02%(subject)s\x02 '
-    'in \x02%(project__name)s\x02 (%(project__id)i). Created by '
-    '\x02%(author__name)s\x02 (%(author__id)i) on \x02%(created_on)s\x02, '
-    'last updated on \x02%(updated_on)s', 
+    registry.String('\x02#$id)i ($status__name)\x02: \x02$subject\x02 '
+    'in \x02$project__name\x02 ($project__id)i). Created by '
+    '\x02$author__name\x02 ($author__id)i) on \x02$created_on\x02, '
+    'last updated on \x02$updated_on', 
     _("""Format of issues displayed by @issue.""")))
 conf.registerGroup(Redmine.format, 'announces')
 conf.registerChannelValue(Redmine.format.announces, 'issue',
-    registry.String('Updated issue: \x02#%(id)i (%(status__name)s)\x02: '
-    '\x02%(subject)s\x02 in \x02%(project__name)s\x02 (%(project__id)i).',
+    registry.String('Updated issue: \x02#$id)i ($status__name)\x02: '
+    '\x02$subject\x02 in \x02$project__name\x02 ($project__id)i).',
     _("""Format of issues displayed by @issue.""")))
 
 conf.registerGroup(Redmine, 'announce')

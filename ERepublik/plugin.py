@@ -31,6 +31,8 @@
 import re
 import json
 
+from string import Template
+
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
@@ -84,7 +86,8 @@ class ERepublik(callbacks.Plugin):
         Returns informations about a citizen with advanced formating."""
         citizen = flatten_subdicts(getCitizen(irc, name))
         try:
-            irc.replies(map(lambda x:x%citizen, format_.split('\\n')))
+            repl = lambda x:Template(x).safe_substitute(citizen)
+            irc.replies(map(repl, format_.split('\\n')))
         except KeyError:
             raise
             irc.error(_('Invalid format.'), Raise=True)
@@ -99,10 +102,10 @@ class ERepublik(callbacks.Plugin):
         %s""" % doc
         return wrap(f, ['text'], name=name)
 
-    info = _gen("""Name: %(name)s (ID: %(id)s), Level: %(level)s, Strength:
-    %(strength)s, Residence: %(residence__country__name)s, Citizenship:
-    %(citizenship__name)s, Rank: %(rank__name)s, Party: %(party__name)s, MU:
-    %(army__name)s.
+    info = _gen("""Name: $name (ID: $id), Level: $level, Strength:
+    $strength, Residence: $residence__country__name, Citizenship:
+    $citizenship__name, Rank: $rank__name, Party: $party__name, MU:
+    $army__name.
     """,
     'info',
     'Returns general informations about a citizen.')

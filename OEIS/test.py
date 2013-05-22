@@ -39,8 +39,8 @@ class OEISTestCase(PluginTestCase):
             self.assertRegexp('names 15454454651,198448,228454456', 'No entry')
 
         def testAdvsearch(self):
-            self.assertRegexp('advsearch "%(id)s" 1,2,6,24,120', 'A000142')
-            self.assertNotRegexp('advsearch "%(id)s" 1,2,6,24,120', 'factorial')
+            self.assertRegexp('advsearch "$id" 1,2,6,24,120', 'A000142')
+            self.assertNotRegexp('advsearch "$id" 1,2,6,24,120', 'factorial')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

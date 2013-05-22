@@ -31,6 +31,7 @@
 import sys
 import json
 import time
+from string import Template
 
 import supybot.conf as conf
 import supybot.utils as utils
@@ -189,7 +190,8 @@ class Redmine(callbacks.Plugin):
                         format_ = self.registryValue('format.announces.issue',
                                 channel)
                         for issue in announces:
-                            s = format_ % flatten_subdicts(issue)
+                            repl = flatten_subdicts(issue)
+                            s = Template(format_).safe_substitute(repl)
                             if sys.version_info[0] < 3:
                                 s = s.encode('utf8', errors='replace')
                             msg = ircmsgs.privmsg(channel, s)
@@ -255,8 +257,8 @@ class Redmine(callbacks.Plugin):
         """
 
         Return the list of projects of the Redmine <site>."""
-        projects = map(lambda x:self.registryValue('format.projects') % x,
-                fetch(site, 'projects')['projects'])
+        repl = Template(self.registryValue('format.projects')).safe_substitute
+        projects = map(repl, fetch(site, 'projects')['projects'])
         irc.reply(format('%L', projects))
 
     @internationalizeDocstring
@@ -285,8 +287,8 @@ class Redmine(callbacks.Plugin):
         new_issues = []
         for issue in issues:
             new_issues.append(flatten_subdicts(issue))
-        issues = map(lambda x:self.registryValue('format.issues') % x,
-                new_issues)
+        repl = Template(self.registryValue('format.issues')).safe_substitute
+        issues = map(repl, new_issues)
         irc.reply(format('%L', issues))
 
     @internationalizeDocstring
@@ -298,7 +300,8 @@ class Redmine(callbacks.Plugin):
         try:
             issue = fetch(site, 'issues/%i' % issueid)['issue']
             issue = flatten_subdicts(issue)
-            irc.reply(self.registryValue('format.issue') % issue)
+            irc.reply(Template(self.registryValue('format.issue')) \
+                    .safe_substitute(issue))
         except ResourceNotFound:
             irc.error(_('Issue not found.'), Raise=True)
         except KeyError as e:

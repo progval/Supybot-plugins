@@ -28,6 +28,8 @@
 
 ###
 
+from string import Template
+
 import supybot.log as log
 import supybot.utils as utils
 from supybot.commands import *
@@ -62,7 +64,8 @@ class OEIS(callbacks.Plugin):
         except ParseError:
             irc.error(_('Could not parse OEIS answer.'), Raise=True)
         if results:
-            irc.reply(format('%L', map(lambda x:format_ % x, results)))
+            repl = Template(format_).safe_substitute
+            irc.reply(format('%L', map(repl, results)))
         else:
             irc.reply(_('No entry matches this sequence.'))
     advsearch = wrap(_advsearch, ['something', 'somethingWithoutSpaces'])
@@ -75,7 +78,7 @@ class OEIS(callbacks.Plugin):
         %s""" % doc
         return wrap(f, ['somethingWithoutSpaces'], name=name)
 
-    names = _gen('%(name)s (%(id)s)', 'names',
+    names = _gen('$name ($id)', 'names',
             'Return names of matching entries.')
 
 
