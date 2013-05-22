@@ -52,7 +52,10 @@ def getCitizen(irc, name):
     try:
         if name.isdigit():
             base = 'http://api.erpk.org/citizen/profile/%s.json?key=nIKh0F7U'
-            return json.load(utils.web.getUrlFd(base % name))
+            data = json.load(utils.web.getUrlFd(base % name))
+            color = 3 if data['online'] else 4
+            data['name'] = '\x030%i%s\x0f' % (color, data['name'])
+            return data
         else:
             base = 'http://api.erpk.org/citizen/search/%s/1.json?key=nIKh0F7U'
             data = json.load(utils.web.getUrlFd(base % name))
@@ -106,7 +109,7 @@ class ERepublik(callbacks.Plugin):
         %s""" % doc
         return wrap(f, ['text'], name=name)
 
-    info = _gen("""\x02\x031Name: \x034$name \x031(ID:\x0310 $id\x031)\x0310, \x031Level: \x0310$level, \x031Strength:\x0310 $strength, \x031Residence: 
+    info = _gen("""\x02\x031Name: $name (ID:\x0310 $id\x031)\x0310, \x031Level: \x0310$level, \x031Strength:\x0310 $strength, \x031Residence:
     \x0310$residence__region__name, \x0310$residence__country__name, \x031Citizenship:
     \x0310$citizenship__name, \x031Rank: \x0310$rank__name, \x031Party: \x0310$party__name, \x031MU:
     \x0310$army__name.
