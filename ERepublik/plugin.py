@@ -102,17 +102,21 @@ class ERepublik(callbacks.Plugin):
         %s""" % doc
         return wrap(f, ['text'], name=name)
 
-    info = _gen("""Name: $name (ID: $id), Level: $level, Strength:
-    $strength, Residence: $residence__country__name, Citizenship:
-    $citizenship__name, Rank: $rank__name, Party: $party__name, MU:
-    $army__name.
+    info = _gen("""\x02\x031Name: \x034$name \x031(ID:\x0310 $id\x031)\x0310, \x031Level: \x0310$level, \x031Strength:\x0310 $strength, \x031Residence: 
+    \x0310$residence__region__name, \x0310$residence__country__name, \x031Citizenship:
+    \x0310$citizenship__name, \x031Rank: \x0310$rank__name, \x031Party: \x0310$party__name, \x031MU:
+    \x0310$army__name.
     """,
     'info',
     'Returns general informations about a citizen.')
-    
+
     link = _gen("""\x02\x034$name's\x0310 <-> \x031http://www.erepublik.com/sq/citizen/profile/$id    """,
     'link',
     'Returns link informations about a citizen.')
+
+    avatar = _gen("""\x02\x034$name's\x0310 <-> \x031$avatar    """,
+    'avatar',
+    'Returns avatar link informations about a citizen.')
 
     @internationalizeDocstring
     def medals(self, irc, msg, args, name):
