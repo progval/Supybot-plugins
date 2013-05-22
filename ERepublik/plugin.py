@@ -33,6 +33,8 @@ from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
+import local.lib as lib
+reload(lib)
 from local.lib import Citizen, Stats, Vojnik, Ekonomija
 try:
     from supybot.i18n import PluginInternationalization

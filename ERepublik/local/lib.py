@@ -9,19 +9,22 @@ from math import ceil
 
 import types 
 
+
 class Citizen:
     def loadByName(self, name):
-        try:
-            self.doc = libxml2.parseFile('http://api.erepublik.com/v2/feeds/citizen_by_name/xml/' +
-                                         name)
-        except:
+        if name.isdigit():
+            return self.loadById(name)
+        import supybot.utils.web as web
+        lines = filter(lambda x:'<id>' in x, web.getUrl('http://api.erpk.org/citizen/search/' + name + '/1.xml?key=nIKh0F7U').split('\n'))
+        if not lines:
             return None
-        self.ctxt = self.doc.xpathNewContext()
-        return self
+        line = lines[0]
+        id = line.split('>')[1].split('<')[0]
+        return self.loadById(id)
 
     def loadById(self, id):
         try:
-            self.doc = libxml2.parseFile('http://api.erepublik.com/v2/feeds/citizens/' + str(id))
+            self.doc = libxml2.parseFile('http://api.erpk.org/citizen/profile/' + str(id) + '.xml?key=nIKh0F7U')
         except:
             return None
         self.ctxt = self.doc.xpathNewContext()
@@ -258,7 +261,7 @@ class Citizen:
         return (
             ' \x02 ' + self.getName() + ': Location: \x02' +
             self.getCountry() + ', ' + self.getRegion() +
-            ';\x02 Wellness: \x02' + str(self.getWellness()) + ';\x02 Rank: \x02' + str(self.getRank()) + ' ( ' + str(self.getRanklvl()) + ' ) ' +
+            ';\x02 Wellness: \x02' + str(self.getWellness()) + ';\x02 Rank: \x02' + str(self.getRank()) +
             ';\x02 Experience: \x02' + str(self.getExperience()) +
              ';\x02 Employed at: \x02' + self.getEmployer() +
             ';\x02 Citizenship: \x02' + self.getCitizenship() +  ';\x02 Work Skill: \x02' + str(self.getVestinu()) +
