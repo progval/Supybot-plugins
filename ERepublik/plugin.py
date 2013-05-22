@@ -54,8 +54,9 @@ def getCitizen(irc, name):
         else:
             base = 'http://api.erpk.org/citizen/search/%s/1.json?key=nIKh0F7U'
             data = json.load(utils.web.getUrlFd(base % name))
-            return getCitizen(irc, data[0]['id'])
+            return getCitizen(irc, str(data[0]['id']))
     except:
+        raise
         irc.error(_('This citizen does not exist.'), Raise=True)
 
 def flatten_subdicts(dicts):
