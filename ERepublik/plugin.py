@@ -54,7 +54,7 @@ def getCitizen(irc, name):
             base = 'http://api.erpk.org/citizen/profile/%s.json?key=nIKh0F7U'
             data = json.load(utils.web.getUrlFd(base % name))
             color = 3 if data['online'] else 4
-            data['name'] = '\x030%i%s\x0f' % (color, data['name'])
+            data['name'] = '\x030%i%s\x03' % (color, data['name'])
             return data
         else:
             base = 'http://api.erpk.org/citizen/search/%s/1.json?key=nIKh0F7U'
@@ -117,11 +117,11 @@ class ERepublik(callbacks.Plugin):
     'info',
     'Returns general informations about a citizen.')
 
-    link = _gen("""\x02\x034$name's\x0310 <-> \x031http://www.erepublik.com/sq/citizen/profile/$id    """,
+    link = _gen("""\x02$name's\x0310 <-> \x031http://www.erepublik.com/sq/citizen/profile/$id    """,
     'link',
     'Returns link informations about a citizen.')
 
-    avatar = _gen("""\x02\x034$name's\x0310 <-> \x031$avatar    """,
+    avatar = _gen("""\x02$name's\x0310 <-> \x031$avatar    """,
     'avatar',
     'Returns avatar link informations about a citizen.')
 
