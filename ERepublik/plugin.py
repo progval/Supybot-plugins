@@ -49,9 +49,14 @@ except:
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
 
-def flatten_subdicts(dicts, flat={}):
+def flatten_subdicts(dicts, flat=None):
     """Change dict of dicts into a dict of strings/integers. Useful for
     using in string formatting."""
+    if flat is None:
+        # Instanciate the dictionnary when the function is run and now when it
+        # is declared; otherwise the same dictionnary instance will be kept and
+        # it will have side effects (memory exhaustion, ...)
+        flat = {}
     if isinstance(dicts, list):
         return flatten_subdicts(dict(enumerate(dicts)))
     elif isinstance(dicts, dict):
