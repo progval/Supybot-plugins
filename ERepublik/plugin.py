@@ -33,6 +33,7 @@ import json
 
 from string import Template
 
+import supybot.conf as conf
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
@@ -74,78 +75,79 @@ def flatten_subdicts(dicts):
 class ERepublik(callbacks.Plugin):
     threaded = True
 
-    def _getCitizen(self, irc, name):
-        key = self.registryValue('apikey')
-        if not key:
-            irc.error(_('No API key set. Ask the owner to add one.'),
-                    Raise=True)
-        try:
-            if name.isdigit():
-                base = 'http://api.erpk.org/citizen/profile/%s.json?key=%s'
-                data = json.load(utils.web.getUrlFd(base % (name, key)))
-                color = 3 if data['online'] else 4
-                data['name'] = '\x030%i%s\x0f' % (color, data['name'])
-                return data
-            else:
-                base = 'http://api.erpk.org/citizen/search/%s/1.json?key=%s'
-                data = json.load(utils.web.getUrlFd(base % (name, key)))
-                return self._getCitizen(irc, str(data[0]['id']))
-        except:
-            raise
-            irc.error(_('This citizen does not exist.'), Raise=True)
+    class citizen(callbacks.Commands):
+        def _get(self, irc, name):
+            key = conf.supybot.plugins.ERepublik.apikey()
+            if not key:
+                irc.error(_('No API key set. Ask the owner to add one.'),
+                        Raise=True)
+            try:
+                if name.isdigit():
+                    base = 'http://api.erpk.org/citizen/profile/%s.json?key=%s'
+                    data = json.load(utils.web.getUrlFd(base % (name, key)))
+                    color = 3 if data['online'] else 4
+                    data['name'] = '\x030%i%s\x0f' % (color, data['name'])
+                    return data
+                else:
+                    base = 'http://api.erpk.org/citizen/search/%s/1.json?key=%s'
+                    data = json.load(utils.web.getUrlFd(base % (name, key)))
+                    return self._get(irc, str(data[0]['id']))
+            except:
+                raise
+                irc.error(_('This citizen does not exist.'), Raise=True)
 
-    def _advinfo(self, irc, msg, args, format_, name):
-        """<format> <name|id>
+        def _advinfo(self, irc, msg, args, format_, name):
+            """<format> <name|id>
 
-        Returns informations about a citizen with advanced formating."""
-        citizen = flatten_subdicts(self._getCitizen(irc, name))
-        try:
-            repl = lambda x:Template(x).safe_substitute(citizen)
-            irc.replies(map(repl, format_.split('\\n')))
-        except KeyError:
-            raise
-            irc.error(_('Invalid format.'), Raise=True)
-    advinfo = wrap(_advinfo, ['something', 'text'])
+            Returns informations about a citizen with advanced formating."""
+            citizen = flatten_subdicts(self._get(irc, name))
+            try:
+                repl = lambda x:Template(x).safe_substitute(citizen)
+                irc.replies(map(repl, format_.split('\\n')))
+            except KeyError:
+                raise
+                irc.error(_('Invalid format.'), Raise=True)
+        advinfo = wrap(_advinfo, ['something', 'text'])
 
-    def _gen(format_, name, doc):
-        format_ = re.sub('[ \n]+', ' ', format_)
-        def f(self, irc, msg, args, sequence):
-            self._advinfo(irc, msg, args, format_, sequence)
-        f.__doc__ = """<name|id>
+        def _gen(format_, name, doc):
+            format_ = re.sub('[ \n]+', ' ', format_)
+            def f(self, irc, msg, args, sequence):
+                self._advinfo(irc, msg, args, format_, sequence)
+            f.__doc__ = """<name|id>
 
-        %s""" % doc
-        return wrap(f, ['text'], name=name)
+            %s""" % doc
+            return wrap(f, ['text'], name=name)
 
-    info = _gen("""\x02Name: $name (ID:\x0310 $id\x03)\x0310,\x03 Level: \x0310$level,\x03 Strength:\x0310 $strength,\x03 Residence:
-    \x0310$residence__region__name, $residence__country__name,\x03 Citizenship:
-    \x0310$citizenship__name,\x03 Rank: \x0310$rank__name,\x03 Party: \x0310$party__name,\x03 MU:
-    \x0310$army__name.
-    """,
-    'info',
-    'Returns general informations about a citizen.')
+        info = _gen("""\x02Name: $name (ID:\x0310 $id\x03)\x0310,\x03 Level: \x0310$level,\x03 Strength:\x0310 $strength,\x03 Residence:
+        \x0310$residence__region__name, $residence__country__name,\x03 Citizenship:
+        \x0310$citizenship__name,\x03 Rank: \x0310$rank__name,\x03 Party: \x0310$party__name,\x03 MU:
+        \x0310$army__name.
+        """,
+        'info',
+        'Returns general informations about a citizen.')
 
-    link = _gen("""\x02$name's link\x0310 <->\x03 http://www.erepublik.com/sq/citizen/profile/$id    """,
-    'link',
-    'Returns link informations about a citizen.')
+        link = _gen("""\x02$name's link\x0310 <->\x03 http://www.erepublik.com/sq/citizen/profile/$id    """,
+        'link',
+        'Returns link informations about a citizen.')
 
-    donate = _gen("""\x02$name's donate link\x0310 <->\x03 http://www.erepublik.com/sq/economy/donate-items/$id    """,
-    'donate',
-    'Returns link to danate.')
+        donate = _gen("""\x02$name's donate link\x0310 <->\x03 http://www.erepublik.com/sq/economy/donate-items/$id    """,
+        'donate',
+        'Returns link to danate.')
 
-    avatar = _gen("""\x02$name's avatar link\x0310 <->\x03 $avatar    """,
-    'avatar',
-    'Returns avatar link of citizen.')
+        avatar = _gen("""\x02$name's avatar link\x0310 <->\x03 $avatar    """,
+        'avatar',
+        'Returns avatar link of citizen.')
 
-    @internationalizeDocstring
-    def medals(self, irc, msg, args, name):
-        """<name|id>
+        @internationalizeDocstring
+        def medals(self, irc, msg, args, name):
+            """<name|id>
 
-        Displays the citizen's medals."""
-        citizen = self._getCitizen(irc, name)
-        medals = ['%s (%i)' % x for x in citizen['medals'].items() if x[1]]
-        irc.reply(_('%s has the following medal(s): %s') %
-                  (name, ', '.join(medals)))
-    medals = wrap(medals, ['text'])
+            Displays the citizen's medals."""
+            citizen = self._get(irc, name)
+            medals = ['%s (%i)' % x for x in citizen['medals'].items() if x[1]]
+            irc.reply(_('%s has the following medal(s): %s') %
+                      (name, ', '.join(medals)))
+        medals = wrap(medals, ['text'])
 
 
 ERepublik = internationalizeDocstring(ERepublik)
