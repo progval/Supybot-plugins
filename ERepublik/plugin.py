@@ -49,25 +49,17 @@ except:
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
 
-def flatten_subdicts(dicts):
+def flatten_subdicts(dicts, flat={}):
     """Change dict of dicts into a dict of strings/integers. Useful for
     using in string formatting."""
-    flat = {
-            'party__name': 'None',
-            'party__id': 0,
-            'party__role': 'N/A',
-            'army__name': 'None',
-            'army__id': 0,
-            'army__role': 'N/A',
-            }
+    if not isinstance(dicts, dict):
+        return dicts
+
     for key, value in dicts.items():
         if isinstance(value, dict):
+            value = dict(flatten_subdicts(value))
             for subkey, subvalue in value.items():
-                if isinstance(subvalue, dict):
-                    for subsubkey, subsubvalue in subvalue.items():
-                        flat['%s__%s__%s' % (key, subkey, subsubkey)] = subsubvalue
-                else:
-                    flat['%s__%s' % (key, subkey)] = subvalue
+                flat['%s__%s' % (key, subkey)] = subvalue
         else:
             flat[key] = value
     return flat
@@ -91,7 +83,6 @@ class ERepublik(callbacks.Plugin):
                 data = json.load(utils.web.getUrlFd(base % (name, key)))
                 return data
             except:
-                raise
                 irc.error(_('This battle does not exist.'), Raise=True)
 
         def _advinfo(self, irc, msg, args, format_, name):
@@ -99,12 +90,8 @@ class ERepublik(callbacks.Plugin):
 
             Returns informations about a battle with advanced formating."""
             battle = flatten_subdicts(self._get(irc, name))
-            try:
-                repl = lambda x:Template(x).safe_substitute(battle)
-                irc.replies(map(repl, format_.split('\\n')))
-            except KeyError:
-                raise
-                irc.error(_('Invalid format.'), Raise=True)
+            repl = lambda x:Template(x).safe_substitute(battle)
+            irc.replies(map(repl, format_.split('\\n')))
         advinfo = wrap(_advinfo, ['something', 'int'])
 
         def active(self, irc, msg, args):
@@ -162,20 +149,22 @@ class ERepublik(callbacks.Plugin):
                     data = json.load(utils.web.getUrlFd(base % (name, key)))
                     return self._get(irc, str(data[0]['id']))
             except:
-                raise
                 irc.error(_('This citizen does not exist.'), Raise=True)
 
         def _advinfo(self, irc, msg, args, format_, name):
             """<format> <name|id>
 
             Returns informations about a citizen with advanced formating."""
-            citizen = flatten_subdicts(self._get(irc, name))
-            try:
-                repl = lambda x:Template(x).safe_substitute(citizen)
-                irc.replies(map(repl, format_.split('\\n')))
-            except KeyError:
-                raise
-                irc.error(_('Invalid format.'), Raise=True)
+            citizen = flatten_subdicts(self._get(irc, name), flat={
+                    'party__name': 'None',
+                    'party__id': 0,
+                    'party__role': 'N/A',
+                    'army__name': 'None',
+                    'army__id': 0,
+                    'army__role': 'N/A',
+                    })
+            repl = lambda x:Template(x).safe_substitute(citizen)
+            irc.replies(map(repl, format_.split('\\n')))
         advinfo = wrap(_advinfo, ['something', 'text'])
 
         def _gen(format_, name, doc):
@@ -237,7 +226,6 @@ class ERepublik(callbacks.Plugin):
                     (name, 'society', key))))
                 return data
             except:
-                raise
                 irc.error(_('This country does not exist.'), Raise=True)
 
         def _advinfo(self, irc, msg, args, format_, name):
@@ -245,12 +233,8 @@ class ERepublik(callbacks.Plugin):
 
             Returns informations about a country with advanced formating."""
             country = flatten_subdicts(self._get(irc, name))
-            try:
-                repl = lambda x:Template(x).safe_substitute(country)
-                irc.replies(map(repl, format_.split('\\n')))
-            except KeyError:
-                raise
-                irc.error(_('Invalid format.'), Raise=True)
+            repl = lambda x:Template(x).safe_substitute(country)
+            irc.replies(map(repl, format_.split('\\n')))
         advinfo = wrap(_advinfo, ['something', 'something'])
 
         def _gen(format_, name, doc):
@@ -280,7 +264,6 @@ class ERepublik(callbacks.Plugin):
                 data = json.load(utils.web.getUrlFd(base % (ids, key)))
                 return data
             except:
-                raise
                 irc.error(_('This job market does not exist.'), Raise=True)
 
         def _advinfo(self, irc, msg, args, format_,
@@ -289,12 +272,8 @@ class ERepublik(callbacks.Plugin):
 
             Returns informations about a job market with advanced formating."""
             jobmarket = flatten_subdicts(self._get(irc, name))
-            try:
-                repl = lambda x:Template(x).safe_substitute(jobmarket)
-                irc.replies(map(repl, format_.split('\\n')))
-            except KeyError:
-                raise
-                irc.error(_('Invalid format.'), Raise=True)
+            repl = lambda x:Template(x).safe_substitute(jobmarket)
+            irc.replies(map(repl, format_.split('\\n')))
         advinfo = wrap(_advinfo, ['something', 'something', optional('int')])
 
         def _gen(format_, name, doc):
@@ -324,7 +303,6 @@ class ERepublik(callbacks.Plugin):
                 data = json.load(utils.web.getUrlFd(base % (ids, key)))
                 return data
             except:
-                raise
                 irc.error(_('This market does not exist.'), Raise=True)
 
         def _advinfo(self, irc, msg, args, format_,
@@ -333,12 +311,8 @@ class ERepublik(callbacks.Plugin):
 
             Returns informations about a market with advanced formating."""
             market = flatten_subdicts(self._get(irc, name))
-            try:
-                repl = lambda x:Template(x).safe_substitute(market)
-                irc.replies(map(repl, format_.split('\\n')))
-            except KeyError:
-                raise
-                irc.error(_('Invalid format.'), Raise=True)
+            repl = lambda x:Template(x).safe_substitute(market)
+            irc.replies(map(repl, format_.split('\\n')))
         advinfo = wrap(_advinfo, ['something', 'something', 'something',
             'int', optional('int')])
 
@@ -368,7 +342,6 @@ class ERepublik(callbacks.Plugin):
                 data = json.load(utils.web.getUrlFd(base % (name, key)))
                 return data
             except:
-                raise
                 irc.error(_('This Military Unit does not exist.'), Raise=True)
 
         def _advinfo(self, irc, msg, args, format_, name):
@@ -376,12 +349,8 @@ class ERepublik(callbacks.Plugin):
 
             Returns informations about a Military Unit with advanced formating."""
             mu = flatten_subdicts(self._get(irc, name))
-            try:
-                repl = lambda x:Template(x).safe_substitute(mu)
-                irc.replies(map(repl, format_.split('\\n')))
-            except KeyError:
-                raise
-                irc.error(_('Invalid format.'), Raise=True)
+            repl = lambda x:Template(x).safe_substitute(mu)
+            irc.replies(map(repl, format_.split('\\n')))
         advinfo = wrap(_advinfo, ['something', 'int'])
 
         def _gen(format_, name, doc):
@@ -409,7 +378,6 @@ class ERepublik(callbacks.Plugin):
                 data = json.load(utils.web.getUrlFd(base % (name, key)))
                 return data
             except:
-                raise
                 irc.error(_('This party does not exist.'), Raise=True)
 
         def _advinfo(self, irc, msg, args, format_, name):
@@ -417,12 +385,8 @@ class ERepublik(callbacks.Plugin):
 
             Returns informations about a party with advanced formating."""
             party = flatten_subdicts(self._get(irc, name))
-            try:
-                repl = lambda x:Template(x).safe_substitute(party)
-                irc.replies(map(repl, format_.split('\\n')))
-            except KeyError:
-                raise
-                irc.error(_('Invalid format.'), Raise=True)
+            repl = lambda x:Template(x).safe_substitute(party)
+            irc.replies(map(repl, format_.split('\\n')))
         advinfo = wrap(_advinfo, ['something', 'int'])
 
         def _gen(format_, name, doc):
