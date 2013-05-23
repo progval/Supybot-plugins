@@ -114,7 +114,7 @@ class ERepublik(callbacks.Plugin):
             key = conf.supybot.plugins.ERepublik.apikey()
             base = 'http://api.erpk.org/battle/active.json?key=%s'
             data = json.load(utils.web.getUrlFd(base % key))
-            irc.reply(format('%L', data))
+            irc.reply(format('%L', map(str, data)))
         active = wrap(active)
 
         def calc(self, irc, msg, args, name):
