@@ -117,6 +117,19 @@ class ERepublik(callbacks.Plugin):
             irc.reply(format('%L', data))
         active = wrap(active)
 
+        def calc(self, irc, msg, args, name):
+            """<name|id>
+
+            Calculates how many damages you can make in one hit."""
+            citizen = ERepublik.citizen()._get(irc, name)
+            rank = citizen['rank']['level']
+            strength = citizen['strength']
+            dmg = (((float (rank-1) / 20) + 0.3) * ((strength / 10) +40))
+            format_ = 'Q%i: \x02%i\x02'
+            irc.reply(', '.join(map(lambda x: format_ % (x, dmg*(1+(0.2*x))),
+                xrange(0, 8))))
+        calc = wrap(calc, ['text'])
+
 
         def _gen(format_, name, doc):
             format_ = re.sub('[ \n]+', ' ', format_)
