@@ -53,12 +53,7 @@ def flatten_subdicts(dicts, flat={}):
     """Change dict of dicts into a dict of strings/integers. Useful for
     using in string formatting."""
     if isinstance(dicts, list):
-        for i, dict_ in enumerate(dicts):
-            for key, value in dict_.items():
-                flat['%i__%s' % (i, key)] = flatten_subdicts(value)
-        print repr(flat)
-        print '1__id' in flat
-        return flat
+        return flatten_subdicts(dict(enumerate(dicts)))
     elif isinstance(dicts, dict):
         for key, value in dicts.items():
             if isinstance(value, dict):
