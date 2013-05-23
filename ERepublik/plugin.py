@@ -75,6 +75,62 @@ def flatten_subdicts(dicts):
 class ERepublik(callbacks.Plugin):
     threaded = True
 
+
+    ##############################################################
+    # Battle
+    ##############################################################
+
+    class battle(callbacks.Commands):
+        def _get(self, irc, name):
+            key = conf.supybot.plugins.ERepublik.apikey()
+            if not key:
+                irc.error(_('No API key set. Ask the owner to add one.'),
+                        Raise=True)
+            try:
+                base = 'http://api.erpk.org/battle/%s.json?key=%s'
+                data = json.load(utils.web.getUrlFd(base % (name, key)))
+                return data
+            except:
+                raise
+                irc.error(_('This battle does not exist.'), Raise=True)
+
+        def _advinfo(self, irc, msg, args, format_, name):
+            """<format> <id>
+
+            Returns informations about a battle with advanced formating."""
+            battle = flatten_subdicts(self._get(irc, name))
+            try:
+                repl = lambda x:Template(x).safe_substitute(battle)
+                irc.replies(map(repl, format_.split('\\n')))
+            except KeyError:
+                raise
+                irc.error(_('Invalid format.'), Raise=True)
+        advinfo = wrap(_advinfo, ['something', 'int'])
+
+        def active(self, irc, msg, args, name):
+            """takes no arguments
+
+            Returns list of active battles."""
+            key = conf.supybot.plugins.ERepublik.apikey()
+            base = 'http://api.erpk.org/battle/active.json?key=%s'
+            data = json.load(utils.web.getUrlFd(base % key))
+            irc.reply(format('%L', data))
+        active = wrap(active)
+
+
+        def _gen(format_, name, doc):
+            format_ = re.sub('[ \n]+', ' ', format_)
+            def f(self, irc, msg, args, *ids):
+                self._advinfo(irc, msg, args, format_, *ids)
+            f.__doc__ = """<id>
+
+            %s""" % doc
+            return wrap(f, ['int'], name=name)
+
+    ##############################################################
+    # Citizen
+    ##############################################################
+
     class citizen(callbacks.Commands):
         def _get(self, irc, name):
             key = conf.supybot.plugins.ERepublik.apikey()
@@ -111,8 +167,8 @@ class ERepublik(callbacks.Plugin):
 
         def _gen(format_, name, doc):
             format_ = re.sub('[ \n]+', ' ', format_)
-            def f(self, irc, msg, args, sequence):
-                self._advinfo(irc, msg, args, format_, sequence)
+            def f(self, irc, msg, args, *ids):
+                self._advinfo(irc, msg, args, format_, *ids)
             f.__doc__ = """<name|id>
 
             %s""" % doc
@@ -149,6 +205,221 @@ class ERepublik(callbacks.Plugin):
                       (name, ', '.join(medals)))
         medals = wrap(medals, ['text'])
 
+
+    ##############################################################
+    # Country
+    ##############################################################
+
+    class country(callbacks.Commands):
+        def _get(self, irc, name):
+            key = conf.supybot.plugins.ERepublik.apikey()
+            if not key:
+                irc.error(_('No API key set. Ask the owner to add one.'),
+                        Raise=True)
+            try:
+                base = 'http://api.erpk.org/country/%s/%s.json?key=%s'
+                data = json.load(utils.web.getUrlFd(base %
+                    (name, 'economy', key)))
+                data.update(json.load(utils.web.getUrlFd(base %
+                    (name, 'society', key))))
+                return data
+            except:
+                raise
+                irc.error(_('This country does not exist.'), Raise=True)
+
+        def _advinfo(self, irc, msg, args, format_, name):
+            """<format> <code>
+
+            Returns informations about a country with advanced formating."""
+            country = flatten_subdicts(self._get(irc, name))
+            try:
+                repl = lambda x:Template(x).safe_substitute(country)
+                irc.replies(map(repl, format_.split('\\n')))
+            except KeyError:
+                raise
+                irc.error(_('Invalid format.'), Raise=True)
+        advinfo = wrap(_advinfo, ['something', 'something'])
+
+        def _gen(format_, name, doc):
+            format_ = re.sub('[ \n]+', ' ', format_)
+            def f(self, irc, msg, args, *ids):
+                self._advinfo(irc, msg, args, format_, *ids)
+            f.__doc__ = """<code>
+
+            %s""" % doc
+            return wrap(f, ['something'], name=name)
+
+
+    ##############################################################
+    # Job market
+    ##############################################################
+
+    class jobmarket(callbacks.Commands):
+        def _get(self, irc, country, page):
+            page = page or 1
+            key = conf.supybot.plugins.ERepublik.apikey()
+            if not key:
+                irc.error(_('No API key set. Ask the owner to add one.'),
+                        Raise=True)
+            try:
+                base = 'http://api.erpk.org/jobmarket/%s.json?key=%s'
+                ids = '/'.join((country, page))
+                data = json.load(utils.web.getUrlFd(base % (ids, key)))
+                return data
+            except:
+                raise
+                irc.error(_('This job market does not exist.'), Raise=True)
+
+        def _advinfo(self, irc, msg, args, format_,
+                country, industry, quality, page):
+            """<format> <country> [<page>]
+
+            Returns informations about a job market with advanced formating."""
+            jobmarket = flatten_subdicts(self._get(irc, name))
+            try:
+                repl = lambda x:Template(x).safe_substitute(jobmarket)
+                irc.replies(map(repl, format_.split('\\n')))
+            except KeyError:
+                raise
+                irc.error(_('Invalid format.'), Raise=True)
+        advinfo = wrap(_advinfo, ['something', 'something', optional('int')])
+
+        def _gen(format_, name, doc):
+            format_ = re.sub('[ \n]+', ' ', format_)
+            def f(self, irc, msg, args, *ids):
+                self._advinfo(irc, msg, args, format_, *ids)
+            f.__doc__ = """<format> <country> [<page>]
+
+            %s""" % doc
+            return wrap(f, ['something', optional('int')], name=name)
+
+
+    ##############################################################
+    # Market
+    ##############################################################
+
+    class market(callbacks.Commands):
+        def _get(self, irc, country, industry, quality, page):
+            page = page or 1
+            key = conf.supybot.plugins.ERepublik.apikey()
+            if not key:
+                irc.error(_('No API key set. Ask the owner to add one.'),
+                        Raise=True)
+            try:
+                base = 'http://api.erpk.org/market/%s.json?key=%s'
+                ids = '/'.join((country, industry, quality, page))
+                data = json.load(utils.web.getUrlFd(base % (ids, key)))
+                return data
+            except:
+                raise
+                irc.error(_('This market does not exist.'), Raise=True)
+
+        def _advinfo(self, irc, msg, args, format_,
+                country, industry, quality, page):
+            """<format> <country> <industry> <quality> [<page>]
+
+            Returns informations about a market with advanced formating."""
+            market = flatten_subdicts(self._get(irc, name))
+            try:
+                repl = lambda x:Template(x).safe_substitute(market)
+                irc.replies(map(repl, format_.split('\\n')))
+            except KeyError:
+                raise
+                irc.error(_('Invalid format.'), Raise=True)
+        advinfo = wrap(_advinfo, ['something', 'something', 'something',
+            'int', optional('int')])
+
+        def _gen(format_, name, doc):
+            format_ = re.sub('[ \n]+', ' ', format_)
+            def f(self, irc, msg, args, *ids):
+                self._advinfo(irc, msg, args, format_, *ids)
+            f.__doc__ = """<format> <country> <industry> <quality> [<page>]
+
+            %s""" % doc
+            return wrap(f, ['something', 'something', 'int', optional('int')],
+                    name=name)
+
+
+    ##############################################################
+    # Mu
+    ##############################################################
+
+    class mu(callbacks.Commands):
+        def _get(self, irc, name):
+            key = conf.supybot.plugins.ERepublik.apikey()
+            if not key:
+                irc.error(_('No API key set. Ask the owner to add one.'),
+                        Raise=True)
+            try:
+                base = 'http://api.erpk.org/mu/%s.json?key=%s'
+                data = json.load(utils.web.getUrlFd(base % (name, key)))
+                return data
+            except:
+                raise
+                irc.error(_('This Military Unit does not exist.'), Raise=True)
+
+        def _advinfo(self, irc, msg, args, format_, name):
+            """<format> <id>
+
+            Returns informations about a Military Unit with advanced formating."""
+            mu = flatten_subdicts(self._get(irc, name))
+            try:
+                repl = lambda x:Template(x).safe_substitute(mu)
+                irc.replies(map(repl, format_.split('\\n')))
+            except KeyError:
+                raise
+                irc.error(_('Invalid format.'), Raise=True)
+        advinfo = wrap(_advinfo, ['something', 'int'])
+
+        def _gen(format_, name, doc):
+            format_ = re.sub('[ \n]+', ' ', format_)
+            def f(self, irc, msg, args, *ids):
+                self._advinfo(irc, msg, args, format_, *ids)
+            f.__doc__ = """<id>
+
+            %s""" % doc
+            return wrap(f, ['int'], name=name)
+
+
+    ##############################################################
+    # Party
+    ##############################################################
+
+    class party(callbacks.Commands):
+        def _get(self, irc, name):
+            key = conf.supybot.plugins.ERepublik.apikey()
+            if not key:
+                irc.error(_('No API key set. Ask the owner to add one.'),
+                        Raise=True)
+            try:
+                base = 'http://api.erpk.org/party/%s.json?key=%s'
+                data = json.load(utils.web.getUrlFd(base % (name, key)))
+                return data
+            except:
+                raise
+                irc.error(_('This party does not exist.'), Raise=True)
+
+        def _advinfo(self, irc, msg, args, format_, name):
+            """<format> <id>
+
+            Returns informations about a party with advanced formating."""
+            party = flatten_subdicts(self._get(irc, name))
+            try:
+                repl = lambda x:Template(x).safe_substitute(party)
+                irc.replies(map(repl, format_.split('\\n')))
+            except KeyError:
+                raise
+                irc.error(_('Invalid format.'), Raise=True)
+        advinfo = wrap(_advinfo, ['something', 'int'])
+
+        def _gen(format_, name, doc):
+            format_ = re.sub('[ \n]+', ' ', format_)
+            def f(self, irc, msg, args, *ids):
+                self._advinfo(irc, msg, args, format_, *ids)
+            f.__doc__ = """<id>
+
+            %s""" % doc
+            return wrap(f, ['int'], name=name)
 
 ERepublik = internationalizeDocstring(ERepublik)
 Class = ERepublik
