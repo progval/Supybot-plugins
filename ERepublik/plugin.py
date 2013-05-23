@@ -107,7 +107,7 @@ class ERepublik(callbacks.Plugin):
                 irc.error(_('Invalid format.'), Raise=True)
         advinfo = wrap(_advinfo, ['something', 'int'])
 
-        def active(self, irc, msg, args, name):
+        def active(self, irc, msg, args):
             """takes no arguments
 
             Returns list of active battles."""
