@@ -139,6 +139,10 @@ class ERepublik(callbacks.Plugin):
 
             %s""" % doc
             return wrap(f, ['int'], name=name)
+            
+        battle = _gen("""Region: \x02\x0310$region__name\x02 \x03(URL:\x02\x0310 $url\x03\x02)\x0310,\\n\x03Total Points: \x02\x0310$attacker__name\x03 .: \x0310$attacker__points \x03.::. \x0304$defender__points \x03:.\x0304 $defender__name. """,
+        'battle',
+        'Returns general informations about a citizen.')
 
     ##############################################################
     # Citizen
@@ -258,6 +262,14 @@ class ERepublik(callbacks.Plugin):
 
             %s""" % doc
             return wrap(f, ['something'], name=name)
+            
+        society = _gen("""\x02Country: \x0310$name \x03(URL:\x0310 http://www.erepublik.com/en/country/society/$name\x03) \\n\x02\x03Active citizens \x0310$active_citizens,000\x03, \x03Online now \x0310$online_now\x03, \x03New citizens today \x0310$new_citizens_today\x03. """,
+        'society',
+        'Returns link informations about a citizen.')
+
+        economy = _gen("""\x02Country: \x0310$name \x03(URL:\x0310 http://www.erepublik.com/en/country/economy/$name\x03) \\n\x02\x03Economy \x0310$treasury__gold Gold - $treasury__cc CC \x03, \x03Taxes import: -Food \x0310$taxes__food__import\x03, -Weapons \x0310$taxes__weapons__import\x03, -Tickets \x0310$taxes__tickets__import\x03, -Frm \x0310$taxes__frm__import\x03, -Wrm \x0310$taxes__wrm__import\x03, -Hospital \x0310$taxes__hospital__import\x03, -Defense \x0310$taxes__defense__import\x03. """,
+        'society',
+        'Returns link informations about a citizen.')
 
 
     ##############################################################
