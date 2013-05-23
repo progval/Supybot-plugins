@@ -48,22 +48,6 @@ except:
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
 
-def getCitizen(irc, name):
-    try:
-        if name.isdigit():
-            base = 'http://api.erpk.org/citizen/profile/%s.json?key=APIKEY'
-            data = json.load(utils.web.getUrlFd(base % name))
-            color = 3 if data['online'] else 4
-            data['name'] = '\x030%i%s\x03' % (color, data['name'])
-            return data
-        else:
-            base = 'http://api.erpk.org/citizen/search/%s/1.json?key=APIKEY'
-            data = json.load(utils.web.getUrlFd(base % name))
-            return getCitizen(irc, str(data[0]['id']))
-    except:
-        raise
-        irc.error(_('This citizen does not exist.'), Raise=True)
-
 def flatten_subdicts(dicts):
     """Change dict of dicts into a dict of strings/integers. Useful for
     using in string formatting."""
@@ -90,11 +74,31 @@ def flatten_subdicts(dicts):
 class ERepublik(callbacks.Plugin):
     threaded = True
 
+    def _getCitizen(self, irc, name):
+        key = self.registryValue('apikey')
+        if not key:
+            irc.error(_('No API key set. Ask the owner to add one.'),
+                    Raise=True)
+        try:
+            if name.isdigit():
+                base = 'http://api.erpk.org/citizen/profile/%s.json?key=%s'
+                data = json.load(utils.web.getUrlFd(base % (name, key)))
+                color = 3 if data['online'] else 4
+                data['name'] = '\x030%i%s\x0f' % (color, data['name'])
+                return data
+            else:
+                base = 'http://api.erpk.org/citizen/search/%s/1.json?key=%s'
+                data = json.load(utils.web.getUrlFd(base % (name, key)))
+                return self._getCitizen(irc, str(data[0]['id']))
+        except:
+            raise
+            irc.error(_('This citizen does not exist.'), Raise=True)
+
     def _advinfo(self, irc, msg, args, format_, name):
         """<format> <name|id>
 
         Returns informations about a citizen with advanced formating."""
-        citizen = flatten_subdicts(getCitizen(irc, name))
+        citizen = flatten_subdicts(self._getCitizen(irc, name))
         try:
             repl = lambda x:Template(x).safe_substitute(citizen)
             irc.replies(map(repl, format_.split('\\n')))
@@ -137,7 +141,7 @@ class ERepublik(callbacks.Plugin):
         """<name|id>
 
         Displays the citizen's medals."""
-        citizen = getCitizen(irc, name)
+        citizen = self._getCitizen(irc, name)
         medals = ['%s (%i)' % x for x in citizen['medals'].items() if x[1]]
         irc.reply(_('%s has the following medal(s): %s') %
                   (name, ', '.join(medals)))

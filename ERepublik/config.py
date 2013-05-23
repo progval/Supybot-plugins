@@ -54,5 +54,8 @@ ERepublik = conf.registerPlugin('ERepublik')
 # conf.registerGlobalValue(ERepublik, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
 
+conf.registerGlobalValue(ERepublik, 'apikey',
+    registry.String('', _("""The API key."""), private=True))
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
