@@ -31,7 +31,7 @@
 import re
 import json
 
-from string import Template
+import string
 
 import supybot.conf as conf
 import supybot.utils as utils
@@ -52,17 +52,30 @@ except:
 def flatten_subdicts(dicts, flat={}):
     """Change dict of dicts into a dict of strings/integers. Useful for
     using in string formatting."""
-    if not isinstance(dicts, dict):
+    if isinstance(dicts, list):
+        for i, dict_ in enumerate(dicts):
+            for key, value in dict_.items():
+                flat['%i__%s' % (i, key)] = flatten_subdicts(value)
+        print repr(flat)
+        print '1__id' in flat
+        return flat
+    elif isinstance(dicts, dict):
+        for key, value in dicts.items():
+            if isinstance(value, dict):
+                value = dict(flatten_subdicts(value))
+                for subkey, subvalue in value.items():
+                    flat['%s__%s' % (key, subkey)] = subvalue
+            else:
+                flat[key] = value
+        return flat
+    else:
         return dicts
 
-    for key, value in dicts.items():
-        if isinstance(value, dict):
-            value = dict(flatten_subdicts(value))
-            for subkey, subvalue in value.items():
-                flat['%s__%s' % (key, subkey)] = subvalue
-        else:
-            flat[key] = value
-    return flat
+
+class Template(string.Template):
+    # Original string.Template does not accept variables starting with a
+    # number.
+    idpattern = r'[_a-z0-9]+'
 
 class ERepublik(callbacks.Plugin):
     threaded = True
@@ -260,7 +273,7 @@ class ERepublik(callbacks.Plugin):
                         Raise=True)
             try:
                 base = 'http://api.erpk.org/jobmarket/%s.json?key=%s'
-                ids = '/'.join((country, page))
+                ids = '/'.join((country, str(page)))
                 data = json.load(utils.web.getUrlFd(base % (ids, key)))
                 return data
             except:
@@ -299,18 +312,17 @@ class ERepublik(callbacks.Plugin):
                         Raise=True)
             try:
                 base = 'http://api.erpk.org/market/%s.json?key=%s'
-                ids = '/'.join((country, industry, quality, page))
+                ids = '/'.join((country, industry, str(quality), str(page)))
                 data = json.load(utils.web.getUrlFd(base % (ids, key)))
                 return data
             except:
                 irc.error(_('This market does not exist.'), Raise=True)
 
-        def _advinfo(self, irc, msg, args, format_,
-                country, industry, quality, page):
+        def _advinfo(self, irc, msg, args, format_, *ids):
             """<format> <country> <industry> <quality> [<page>]
 
             Returns informations about a market with advanced formating."""
-            market = flatten_subdicts(self._get(irc, name))
+            market = flatten_subdicts(self._get(irc, *ids))
             repl = lambda x:Template(x).safe_substitute(market)
             irc.replies(map(repl, format_.split('\\n')))
         advinfo = wrap(_advinfo, ['something', 'something', 'something',
