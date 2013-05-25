@@ -70,7 +70,7 @@ class Iwant(callbacks.Plugin):
         wishlist.append(thing)
         self.setRegistryValue('wishlist', serialize(wishlist), channel)
         irc.replySuccess()
-    iwant = wrap(iwant, ['channel', 'something'])
+    iwant = wrap(iwant, ['channel', 'text'])
 
     @internationalizeDocstring
     def list(self, irc, msg, args, channel):
