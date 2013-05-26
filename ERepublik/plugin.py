@@ -142,7 +142,7 @@ class ERepublik(callbacks.Plugin):
             
         battle = _gen("""Region: \x02\x0310$region__name\x02 \x03(URL:\x02\x0310 $url\x03\x02)\x0310,\\n\x03Total Points: \x02\x0310$attacker__name\x03 .: \x0310$attacker__points \x03.::. \x0304$defender__points \x03:.\x0304 $defender__name. """,
         'battle',
-        'Returns general informations about a citizen.')
+        'Returns general informations about a battle.')
 
     ##############################################################
     # Citizen
