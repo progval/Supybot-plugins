@@ -123,10 +123,10 @@ def fetch(method, maxIds, name):
         return []
 
     if maxIds[name] is None:
-        maxIds[name] = tweets[-1].id
+        maxIds[name] = tweets[0].id
         return []
     else:
-        maxIds[name] = tweets[-1].id
+        maxIds[name] = tweets[0].id
         return tweets
 
 
