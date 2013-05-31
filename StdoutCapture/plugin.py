@@ -79,6 +79,8 @@ class StdoutCapture(callbacks.Plugin):
         assert isinstance(sys.stdout, self.StdoutBuffer)
         for logger in logging._handlerList:
             logger = logger()
+            if not hasattr(logger, 'stream'):
+                continue
             if logger.stream is sys.stdout:
                 logger.stream = sys.stderr._real
             elif logger.stream is sys.stderr:
