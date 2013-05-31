@@ -102,6 +102,9 @@ class ChannelStatusCallback(httpserver.SupyHTTPServerCallback):
             channels.sort()
             self.wfile.write(template % {'channels': ('\n'.join(channels))})
         elif len(parts) == 2:
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
             (channel, network) = urllib.unquote(parts[0]).split('@')
             if not ircutils.isChannel(channel):
                 self._invalidChannel()
