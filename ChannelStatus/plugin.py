@@ -65,6 +65,8 @@ DEFAULT_TEMPLATES = {
         'channelstatus/channel.html': PAGE_SKELETON % """\
 <body class="purelisting">
     <h1>%(channel)s@%(network)s</h1>
+    <h2>Topic</h2>
+    %(topic)s
     <h2>Users</h2>
     %(nicks)s
 </body>""",
@@ -104,18 +106,21 @@ class ChannelStatusCallback(httpserver.SupyHTTPServerCallback):
             if not ircutils.isChannel(channel):
                 self._invalidChannel()
                 return
+            for irc in world.ircs:
+                if irc.network == network:
+                    break
+            if irc.network != network or channel not in irc.state.channels:
+                self._invalidChannel()
+                return
+            state = irc.state.channels[channel]
             replacements = {'channel': channel, 'network': network,
-                    'nicks': _('Private')}
+                    'nicks': _('Private'), 'topic': _('Private')}
+            if self._plugin.registryValue('topic', channel):
+                replacements['topic'] = state.topic
             if self._plugin.registryValue('nicks', channel):
-                for irc in world.ircs:
-                    if irc.network == network:
-                        break
-                if irc.network != network or channel not in irc.state.channels:
-                    self._invalidChannel()
-                    return
                 replacements['nicks'] = '<ul>' + \
                         '\n'.join(sorted(['<li>%s</li>' % x
-                            for x in irc.state.channels[channel].users])) + \
+                            for x in state.users])) + \
                         '</ul>'
             template = httpserver.get_template('channelstatus/channel.html')
             self.wfile.write(template % replacements)
