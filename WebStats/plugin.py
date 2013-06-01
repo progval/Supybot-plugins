@@ -190,12 +190,10 @@ PAGE_SKELETON = """\
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>Supybot WebStats</title>
+        <link rel="stylesheet" media="screen" type="text/css" title="Design" href="/default.css" />
         <link rel="stylesheet" media="screen" type="text/css" title="Design" href="/webstats/design.css" />
     </head>
-    <body>
-        <p id="header">
-            WebStats
-        </p>
+    <body %%s>
 %%s
         <p id="footer">
             <a href="http://supybot.com">Supybot</a> and
@@ -217,36 +215,10 @@ li {
     list-style-type: none;
 }
 
-#header {
-    width: 100%;
-    font-size: 1.2em;
-    text-align: center;
-}
-
-#menu {
-    width: 100%;
-    font-size: 0.8em;
-    text-align: center;
-    margin: 0;
-    padding: 0;
-}
-
-#menu:before {
-    content: \"""" + _('Menu:') + """\";
-}
-
-#menu li {
-    display: inline;
-}
-
 #footer {
     width: 100%;
     font-size: 0.6em;
     text-align: right;
-}
-
-h1 {
-    text-align: center;
 }
 
 .chanslist li a:visited {
@@ -275,13 +247,13 @@ table {
     margin-top: auto;
     margin-bottom: auto;
 }""",
-        'webstats/index.html': PAGE_SKELETON % """\
+        'webstats/index.html': PAGE_SKELETON % ('class="purelisting"', """\
 <h1>%(title)s</h1>
 
 <ul class="chanslist">
 %(channels)s
-</ul>""",
-        'webstats/global.html': PAGE_SKELETON % """\
+</ul>"""),
+        'webstats/global.html': PAGE_SKELETON % ('', """\
 <h1>Stats about %(channel)s channel</h1>
 
 <p><a href="/webstats/nicks/%(escaped_channel)s/">View nick-by-nick stats</a></p>
@@ -289,8 +261,8 @@ table {
 
 <p>There were %(quick_stats)s</p>
 
-%(table)s""",
-        'webstats/nicks.html': PAGE_SKELETON % """\
+%(table)s"""),
+        'webstats/nicks.html': PAGE_SKELETON % ('', """\
 <h1>Stats about %(channel)s channel</h1>
 
 <p><a href="/webstats/global/%(escaped_channel)s/">View global stats</a></p>
@@ -299,7 +271,7 @@ table {
 %(table)s
 
 <p>%(pagination)s</p>
-""",
+"""),
 }
 
 httpserver.set_default_templates(DEFAULT_TEMPLATES)
