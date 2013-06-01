@@ -69,6 +69,8 @@ class StdoutCapture(callbacks.Plugin):
         # I'm being a bit evil here.
         for logger in logging._handlerList:
             logger = logger() # That's a weakref
+            if not hasattr(logger, 'stream'):
+                continue
             if logger.stream is sys.stdout._real:
                 logger.stream = sys.stderr
             elif logger.stream is sys.stderr._real:
