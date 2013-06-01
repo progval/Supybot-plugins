@@ -46,6 +46,7 @@ except:
     _ = lambda x:x
 
 PAGE_SKELETON = """\
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -80,7 +81,7 @@ class ChannelStatusCallback(httpserver.SupyHTTPServerCallback):
 
     def _invalidChannel(self):
         self.send_response(404)
-        self.send_header('Content-type', 'text/html')
+        self.send_header('Content-type', 'text/html; charset=utf-8')
         self.end_headers()
         self.wfile.write(httpserver.get_template('generic/error.html')%
             {'title': 'ChannelStatus - not a channel',
@@ -90,7 +91,7 @@ class ChannelStatusCallback(httpserver.SupyHTTPServerCallback):
         parts = path.split('/')[1:]
         if path == '/':
             self.send_response(200)
-            self.send_header('Content-type', 'text/html')
+            self.send_header('Content-type', 'text/html; charset=utf-8')
             self.end_headers()
             template = httpserver.get_template('channelstatus/index.html')
             channels = set()
@@ -114,7 +115,7 @@ class ChannelStatusCallback(httpserver.SupyHTTPServerCallback):
                 self._invalidChannel()
                 return
             self.send_response(200)
-            self.send_header('Content-type', 'text/html')
+            self.send_header('Content-type', 'text/html; charset=utf-8')
             self.end_headers()
             state = irc.state.channels[channel]
             replacements = {'channel': channel, 'network': network,
