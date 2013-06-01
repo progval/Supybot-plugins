@@ -33,8 +33,12 @@ import re
 import os
 import sys
 import time
+import urllib
 import random
 import datetime
+import pygraphviz
+from cStringIO import StringIO
+
 import supybot.conf as conf
 import supybot.world as world
 import supybot.log as log
@@ -70,19 +74,239 @@ except ImportError:
 
 DEBUG = False
 
-world.webStatsCacheLinks = {}
 testing = world.testing
+world.webStatsCacheLinks = {}
 
-def getTemplate(name):
-    if 'WebStats.templates.skeleton' in sys.modules:
-        reload(sys.modules['WebStats.templates.skeleton'])
-    if 'WebStats.templates.%s' % name in sys.modules:
-        reload(sys.modules['WebStats.templates.%s' % name])
-    module = __import__('WebStats.templates.%s' % name)
-    return getattr(getattr(module, 'templates'), name)
+#####################################################################
+# Utilities
+#####################################################################
 
 class FooException(Exception):
     pass
+
+if not hasattr(world, 'webStatsCacheLinks'):
+    world.webStatsCacheLinks = {}
+
+colors = ['green', 'red', 'orange', 'blue', 'black', 'gray50', 'indigo']
+
+def chooseColor(nick):
+    global colors
+    return random.choice(colors)
+
+def progressbar(item, max_):
+    template = """<td class="progressbar">
+                      <div class="text">%i</div>
+                      <div style="width: %ipx; background-color: %s"
+                      class="color"></div>
+                  </td>"""
+    try:
+        percent = round(float(item)/float(max_)*100)
+        color = round((100-percent)/10)*3+59
+        template %= (item, percent, '#ef%i%i' % (color, color))
+    except ZeroDivisionError:
+        template %= (item, 0, 'orange')
+    return template
+
+def fillTable(items, page, orderby=None):
+    output = ''
+    nbDisplayed = 0
+    max_ = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    for index in items:
+        for index_ in range(0, len(max_)):
+            max_[index_] = max(max_[index_], items[index][index_])
+    rowsList = []
+    while len(items) > 0:
+        maximumIndex = (0, 0, 0, 0, 0)
+        highScore = -1
+        for index in items:
+            if orderby is not None and items[index][orderby] > highScore:
+                maximumIndex = index
+                highScore = items[index][orderby]
+            if orderby is None and index < maximumIndex:
+                maximumIndex = index
+        item = items.pop(maximumIndex)
+        try:
+            int(index)
+            indexIsInt = True
+        except:
+            indexIsInt = False
+        if sum(item[0:1] + item[3:]) > 5 or indexIsInt:
+            rowsList.append((maximumIndex, item))
+            nbDisplayed += 1
+    for row in rowsList[int(page):int(page)+25]:
+        index, row = row
+        output += '<tr><td>%s</td>' % index
+        for cell in (progressbar(row[0], max_[0]),
+                     progressbar(row[1], max_[1]),
+                     progressbar(row[3], max_[3]),
+                     progressbar(row[4], max_[4]),
+                     progressbar(row[5], max_[5]),
+                     progressbar(row[6], max_[6]),
+                     progressbar(row[7], max_[7]),
+                     progressbar(row[8], max_[8])
+                     ):
+            output += cell
+        output += '</tr>'
+    return output, nbDisplayed
+
+headers = (_('Lines'), _('Words'), _('Joins'), _('Parts'),
+           _('Quits'), _('Nick changes'), _('Kicks'), _('Kicked'))
+tableHeaders = '<table><tr><th><a href="%s">%s</a></th>'
+for header in headers:
+    tableHeaders += '<th style="width: 150px;"><a href="%%s%s/">%s</a></th>' %\
+                    (header, header)
+tableHeaders += '</tr>'
+
+nameToColumnIndex = {_('lines'):0,_('words'):1,_('chars'):2,_('joins'):3,
+                     _('parts'):4,_('quits'):5,_('nick changes'):6,_('kickers'):7,
+                     _('kicked'):8,_('kicks'):7}
+def getTable(firstColumn, items, channel, urlLevel, page, orderby):
+    percentParameter = tuple()
+    for foo in range(1, len(tableHeaders.split('%s'))-1):
+        percentParameter += ('./' + '../'*(urlLevel-4),)
+        if len(percentParameter) == 1:
+            percentParameter += (firstColumn,)
+    output = tableHeaders % percentParameter
+    if orderby is not None:
+        orderby = urllib.unquote(orderby)
+        try:
+            index = nameToColumnIndex[orderby]
+            html, nbDisplayed = fillTable(items, page, index)
+        except KeyError:
+            orderby = None
+    if orderby is None:
+        html, nbDisplayed = fillTable(items, page)
+    output += html
+    output += '</table>'
+    return output, nbDisplayed
+
+#####################################################################
+# Templates
+#####################################################################
+
+PAGE_SKELETON = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Supybot WebStats</title>
+        <link rel="stylesheet" media="screen" type="text/css" title="Design" href="/webstats/design.css" />
+    </head>
+    <body>
+        <p id="header">
+            WebStats
+        </p>
+%%s
+        <p id="footer">
+            <a href="http://supybot.com">Supybot</a> and
+            <a href="https://github.com/ProgVal/Supybot-plugins/tree/master/WebStats/">WebStats</a> powered.<br />
+            Libre software available under BSD licence.<br />
+            Page generated at %s.
+        </p>
+    </body>
+</html>
+""" % time.strftime('%H:%M:%S')
+
+DEFAULT_TEMPLATES = {
+        'webstats/design.css': """\
+body, html {
+    text-align: center;
+}
+
+li {
+    list-style-type: none;
+}
+
+#header {
+    width: 100%;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+#menu {
+    width: 100%;
+    font-size: 0.8em;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+#menu:before {
+    content: \"""" + _('Menu:') + """\";
+}
+
+#menu li {
+    display: inline;
+}
+
+#footer {
+    width: 100%;
+    font-size: 0.6em;
+    text-align: right;
+}
+
+h1 {
+    text-align: center;
+}
+
+.chanslist li a:visited {
+    color: blue;
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+}
+.progressbar {
+    border: orange 1px solid;
+    height: 20px;
+}
+.progressbar .color {
+    background-color: orange;
+    height: 20px;
+    text-align: center;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+.progressbar .text {
+    position: absolute;
+    width: 150px;
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
+}""",
+        'webstats/index.html': PAGE_SKELETON % """\
+<h1>%(title)s</h1>
+
+<ul class="chanslist">
+%(channels)s
+</ul>""",
+        'webstats/global.html': PAGE_SKELETON % """\
+<h1>Stats about %(channel)s channel</h1>
+
+<p><a href="/webstats/nicks/%(escaped_channel)s/">View nick-by-nick stats</a></p>
+<p><a href="/webstats/links/%(escaped_channel)s/">View links</a></p>
+
+<p>There were %(quick_stats)s</p>
+
+%(table)s""",
+        'webstats/nicks.html': PAGE_SKELETON % """\
+<h1>Stats about %(channel)s channel</h1>
+
+<p><a href="/webstats/global/%(escaped_channel)s/">View global stats</a></p>
+<p><a href="/webstats/links/%(escaped_channel)s/">View links</a></p>
+
+%(table)s
+
+<p>%(pagination)s</p>
+""",
+}
+
+httpserver.set_default_templates(DEFAULT_TEMPLATES)
+
+#####################################################################
+# Controller
+#####################################################################
 
 class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
     name = 'WebStats'
@@ -92,20 +316,15 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
         try:
             if path == '/design.css':
                 response = 200
-                content_type = 'text/css'
-                output = getTemplate('design').get(not testing)
+                content_type = 'text/css; charset=utf-8'
+                output = httpserver.get_template('webstats/design.css')
             elif path == '/':
                 response = 200
-                content_type = 'text/html'
-                output = getTemplate('index').get(not testing,
-                                                 self.db.getChannels())
-            elif path == '/%s/' % _('about'):
-                response = 200
-                content_type = 'text/html'
-                output = getTemplate('about').get(not testing)
+                content_type = 'text/html; charset=utf-8'
+                output = self.get_index()
             elif path == '/global/':
                 response = 404
-                content_type = 'text/html'
+                content_type = 'text/html; charset=utf-8'
                 output = """<p style="font-size: 20em">BAM!</p>
                 <p>You played with the URL, you lost.</p>"""
             elif splittedPath[1] in ('nicks', 'global', 'links') \
@@ -113,13 +332,13 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                     or splittedPath[1] == 'nicks' and \
                     path.endswith('.htm'):
                 response = 200
-                content_type = 'text/html'
+                content_type = 'text/html; charset=utf-8'
                 if splittedPath[1] == 'links':
                     try:
                         import pygraphviz
                         content_type = 'image/png'
                     except ImportError:
-                        content_type = 'text/plain'
+                        content_type = 'text/plain; charset=utf-8'
                         response = 501
                         self.send_response(response)
                         self.send_header('Content-type', content_type)
@@ -130,44 +349,174 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                         return
                 assert len(splittedPath) > 2
                 chanName = splittedPath[2].replace('%20', '#')
-                getTemplate('listingcommons') # Reload
                 page = splittedPath[-1][0:-len('.htm')]
                 if page == '':
                     page = '0'
+                if splittedPath[1] == 'nicks':
+                    formatter = self.get_nicks
+                elif splittedPath[1] == 'global':
+                    formatter = self.get_global
+                elif splittedPath[1] == 'links':
+                    formatter = self.get_links
+                else:
+                    raise AssertionError(splittedPath[1])
+                
                 if len(splittedPath) == 3:
                     _.loadLocale(self.plugin._getLanguage(chanName))
-                    output = getTemplate(splittedPath[1]).get(not testing,
-                                                           chanName,
-                                                           self.db,
-                                                           len(splittedPath),
-                                                           page)
+                    output = formatter(len(splittedPath), chanName, page)
                 else:
                     assert len(splittedPath) > 3
                     _.loadLocale(self.plugin._getLanguage(chanName))
-                    subdir = splittedPath[3]
-                    output = getTemplate(splittedPath[1]).get(not testing,
-                                                           chanName,
-                                                           self.db,
-                                                           len(splittedPath),
-                                                           page,
-                                                           subdir.lower())
+                    subdir = splittedPath[3].lower()
+                    output = formatter(len(splittedPath), chanName, page,
+                            subdir)
             else:
                 response = 404
-                content_type = 'text/html'
-                output = getTemplate('error404').get(not testing)
-        except FooException as  e:
+                content_type = 'text/html; charset=utf-8'
+                output = httpserver.get_template('generic/error.html') % \
+                    {'title': 'WebStats - not found',
+                     'error': 'Requested page is not found. Sorry.'}
+        except Exception as e:
             response = 500
-            content_type = 'text/html'
+            content_type = 'text/html; charset=utf-8'
             if output == '':
-                output = '<h1>Internal server error</h1>'
+                error = '<h1>Internal server error</h1>'
                 if DEBUG:
-                    output += '<p>The server raised this exception: %s</p>' % \
-                    repr(e)
+                    error = '<p>The server raised this exception: %s</p>' % \
+                            repr(e)
+                output = httpserver.get_template('generic/error.html') % \
+                    {'title': 'Internal server error',
+                     'error': error}
         finally:
             self.send_response(response)
             self.send_header('Content-type', content_type)
             self.end_headers()
-            self.wfile.write(output.encode())
+            if sys.version_info[0] >= 3:
+                output = output.encode()
+            self.wfile.write(output)
+
+    def get_index(self):
+        template = httpserver.get_template('webstats/index.html')
+        channels = self.db.getChannels()
+        if len(channels) == 0:
+            title = _('Stats available for no channels')
+        elif len(channels) == 1:
+            title = _('Stats available for a channel:')
+        else:
+            title = _('Stats available for channels:')
+        channels_html = ''
+        for channel in channels:
+            channels_html += ('<li><a href="/webstats/global/%s/" title="%s">'
+                         '%s</a></li>') % \
+                      (channel[1:].replace('#', ' '), # Strip the leading #
+                      _('View the stats for the %s channel') % channel,
+                      channel)
+        return template % {'title': title, 'channels': channels_html}
+
+    def get_global(self, urlLevel, channel, page, orderby=None):
+        template = httpserver.get_template('webstats/global.html')
+        channel = '#' + channel
+        items = self.db.getChanGlobalData(channel)
+        bound = self.db.getChanRecordingTimeBoundaries(channel)
+        hourly_items = self.db.getChanXXlyData(channel, 'hour')
+        replacement = {'channel': channel,
+                'escaped_channel': channel[1:].replace('#', ' '),
+                'quick_stats': utils.str.format(
+                    '%n, %n, %n, %n, %n, %n, %n, and %n.',
+                    (items[0], _('line')), (items[1], _('word')),
+                    (items[2], _('char')), (items[3], _('join')),
+                    (items[4], _('part')), (items[5], _('quit')),
+                    (items[6], _('nick change')),
+                    (items[8], _('kick'))),
+                'table': getTable(_('Hour'), hourly_items, channel, urlLevel,
+                    page, orderby)[0]
+                }
+        return template % replacement
+
+    def get_nicks(self, urlLevel, channel, page, orderby=None):
+        channel = '#' + channel
+        template = httpserver.get_template('webstats/nicks.html')
+        items = self.db.getChanGlobalData(channel)
+        bound = self.db.getChanRecordingTimeBoundaries(channel)
+        nickly_items = self.db.getChanNickGlobalData(channel, 20)
+        table, nbItems = getTable(_('Nick'), nickly_items, channel,
+                urlLevel, page, orderby)
+
+        page = int(page)
+        pagination = ''
+        if nbItems >= 25:
+            if page == 0:
+                pagination += '1 '
+            else:
+                pagination += '<a href="0.htm">1</a> '
+            if page > 100:
+                pagination += '... '
+            for i in range(int(max(1,page/25-3)),int(min(nbItems/25-1,page/25+3))):
+                if page != i*25-1:
+                    pagination += '<a href="%i.htm">%i</a> ' % (i*25-1, i*25)
+                else:
+                    pagination += '%i ' % (i*25)
+            if nbItems - page > 100:
+                pagination += '... '
+            if page == nbItems-24-1:
+                pagination += '%i' % (nbItems-24)
+            else:
+                pagination += '<a href="%i.htm">%i</a>' % (nbItems-24-1, nbItems-24)
+        replacement = {
+                'channel': channel,
+                'escaped_channel': channel[1:].replace('#', ' '),
+                'table': table,
+                'pagination': pagination,
+                }
+        return template % replacement
+
+    def get_links(self, urlLevel, channel, page, orderby=None):
+        cache = world.webStatsCacheLinks
+        channel = '#' + channel
+        items = self.db.getChanLinks(channel)
+        output = ''
+        if channel in cache and cache[channel][0] > time.time() - 3600:
+            output = cache[channel][1]
+        else:
+            graph = pygraphviz.AGraph(strict=False, directed=True,
+                                      start='regular', smoothing='spring',
+                                      size='40') # /!\ Size is in inches /!\
+            items = [(x,y,float(z)) for x,y,z in items]
+            if not items:
+                graph.add_node('No links for the moment.')
+                buffer_ = StringIO()
+                graph.draw(buffer_, prog='circo', format='png')
+                buffer_.seek(0)
+                output = buffer_.read()
+                return output
+            graph.add_node('#root#', style='invisible')
+            insertedNicks = {}
+            divideBy = max([z for x,y,z in items])/10
+            for item in items:
+                for i in (0, 1):
+                    if item[i] not in insertedNicks:
+                        try:
+                            insertedNicks.update({item[i]: chooseColor(item[i])})
+                            graph.add_node(item[i], color=insertedNicks[item[i]],
+                                           fontcolor=insertedNicks[item[i]])
+                            graph.add_edge(item[i], '#root#', style='invisible',
+                                           arrowsize=0, color='white')
+                        except: # Probably unicode issue
+                            pass
+                graph.add_edge(item[0], item[1], arrowhead='vee',
+                               color=insertedNicks[item[1]],
+                               penwidth=item[2]/divideBy,
+                               arrowsize=item[2]/divideBy/2+1)
+            buffer_ = StringIO()
+            graph.draw(buffer_, prog='circo', format='png')
+            buffer_.seek(0)
+            output = buffer_.read()
+            cache.update({channel: (time.time(), output)})
+        return output
+
+#####################################################################
+# Database
+#####################################################################
 
 class WebStatsDB:
     def __init__(self):
@@ -460,6 +809,10 @@ class WebStatsDB:
         for table in ('messages', 'moves', 'links_cache', 'chans_cache',
                 'nicks_cache'):
             cursor.execute('DELETE FROM %s WHERE chan=?' % table, (channel,))
+
+#####################################################################
+# Plugin
+#####################################################################
 
 class WebStats(callbacks.Plugin):
     def __init__(self, irc):
