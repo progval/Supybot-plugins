@@ -61,7 +61,6 @@ class Seeks(callbacks.Plugin):
             raise
             irc.error("Server's JSON is corrupted")
             return
-        print repr(content)
         snippets = content["snippets"]
         if len(snippets) == 0:
             irc.reply('No results')
