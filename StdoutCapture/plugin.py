@@ -83,10 +83,8 @@ class StdoutCapture(callbacks.Plugin):
             logger = logger()
             if not hasattr(logger, 'stream'):
                 continue
-            if logger.stream is sys.stdout:
-                logger.stream = sys.stderr._real
-            elif logger.stream is sys.stderr:
-                logger.stream = sys.stderr._real
+            if logger.stream in (sys.stdout, sys.stderr):
+                logger.stream = logger.stream._real
         sys.stdout = sys.stdout._real
         sys.stderr = sys.stderr._real
 
