@@ -71,7 +71,9 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
     def doPost(self, handler, path, form):
         if not handler.address_string().endswith('.rs.github.com') and \
                 not handler.address_string().endswith('.cloud-ips.com') and \
-                not handler.address_string() == 'localhost':
+                not handler.address_string() == 'localhost' and \
+                not handler.address_string().startswith('192.30.252.') and \
+                not handler.address_string().startswith('204.232.175.'):
             log.warning("""'%s' tried to act as a web hook for Github,
             but is not GitHub.""" % handler.address_string())
             self.send_response(403)
