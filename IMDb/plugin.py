@@ -11,15 +11,33 @@ import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 
+import sys
 import json
 import socket
-import urllib2
 import unicodedata
 from lxml import html
-from urllib import urlencode
+
+if sys.version_info[0] >= 3:
+    def u(s):
+        return s
+    import urllib
+    Request = urllib.request.Request
+    urlopen = urllib.request.urlopen
+    HTTPError = urllib.error.HTTPError
+    URLError = urllib.error.URLError
+    urlencode = urllib.parse.urlencode
+else:
+    import urllib2
+    from urllib import urlencode
+    Request = urllib2.Request
+    urlopen = urllib2.urlopen
+    HTTPError = urllib2.HTTPError
+    URLError = urllib2.URLError
+    def u(s):
+        return unicode(s, "unicode_escape")
 
 def unid(s):
-    if isinstance(s, unicode):
+    if sys.version_info[0] < 3 and isinstance(s, unicode):
         return unicodedata.normalize('NFKD', s).encode('ascii', 'ignore')
     else:
         return s
@@ -40,16 +58,16 @@ class IMDb(callbacks.Plugin):
 
         textencoded = urlencode({'q': 'site:http://www.imdb.com/title/ %s' % text})
         url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s' % (textencoded)
-        request = urllib2.Request(url)
+        request = Request(url)
         try:
-            page = urllib2.urlopen(request)
-        except socket.timeout, e:
+            page = urlopen(request)
+        except socket.timeout as e:
             irc.error('\x0304Connection timed out.\x03', prefixNick=False)
             return
-        except urllib2.HTTPError, e:
+        except HTTPError as e:
             irc.error('\x0304HTTP Error\x03', prefixNick=False)
             return
-        except urllib2.URLError, e:
+        except URLError as e:
             irc.error('\x0304URL Error\x03', prefixNick=False)
             return
 
@@ -70,18 +88,18 @@ class IMDb(callbacks.Plugin):
             irc.error('\x0304Couldnt find a title')
             return
 
-        request = urllib2.Request(imdb_url, 
+        request = Request(imdb_url, 
                 headers={'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:5.0) Gecko/20100101 Firefox/5.0',
                         'Accept-Language': 'en-us,en;q=0.5'})
         try:
-            page = urllib2.urlopen(request)
-        except socket.timeout, e:
+            page = urlopen(request)
+        except socket.timeout as e:
             irc.error('\x0304Connection timed out.\x03', prefixNick=False)
             return
-        except urllib2.HTTPError, e:
+        except HTTPError as e:
             irc.error('\x0304HTTP Error\x03', prefixNick=False)
             return
-        except urllib2.URLError, e:
+        except URLError as e:
             irc.error('\x0304URL Error\x03', prefixNick=False)
             return
 
@@ -110,7 +128,7 @@ class IMDb(callbacks.Plugin):
 
         elem = root.xpath('//div[h4="Plot Keywords:"]')
         if elem:
-            plot_keywords = unid(' '.join(elem[0].text_content().replace(u'\xbb', '').split()).strip().replace(' | See more', '').replace('Plot Keywords: ', ''))
+            plot_keywords = unid(' '.join(elem[0].text_content().replace(u('\xbb'), '').split()).strip().replace(' | See more', '').replace('Plot Keywords: ', ''))
         else:
             plot_keywords = ''
 
@@ -118,7 +136,7 @@ class IMDb(callbacks.Plugin):
         if elem:
             year = elem[0].text
         else:
-            year = unid(root.xpath('//h1[span/@itemprop="name"]/span[last()]')[0].text.strip().strip(')(').replace(u'\u2013', '-'))
+            year = unid(root.xpath('//h1[span/@itemprop="name"]/span[last()]')[0].text.strip().strip(')(').replace(u('\u2013', '-')))
 
         elem = root.xpath('//div[@class="star-box-details"]/strong/span|//div[@class="star-box-details"]/span[@class="mellow"]/span')
         if elem:
@@ -129,7 +147,7 @@ class IMDb(callbacks.Plugin):
         elem = root.xpath('//p[@itemprop="description"]')
         if elem:
             description = elem[0].text_content()
-            description = unid(description.replace(u'\xbb', '').strip().replace('See full summary', '').strip())
+            description = unid(description.replace(u('\xbb'), '').strip().replace('See full summary', '').strip())
         else:
             description = ''
 
