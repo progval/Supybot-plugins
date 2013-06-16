@@ -59,6 +59,13 @@ except:
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
 
+if sys.version_info[0] >= 3:
+    def b(s):
+        return s.encode('utf-8')
+else:
+    def b(s):
+        return s
+
 #####################
 # Server stuff
 #####################
@@ -79,12 +86,12 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
             self.send_response(403)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
-            self.wfile.write('Error: you are not a GitHub server.')
+            self.wfile.write(b('Error: you are not a GitHub server.'))
         else:
             self.send_response(200)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
-            self.wfile.write('Thanks.')
+            self.wfile.write(b('Thanks.'))
             self.plugin.announce.onPayload(json.loads(form['payload'].value))
 
 #####################
