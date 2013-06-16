@@ -30,8 +30,11 @@
 ###
 
 from __future__ import unicode_literals
+import sys
 
-from django.contrib.gis.geoip import GeoIP
+GEOIP_PATH ='/usr/share/GeoIP/GeoIP.dat' 
+from . import pygeoip
+from . import pycountry
 
 import supybot.utils as utils
 import supybot.world as world
@@ -107,9 +110,11 @@ class Glob2Chan(callbacks.Plugin):
             version = 'Glob2 version %s' % realname.split('-')[1]
         except:
             version = 'unknown version'
-        g = GeoIP()
-        country = g.country(hostname)['country_name']
-        if country == 'France':
+        if not utils.net.isIP(hostname):
+            hostname = utils.net.getAddressFromHostname(hostname)
+        code = pygeoip.Database(GEOIP_PATH).lookup(hostname).country
+        country = pycountry.countries.get(alpha2=code).name
+        if code == 'FR':
             irc.queueMsg(ircmsgs.privmsg(nick, ('Bonjour %s, bienvenue dans le '
                 'salon de jeu Globulation2 en ligne. Il y a actuellement %i '
                 'personnes connectées via IRC, elles pourraient se réveiller et '
