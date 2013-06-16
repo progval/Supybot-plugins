@@ -20,9 +20,14 @@ from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
-import cleverbot
-import re, random, time
-from htmlentitydefs import name2codepoint
+import re, random, time, sys
+
+if sys.version_info[0] >= 3:
+    from html.entities import name2codepoint
+else:
+    from htmlentitydefs import name2codepoint
+
+from . import cleverbot
  
 class Cleverbot(callbacks.Plugin):
     """This plugin replies using the Cleverbot API upon intercepting an invalid command."""
@@ -52,10 +57,7 @@ class Cleverbot(callbacks.Plugin):
 
     @classmethod
     def _post(cls,bot,hash,line,sess):
-        try:
-            m = sess.Ask(line)
-        except:
-            return None
+        m = sess.Ask(line)
         if m:
             return m
         return None
@@ -101,7 +103,7 @@ class Cleverbot(callbacks.Plugin):
             if reply is not None:
                 self.log.debug("Reply is: "+str(reply))
                 if self.registryValue('enable', channel):
-                                 irc.reply(reply)
+                     irc.reply(reply)
             else:
                 irc.reply("My AI is down, sorry! :( I couldn't process what you said... blame it on a brain fart. :P")
         elif (msg.args[0] == irc.nick) and self.registryValue('reactprivate',msg.args[0]):
@@ -112,7 +114,7 @@ class Cleverbot(callbacks.Plugin):
             if reply is not None:
                 self.log.debug("Reply is: "+str(reply))
                 if self.registryValue('enable', channel):
-                                 irc.reply(reply)
+                     irc.reply(reply)
             else:
                 irc.reply("My AI is down, sorry! :( I couldn't process what you said... blame it on a brain fart. :P", err, None, True, None, None)
 

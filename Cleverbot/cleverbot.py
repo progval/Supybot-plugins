@@ -31,9 +31,26 @@ Example of how to use the bindings:
 
 """
 
-import urllib2
 import hashlib
+import sys
 import re
+
+if sys.version_info[0] >= 3:
+    import urllib
+    Request = urllib.request.Request
+    urlopen = urllib.request.urlopen
+    def u(s):
+        return s
+    def b(s):
+        return s.encode('utf-8')
+else:
+    import urllib2
+    from urllib import urlencode
+    Request = urllib2.Request
+    def u(s):
+        return unicode(s, "unicode_escape")
+    def b(s):
+        return s
 
 class ServerFullError(Exception):
     pass
@@ -59,12 +76,14 @@ class Session(object):
     def Send(self):
         data=encode(self.keylist,self.arglist)
         digest_txt=data[9:29]
-        hash=hashlib.md5(digest_txt).hexdigest()
+        hash=hashlib.md5(b(digest_txt)).hexdigest()
         self.arglist[self.keylist.index('icognocheck')]=hash
         data=encode(self.keylist,self.arglist)
-        req=urllib2.Request("http://www.cleverbot.com/webservicemin",data,self.headers)
-        f=urllib2.urlopen(req, timeout=9) #Needed to prevent supybot errors
+        req=Request("http://www.cleverbot.com/webservicemin",b(data),self.headers)
+        f=urlopen(req, timeout=9) #Needed to prevent supybot errors
         reply=f.read()
+        if sys.version_info[0] >= 3:
+            reply = reply.decode()
         return reply
 
     def Ask(self,q):
@@ -73,7 +92,7 @@ class Session(object):
         asw=self.Send()
         self.MsgList.append(q)
         answer = parseAnswers(asw)
-        for k,v in answer.iteritems():
+        for k,v in answer.items():
             try:
                 self.arglist[self.keylist.index(k)] = v
             except ValueError:
@@ -124,11 +143,14 @@ def main():
     q = ''
     while q != 'bye':
         try:
-            q = raw_input("> ")
+            if sys.version_info[0] < 3:
+                q = raw_input("> ")
+            else:
+                q = input("> ")
         except KeyboardInterrupt:
-            print
+            print()
             sys.exit()
-        print cb.Ask(q)
+        print(cb.Ask(q))
 
 if __name__ == "__main__":
     main()
