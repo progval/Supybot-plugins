@@ -134,7 +134,7 @@ class Sudo(callbacks.Plugin):
         self.db = SudoDB()
         self._path = os.path.join(conf.supybot.directories.data(), 'sudo.db')
         if not world.testing and os.path.isfile(self._path):
-            self.db.load(open(self._path, 'ru'))
+            self.db.load(open(self._path, 'r'))
 
     @internationalizeDocstring
     def add(self, irc, msg, args, priority, name, mode, hostmask, regexp):

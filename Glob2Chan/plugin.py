@@ -116,6 +116,10 @@ class Glob2Chan(callbacks.Plugin):
                 'jouer avec vous. Attendez ici au moins quelques minutes, '
                 'quelqu\'un pourrait se connecter d\'ici là.') %
                 (nick, len(irc.state.channels['#glob2'].users))))
+            irc.queueMsg(ircmsgs.privmsg(nick, ('Si vous avez une question ou '
+                'que vous voulez programmer une partie, vous pouvez contacter '
+                'ProgVal à l\'adresse progval (arobase) progval (point) '
+                'net.')))
         else:
             irc.queueMsg(ircmsgs.privmsg(nick, ('Hi %s, welcome to the '
                 'globulation online game room. There are currently %i '
@@ -123,6 +127,9 @@ class Glob2Chan(callbacks.Plugin):
                 'you to a game. Please stay here at least a few minutes, '
                 'someone may connect in the meantime.') %
                 (nick, len(irc.state.channels['#glob2'].users))))
+            irc.queueMsg(ircmsgs.privmsg(nick, ('If you have any question or '
+                'want to schedule a game, feel free to contact ProgVal at '
+                'progval at progval dot net.')))
         irc.queueMsg(ircmsgs.privmsg('#glob2', ('Welcome to %s, running %s '
             'and connecting from %s.') % (nick, version, country)))
 
