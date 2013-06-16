@@ -62,9 +62,15 @@ except:
 if sys.version_info[0] >= 3:
     def b(s):
         return s.encode('utf-8')
+    def u(s):
+        return s
+    urlencode = urllib.parse.urlencode
 else:
+    def u(s):
+        return unicode(s, "unicode_escape")
     def b(s):
         return s
+    urlencode = urllib.urlencode
 
 #####################
 # Server stuff
@@ -101,7 +107,7 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
 def query(caller, type_, uri_end, args):
     args = dict([(x,y) for x,y in args.items() if y is not None])
     url = '%s/%s/%s?%s' % (caller._url(), type_, uri_end,
-                           urllib.urlencode(args))
+                           urlencode(args))
     return json.load(utils.web.getUrlFd(url))
 
 #####################
@@ -152,7 +158,7 @@ class GitHub(callbacks.Plugin):
                      url)
             if hidden is not None:
                 s += _(' (+ %i hidden commits)') % hidden
-            return ircmsgs.privmsg(channel, s.encode('utf8'))
+            return ircmsgs.privmsg(channel, u(s))
 
         def onPayload(self, payload):
             repo = '%s/%s' % (payload['repository']['owner']['name'],
@@ -272,7 +278,7 @@ class GitHub(callbacks.Plugin):
             if reply == '':
                 irc.error(_('No repositories matches your search.'))
             else:
-                irc.reply(reply.encode('utf8'))
+                irc.reply(u(reply))
         search = wrap(search, ['something',
                                getopts({'page': 'id',
                                         'language': 'somethingWithoutSpaces'})])
@@ -304,7 +310,7 @@ class GitHub(callbacks.Plugin):
             for key, value in results.items():
                 if key in enabled:
                     output.append('%s: %s' % (key, value))
-            irc.reply(', '.join(output).encode('utf8'))
+            irc.reply(u(', '.join(output)))
         info = wrap(info, ['something', 'something',
                            getopts({'enable': 'anything',
                                     'disable': 'anything'})])

@@ -29,8 +29,20 @@ import re
 
 if sys.version_info[0] < 3:
     import urlparse
+    urlencode = urllib.urlencode
+    urlopen = urllib.urlopen
+    def b(s):
+        return s
+    def u(s):
+        return unicode(s, "unicode_escape")
 else:
     import urllib.parse as urlparse
+    urlencode = urllib.parse.urlencode
+    urlopen = urllib.request.urlopen
+    def b(s):
+        return s.encode('utf-8')
+    def u(s):
+        return s
 
 UR1CA = "http://ur1.ca/"
 ESUCCESS = 0
@@ -67,7 +79,7 @@ def parameterize(url):
     Returns the POST parameter constructed from the URL.
 
     """
-    return urllib.urlencode({"longurl": url})
+    return urlencode({"longurl": url})
 
 
 def request(parameter):
@@ -79,7 +91,7 @@ def request(parameter):
     Returns the file-like object as returned by urllib.urlopen.
 
     """
-    return urllib.urlopen(UR1CA, parameter)
+    return urlopen(UR1CA, b(parameter))
 
 
 def retrievedoc(response):
@@ -110,11 +122,11 @@ def scrape(document):
     indicating the possible problem
 
     """
-    goodguess = RE_GOOD.search(document)
+    goodguess = RE_GOOD.search(u(document))
     if goodguess:
         matchdict = goodguess.groupdict()
         return (True, matchdict["shorturl"])
-    badguess = RE_BAD.search(document)
+    badguess = RE_BAD.search(u(document))
     if badguess:
         matchdict = badguess.groupdict()
         return (False, matchdict["errormsg"])
