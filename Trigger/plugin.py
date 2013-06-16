@@ -70,6 +70,8 @@ class Trigger(callbacks.Plugin):
         if not filter(lambda x:x!=' ', command):
             return
         tokens = callbacks.tokenize(command)
+        if not tokens:
+            return
         try:
             msg.args = (channel,) + msg.args[1:]
             self.Proxy(irc.irc, msg, tokens)
@@ -86,11 +88,11 @@ class Trigger(callbacks.Plugin):
     def doNotice(self, irc, msg):
         self._run(irc, msg, 'notice')
     def doQuit(self, irc, msg):
-        for (channel, c) in self.lastStates[irc].channels.iteritems():
+        for (channel, c) in self.lastStates[irc].channels.items():
             if msg.nick in c.users:
                 self._run(irc, msg, 'quit', channel)
     def doNick(self, irc, msg):
-        for (channel, c) in irc.state.channels.iteritems():
+        for (channel, c) in irc.state.channels.items():
             if msg.args[0] in c.users:
                 self._run(irc, msg, 'nick', channel)
     def do376(self, irc, msg):
