@@ -28,14 +28,25 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ###
 
+import sys
 import xml.dom.minidom as dom
 
 import supybot.utils as utils
 from supybot.commands import wrap, additional, getopts
 import supybot.callbacks as callbacks
 
-import shortforms
-reload(shortforms)
+from . import shortforms
+
+# Name 'reload' is used by Supybot
+from imp import reload as reload_
+reload_(shortforms)
+
+if sys.version_info[0] >= 3:
+    def u(s):
+        return s
+else:
+    def u(s):
+        return unicode(s, "unicode_escape")
 
 noLocationError = 'No such location could be found.'
 class NoLocation(callbacks.Error):
@@ -84,11 +95,11 @@ class WunderWeather(callbacks.Plugin):
                     showForecast = True
         
         if showCurrent and showForecast:
-            output.append(u'Weather for ' + locationName)
+            output.append(u('Weather for ') + locationName)
         elif showCurrent:
-            output.append(u'Current weather for ' + locationName)
+            output.append(u('Current weather for ') + locationName)
         elif showForecast:
-            output.append(u'Forecast for ' + locationName)
+            output.append(u('Forecast for ') + locationName)
         
         if showCurrent:
             output.append(self._getCurrentConditions(matchedLocation[0]))
@@ -159,13 +170,13 @@ class WunderWeather(callbacks.Plugin):
     
     # format temperatures using _formatForMetricOrImperial
     def _formatCurrentConditionTemperatures(self, dom, string):
-        tempC = self._getNodeValue(dom, string + '_c', u'N/A') + u'\xb0C'
-        tempF = self._getNodeValue(dom, string + '_f', u'N/A') + u'\xb0F'
+        tempC = self._getNodeValue(dom, string + '_c', u('N/A')) + u('\xb0C')
+        tempF = self._getNodeValue(dom, string + '_f', u('N/A')) + u('\xb0F')
         return self._formatForMetricOrImperial(tempF, tempC)
     
     def _formatForecastTemperatures(self, dom, type):
-        tempC = self._getNodeValue(dom.getElementsByTagName(type)[0], 'celsius', u'N/A') + u'\xb0C'
-        tempF = self._getNodeValue(dom.getElementsByTagName(type)[0], 'fahrenheit', u'N/A') + u'\xb0F'
+        tempC = self._getNodeValue(dom.getElementsByTagName(type)[0], 'celsius', u('N/A')) + u('\xb0C')
+        tempF = self._getNodeValue(dom.getElementsByTagName(type)[0], 'fahrenheit', u('N/A')) + u('\xb0F')
         return self._formatForMetricOrImperial(tempF, tempC)
     
     # formats any imperial or metric values according to the config
@@ -180,25 +191,25 @@ class WunderWeather(callbacks.Plugin):
         if not returnValues:
             returnValues = (imperial, metric)
         
-        return u' / '.join(returnValues)
+        return u(' / ').join(returnValues)
     
     def _formatPressures(self, dom):
         # lots of function calls, but it just divides pressure_mb by 10 and rounds it
-        pressureKpa = str(round(float(self._getNodeValue(dom, 'pressure_mb', u'0')) / 10, 1)) + 'kPa'
-        pressureIn = self._getNodeValue(dom, 'pressure_in', u'0') + 'in'
+        pressureKpa = str(round(float(self._getNodeValue(dom, 'pressure_mb', u('0'))) / 10, 1)) + 'kPa'
+        pressureIn = self._getNodeValue(dom, 'pressure_in', u('0')) + 'in'
         return self._formatForMetricOrImperial(pressureIn, pressureKpa)
     
     def _formatSpeeds(self, dom, string):
-        mphValue = float(self._getNodeValue(dom, string, u'0'))
-        speedM = u'%dmph' % round(mphValue)
-        speedK = u'%dkph' % round(mphValue * 1.609344) # thanks Wikipedia for the conversion rate
+        mphValue = float(self._getNodeValue(dom, string, u('0')))
+        speedM = u('%dmph') % round(mphValue)
+        speedK = u('%dkph') % round(mphValue * 1.609344) # thanks Wikipedia for the conversion rate
         return self._formatForMetricOrImperial(speedM, speedK)
     
     def _formatUpdatedTime(self, dom):
         observationTime = self._getNodeValue(dom, 'observation_epoch', None)
         localTime = self._getNodeValue(dom, 'local_epoch', None)
         if not observationTime or not localTime:
-            return self._getNodeValue(dom, 'observation_time', 'Unknown Time').lstrip(u'Last Updated on ')
+            return self._getNodeValue(dom, 'observation_time', 'Unknown Time').lstrip(u('Last Updated on '))
         
         seconds = int(localTime) - int(observationTime)
         minutes = int(seconds / 60)
@@ -232,24 +243,24 @@ class WunderWeather(callbacks.Plugin):
         
         temp = self._formatCurrentConditionTemperatures(dom, 'temp')
         if self._getNodeValue(dom, 'heat_index_string') != 'NA':
-            temp += u' (Heat Index: %s)' % self._formatCurrentConditionTemperatures(dom, 'heat_index')
+            temp += u(' (Heat Index: %s)') % self._formatCurrentConditionTemperatures(dom, 'heat_index')
         if self._getNodeValue(dom, 'windchill_string') != 'NA':
-            temp += u' (Wind Chill: %s)' % self._formatCurrentConditionTemperatures(dom, 'windchill')
-        output.append(u'Temperature: ' + temp)
+            temp += u(' (Wind Chill: %s)') % self._formatCurrentConditionTemperatures(dom, 'windchill')
+        output.append(u('Temperature: ') + temp)
         
-        output.append(u'Humidity: ' + self._getNodeValue(dom, 'relative_humidity', u'N/A%'))
+        output.append(u('Humidity: ') + self._getNodeValue(dom, 'relative_humidity', u('N/A%')))
         if self.registryValue('showPressure', self.__channel):
-            output.append(u'Pressure: ' + self._formatPressures(dom))
-        output.append(u'Conditions: ' + self._getNodeValue(dom, 'weather').capitalize())
-        output.append(u'Wind: ' + self._getNodeValue(dom, 'wind_dir', u'None').capitalize() + ', ' + self._formatSpeeds(dom, 'wind_mph'))
-        output.append(u'Updated: ' + self._formatUpdatedTime(dom))
-        return u'; '.join(output)
+            output.append(u('Pressure: ') + self._formatPressures(dom))
+        output.append(u('Conditions: ') + self._getNodeValue(dom, 'weather').capitalize())
+        output.append(u('Wind: ') + self._getNodeValue(dom, 'wind_dir', u('None')).capitalize() + ', ' + self._formatSpeeds(dom, 'wind_mph'))
+        output.append(u('Updated: ') + self._formatUpdatedTime(dom))
+        return u('; ').join(output)
     
     def _getDom(self, url):
         try:
             xmlString = utils.web.getUrl(url)
             return dom.parseString(xmlString)
-        except utils.web.Error, e:
+        except utils.web.Error as e:
             error = e.args[0].capitalize()
             if error[-1] != '.':
                 error = error + '.'
@@ -282,10 +293,13 @@ class WunderWeather(callbacks.Plugin):
     def _formatUnicodeOutput(output):
         # UTF-8 encoding is required for Supybot to handle \xb0 (degrees) and other special chars
         # We can't (yet) pass it a Unicode string on its own (an oddity, to be sure)
-        return u' | '.join(output).encode('utf-8')
+        s = u(' | ').join(output)
+        if sys.version_info[0] < 3:
+            s = s.encode('utf-8')
+        return s
     _formatUnicodeOutput = staticmethod(_formatUnicodeOutput)
     
-    def _getNodeValue(dom, value, default=u'Unknown'):
+    def _getNodeValue(dom, value, default=u('Unknown')):
         subTag = dom.getElementsByTagName(value)
         if len(subTag) < 1:
             return default
@@ -296,7 +310,7 @@ class WunderWeather(callbacks.Plugin):
     _getNodeValue = staticmethod(_getNodeValue)
     
     def _noLocation():
-        raise NoLocation, noLocationError
+        raise NoLocation(noLocationError)
     _noLocation = staticmethod(_noLocation)
 
 Class = WunderWeather

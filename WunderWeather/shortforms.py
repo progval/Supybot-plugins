@@ -28,7 +28,15 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ###
 
+import sys
+
 encoding = 'utf-8'
+if sys.version_info[0] >= 3:
+    def u(s):
+        return s
+else:
+    def u(s):
+        return unicode(s, "unicode_escape")
 
 # Provinces.  (Province being a metric state measurement mind you. :D)
 _shortforms = {
@@ -63,7 +71,7 @@ _shortforms = {
     'at': 'austria',
     'au': 'australia',
     'aw': 'aruba',
-    'ax': u'åland islands',
+    'ax': u('åland islands'),
     'ba': 'bosnia and herzegovina',
     'bb': 'barbados',
     'bd': 'bangladesh',
