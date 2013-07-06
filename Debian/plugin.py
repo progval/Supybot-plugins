@@ -375,7 +375,7 @@ class Debian(callbacks.Plugin):
             L = map(utils.web.htmlToText, map(lambda p: p.group(1), searches))
             resp = format(resp, *L)
             if sev:
-                sev = filter(None, sev.groups())
+                sev = list(filter(None, sev.groups()))
                 if sev:
                     sev = utils.web.htmlToText(sev[0])
                     resp += format('; %s: %s', self.bold('Severity'), sev)
