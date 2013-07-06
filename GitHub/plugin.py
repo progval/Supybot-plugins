@@ -44,7 +44,6 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import supybot.httpserver as httpserver
 
-from . import ur1ca
 if sys.version_info[0] < 3:
     from cStringIO import StringIO
 else:
@@ -136,18 +135,19 @@ class GitHub(callbacks.Plugin):
             bold = ircutils.bold
             url = commit['url']
 
-            # ur1.ca
             try:
-                post_param = ur1ca.parameterize(url)
-                answerfile = ur1ca.request(post_param)
-                doc = ur1ca.retrievedoc(answerfile)
-                answerfile.close()
-                status, url2 = ur1ca.scrape(doc)
-
-                if status:
-                    url = url2
+                data = urlencode({'url': url})
+                if sys.version_info[0] >= 3:
+                    data = data.encode()
+                    f = utils.web.getUrlFd('http://git.io/', data=data)
+                    url = list(filter(lambda x:x[0] == 'Location',
+                        f.headers._headers))[0][1].strip()
+                else:
+                    f = utils.web.getUrlFd('http://git.io/', data=data)
+                    url = filter(lambda x:x.startswith('Location: '),
+                            f.headers.headers)[0].split(': ', 1)[1].strip()
             except Exception as e:
-                log.error('Cannot connect to ur1.ca: %s' % e)
+                log.error('Cannot connect to git.io: %s' % e)
 
             s = _('%s/%s (in %s): %s committed %s %s') % \
                     (payload['repository']['owner']['name'],
