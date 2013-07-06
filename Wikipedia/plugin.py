@@ -69,7 +69,7 @@ class Wikipedia(callbacks.Plugin):
         Returns the first paragraph of a Wikipedia article"""
         reply = ''
         # first, we get the page
-        addr = 'http://%s/wiki/Special:Search?search=%s' % \
+        addr = 'https://%s/wiki/Special:Search?search=%s' % \
                     (self.registryValue('url', msg.args[0]),
                      urllib.quote_plus(search))
         article = utils.web.getUrl(addr)
