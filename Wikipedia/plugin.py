@@ -55,6 +55,11 @@ except:
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
 
+if sys.version_info[0] >= 3:
+    quote_plus = urllib.parse.quote_plus
+else:
+    quote_plus = urllib.quote_plus
+
 
 class Wikipedia(callbacks.Plugin):
     """Add the help for "@plugin help Wikipedia" here
@@ -71,8 +76,10 @@ class Wikipedia(callbacks.Plugin):
         # first, we get the page
         addr = 'https://%s/wiki/Special:Search?search=%s' % \
                     (self.registryValue('url', msg.args[0]),
-                     urllib.quote_plus(search))
+                     quote_plus(search))
         article = utils.web.getUrl(addr)
+        if sys.version_info[0] >= 3:
+            article = article.decode()
         # parse the page
         tree = lxml.html.document_fromstring(article)
         # check if it gives a "Did you mean..." redirect
@@ -85,6 +92,8 @@ class Wikipedia(callbacks.Plugin):
             addr = self.registryValue('url', msg.args[0]) + \
                    didyoumean[0].get('href')
             article = utils.web.getUrl(addr)
+            if sys.version_info[0] >= 3:
+                article = article.decode()
             tree = lxml.html.document_fromstring(article)
             search = redirect
         # check if it's a page of search results (rather than an article), and
@@ -97,6 +106,8 @@ class Wikipedia(callbacks.Plugin):
             addr = self.registryValue('url', msg.args[0]) + \
                    searchresults[0].get('href')
             article = utils.web.getUrl(addr)
+            if sys.version_info[0] >= 3:
+                article = article.decode()
             tree = lxml.html.document_fromstring(article)
             search = redirect
         # otherwise, simply return the title and whether it redirected
@@ -137,7 +148,8 @@ class Wikipedia(callbacks.Plugin):
                 p = p[0]
                 p = p.text_content()
                 p = p.strip()
-                p = p.encode('utf-8')
+                if sys.version_info[0] < 3:
+                    p = p.encode('utf-8')
                 reply += '%s %s' % (p, ircutils.bold(addr))
         irc.reply(reply)
     wiki = wrap(wiki, ['text'])
