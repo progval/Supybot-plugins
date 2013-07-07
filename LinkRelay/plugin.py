@@ -160,6 +160,7 @@ class LinkRelay(callbacks.Plugin):
             irc.reply(_('This is no relay enabled. Use "linkrelay add" to '
                 'add one.'))
             return
+        replies = []
         for relay in self.relays:
             if world.getIrc(relay.targetNetwork):
                 hasIRC = 'Link healthy!'
@@ -169,12 +170,13 @@ class LinkRelay(callbacks.Plugin):
             s ='\x02%s\x02 on \x02%s\x02 ==> \x02%s\x02 on \x02%s\x02.  %s'
             if not self.registryValue('color', msg.args[0]):
                 s = s.replace('\x02', '')
-            irc.reply(s %
+            replies.append(s %
                         (relay.sourceChannel,
                          relay.sourceNetwork,
                          relay.targetChannel,
                          relay.targetNetwork,
                          hasIRC))
+        irc.replies(replies)
 
     def doPrivmsg(self, irc, msg):
         channel = msg.args[0]
