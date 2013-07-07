@@ -67,7 +67,6 @@ class LinkRelay(callbacks.Plugin):
             self.channelRegex = channelRegex
             self.networkRegex = networkRegex
             self.messageRegex = messageRegex
-            self.hasTargetIRC = False
             self.hasSourceIRCChannels = False
 
 
@@ -76,8 +75,6 @@ class LinkRelay(callbacks.Plugin):
         self.__parent.__init__(irc)
         self._loadFromConfig()
         self.ircstates = {}
-        for IRC in world.ircs:
-            self.addIRC(IRC)
         try:
             conf.supybot.plugins.LinkRelay.substitutes.addCallback(
                     self._loadFromConfig)
@@ -164,10 +161,10 @@ class LinkRelay(callbacks.Plugin):
                 'add one.'))
             return
         for relay in self.relays:
-            if relay.hasTargetIRC:
+            if world.getIrc(relay.targetNetwork):
                 hasIRC = 'Link healthy!'
             else:
-                hasIRC = '\x03%sIRC object not scraped yet.\017' % \
+                hasIRC = '\x03%sNot connected to network.\017' % \
                         self.registryValue('colors.info', msg.args[0])
             s ='\x02%s\x02 on \x02%s\x02 ==> \x02%s\x02 on \x02%s\x02.  %s'
             if not self.registryValue('color', msg.args[0]):
@@ -180,7 +177,6 @@ class LinkRelay(callbacks.Plugin):
                          hasIRC))
 
     def doPrivmsg(self, irc, msg):
-        self.addIRC(irc)
         channel = msg.args[0]
         s = msg.args[1]
         s, args = self.getPrivmsgData(channel, msg.nick, s,
@@ -211,11 +207,7 @@ class LinkRelay(callbacks.Plugin):
         return msg
 
 
-    def doPing(self, irc, msg):
-        self.addIRC(irc)
-
     def doMode(self, irc, msg):
-        self.addIRC(irc)
         args = {'nick': msg.nick, 'channel': msg.args[0],
                 'mode': ' '.join(msg.args[1:]), 'color': ''}
         if self.registryValue('color', msg.args[0]):
@@ -225,7 +217,6 @@ class LinkRelay(callbacks.Plugin):
         self.sendToOthers(irc, msg.args[0], s, args)
 
     def doJoin(self, irc, msg):
-        self.addIRC(irc)
         args = {'nick': msg.nick, 'channel': msg.args[0], 'color': ''}
         if self.registryValue('color', msg.args[0]):
             args['color'] = '\x03%s' % self.registryValue('colors.join', msg.args[0])
@@ -235,7 +226,6 @@ class LinkRelay(callbacks.Plugin):
         self.sendToOthers(irc, msg.args[0], s, args)
 
     def doPart(self, irc, msg):
-        self.addIRC(irc)
         args = {'nick': msg.nick, 'channel': msg.args[0], 'color': ''}
         if self.registryValue('color', msg.args[0]):
             args['color'] = '\x03%s' % self.registryValue('colors.part', msg.args[0])
@@ -245,7 +235,6 @@ class LinkRelay(callbacks.Plugin):
         self.sendToOthers(irc, msg.args[0], s, args)
 
     def doKick(self, irc, msg):
-        self.addIRC(irc)
         args = {'kicked': msg.args[1], 'channel': msg.args[0],
                 'kicker': msg.nick, 'message': msg.args[2], 'color': ''}
         if self.registryValue('color', msg.args[0]):
@@ -256,7 +245,6 @@ class LinkRelay(callbacks.Plugin):
         self.sendToOthers(irc, msg.args[0], s, args)
 
     def doNick(self, irc, msg):
-        self.addIRC(irc)
         args = {'oldnick': msg.nick, 'network': irc.network,
                 'newnick': msg.args[0], 'color': ''}
         if self.registryValue('color', msg.args[0]):
@@ -274,7 +262,6 @@ class LinkRelay(callbacks.Plugin):
             args['color'] = '\x03%s' % self.registryValue('colors.quit', msg.args[0])
         s = _('<-- %(nick)s has quit on %(network)s (%(message)s)')
         self.sendToOthers(irc, None, s, args, msg.nick)
-        self.addIRC(irc)
 
     def sendToOthers(self, irc, channel, s, args, nick=None, isPrivmsg=False):
         assert channel is not None or nick is not None
@@ -286,14 +273,15 @@ class LinkRelay(callbacks.Plugin):
                     args['network'] = ''
             return s % args
         def send(s):
-            if not relay.hasTargetIRC:
-                self.log.info('LinkRelay:  IRC %s not yet scraped.' %
+            targetIRC = world.getIrc(relay.targetNetwork)
+            if not targetIRC:
+                self.log.info('LinkRelay:  Not connected to network %s.' %
                               relay.targetNetwork)
-            elif relay.targetIRC.zombie:
+            elif targetIRC.zombie:
                 self.log.info('LinkRelay:  IRC %s appears to be a zombie'%
                               relay.targetNetwork)
             elif irc.isChannel(relay.targetChannel) and \
-                    relay.targetChannel not in relay.targetIRC.state.channels:
+                    relay.targetChannel not in targetIRC.state.channels:
                 self.log.info('LinkRelay:  I\'m not in in %s on %s' %
                               (relay.targetChannel, relay.targetNetwork))
             else:
@@ -305,7 +293,7 @@ class LinkRelay(callbacks.Plugin):
                 else:
                     return
                 msg.tag('relayedMsg')
-                relay.targetIRC.sendMsg(msg)
+                targetIRC.sendMsg(msg)
 
         if channel is None:
             for relay in self.relays:
@@ -327,17 +315,6 @@ class LinkRelay(callbacks.Plugin):
                     send(new_s)
 
 
-    def addIRC(self, irc):
-        match = False
-        for relay in self.relays:
-            if relay.sourceNetwork == irc.network:
-                relay.sourceIRCChannels = copy.deepcopy(irc.state.channels)
-                relay.hasSourceIRCChannels = True
-            if relay.targetNetwork == irc.network and not relay.hasTargetIRC:
-                relay.targetIRC = irc
-                relay.hasTargetIRC = True
-
-
     @internationalizeDocstring
     def nicks(self, irc, msg, args, channel):
         """[<channel>]
@@ -348,9 +325,8 @@ class LinkRelay(callbacks.Plugin):
         for relay in self.relays:
             if relay.sourceChannel == channel and \
                     relay.sourceNetwork == irc.network:
-                if not relay.hasTargetIRC:
-                    irc.reply(_('I haven\'t scraped the IRC object for %s '
-                              'yet. Try again in a minute or two.') % \
+                if not world.getIrc(relay.targetNetwork):
+                    irc.reply(_('Not connected to network %s.') %
                               relay.targetNetwork)
                 else:
                     users = []
@@ -361,7 +337,7 @@ class LinkRelay(callbacks.Plugin):
                     numUsers = 0
                     target = relay.targetChannel
 
-                    channels = relay.targetIRC.state.channels
+                    channels = world.getIrc(relay.targetNetwork).state.channels
                     found = False
                     for key, channel_ in channels.items():
                         if re.match(relay.targetChannel, key):
