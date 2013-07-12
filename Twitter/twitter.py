@@ -3222,8 +3222,8 @@ class Api(object):
     Returns:
       A twitter.User instance representing the befriended user.
     '''
-    url  = '%s/friendships/create/%s.json' % (self.base_url, user)
-    json = self._FetchUrl(url, post_data={'user': user})
+    url  = '%s/friendships/create.json' % (self.base_url,)
+    json = self._FetchUrl(url, post_data={'screen_name': user})
     data = self._ParseAndCheckTwitter(json)
     return User.NewFromJsonDict(data)
 
