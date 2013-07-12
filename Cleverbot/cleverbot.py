@@ -45,7 +45,7 @@ if sys.version_info[0] >= 3:
         return s.encode('utf-8')
 else:
     import urllib2
-    from urllib import urlencode
+    from urllib import urlencode, urlopen
     Request = urllib2.Request
     def u(s):
         return unicode(s, "unicode_escape")
