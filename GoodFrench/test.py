@@ -65,7 +65,6 @@ class GoodFrenchTestCase(ChannelPluginTestCase):
         try:
             self.assertRegexp("GoodFrench detect %s" % text, 'erreurs? : ')
         except AssertionError as e:
-            print text
             raise e
 
     def testMistakes(self):
@@ -80,7 +79,6 @@ class GoodFrenchTestCase(ChannelPluginTestCase):
         try:
             self.assertRegexp("GoodFrench detect %s" % text, 'correcte')
         except AssertionError as e:
-            print text
             raise e
 
     def testNotMistakes(self):

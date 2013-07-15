@@ -29,9 +29,6 @@
 
 ###
 
-import config
-reload(config)
-
 import re
 import supybot.world as world
 import supybot.ircmsgs as ircmsgs
