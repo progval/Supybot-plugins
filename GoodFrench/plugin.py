@@ -97,14 +97,14 @@ class SpellChecker:
                 self._raise(correct)
             else:
                 if correct.__class__ == list:
-                    correct = '`%s`' % '`, ou `'.join(correct)
+                    correct = '« %s »' % '» , ou «'.join(correct)
                 else:
-                    correct = '`%s`' % correct
+                    correct = '« %s »' % correct
 
                 if displayedMask.__class__ == list:
-                    displayedMask = '`%s`' % '` ou `'.join(displayedMask)
+                    displayedMask = '« %s »' % '» ou «'.join(displayedMask)
                 else:
-                    displayedMask = '`%s`' % displayedMask
+                    displayedMask = '« %s »' % displayedMask
                 self._raise('On ne dit pas %s mais %s' %
                            (displayedMask, correct))
 
@@ -138,12 +138,12 @@ class SpellChecker:
     def checkPlural(self):
         pass
     def checkConjugaison(self):
-        self._detect(mode='regexp', correct="t'as oublié un `ne` ou un `n'`",
+        self._detect(mode='regexp', correct="tu as oublié un « ne » ou un « n' »",
                      mask="(je|tu|on|il|elle|nous|vous|ils|elles) [^' ]+ pas ")
-        self._detect(mode='regexp', correct="t'as oublié un `ne` ou un `n'`",
+        self._detect(mode='regexp', correct="tu as oublié un « ne » ou un « n' »",
                      mask="j'[^' ]+ pas")
-        firstPerson = 'un verbe à la première personne ne finit pas par un `t`'
-        notAS = 'ce verbe ne devrait pas se finir par un `s` à cette personne.'
+        firstPerson = 'un verbe à la première personne ne finit pas par un « t »'
+        notAS = 'ce verbe ne devrait pas se finir par un « s » à cette personne.'
         self._detect(mode='regexp', correct=firstPerson, mask="j'[^ ]*t\W")
         self._detect(mode='regexp', correct=firstPerson,mask="je( ne)? [^ ]*t\W")
         self._detect(mode='regexp', correct=notAS,
