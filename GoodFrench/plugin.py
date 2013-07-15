@@ -182,19 +182,19 @@ class SpellChecker:
     def checkTypographic(self):
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation double est toujours "
-                     "précédé d'un espace",
+                     "précédé d'une espace",
                      mask="[^ _D()][:!?;][^/]", wizard='_')
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation double est toujours "
-                     "suivi d'un espace",
+                     "suivi d'une espace",
                      mask="(?<!(tp|ps|.[^ a-zA-Z]))[:!?;][^ _'D()]", wizard='_')
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation simple n'est jamais "
-                     "précédé d'un espace",
+                     "précédé d'une espace",
                      mask=" ,", wizard='_')
         self._detect(mode='regexp',
                      correct="Un caractère de ponctuation simple est toujours "
-                     "suivi d'un espace",
+                     "suivi d'une espace",
                      mask=",[^ _]", wizard='_')
 
     def getErrors(self):
