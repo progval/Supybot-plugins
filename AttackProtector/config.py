@@ -110,7 +110,7 @@ kinds = {'join': ['5p10', 'ban', ''],
          'groupknock': ['7p20', 'mode+K', ''],
          'grouppart': ['20p10', 'mode+i', ''],
          'groupnick': ['20p10', 'mode+N', ''],
-         'groupmessage': ['100p10', 'mode+m', '']}
+         'groupmessage': ['20p20', 'mode+m', '']}
 for kind, data in kinds.items():
     detection, punishment, help_ = data
     help_ = help_ or (_('a %s flood is detected') % kind)
