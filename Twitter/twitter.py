@@ -3237,7 +3237,7 @@ class Api(object):
     Returns:
       A twitter.User instance representing the discontinued friend.
     '''
-    url  = '%s/friendships/destroy/%s.json' % (self.base_url, user)
+    url  = '%s/friendships/destroy.json' % (self.base_url,)
     json = self._FetchUrl(url, post_data={'user': user})
     data = self._ParseAndCheckTwitter(json)
     return User.NewFromJsonDict(data)
