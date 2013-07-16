@@ -71,6 +71,8 @@ DEFAULT_TEMPLATES = {
 
 <h1>%(plugin)s</h1>
 
+<p>%(description)s</p>
+
 <table>
     <tr>
         <th>Command</th>
@@ -112,12 +114,18 @@ class WebDocServerCallback(httpserver.SupyHTTPServerCallback):
                 response = 200
                 callback = cbs[name]
                 commands = callback.listCommands()
+                description = callback.__doc__
+                if not description or description.startswith('Add the help for'):
+                    description = ''
                 if commands:
                     commands.sort()
                 def formatter(command):
                     command = list(map(callbacks.canonicalName,
                         command.split(' ')))
                     doc = callback.getCommandMethod(command).__doc__
+                    if not doc:
+                        return '<tr><td>%s</td><td> </td></tr>' % \
+                                ' '.join(command)
                     doclines = doc.splitlines()
                     s = cgi.escape('%s %s' % (name, doclines.pop(0)))
                     if doclines:
@@ -131,6 +139,7 @@ class WebDocServerCallback(httpserver.SupyHTTPServerCallback):
                 output = httpserver.get_template('webdoc/plugin.html') % {
                         'plugin': name,
                         'table': table,
+                        'description': description
                         }
                 
         self.send_response(response)
