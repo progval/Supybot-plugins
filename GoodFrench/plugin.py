@@ -64,11 +64,11 @@ class SpellChecker:
             self._checking = 'abbréviation'
             self.checkAbbreviation()
         if level >= 6:
-            self._checking = 'lol'
-            self.checkLol()
-        if level >= 7:
             self._checking = 'typographie'
             self.checkTypographic()
+        if level >= 7:
+            self._checking = 'lol'
+            self.checkLol()
 
     def _raise(self, message):
         self._errors.append('[%s] %s' % (self._checking, message))
@@ -77,12 +77,12 @@ class SpellChecker:
         if displayedMask is None:
             displayedMask = mask
         raise_ = False
-        text = self._text
+        text = re.sub('[a-zA-Z0-9]+://[^ ]+', '', self._text)
         nickRemover = re.match('[^ ]*: (?P<text>.*)', text)
         if nickRemover is not None:
             text = nickRemover.group('text')
         text = '%s%s%s' % (wizard, text, wizard)
-        AntislashDoubleYou = '[^a-zA-Z0-9éèàùâêûôîäëüïö\']'
+        AntislashDoubleYou = '[^a-zA-Z0-9éèàùâêûôîäëüïöç’\']'
         if mode == 'single' and re.match('.*%s%s%s.*' % (AntislashDoubleYou,
                                                         mask,
                                                         AntislashDoubleYou),
@@ -97,12 +97,12 @@ class SpellChecker:
                 self._raise(correct)
             else:
                 if correct.__class__ == list:
-                    correct = '« %s »' % '» , ou «'.join(correct)
+                    correct = '« %s »' % ' » , ou « '.join(correct)
                 else:
                     correct = '« %s »' % correct
 
                 if displayedMask.__class__ == list:
-                    displayedMask = '« %s »' % '» ou «'.join(displayedMask)
+                    displayedMask = '« %s »' % ' » ou « '.join(displayedMask)
                 else:
                     displayedMask = '« %s »' % displayedMask
                 self._raise('On ne dit pas %s mais %s' %
