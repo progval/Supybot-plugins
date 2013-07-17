@@ -4,6 +4,7 @@
 # Note that you have to follow OEIS' license.
 
 import re
+import sys
 import logging
 
 class InvalidEntry(Exception):
@@ -42,6 +43,8 @@ class OEISEntry(dict):
             line = line[0:-1]
             if not line:
                 break
+            if sys.version_info[0] >= 3 and isinstance(line, bytes):
+                line = line.decode()
             if line.startswith('#'):
                 continue
             try:
@@ -95,6 +98,8 @@ class OEISEntry(dict):
         paging = None
         for line in fd:
             line = line[0:-1]
+            if sys.version_info[0] >= 3 and isinstance(line, bytes):
+                line = line.decode()
             if line.startswith('No results.'):
                 return ((0, 0, 0), [])
             if line.startswith('Showing '):
