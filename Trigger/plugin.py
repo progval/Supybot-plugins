@@ -81,6 +81,8 @@ class Trigger(callbacks.Plugin):
         self._run(irc, msg, 'join')
     def doPart(self, irc, msg):
         self._run(irc, msg, 'part')
+    def doKick(self, irc, msg):
+        self._run(irc, msg, 'kick')
     def doPrivmsg(self, irc, msg):
         self._run(irc, msg, 'privmsg')
         if irc.nick in msg.args[1]:
