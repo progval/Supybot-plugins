@@ -331,7 +331,7 @@ class WebLogs(callbacks.Plugin):
 
         if not isinstance(irc, irclib.Irc):
             irc = irc.getRealIrc()
-        for (channel, chan) in self.lastStates[irc].channels.iteritems():
+        for (channel, chan) in self.lastStates[irc].channels.items():
             if msg.nick in chan.users:
                 if self.registryValue('enabled', channel):
                     middleware = WebLogsMiddleware(channel)
