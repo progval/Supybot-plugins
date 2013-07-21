@@ -66,7 +66,7 @@ if sys.version_info[0] >= 3:
     urlencode = urllib.parse.urlencode
 else:
     def u(s):
-        return unicode(s, "unicode_escape")
+        return s.decode('utf-8')
     def b(s):
         return s
     urlencode = urllib.urlencode
