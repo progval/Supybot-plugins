@@ -158,7 +158,9 @@ class GitHub(callbacks.Plugin):
                      url)
             if hidden is not None:
                 s += _(' (+ %i hidden commits)') % hidden
-            return ircmsgs.privmsg(channel, u(s))
+            if sys.version_info[0] < 3:
+                s = s.encode('utf-8')
+            return ircmsgs.privmsg(channel, s)
 
         def onPayload(self, payload):
             repo = '%s/%s' % (payload['repository']['owner']['name'],

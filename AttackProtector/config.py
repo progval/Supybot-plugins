@@ -67,6 +67,7 @@ class Punishment(registry.String):
         if s not in ('ban', 'kick', 'kban') and not s.startswith('mode+') and \
                 not s.startswith('mode-') and not s.startswith('umode-') and \
                 not s.startswith('umode+') and \
+                not s.startswith('mmode-') and not s.startswith('mmode-') and \
                 not s.startswith('command ') and \
                 not s.startswith('kban+') and not s.startswith('ban+') :
             self.error()
