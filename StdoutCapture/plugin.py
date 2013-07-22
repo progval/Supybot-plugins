@@ -55,6 +55,8 @@ class StdoutBuffer:
             self._buffer[-1] += '\n'
         else:
             self._buffer.append(data)
+    def flush(self):
+        pass
     def __getattr_(self, name):
         sys.stderr.write(repr(name))
 
