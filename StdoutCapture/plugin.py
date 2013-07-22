@@ -55,10 +55,8 @@ class StdoutBuffer:
             self._buffer[-1] += '\n'
         else:
             self._buffer.append(data)
-    def __getattr__(self, name):
-        def f(*args, **kwargs):
-            pass
-        return f
+    def flush(self):
+        pass
 
 class StdoutCapture(callbacks.Plugin):
     """Add the help for "@plugin help StdoutCapture" here
