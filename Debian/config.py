@@ -43,30 +43,51 @@ def configure(advanced):
     from supybot.questions import output, expect, anything, something, yn
     conf.registerPlugin('Debian', True)
 
-class ValidBranch(registry.OnlySomeStrings):
+class ValidFileBranch(registry.OnlySomeStrings):
     validStrings = ('oldstable', 'stable', 'testing', 'unstable',
             'experimental')
-class ValidMode(registry.OnlySomeStrings):
+class ValidFileMode(registry.OnlySomeStrings):
     validStrings = ('path', 'exactfilename', 'filename')
-class ValidSection(registry.OnlySomeStrings):
+class ValidFileSection(registry.OnlySomeStrings):
     validStrings = ('any', 'main', 'contrib', 'non-free')
+
+class ValidVersionBranch(registry.OnlySomeStrings):
+    validStrings = ('oldstable', 'stable', 'testing', 'unstable',
+            'experimental', 'all')
+class ValidVersionSection(registry.OnlySomeStrings):
+    validStrings = ('all', 'main', 'contrib', 'non-free')
+class ValidVersionSearchon(registry.OnlySomeStrings):
+    validStrings = ('names', 'all', 'sourcenames')
 
 Debian = conf.registerPlugin('Debian')
 conf.registerChannelValue(Debian, 'bold',
     registry.Boolean(True, _("""Determines whether the plugin will use bold in
     the responses to some of its commands.""")))
 conf.registerGroup(Debian, 'defaults')
-conf.registerChannelValue(Debian.defaults, 'branch',
-    ValidBranch('stable', _("""Determines the default branch, ie. the branch
-    selected if --branch is not given.""")))
-conf.registerChannelValue(Debian.defaults, 'mode',
-    ValidMode('path', _("""Determines the default mode, ie. the mode
+conf.registerGroup(Debian.defaults, 'file')
+conf.registerChannelValue(Debian.defaults.file, 'branch',
+    ValidFileBranch('stable', _("""Determines the default branch, ie. the
+    branch selected if --branch is not given.""")))
+conf.registerChannelValue(Debian.defaults.file, 'mode',
+    ValidFileMode('path', _("""Determines the default mode, ie. the mode
     selected if --mode is not given.""")))
-conf.registerChannelValue(Debian.defaults, 'section',
-    ValidSection('any', _("""Determines the default section, ie. the section
-    selected if --section is not given.""")))
-conf.registerChannelValue(Debian.defaults, 'arch',
+conf.registerChannelValue(Debian.defaults.file, 'section',
+    ValidFileSection('any', _("""Determines the default section, ie. the
+    section selected if --section is not given.""")))
+conf.registerChannelValue(Debian.defaults.file, 'arch',
     registry.String('any', _("""Determines the default architecture,
     ie. the architecture selected if --arch is not given.""")))
+
+conf.registerGroup(Debian.defaults, 'version')
+conf.registerChannelValue(Debian.defaults.version, 'branch',
+    ValidVersionBranch('all', _("""Determines the default branch, ie. the
+    branch selected if --branch is not given.""")))
+conf.registerChannelValue(Debian.defaults.version, 'section',
+    ValidVersionSection('all', _("""Determines the default section, ie. the
+    section selected if --section is not given.""")))
+conf.registerChannelValue(Debian.defaults.version, 'searchon',
+    ValidVersionSearchon('names', _("""Determines the default 'searchon', ie.
+    where to search if --searchon is not given.""")))
+
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

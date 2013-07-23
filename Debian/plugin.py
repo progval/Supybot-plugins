@@ -64,12 +64,13 @@ class Debian(callbacks.Plugin):
         url = 'http://packages.debian.org/search?searchon=contents' + \
               '&keywords=%(keywords)s&mode=%(mode)s&suite=%(suite)s' + \
               '&arch=%(arch)s'
-        chan = msg.args[0]
+        def reg(name):
+            return self.registryValue('defaults.file.%s' % name, msg.args[0])
         args = {'keywords': None,
-                'mode': self.registryValue('defaults.mode', chan),
-                'suite': self.registryValue('defaults.branch', chan),
-                'section': self.registryValue('defaults.section', chan),
-                'arch': self.registryValue('defaults.arch', chan)}
+                'mode': reg('mode'),
+                'suite': reg('branch'),
+                'section': reg('section'),
+                'arch': reg('arch')}
         exact = ('exact', True) in optlist
         for (key, value) in optlist:
             if key == 'branch':
@@ -139,8 +140,12 @@ class Debian(callbacks.Plugin):
         --section defaults to all, and defines in what section to search."""
         url = 'http://packages.debian.org/search?keywords=%(keywords)s' + \
               '&searchon=%(searchon)s&suite=%(suite)s&section=%(section)s'
-        args = {'keywords': None, 'searchon': 'names', 'suite': 'all',
-                'section': 'all'}
+        def reg(name):
+            return self.registryValue('defaults.version.%s' % name, msg.args[0])
+        args = {'keywords': None,
+                'searchon': reg('searchon'),
+                'suite': reg('branch'),
+                'section': reg('section')}
         for (key, value) in optlist:
             if key == 'exact':
                 url += '&exact=1'
