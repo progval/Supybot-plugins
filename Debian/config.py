@@ -29,6 +29,11 @@
 
 import supybot.conf as conf
 import supybot.registry as registry
+try:
+    from supybot.i18n import PluginInternationalization
+    _ = PluginInternationalization('AttackProtector')
+except:
+    _ = lambda x:x
 
 def configure(advanced):
     # This will be called by supybot to configure this module.  advanced is
@@ -38,9 +43,30 @@ def configure(advanced):
     from supybot.questions import output, expect, anything, something, yn
     conf.registerPlugin('Debian', True)
 
+class ValidBranch(registry.OnlySomeStrings):
+    validStrings = ('oldstable', 'stable', 'testing', 'unstable',
+            'experimental')
+class ValidMode(registry.OnlySomeStrings):
+    validStrings = ('path', 'exactfilename', 'filename')
+class ValidSection(registry.OnlySomeStrings):
+    validStrings = ('any', 'main', 'contrib', 'non-free')
+
 Debian = conf.registerPlugin('Debian')
 conf.registerChannelValue(Debian, 'bold',
-    registry.Boolean(True, """Determines whether the plugin will use bold in
-    the responses to some of its commands."""))
+    registry.Boolean(True, _("""Determines whether the plugin will use bold in
+    the responses to some of its commands.""")))
+conf.registerGroup(Debian, 'defaults')
+conf.registerChannelValue(Debian.defaults, 'branch',
+    ValidBranch('stable', _("""Determines the default branch, ie. the branch
+    selected if --branch is not given.""")))
+conf.registerChannelValue(Debian.defaults, 'mode',
+    ValidMode('path', _("""Determines the default mode, ie. the mode
+    selected if --mode is not given.""")))
+conf.registerChannelValue(Debian.defaults, 'section',
+    ValidSection('any', _("""Determines the default section, ie. the section
+    selected if --section is not given.""")))
+conf.registerChannelValue(Debian.defaults, 'arch',
+    registry.String('any', _("""Determines the default architecture,
+    ie. the architecture selected if --arch is not given.""")))
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

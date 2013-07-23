@@ -55,6 +55,7 @@ class Debian(callbacks.Plugin):
         """[--exact] \
         [--mode {path,filename,exactfilename}] \
         [--branch {oldstable,stable,testing,unstable,experimental}] \
+        [--arch <architecture>] \
         [--section {main,contrib,non-free}] <file name>
 
         Returns the package(s) containing the <file name>.
@@ -63,12 +64,18 @@ class Debian(callbacks.Plugin):
         url = 'http://packages.debian.org/search?searchon=contents' + \
               '&keywords=%(keywords)s&mode=%(mode)s&suite=%(suite)s' + \
               '&arch=%(arch)s'
-        args = {'keywords': None, 'mode': 'path', 'suite': 'stable',
-                'arch': 'any'}
+        chan = msg.args[0]
+        args = {'keywords': None,
+                'mode': self.registryValue('defaults.mode', chan),
+                'suite': self.registryValue('defaults.branch', chan),
+                'section': self.registryValue('defaults.section', chan),
+                'arch': self.registryValue('defaults.arch', chan)}
         exact = ('exact', True) in optlist
         for (key, value) in optlist:
             if key == 'branch':
                 args['suite'] = value
+            elif key == 'section':
+                args['section'] = value
             elif key == 'arch':
                 args['arch'] = value
             elif key == 'mode':
@@ -110,9 +117,10 @@ class Debian(callbacks.Plugin):
                                 'mode': ('literal', ('path',
                                                      'exactfilename',
                                                      'filename')),
-                                'arch': ('literal', ('main',
+                                'section': ('literal', ('main',
                                                      'contrib',
-                                                     'non-free'))}),
+                                                     'non-free')),
+                                'arch': 'somethingWithoutSpaces'}),
                                 'text'])
 
     _debreflags = re.DOTALL | re.IGNORECASE
