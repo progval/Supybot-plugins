@@ -55,7 +55,7 @@ NUMBER_TYPES = (
 class SchemeException(Exception):
     pass
 
-def no_edge_effect(f):
+def no_side_effect(f):
     def newf(tree, env):
         return f(tree, env.copy())
     return newf
@@ -97,7 +97,7 @@ def schemify_math(f):
     return newf
 
 ARGUMENTS_ERROR = _('%s takes %s %i arguments not %i (in (%s))')
-@no_edge_effect
+@no_side_effect
 def scm_lambda(tree, env):
     try:
         self, args, expr = tree
@@ -114,7 +114,7 @@ def scm_lambda(tree, env):
         args = args[0:-2]
     except ValueError: # No rest
         rest = None
-    @no_edge_effect
+    @no_side_effect
     def f(tree2, env2):
         self2, args2 = tree2[0], tree2[1:]
         arguments_error = ARGUMENTS_ERROR % \
