@@ -289,13 +289,22 @@ class LinkRelay(callbacks.Plugin):
             else:
                 if isPrivmsg or \
                         self.registryValue('nonPrivmsgs', channel) == 'privmsg':
-                    msg = ircmsgs.privmsg(relay.targetChannel, s)
+                    f = ircmsgs.privmsg
                 elif self.registryValue('nonPrivmsgs', channel) == 'notice':
-                    msg = ircmsgs.notice(relay.targetChannel, s)
+                    f = ircmsgs.notice
                 else:
                     return
-                msg.tag('relayedMsg')
-                targetIRC.sendMsg(msg)
+                allowedLength = conf.get(conf.supybot.reply.mores.length,
+                         relay.targetChannel) or 470
+                cont = _('(continuation)')
+                remainingLength = allowedLength - len(cont) - 1
+                head = s[0:allowedLength]
+                tail = [cont + ' ' + s[i:i+remainingLength] for i in
+                        range(allowedLength, len(s), remainingLength)]
+                for s in [head] + tail:
+                    msg = f(relay.targetChannel, s)
+                    msg.tag('relayedMsg')
+                    targetIRC.sendMsg(msg)
 
         if channel is None:
             for relay in self.relays:
