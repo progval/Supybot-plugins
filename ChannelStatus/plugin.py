@@ -28,6 +28,7 @@
 
 ###
 
+import sys
 import urllib
 
 import supybot.utils as utils
@@ -76,6 +77,13 @@ DEFAULT_TEMPLATES = {
 
 httpserver.set_default_templates(DEFAULT_TEMPLATES)
 
+if sys.version_info[0] >= 3:
+    quote = urllib.parse.quote
+    unquote = urllib.parse.unquote
+else:
+    quote = urllib.quote
+    unquote = urllib.unquote
+
 class ChannelStatusCallback(httpserver.SupyHTTPServerCallback):
     name = 'Channels status'
 
@@ -96,15 +104,15 @@ class ChannelStatusCallback(httpserver.SupyHTTPServerCallback):
             template = httpserver.get_template('channelstatus/index.html')
             channels = set()
             for irc in world.ircs:
-                channels |= set(['<li><a href="./%s/">%s@%s</a></li>' % 
-                    (urllib.quote('%s@%s' % (x, irc.network)), x, irc.network)
+                channels |= set(['<li><a href="./%s/">%s@%s</a></li>' %
+                    (quote('%s@%s' % (x, irc.network)), x, irc.network)
                     for x in irc.state.channels.keys()
                     if self._plugin.registryValue('listed', x)])
             channels = list(channels)
             channels.sort()
-            self.wfile.write(template % {'channels': ('\n'.join(channels))})
+            self._write(template % {'channels': ('\n'.join(channels))})
         elif len(parts) == 2:
-            (channel, network) = urllib.unquote(parts[0]).split('@')
+            (channel, network) = unquote(parts[0]).split('@')
             if not ircutils.isChannel(channel):
                 self._invalidChannel()
                 return
@@ -128,7 +136,11 @@ class ChannelStatusCallback(httpserver.SupyHTTPServerCallback):
                             for x in state.users])) + \
                         '</ul>'
             template = httpserver.get_template('channelstatus/channel.html')
-            self.wfile.write(template % replacements)
+            self._write(template % replacements)
+    def _write(self, s):
+        if sys.version_info[0] >= 3 and isinstance(s, str):
+            s = s.encode()
+        self.wfile.write(s)
 
 
 class ChannelStatus(callbacks.Plugin):
