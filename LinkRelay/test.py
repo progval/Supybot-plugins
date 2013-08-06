@@ -56,6 +56,9 @@ class LinkRelayTestCase(ChannelPluginTestCase):
         self.assertResponse('config supybot.plugins.LinkRelay.relays',
                             '#test | test | #foo | bar | ')
 
+        self.assertRegexp('linkrelay add --to #foo@bar', 'already exists')
+        self.assertRegexp('linkrelay add --to #FOO@bar', 'already exists')
+
     def testRemove(self):
         self.assertNotError('config supybot.plugins.LinkRelay.relays '
                             '"#foo | bar | #baz | bam | "')

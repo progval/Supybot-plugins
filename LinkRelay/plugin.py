@@ -394,20 +394,20 @@ class LinkRelay(callbacks.Plugin):
         s = ' | '.join(args)
 
         currentConfig = self.registryValue('relays')
+        config = list(map(ircutils.IrcString, currentConfig.split(' || ')))
         if add == True:
-            if s in currentConfig.split(' || '):
+            if s in config:
                 return False
             if currentConfig == '':
                 self.setRegistryValue('relays', value=s)
             else:
                 self.setRegistryValue('relays',
-                                      value=' || '.join((currentConfig,s)))
+                                      value=' || '.join((currentConfig, s)))
         else:
-            newConfig = currentConfig.split(' || ')
-            if s not in newConfig:
+            if s not in config:
                 return False
-            newConfig.remove(s)
-            self.setRegistryValue('relays', value=' || '.join(newConfig))
+            config.remove(s)
+            self.setRegistryValue('relays', value=' || '.join(config))
         return True
 
     def _parseOptlist(self, irc, msg, tupleOptlist):
