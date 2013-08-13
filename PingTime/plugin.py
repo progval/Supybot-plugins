@@ -51,7 +51,7 @@ class PingTime(callbacks.PluginRegexp):
     This should describe *how* to use this plugin."""
     regexps = ('onPing', 'onPong')
 
-    _pings = {} # {channel: {(from, to): timestamp}}
+    _pings = {} # {channel: {(from, to): timestamp}}
 
     def onPing(self, irc, msg, match):
         channel = msg.args[0]
