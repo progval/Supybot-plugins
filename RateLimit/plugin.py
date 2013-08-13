@@ -98,7 +98,7 @@ class RateLimit(callbacks.Plugin):
         self.db = RateLimitDB(filename)
         callbacks.Commands.pre_command_callbacks.append(
                 self._pre_command_callback)
-        self._history = {} # {command: [(user, timestamp)]}
+        self._history = {} # {command: [(user, timestamp)]}
 
     def die(self):
         callbacks.Commands.pre_command_callbacks.remove(
