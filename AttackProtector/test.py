@@ -236,6 +236,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
     # 'Kicked' tests
     def testKbanAfterKicks(self):
         prefix = 'testing!Attack@Protector'
+        self.assertNotError('config plugins.AttackProtector.groupmessage.detection 100p10')
         for i in range(1, 5):
             for i in range(1, 11):
                 msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
