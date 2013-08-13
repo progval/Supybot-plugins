@@ -71,7 +71,6 @@ class AutoTrans(callbacks.Plugin):
                                         '&otf=1&ssel=0&tsel=0&uptl=en&sc=1&text='
                                         '%s' % (lang, origin_text),
                                         headers).read().decode('utf8')
-            print(result)
 
             while ',,' in result:
                 result = result.replace(',,', ',null,')
@@ -83,7 +82,7 @@ class AutoTrans(callbacks.Plugin):
                 language = 'unknown'
 
             text = ''.join(x[0] for x in data[0])
-            text = '<%s> %s' % (msg.nick, text)
+            text = '<%s@%s> %s' % (msg.nick, channel, text)
             for (nick, user_lang) in conf:
                 if user_lang != language and user_lang == lang:
                     irc.reply(text, to=nick, private=True)
