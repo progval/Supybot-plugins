@@ -53,6 +53,19 @@ class RateLimitTestCase(PluginTestCase):
         self.assertNoResponse('echo spam', frm='foo!a@a')
         self.assertResponse('echo spam', 'spam', frm='bar!a@a')
 
+        time.sleep(1.1)
+
+        self.assertNotError('ratelimit unset foo echo')
+        self.assertResponse('ratelimit get echo',
+                'global: none, *: none')
+        self.assertResponse('echo spam', 'spam', frm='foo!a@a')
+        self.assertResponse('echo spam', 'spam', frm='foo!a@a')
+        self.assertResponse('echo spam', 'spam', frm='foo!a@a')
+        self.assertResponse('echo spam', 'spam', frm='foo!a@a')
+
+        self.assertRegexp('ratelimit unset foo echo',
+                'Error:.*did not exist')
+
     def testStar(self):
         self.assertResponse('ratelimit get echo',
                 'global: none, *: none')

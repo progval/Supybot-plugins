@@ -69,6 +69,17 @@ class RateLimitDB(dbi.DB):
             self.add(record)
         else:
             self.set(previous_record.id, record)
+    def unset_user_limit(self, channel, user, command):
+        try:
+            record = list(filter(
+                    lambda x:x.user == user and
+                             x.command == command and
+                             x.channel == channel,
+                    self))[0]
+        except IndexError:
+            raise
+        else:
+            self.remove(record.id)
 
     def get_limits(self, command):
         return filter(lambda x:x.command == command, self)
@@ -147,6 +158,26 @@ class RateLimit(callbacks.Plugin):
             user = user.id
         self.db.set_user_limit(None, user, count, interval, command)
         irc.replySuccess()
+
+    @wrap([optional(first('otherUser', ('literal', '*'))),
+        'commandName', 'admin'])
+    def unset(self, irc, msg, args, user, command):
+        """[<user>] <command>
+
+        Unsets the rate limit of the <command> for the <user>.
+        If <user> is not given, the rate limit will be enforced globally,
+        and if * is given as the <user>, the rate limit will be enforced
+        for everyone."""
+        if user is None:
+            user = 'global'
+        elif user != '*':
+            user = user.id
+        try:
+            self.db.unset_user_limit(None, user, command)
+        except IndexError:
+            irc.error(_('This rate limit did not exist.'))
+        else:
+            irc.replySuccess()
 
     @wrap(['commandName'])
     def get(self, irc, msg, args, command):
