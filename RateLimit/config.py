@@ -51,6 +51,9 @@ RateLimit = conf.registerPlugin('RateLimit')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(RateLimit, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
+conf.registerChannelValue(RateLimit, 'error',
+    registry.Boolean(False, _("""Determines whether an error message will
+    be sent if a user reaches the rate limit.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

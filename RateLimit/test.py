@@ -29,6 +29,7 @@
 ###
 
 from supybot.test import *
+import supybot.conf as conf
 
 class RateLimitTestCase(PluginTestCase):
     plugins = ('RateLimit', 'User', 'Utilities')
@@ -52,6 +53,9 @@ class RateLimitTestCase(PluginTestCase):
         self.assertResponse('echo spam', 'spam', frm='foo!a@a')
         self.assertNoResponse('echo spam', frm='foo!a@a')
         self.assertResponse('echo spam', 'spam', frm='bar!a@a')
+        with conf.supybot.plugins.RateLimit.Error.context(True):
+            self.assertRegexp('echo spam', 'called more than 3 times',
+                    frm='foo!a@a')
 
         time.sleep(1.1)
 

@@ -138,6 +138,10 @@ class RateLimit(callbacks.Plugin):
             if len(list_) >= record.count:
                 self.log.info('Throttling command %r call (rate limited).',
                         command)
+                if self.registryValue('error', msg.args[0]):
+                    irc.error(_('This command has been called more than {0} '
+                                'times in the last {1} seconds.').format(
+                              record.count, record.interval))
                 return True
             list_.append((user, time.time()))
             self._history[command] = list_
