@@ -29,9 +29,48 @@
 ###
 
 from supybot.test import *
+import supybot.conf as conf
 
-class AutoTransTestCase(PluginTestCase):
+class AutoTransTestCase(ChannelPluginTestCase):
     plugins = ('AutoTrans',)
+
+    if network:
+        def testTranslate(self):
+            def feedMsg(msg):
+                return self._feedMsg(msg, usePrefixChar=False)
+            self.assertNotError('config channel plugins.AutoTrans.queries '
+                    'foo:en bar:de')
+            while self.irc.takeMsg():
+                pass
+            m = feedMsg('This is a test')
+            self.assertEqual(m.command, 'PRIVMSG', m)
+            self.assertEqual(m.args[0], 'bar', m)
+            self.assertEqual(m.args[1], '<test@#test> Dies ist ein Test', m)
+
+            self.assertEqual(self.irc.takeMsg(), None)
+
+            m = feedMsg('Dies ist ein Test')
+            self.assertEqual(m.command, 'PRIVMSG', m)
+            self.assertEqual(m.args[0], 'foo', m)
+            self.assertEqual(m.args[1], '<test@#test> This is a test', m)
+
+            self.assertEqual(self.irc.takeMsg(), None)
+
+            msgs = set((feedMsg('Ceci est un test'), self.irc.takeMsg()))
+            msgs_foo = list(filter(lambda m:m.args[0]=='foo', msgs))
+            msgs_bar = list(filter(lambda m:m.args[0]=='bar', msgs))
+            self.assertEqual(len(msgs_foo), 1)
+            self.assertEqual(len(msgs_bar), 1)
+            m = msgs_foo[0]
+            self.assertEqual(m.command, 'PRIVMSG', m)
+            self.assertEqual(m.args[0], 'foo', m)
+            self.assertEqual(m.args[1], '<test@#test> This is a test', m)
+            m = msgs_bar[0]
+            self.assertEqual(m.command, 'PRIVMSG', m)
+            self.assertEqual(m.args[0], 'bar', m)
+            self.assertEqual(m.args[1], '<test@#test> Dies ist ein Test', m)
+
+            self.assertEqual(self.irc.takeMsg(), None)
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
