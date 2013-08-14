@@ -33,9 +33,10 @@ from supybot.test import *
 class SeeksTestCase(PluginTestCase):
     plugins = ('Seeks',)
 
-    def testSearch(self):
-        self.assertRegexp('seeks search supybot',
-                'http://sourceforge.net/projects/supybot/')
+    if network:
+        def testSearch(self):
+            self.assertRegexp('seeks search supybot',
+                    'http://sourceforge.net/projects/supybot/')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
