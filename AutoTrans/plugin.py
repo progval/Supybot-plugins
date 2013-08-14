@@ -68,8 +68,8 @@ class AutoTrans(callbacks.Plugin):
         for lang in set(map(operator.itemgetter(1), conf)):
             result = utils.web.getUrlFd('http://translate.google.com/translate_a/t'
                                         '?client=t&hl=en&sl=auto&tl=%s&multires=1'
-                                        '&otf=1&ssel=0&tsel=0&uptl=en&sc=1&text='
-                                        '%s' % (lang, origin_text),
+                                        '&otf=1&ssel=0&tsel=0&uptl=%s&sc=1&text='
+                                        '%s' % (lang, lang, origin_text),
                                         headers).read().decode('utf8')
 
             while ',,' in result:
