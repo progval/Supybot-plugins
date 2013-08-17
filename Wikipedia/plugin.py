@@ -151,6 +151,7 @@ class Wikipedia(callbacks.Plugin):
                 if sys.version_info[0] < 3:
                     p = p.encode('utf-8')
                 reply += '%s %s' % (p, ircutils.bold(addr))
+        reply = reply.replace('&amp;','&')
         irc.reply(reply)
     wiki = wrap(wiki, ['text'])
 
