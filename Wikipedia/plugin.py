@@ -87,6 +87,11 @@ class Wikipedia(callbacks.Plugin):
                                 '[@title="Special:Search"]')
         if didyoumean:
             redirect = didyoumean[0].text_content().strip()
+            if sys.version_info[0] < 3:
+                if isinstance(redirect, unicode):
+                    redirect = redirect.encode('utf-8','replace')
+                if isinstance(search, unicode):
+                    search = search.encode('utf-8','replace')
             reply += _('I didn\'t find anything for "%s".'
                        'Did you mean "%s"? ') % (search, redirect)
             addr = self.registryValue('url', msg.args[0]) + \
@@ -108,6 +113,7 @@ class Wikipedia(callbacks.Plugin):
             article = utils.web.getUrl(addr)
             if sys.version_info[0] >= 3:
                 article = article.decode()
+
             tree = lxml.html.document_fromstring(article)
             search = redirect
         # otherwise, simply return the title and whether it redirected
@@ -119,6 +125,11 @@ class Wikipedia(callbacks.Plugin):
                 redirect = redirect.text_content().strip()
                 title = tree.xpath('//*[@class="firstHeading"]')
                 title = title[0].text_content().strip()
+                if sys.version_info[0] < 3:
+                    if isinstance(title, unicode):
+                        title = title.encode('utf-8','replace')
+                    if isinstance(redirect, unicode):
+                        redirect = redirect.encode('utf-8','replace')
                 reply += '"%s" (Redirect from "%s"): ' % (title, redirect)
         # extract the address we got it from
         addr = re.search(_('Retrieved from') + ' "<a href="([^"]*)">', article)
@@ -149,7 +160,10 @@ class Wikipedia(callbacks.Plugin):
                 p = p.text_content()
                 p = p.strip()
                 if sys.version_info[0] < 3:
-                    p = p.encode('utf-8')
+                    if isinstance(p, unicode):
+                        p = p.encode('utf-8', 'replace')
+                    if isinstance(reply, unicode):
+                        reply = reply.encode('utf-8','replace')
                 reply += '%s %s' % (p, ircutils.bold(addr))
         reply = reply.replace('&amp;','&')
         irc.reply(reply)
