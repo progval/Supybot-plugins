@@ -96,7 +96,8 @@ class Wikipedia(callbacks.Plugin):
                        'Did you mean "%s"? ') % (search, redirect)
             addr = self.registryValue('url', msg.args[0]) + \
                    didyoumean[0].get('href')
-            article = utils.web.getUrl(addr)
+            if not article.startswith('http'):
+                article = utils.web.getUrl('https://' + addr)
             if sys.version_info[0] >= 3:
                 article = article.decode()
             tree = lxml.html.document_fromstring(article)
