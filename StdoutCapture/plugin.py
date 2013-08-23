@@ -68,6 +68,8 @@ class StdoutCapture(callbacks.Plugin):
         sys.stderr = self.StdoutBuffer(sys.stderr)
         # I'm being a bit evil here.
         for logger in logging._handlerList:
+            if isinstance(logger, StdoutBuffer):
+                continue
             logger = logger() # That's a weakref
             if not hasattr(logger, 'stream'):
                 continue
