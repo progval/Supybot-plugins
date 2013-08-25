@@ -136,7 +136,7 @@ class IMDb(callbacks.Plugin):
         if elem:
             year = elem[0].text
         else:
-            year = unid(root.xpath('//h1[span/@itemprop="name"]/span[last()]')[0].text.strip().strip(')(').replace(u('\u2013', '-')))
+            year = unid(root.xpath('//h1[span/@itemprop="name"]/span[last()]')[0].text.strip().strip(')(').replace(u'\u2013','-'))
 
         elem = root.xpath('//div[@class="star-box-details"]/strong/span|//div[@class="star-box-details"]/span[@class="mellow"]/span')
         if elem:
