@@ -52,7 +52,7 @@ class Glob2ChanCallback(httpserver.SupyHTTPServerCallback):
     index and try out other plugins (if any)."""
     def doGet(self, handler, path):
         host = handler.address_string()
-        if host == 'localhost':
+        if host in ('localhost', '127.0.0.1', '::1'):
             assert path.startswith('/status/')
             status = path[len('/status/'):].replace('/', ' ')
             self.plugin._announce(ircutils.bold('[YOG]') +
@@ -60,12 +60,12 @@ class Glob2ChanCallback(httpserver.SupyHTTPServerCallback):
             self.send_response(200)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
-            self.wfile.write('Channel notified.')
+            self.wfile.write(b'Channel notified.')
         else:
             self.send_response(403)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
-            self.wfile.write('Not authorized.')
+            self.wfile.write(b'Not authorized.')
 
 instance = None
 
