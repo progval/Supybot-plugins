@@ -58,7 +58,11 @@ class XpY(registry.String):
             registry.String.setValue(self, v)
         else:
             self.error()
-XpY = internationalizeDocstring(XpY)
+try:
+    XpY = internationalizeDocstring(XpY)
+except TypeError:
+    # Pypy
+    pass
 
 class Punishment(registry.String):
     """Value must be a valid punishment ('ban', 'kick', 'kban', 'mode+X',
