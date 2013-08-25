@@ -83,7 +83,11 @@ class Punishment(registry.String):
                 self.error()
                 return
         self.setValue(s)
-Punishment = internationalizeDocstring(Punishment)
+try:
+    Punishment = internationalizeDocstring(Punishment)
+except TypeError:
+    # Pypy
+    pass
 
 AttackProtector = conf.registerPlugin('AttackProtector')
 # This is where your configuration variables (if any) should go.  For example:
