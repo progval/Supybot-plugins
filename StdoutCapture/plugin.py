@@ -31,6 +31,7 @@
 import sys
 import json
 import logging
+import weakref
 
 import supybot.utils as utils
 from supybot.commands import *
@@ -68,9 +69,8 @@ class StdoutCapture(callbacks.Plugin):
         sys.stderr = self.StdoutBuffer(sys.stderr)
         # I'm being a bit evil here.
         for logger in logging._handlerList:
-            if isinstance(logger, StdoutBuffer):
-                continue
-            logger = logger() # That's a weakref
+            if isinstance(logger, weakref.ref):
+                logger = logger()
             if not hasattr(logger, 'stream'):
                 continue
             if logger.stream is sys.stdout._real:
