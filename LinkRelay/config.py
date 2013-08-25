@@ -53,7 +53,11 @@ class ColorNumber(registry.String):
             self.error()
             return
         self.setValue(s)
-ColorNumber = internationalizeDocstring(ColorNumber)
+try:
+    ColorNumber = internationalizeDocstring(ColorNumber)
+except TypeError:
+    # Pypy
+    pass
 
 
 LinkRelay = conf.registerPlugin('LinkRelay')
