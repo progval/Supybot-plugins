@@ -42,5 +42,12 @@ class CoinpanTestCase(ChannelPluginTestCase):
         self.assertSnarfResponse('foo Coin bar', 'foo Pan bar')
         self.assertSnarfResponse('foo c01n bar', 'foo p4n bar')
 
+        self.assertSnarfResponse('foo coïn bar', 'foo pän bar')
+        self.assertSnarfResponse('foo cöïn bar', 'foo pän bar')
+        self.assertSnarfResponse('foo côîn bar', 'foo pân bar')
+        self.assertSnarfResponse('foo côïn bar', 'foo COINCOINCOINPANPANPAN bar')
+        self.assertSnarfResponse('foo coiÑ bar', 'foo paÑ bar')
+        self.assertSnarfResponse('foo KOIN bar', 'foo PANG bar')
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

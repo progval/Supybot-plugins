@@ -43,19 +43,33 @@ except:
     # without the i18n module
     _ = lambda x:x
 
-_regexp = re.compile('c[o0][i1]n', re.I)
+_regexp = re.compile('[cçk][o0öô][i1ïî][nñ]', re.I)
 def replacer(match):
     coin = match.group(0)
     assert len(coin) == 4
     pan = ''
-    if coin[0] == 'c':
+    if coin[0] in 'ck':
         pan += 'p'
-    elif coin[0] == 'C':
+    elif coin[0] in 'CK':
         pan += 'P'
+    elif coin[0] == 'ç':
+        pan += '\u0327p'
+    elif coin[0] == 'Ç':
+        pan += '\u0327P'
     else:
         raise AssertionError(coin)
     if coin[1] == '0' or coin[2] == '1':
         pan += '4'
+    elif coin[1:3] in 'Oï OÏ oÏ Öi ÖI öI Öï ÖÏ öÏ'.split(' '):
+        pan += 'Ä'
+    elif coin[1:3] in 'Oî OÎ oÎ Ôi ÔI ôI Ôî ÔÎ ôÎ'.split(' '):
+        pan += 'Â'
+    elif coin[1:3] in 'öi öï oï'.split(' '):
+        pan += 'ä'
+    elif coin[1:3] in 'ôi ôî oî'.split(' '):
+        pan += 'â'
+    elif coin[1] in 'ôÔöÖ' and coin[2] in 'îÎïÏ':
+        return 'COINCOINCOINPANPANPAN'
     elif coin[1] == 'O' or coin[2] == 'I':
         pan += 'A'
     elif coin[1] == 'o' and coin[2] == 'i':
@@ -66,8 +80,16 @@ def replacer(match):
         pan += 'n'
     elif coin[3] == 'N':
         pan += 'N'
+    elif coin[3] == 'ñ':
+        pan += 'ñ'
+    elif coin[3] == 'Ñ':
+        pan += 'Ñ'
     else:
         raise AssertionError(coin)
+    if coin[0] == 'k':
+        pan += 'g'
+    elif coin[0] == 'K':
+        pan += 'G'
     return pan
 
 class Coinpan(callbacks.PluginRegexp):
@@ -78,7 +100,7 @@ class Coinpan(callbacks.PluginRegexp):
 
     @urlSnarfer
     def coinSnarfer(self, irc, msg, match):
-        """(?i).*c[o0][i1]n.*"""
+        """(?i).*[cçk][o0öô][i1ïî][nñ].*"""
         if self.registryValue('enable', msg.args[0]):
             irc.reply(_regexp.sub(replacer, msg.args[1]), prefixNick=False)
 
