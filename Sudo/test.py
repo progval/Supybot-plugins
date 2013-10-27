@@ -30,7 +30,7 @@
 
 import supybot.ircutils as ircutils
 from supybot.test import *
-import plugin
+from . import plugin
 assert hasattr(plugin, 'SudoDB')
 
 from cStringIO import StringIO
