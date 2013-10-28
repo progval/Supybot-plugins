@@ -67,7 +67,7 @@ class Trigger(callbacks.Plugin):
         if channel is None:
             channel = msg.args[0]
         command = self.registryValue('triggers.%s' % triggerName, channel)
-        if not filter(lambda x:x!=' ', command):
+        if not list(filter(lambda x:x!=' ', command)):
             return
         tokens = callbacks.tokenize(command)
         if not tokens:
