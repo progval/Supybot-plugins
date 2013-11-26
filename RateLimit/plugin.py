@@ -115,7 +115,7 @@ class RateLimit(callbacks.Plugin):
         callbacks.Commands.pre_command_callbacks.remove(
                 self._pre_command_callback)
 
-    def _pre_command_callback(self, command, irc, msg, *args, **kwargs):
+    def _pre_command_callback(self, plugin, command, irc, msg, *args, **kwargs):
         command = ' '.join(command)
         try:
             user = ircdb.users.getUserId(msg.prefix)
