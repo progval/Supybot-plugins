@@ -217,7 +217,7 @@ class Sudo(callbacks.Plugin):
                 os.unlink(self._path)
             except OSError:
                 pass
-            self.db.save(open(self._path, 'au'))
+            self.db.save(open(self._path, 'a'))
         callbacks.Plugin.die(self)
 
 
