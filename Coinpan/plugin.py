@@ -43,7 +43,8 @@ except:
     # without the i18n module
     _ = lambda x:x
 
-_regexp = re.compile('[cçk]([o0öôØ][i1ïî]|[i1][o0Ø])[nñ]', re.I)
+REGEXP = '[cçk]^([o0öôØ]^[i1ïî]^|[i1]^[o0Ø])^[nñ]'
+_regexp = re.compile(REGEXP.replace('^', ''), re.I)
 def replacer(match):
     coin = match.group(0)
     assert len(coin) == 4
@@ -107,18 +108,23 @@ def replacer(match):
         pan = pan.replace('4', 'ㄣ')
     return pan
 
+def snarfer_generator():
+    def coinSnarfer(self, irc, msg, match):
+        if self.registryValue('enable', msg.args[0]):
+            txt = msg.args[1].replace('>o_/', '>x_/').replace('\_o<', '\_x<')
+            txt = txt.replace('\u200b', '')
+            irc.reply(_regexp.sub(replacer, txt), prefixNick=False)
+    regexp = '(?i).*(%s|>^o^_^/|\^_^o^<).*' % REGEXP
+    regexp = regexp.replace('^', '\u200b?')
+    coinSnarfer.__doc__ = regexp
+    return coinSnarfer
+
 class Coinpan(callbacks.PluginRegexp):
     """Add the help for "@plugin help Coinpan" here
     This should describe *how* to use this plugin."""
 
     regexps = ['coinSnarfer']
-
-    @urlSnarfer
-    def coinSnarfer(self, irc, msg, match):
-        """(?i).*([cçk]([o0öôØ][i1ïî]|[i1][o0Ø])[nñ]|>o_/|\_o<).*"""
-        if self.registryValue('enable', msg.args[0]):
-            txt = msg.args[1].replace('>o_/', '>x_/').replace('\_o<', '\_x<')
-            irc.reply(_regexp.sub(replacer, txt), prefixNick=False)
+    coinSnarfer = snarfer_generator()
 
 
 Class = Coinpan
