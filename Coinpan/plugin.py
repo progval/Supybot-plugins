@@ -43,7 +43,7 @@ except:
     # without the i18n module
     _ = lambda x:x
 
-REGEXP = '[cçk]^([o0öôØ]^[i1ïî]^|[i1]^[o0Ø])^[nñ]'
+REGEXP = '[cçk]^([o0öôØ]^[i1ïî]|[i1]^[o0Ø])^[nñ]'
 _regexp = re.compile(REGEXP.replace('^', ''), re.I)
 def replacer(match):
     coin = match.group(0)
@@ -111,11 +111,12 @@ def replacer(match):
 def snarfer_generator():
     def coinSnarfer(self, irc, msg, match):
         if self.registryValue('enable', msg.args[0]):
-            txt = msg.args[1].replace('>o_/', '>x_/').replace('\_o<', '\_x<')
+            txt = msg.args[1]
             txt = txt.replace('\u200b', '')
+            txt = txt.replace('>o_/', '>x_/').replace('\_o<', '\_x<')
             irc.reply(_regexp.sub(replacer, txt), prefixNick=False)
     regexp = '(?i).*(%s|>^o^_^/|\^_^o^<).*' % REGEXP
-    regexp = regexp.replace('^', '\u200b?')
+    regexp = regexp.replace('^', '\u200b*')
     coinSnarfer.__doc__ = regexp
     return coinSnarfer
 
