@@ -43,10 +43,19 @@ except:
     # without the i18n module
     _ = lambda x:x
 
-_regexp = re.compile('[cçk][o0öô][i1ïî][nñ]', re.I)
+_regexp = re.compile('[cçk]([o0öôØ][i1ïî]|[i1][o0Ø])[nñ]', re.I)
 def replacer(match):
     coin = match.group(0)
     assert len(coin) == 4
+    reverse = coin[1] in 'i1I'
+    if reverse:
+        assert coin[2] in 'oO0'
+        coin = coin[0] + coin[2] + coin[1] + coin[3]
+        reverse = True
+    strike = 'Ø' in coin
+    if strike:
+        coin = coin.replace('Ø', 'o')
+    coin = coin.replace('Ο', 'O')
     pan = ''
     if coin[0] in 'ck':
         pan += 'p'
@@ -58,6 +67,8 @@ def replacer(match):
         pan += '\u0327P'
     else:
         raise AssertionError(coin)
+    if strike:
+        pan += '\u0336'
     if coin[1] == '0' or coin[2] == '1':
         pan += '4'
     elif coin[1:3] in 'Oï OÏ oÏ Öi ÖI öI Öï ÖÏ öÏ'.split(' '):
@@ -90,6 +101,10 @@ def replacer(match):
         pan += 'g'
     elif coin[0] == 'K':
         pan += 'G'
+    if reverse:
+        pan = pan.replace('a', 'ɐ')
+        pan = pan.replace('A', '∀')
+        pan = pan.replace('4', 'ㄣ')
     return pan
 
 class Coinpan(callbacks.PluginRegexp):
@@ -100,9 +115,10 @@ class Coinpan(callbacks.PluginRegexp):
 
     @urlSnarfer
     def coinSnarfer(self, irc, msg, match):
-        """(?i).*[cçk][o0öô][i1ïî][nñ].*"""
+        """(?i).*([cçk]([o0öôØ][i1ïî]|[i1][o0Ø])[nñ]|>o_/|\_o<).*"""
         if self.registryValue('enable', msg.args[0]):
-            irc.reply(_regexp.sub(replacer, msg.args[1]), prefixNick=False)
+            txt = msg.args[1].replace('>o_/', '>x_/').replace('\_o<', '\_x<')
+            irc.reply(_regexp.sub(replacer, txt), prefixNick=False)
 
 
 Class = Coinpan
