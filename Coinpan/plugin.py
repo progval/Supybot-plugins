@@ -56,7 +56,6 @@ def replacer(match):
     strike = 'Ø' in coin
     if strike:
         coin = coin.replace('Ø', 'o')
-    coin = coin.replace('Ο', 'O')
     pan = ''
     if coin[0] in 'ck':
         pan += 'p'
@@ -81,7 +80,12 @@ def replacer(match):
     elif coin[1:3] in 'ôi ôî oî'.split(' '):
         pan += 'â'
     elif coin[1] in 'ôÔöÖ' and coin[2] in 'îÎïÏ':
-        return 'COINCOINCOINPANPANPAN'
+        if coin[0] in 'kK':
+            return'KOINKOINKOINPANGPANGPANG'
+        elif coin[0] in 'ĉĈ':
+            return'ĈOINĈOINĈOINPANPANPAN'
+        else:
+            return'COINCOINCOINPANPANPAN'
     elif coin[1] == 'O' or coin[2] == 'I':
         pan += 'A'
     elif coin[1] == 'o' and coin[2] == 'i':
@@ -113,9 +117,11 @@ def snarfer_generator():
         if self.registryValue('enable', msg.args[0]):
             txt = msg.args[1]
             txt = txt.replace('\u200b', '')
+            txt = txt.replace('Ο', 'O')
             txt = txt.replace('>o_/', '>x_/').replace('\_o<', '\_x<')
+            txt = txt.replace('>O_/', '>x_/').replace('\_O<', '\_x<')
             irc.reply(_regexp.sub(replacer, txt), prefixNick=False)
-    regexp = '(?i).*(%s|>^o^_^/|\^_^o^<).*' % REGEXP
+    regexp = '(?i).*(%s|>^o^_^/|\^_^[Oo]^<).*' % REGEXP
     regexp = regexp.replace('^', '\u200b*')
     coinSnarfer.__doc__ = regexp
     return coinSnarfer
