@@ -107,7 +107,10 @@ def query(caller, type_, uri_end, args):
     args = dict([(x,y) for x,y in args.items() if y is not None])
     url = '%s/%s/%s?%s' % (caller._url(), type_, uri_end,
                            urlencode(args))
-    return json.load(utils.web.getUrlFd(url))
+    if sys.version_info[0] >= 3:
+        return json.loads(utils.web.getUrl(url).decode('utf8'))
+    else:
+        return json.load(utils.web.getUrlFd(url))
 
 #####################
 # Plugin itself
