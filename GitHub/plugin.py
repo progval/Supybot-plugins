@@ -46,8 +46,10 @@ import supybot.httpserver as httpserver
 
 if sys.version_info[0] < 3:
     from cStringIO import StringIO
+    quote_plus = urllib.quote_plus
 else:
     from io import StringIO
+    quote_plus = urllib.parse.quote_plus
 try:
     from supybot.i18n import PluginInternationalization
     from supybot.i18n import internationalizeDocstring
@@ -277,7 +279,7 @@ class GitHub(callbacks.Plugin):
                 if name in args:
                     args[name] = value
             results = query(self, 'legacy/repos/search',
-                    urllib.quote_plus(search), args)
+                    quote_plus(search), args)
             reply = ' & '.join('%s/%s' % (x['owner'], x['name'])
                                for x in results['repositories'])
             if reply == '':
