@@ -155,7 +155,7 @@ class GitHub(callbacks.Plugin):
                 log.error('Cannot connect to git.io: %s' % e)
 
             s = _('%s/%s (in %s): %s committed %s %s') % \
-                    (payload['repository']['owner']['login'],
+                    (payload['repository']['owner']['name'],
                      bold(payload['repository']['name']),
                      bold(payload['ref'].split('/')[-1]),
                      commit['author']['name'],
@@ -168,7 +168,7 @@ class GitHub(callbacks.Plugin):
             return ircmsgs.privmsg(channel, s)
 
         def onPayload(self, payload):
-            repo = '%s/%s' % (payload['repository']['owner']['login'],
+            repo = '%s/%s' % (payload['repository']['owner']['name'],
                               payload['repository']['name'])
             announces = self._load()
             if repo not in announces:
