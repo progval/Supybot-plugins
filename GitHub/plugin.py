@@ -198,7 +198,6 @@ class GitHub(callbacks.Plugin):
                     repl[key + '__branch'] = value.split('/', 2)[2]
                 elif isinstance(value, str):
                     repl[key + '__firstline'] = value.split('\n', 1)[0]
-            print(repr(repl))
             s = Template(format_).safe_substitute(repl)
             if hidden is not None:
                 s += _(' (+ %i hidden commits)') % hidden

@@ -65,11 +65,22 @@ conf.registerGlobalValue(GitHub, 'announces',
 
 conf.registerGroup(GitHub, 'format')
 conf.registerChannelValue(GitHub.format, 'push',
-        registry.String
+        registry.String(
         _('echo $repository__owner__name/\x02$repository__name\x02 '
         '(in \x02$ref__branch\x02): $__commit__author__name committed '
         '\x02$__commit__message__firstline\x02 $__commit__url__tiny') \
         .replace('\n        ', ' '),
         _("""Format for push events.""")))
+
+for event_type in ('commit_comment', 'create', 'delete', 'deployment',
+        'deployment_status', 'download', 'follow', 'fork', 'fork_apply',
+        'gist', 'gollum', 'issue_comment', 'issues', 'member', 'public',
+        'pull_request', 'pull_request_review_comment', 'push', 'release',
+        'status', 'team_add', 'watch'):
+    if event_type == 'push':
+        continue
+    conf.registerChannelValue(GitHub.format, event_type,
+            registry.String('', _("""Format for %s events.""") % event_type))
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
