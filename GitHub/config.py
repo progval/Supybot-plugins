@@ -63,4 +63,13 @@ conf.registerGlobalValue(GitHub, 'announces',
         variable yourself, unless you know what you do. Use '@Github announce
         add' or '@Github announce remove' instead.""")))
 
+conf.registerGroup(GitHub, 'format')
+conf.registerChannelValue(GitHub.format, 'push',
+        registry.String
+        _('echo $repository__owner__name/\x02$repository__name\x02 '
+        '(in \x02$ref__branch\x02): $__commit__author__name committed '
+        '\x02$__commit__message__firstline\x02 $__commit__url__tiny') \
+        .replace('\n        ', ' '),
+        _("""Format for push events.""")))
+
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

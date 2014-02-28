@@ -1,5 +1,5 @@
 ###
-# Copyright (c) 2011, Valentin Lorentz
+# Copyright (c) 2011-2014, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@ import time
 import urllib
 import socket
 import threading
+from string import Template
 import supybot.log as log
 import supybot.utils as utils
 import supybot.world as world
@@ -73,6 +74,28 @@ else:
         return s
     urlencode = urllib.urlencode
 
+def flatten_subdicts(dicts, flat=None):
+    """Change dict of dicts into a dict of strings/integers. Useful for
+    using in string formatting."""
+    if flat is None:
+        # Instanciate the dictionnary when the function is run and now when it
+        # is declared; otherwise the same dictionnary instance will be kept and
+        # it will have side effects (memory exhaustion, ...)
+        flat = {}
+    if isinstance(dicts, list):
+        return flatten_subdicts(dict(enumerate(dicts)))
+    elif isinstance(dicts, dict):
+        for key, value in dicts.items():
+            if isinstance(value, dict):
+                value = dict(flatten_subdicts(value))
+                for subkey, subvalue in value.items():
+                    flat['%s__%s' % (key, subkey)] = subvalue
+            else:
+                flat[key] = value
+        return flat
+    else:
+        return dicts
+
 #####################
 # Server stuff
 #####################
@@ -86,6 +109,7 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
         if not handler.address_string().endswith('.rs.github.com') and \
                 not handler.address_string().endswith('.cloud-ips.com') and \
                 not handler.address_string() == 'localhost' and \
+                not handler.address_string().startswith('127.0.0.') and \
                 not handler.address_string().startswith('192.30.252.') and \
                 not handler.address_string().startswith('204.232.175.'):
             log.warning("""'%s' tried to act as a web hook for Github,
@@ -95,11 +119,15 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
             self.end_headers()
             self.wfile.write(b('Error: you are not a GitHub server.'))
         else:
-            self.send_response(200)
-            self.send_header('Content-type', 'text/plain')
-            self.end_headers()
-            self.wfile.write(b('Thanks.'))
-            self.plugin.announce.onPayload(json.loads(form['payload'].value))
+            headers = dict(self.headers)
+            try:
+                self.send_response(200)
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write(b('Thanks.'))
+            except socket.error:
+                pass
+            self.plugin.announce.onPayload(headers, json.loads(form['payload'].value))
 
 #####################
 # API access stuff
@@ -134,12 +162,13 @@ class GitHub(callbacks.Plugin):
         callback = GithubCallback()
         callback.plugin = self
         httpserver.hook('github', callback)
+        for cb in self.cbs:
+            cb.plugin = self
+
+
 
     class announce(callbacks.Commands):
-        def _createPrivmsg(self, channel, payload, commit, hidden=None):
-            bold = ircutils.bold
-            url = commit['url']
-
+        def _shorten_url(self, url):
             try:
                 data = urlencode({'url': url})
                 if sys.version_info[0] >= 3:
@@ -153,23 +182,34 @@ class GitHub(callbacks.Plugin):
                             f.headers.headers)[0].split(': ', 1)[1].strip()
             except Exception as e:
                 log.error('Cannot connect to git.io: %s' % e)
+            return url
+        def _createPrivmsg(self, channel, payload, event, hidden=None):
+            bold = ircutils.bold
 
-            s = _('%s/%s (in %s): %s committed %s %s') % \
-                    (payload['repository']['owner']['name'],
-                     bold(payload['repository']['name']),
-                     bold(payload['ref'].split('/')[-1]),
-                     commit['author']['name'],
-                     bold(commit['message'].split('\n')[0]),
-                     url)
+
+            format_ = self.plugin.registryValue('format.%s' % event, channel)
+            if not format_.strip():
+                return
+            repl = flatten_subdicts(payload)
+            for (key, value) in dict(repl).items():
+                if key.endswith('url'):
+                    repl[key + '__tiny'] = self._shorten_url(value)
+                elif key.endswith('ref'):
+                    repl[key + '__branch'] = value.split('/', 2)[2]
+                elif isinstance(value, str):
+                    repl[key + '__firstline'] = value.split('\n', 1)[0]
+            print(repr(repl))
+            s = Template(format_).safe_substitute(repl)
             if hidden is not None:
                 s += _(' (+ %i hidden commits)') % hidden
             if sys.version_info[0] < 3:
                 s = s.encode('utf-8')
             return ircmsgs.privmsg(channel, s)
 
-        def onPayload(self, payload):
+        def onPayload(self, headers, payload):
             repo = '%s/%s' % (payload['repository']['owner']['name'],
                               payload['repository']['name'])
+            event = headers['X-GitHub-Event']
             announces = self._load()
             if repo not in announces:
                 log.info('Commit for repo %s not announced anywhere' % repo)
@@ -178,22 +218,30 @@ class GitHub(callbacks.Plugin):
                 for irc in world.ircs:
                     if channel in irc.state.channels:
                         break
-                commits = payload['commits']
-                if channel not in irc.state.channels:
-                    log.info('Cannot announce commit for repo %s on %s' %
-                             (repo, channel))
-                elif len(commits) == 0:
-                    log.warning('GitHub callback called without any commit.')
+                if event == 'push':
+                    commits = payload['commits']
+                    if channel not in irc.state.channels:
+                        log.info('Cannot announce commit for repo %s on %s' %
+                                 (repo, channel))
+                    elif len(commits) == 0:
+                        log.warning('GitHub push hook called without any commit.')
+                    else:
+                        hidden = None
+                        last_commit = commits[-1]
+                        if last_commit['message'].startswith('Merge ') and \
+                                len(commits) > 5:
+                            hidden = len(commits) + 1
+                            commits = [last_commit]
+                        payload2 = dict(payload)
+                        for commit in commits:
+                            payload2['__commit'] = commit
+                            msg = self._createPrivmsg(channel, payload2,
+                                    'push', hidden)
+                            if msg:
+                                irc.queueMsg(msg)
                 else:
-                    hidden = None
-                    last_commit = commits[-1]
-                    if last_commit['message'].startswith('Merge ') and \
-                            len(commits) > 5:
-                        hidden = len(commits) + 1
-                        payload['commits'] = [last_commit]
-                    for commit in payload['commits']:
-                        msg = self._createPrivmsg(channel, payload, commit,
-                                hidden)
+                    msg = self._createPrivmsg(channel, payload, event)
+                    if msg:
                         irc.queueMsg(msg)
 
         def _load(self):
