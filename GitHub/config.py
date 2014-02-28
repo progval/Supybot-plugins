@@ -66,7 +66,7 @@ conf.registerGlobalValue(GitHub, 'announces',
 conf.registerGroup(GitHub, 'format')
 conf.registerChannelValue(GitHub.format, 'push',
         registry.String(
-        _('echo $repository__owner__name/\x02$repository__name\x02 '
+        _('$repository__owner__name/\x02$repository__name\x02 '
         '(in \x02$ref__branch\x02): $__commit__author__name committed '
         '\x02$__commit__message__firstline\x02 $__commit__url__tiny') \
         .replace('\n        ', ' '),
