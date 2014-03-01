@@ -237,6 +237,10 @@ class AttackProtector(callbacks.Plugin):
         elif punishment.startswith('umode'):
             msg = ircmsgs.mode(channel, (punishment[len('umode'):], msg.nick))
             irc.queueMsg(msg)
+            #now reverse the polarity
+            unban = functools.partial(irc.queueMsg,
+                        ircmsgs.mode(channel,(punishment[len('umode'):].replace('+','-').replace('-','+'), msg.nick))
+            schedule.addEvent(unban, delay + time.time())
         elif punishment.startswith('mmode'):
             msg = ircmsgs.mode(channel, (punishment[len('mmode'):], banmask))
             irc.queueMsg(msg)
