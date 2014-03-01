@@ -206,8 +206,7 @@ class GitHub(callbacks.Plugin):
             return ircmsgs.privmsg(channel, s)
 
         def onPayload(self, headers, payload):
-            repo = '%s/%s' % (payload['repository']['owner']['name'],
-                              payload['repository']['name'])
+            repo = payload['repository']['full_name']
             event = headers['X-GitHub-Event']
             announces = self._load()
             if repo not in announces:
