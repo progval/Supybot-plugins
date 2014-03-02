@@ -42,6 +42,7 @@ import supybot.schedule as schedule
 import supybot.registry as registry
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
+from string import maketrans
 
 try:
     from supybot.i18n import PluginInternationalization
@@ -235,11 +236,14 @@ class AttackProtector(callbacks.Plugin):
             msg = ircmsgs.mode(channel, punishment[len('mode'):])
             irc.queueMsg(msg)
         elif punishment.startswith('umode'):
+            nick= msg.nick
+            delay=self.registryValue('delay')
             msg = ircmsgs.mode(channel, (punishment[len('umode'):], msg.nick))
             irc.queueMsg(msg)
-            #now reverse the polarity
+            mode=punishment[len('umode'):]
+            polarityflip=maketrans("-+","+-")
             unban = functools.partial(irc.queueMsg,
-                        ircmsgs.mode(channel,(punishment[len('umode'):].replace('+','-').replace('-','+'), msg.nick))
+                    ircmsgs.mode(channel, (mode.translate(polarityflip),nick)))
             schedule.addEvent(unban, delay + time.time())
         elif punishment.startswith('mmode'):
             msg = ircmsgs.mode(channel, (punishment[len('mmode'):], banmask))
