@@ -89,7 +89,7 @@ class ExtendedApi(twitter.Api):
         Returns:
         A twitter.Status instance representing the retweet posted
         '''
-        if not self._oauth_consumer:
+        if hasattr(api, '_oauth_consumer') and not api._oauth_consumer:
             raise TwitterError("The twitter.Api instance must be authenticated.")
         try:
             if int(id) <= 0:
@@ -254,7 +254,7 @@ class Twitter(callbacks.Plugin):
                 lastRun = time.time()
                 self.log.debug(_('Fetching tweets for channel %s') % channel)
                 api = self._getApi(channel) # Reload it from conf everytime
-                if not api._oauth_consumer:
+                if hasattr(api, '_oauth_consumer') and not api._oauth_consumer:
                     return
                 retweets = self.registryValue('announce.retweets', channel)
                 try:
@@ -313,7 +313,7 @@ class Twitter(callbacks.Plugin):
         defaults to the <channel>'s account. If <channel> is not given, it
         defaults to the current channel."""
         api = self._getApi(channel)
-        if not api._oauth_consumer and user is None:
+        if hasattr(api, '_oauth_consumer') and not api._oauth_consumer and user is None:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op, try with another channel, or provide '
                         'a user name.'))
@@ -336,7 +336,7 @@ class Twitter(callbacks.Plugin):
         Replies with the people that follow this account. If <channel> is not
         given, it defaults to the current channel."""
         api = self._getApi(channel)
-        if not api._oauth_consumer:
+        if hasattr(api, '_oauth_consumer') and not api._oauth_consumer:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op, try with another channel, or provide '
                         'a user name.'))
@@ -356,7 +356,7 @@ class Twitter(callbacks.Plugin):
         given <channel>. If <channel> is not given, it defaults to the current
         channel."""
         api = self._getApi(channel)
-        if not api._oauth_consumer:
+        if hasattr(api, '_oauth_consumer') and not api._oauth_consumer:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op or try with another channel.'))
             return
@@ -378,7 +378,7 @@ class Twitter(callbacks.Plugin):
         to the <message>. If <channel> is not given, it defaults to the
         current channel."""
         api = self._getApi(channel)
-        if not api._oauth_consumer:
+        if hasattr(api, '_oauth_consumer') and not api._oauth_consumer:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op or try with another channel.'))
             return
@@ -443,7 +443,7 @@ class Twitter(callbacks.Plugin):
         optlist['with-id'] = 'with-id' in optlist
 
         api = self._getApi(channel)
-        if not api._oauth_consumer and user is None:
+        if hasattr(api, '_oauth_consumer') and not api._oauth_consumer and user is None:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op, try with another channel.'))
             return
@@ -571,7 +571,7 @@ class Twitter(callbacks.Plugin):
         """
 
         api = self._getApi(channel)
-        if not api._oauth_consumer:
+        if hasattr(api, '_oauth_consumer') and not api._oauth_consumer:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op, try with another channel.'))
             return
@@ -594,7 +594,7 @@ class Twitter(callbacks.Plugin):
         """
 
         api = self._getApi(channel)
-        if not api._oauth_consumer:
+        if hasattr(api, '_oauth_consumer') and not api._oauth_consumer:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op, try with another channel.'))
             return
@@ -630,7 +630,7 @@ class Twitter(callbacks.Plugin):
                 return
 
         api = self._getApi(channel)
-        if not api._oauth_consumer:
+        if hasattr(api, '_oauth_consumer') and not api._oauth_consumer:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op, try with another channel.'))
             return
@@ -673,7 +673,7 @@ class Twitter(callbacks.Plugin):
         """
 
         api = self._getApi(channel)
-        if not api._oauth_consumer:
+        if hasattr(api, '_oauth_consumer') and not api._oauth_consumer:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op, try with another channel.'))
             return
