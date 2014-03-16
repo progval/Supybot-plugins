@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 ###
 # Copyright (c) 2013, Valentin Lorentz
 # All rights reserved.
@@ -28,6 +29,7 @@
 
 ###
 
+import sys
 from supybot.test import *
 
 class CoinpanTestCase(ChannelPluginTestCase):
@@ -54,5 +56,8 @@ class CoinpanTestCase(ChannelPluginTestCase):
         self.assertSnarfResponse('foo CION bar', 'foo P∀N bar')
         self.assertSnarfResponse('foo cion bar', 'foo pɐn bar')
 
+    if sys.version_info[0] == 2:
+        def testCoinpan(self):
+            print('Skipped')
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
