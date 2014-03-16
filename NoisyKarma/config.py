@@ -53,7 +53,7 @@ def value_validator(value):
     for subvalue in value:
         if not isinstance(subvalue, dict):
             return _('List items must be dicts.')
-        if set(value.keys()) != {'action', 'message'}:
+        if set(value.keys()) != set(['action', 'message']):
             return _('List items must be dicts with "action" and "message" '
                     'as keys.')
     return None
