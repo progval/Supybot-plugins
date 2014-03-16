@@ -182,8 +182,9 @@ class GitHub(callbacks.Plugin):
                             f.headers.headers)[0].split(': ', 1)[1].strip()
             except Exception as e:
                 log.error('Cannot connect to git.io: %s' % e)
+                return None
             return url
-        def _createPrivmsg(self, channel, payload, event, hidden=None):
+        def _createPrivmsg(self, irc, channel, payload, event, hidden=None):
             bold = ircutils.bold
 
 
@@ -191,22 +192,50 @@ class GitHub(callbacks.Plugin):
             if not format_.strip():
                 return
             repl = flatten_subdicts(payload)
+            try_gitio = True
             for (key, value) in dict(repl).items():
                 if key.endswith('url'):
-                    repl[key + '__tiny'] = self._shorten_url(value)
+                    if try_gitio:
+                        url = self._shorten_url(value)
+                    else:
+                        url = None
+                    if url:
+                        repl[key + '__tiny'] = url
+                    else:
+                        repl[key + '__tiny'] = value
+                        try_gitio = False
                 elif key.endswith('ref'):
-                    repl[key + '__branch'] = value.split('/', 2)[2]
+                    try:
+                        repl[key + '__branch'] = value.split('/', 2)[2]
+                    except IndexError:
+                        pass
                 elif isinstance(value, str):
                     repl[key + '__firstline'] = value.split('\n', 1)[0]
-            s = Template(format_).safe_substitute(repl)
+            repl.update({'__hidden': hidden or 0})
+            command = Template(format_).safe_substitute(repl)
             if hidden is not None:
                 s += _(' (+ %i hidden commits)') % hidden
             if sys.version_info[0] < 3:
-                s = s.encode('utf-8')
-            return ircmsgs.privmsg(channel, s)
+                    s = s.encode('utf-8')
+            tokens = callbacks.tokenize(command)
+            if not tokens:
+                return
+            fake_msg = ircmsgs.IrcMsg(command='PRIVMSG',
+                    args=(channel, 'GITHUB'))
+            try:
+                self.plugin.Proxy(irc, fake_msg, tokens)
+            except Exception as  e:
+                self.plugin.log.exception('Error occured while running triggered command:')
 
         def onPayload(self, headers, payload):
-            repo = payload['repository']['full_name']
+            if 'full_name' in payload['repository']:
+                repo = payload['repository']['full_name']
+            elif 'name' in payload['repository']['owner']:
+                repo = '%s/%s' % (payload['repository']['owner']['name'],
+                                  payload['repository']['name'])
+            else:
+                repo = '%s/%s' % (payload['repository']['owner']['login'],
+                                  payload['repository']['name'])
             event = headers['X-GitHub-Event']
             announces = self._load()
             if repo not in announces:
@@ -233,14 +262,10 @@ class GitHub(callbacks.Plugin):
                         payload2 = dict(payload)
                         for commit in commits:
                             payload2['__commit'] = commit
-                            msg = self._createPrivmsg(channel, payload2,
+                            self._createPrivmsg(irc, channel, payload2,
                                     'push', hidden)
-                            if msg:
-                                irc.queueMsg(msg)
                 else:
-                    msg = self._createPrivmsg(channel, payload, event)
-                    if msg:
-                        irc.queueMsg(msg)
+                    self._createPrivmsg(irc, channel, payload, event)
 
         def _load(self):
             announces = instance.registryValue('announces').split(' || ')
