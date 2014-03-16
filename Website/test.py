@@ -33,12 +33,13 @@ from supybot.test import *
 class WebsiteTestCase(PluginTestCase):
     plugins = ('Website',)
 
-    def testPlugin(self):
-        self.assertError('plugin')
-        self.assertError('plugin Eeigrg')
-        self.assertResponse('plugin AttackProtector', 'This plugin aims to '
-                'provide a highly configurable protection against flood and '
-                'spam. http://supybot.fr.cr/plugins/view/AttackProtector/')
+    if network:
+        def testPlugin(self):
+            self.assertError('plugin')
+            self.assertError('plugin Eeigrg')
+            self.assertResponse('plugin AttackProtector', 'This plugin aims to '
+                    'provide a highly configurable protection against flood and '
+                    'spam. http://supybot.aperio.fr/plugins/view/AttackProtector/')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

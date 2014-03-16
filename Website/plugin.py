@@ -64,7 +64,7 @@ class WebsiteCallback(httpserver.SupyHTTPServerCallback):
 
 def query(path, args={}):
     args = dict([(x,y) for x,y in args.items() if y is not None])
-    url = 'http://supybot.fr.cr/api%s?%s' % (path, urlencode(args))
+    url = 'http://supybot.aperio.fr/api%s?%s' % (path, urlencode(args))
     data = utils.web.getUrl(url)
     if sys.version_info[0] >= 3:
         data = data.decode()
@@ -113,7 +113,7 @@ class Website(callbacks.Plugin):
                 if irc.network == 'freenode':
                     assert channel in irc.state.channels
                     s = ('%s just pasted %s (type: %s): '
-                            'http://supybot.fr.cr/paste/%s') % (
+                            'http://supybot.aperio.fr/paste/%s') % (
                             bold(author),
                             bold(name),
                             bold(lexer),
@@ -134,7 +134,7 @@ class Website(callbacks.Plugin):
             return
         irc.reply('%s %s' % (results['short_description'].replace('\r', '')
                                                          .replace('\n', ' '),
-                             'http://supybot.fr.cr/plugins/view/%s/' % name))
+                             'http://supybot.aperio.fr/plugins/view/%s/' % name))
     plugin = wrap(plugin, ['something'])
 
 
