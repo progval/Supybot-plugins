@@ -97,6 +97,9 @@ class NoisyKarma(callbacks.Plugin):
             irc.error(_('Karma cannot be null.', Raise=True))
         registry_value = registry_value.get(channel)
         with registry_value.editable() as rv:
+            if str(karma) in rv:
+                # Why do we need this????
+                del rv[str(karma)]
             rv[karma] = {'action': 'action' in optlist, 'message': message}
         irc.replySuccess()
 
