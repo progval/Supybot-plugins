@@ -30,6 +30,7 @@
 ###
 
 import sys
+from unittest import skip
 from supybot.test import *
 
 class CoinpanTestCase(ChannelPluginTestCase):
@@ -56,8 +57,10 @@ class CoinpanTestCase(ChannelPluginTestCase):
         self.assertSnarfResponse('foo CION bar', 'foo P∀N bar')
         self.assertSnarfResponse('foo cion bar', 'foo pɐn bar')
 
-    if sys.version_info[0] == 2:
+    if sys.version_info < (2, 7, 0):
         def testCoinpan(self):
-            print('Skipped')
+            pass
+    elif sys.version_info < (3, 0, 0):
+        testCoinpan = skip('Plugin not compatible with Python2.')(testCoinpan)
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
