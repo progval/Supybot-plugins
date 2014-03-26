@@ -213,10 +213,10 @@ class GitHub(callbacks.Plugin):
                     repl[key + '__firstline'] = value.split('\n', 1)[0]
             repl.update({'__hidden': hidden or 0})
             command = Template(format_).safe_substitute(repl)
-            if hidden is not None:
-                s += _(' (+ %i hidden commits)') % hidden
-            if sys.version_info[0] < 3:
-                    s = s.encode('utf-8')
+            #if hidden is not None:
+            #    s += _(' (+ %i hidden commits)') % hidden
+            #if sys.version_info[0] < 3:
+            #        s = s.encode('utf-8')
             tokens = callbacks.tokenize(command)
             if not tokens:
                 return
