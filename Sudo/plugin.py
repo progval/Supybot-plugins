@@ -188,7 +188,8 @@ class Sudo(callbacks.Plugin):
         name, rule = self.db.getRuleMatching(command)
         bannedChars = conf.supybot.commands.nested.brackets()
         if name is None:
-            log.warning('Sudo not granted to "%s"' % msg.prefix)
+            log.warning('Sudo for %r not granted to "%s"' %
+                    (command, msg.prefix))
             irc.error(_('Sudo not granted.'))
         else:
             assert rule is not None
