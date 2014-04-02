@@ -38,7 +38,7 @@ import random
 import datetime
 if sys.version_info[0] >= 3:
     from io import BytesIO
-else
+else:
     from cStringIO import StringIO as StringIO
 
 import supybot.conf as conf
@@ -170,7 +170,10 @@ def getTable(firstColumn, items, channel, urlLevel, page, orderby):
             percentParameter += (firstColumn,)
     output = tableHeaders % percentParameter
     if orderby is not None:
-        orderby = urllib.unquote(orderby)
+        if sys.version_info[0] >= 0:
+            orderby = urllib.parse.unquote(orderby)
+        else:
+            orderby = urllib.unquote(orderby)
         try:
             index = nameToColumnIndex[orderby]
             html, nbDisplayed = fillTable(items, page, index)
@@ -608,9 +611,9 @@ class WebStatsDB:
                 if to not in tmp_links_cache[chan][nick]:
                     tmp_links_cache[chan][nick].update({to: 0})
                 tmp_links_cache[chan][nick][to] += 1
-        for chan, nicks in tmp_links_cache.items():
-            for nick, tos in nicks.items(): # Yes, tos is the plural for to
-                for to, count in tos.items():
+        for chan, nicks in list(tmp_links_cache.items()):
+            for nick, tos in list(nicks.items()): # Yes, tos is the plural for to
+                for to, count in list(tos.items()):
                     if to not in nicks:
                         continue
                     cursor.execute('INSERT INTO links_cache VALUES(?,?,?,?)',
@@ -637,7 +640,7 @@ class WebStatsDB:
 
         If the key is not in the list, add it in the list with value list
         filled with zeros."""
-        if not tmpCache.has_key(key):
+        if key not in tmpCache:
             tmpCache.update({key: [0, 0, 0, 0, 0, 0, 0, 0, 0]})
 
     def _truncateCache(self):
@@ -766,7 +769,7 @@ class WebStatsDB:
                           FROM nicks_cache WHERE chan=?""", (chanName,))
         results = {}
         for row in cursor:
-            if not results.has_key(row[0]):
+            if row[0] not in results:
                 results.update({row[0]: row[1:]})
             else:
                 results.update({row[0]: tuple(sum(i)
