@@ -36,8 +36,10 @@ import time
 import urllib
 import random
 import datetime
-import pygraphviz
-from cStringIO import StringIO
+if sys.version_info[0] >= 3:
+    from io import BytesIO
+else
+    from cStringIO import StringIO as StringIO
 
 import supybot.conf as conf
 import supybot.world as world
@@ -443,6 +445,7 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
         return template % replacement
 
     def get_links(self, urlLevel, channel, page, orderby=None):
+        import pygraphviz
         cache = world.webStatsCacheLinks
         channel = '#' + channel
         items = self.db.getChanLinks(channel)
@@ -456,7 +459,7 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
             items = [(x,y,float(z)) for x,y,z in items]
             if not items:
                 graph.add_node('No links for the moment.')
-                buffer_ = StringIO()
+                buffer_ = BytesIO()
                 graph.draw(buffer_, prog='circo', format='png')
                 buffer_.seek(0)
                 output = buffer_.read()
@@ -479,7 +482,7 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                                color=insertedNicks[item[1]],
                                penwidth=item[2]/divideBy,
                                arrowsize=item[2]/divideBy/2+1)
-            buffer_ = StringIO()
+            buffer_ = BytesIO()
             graph.draw(buffer_, prog='circo', format='png')
             buffer_.seek(0)
             output = buffer_.read()
