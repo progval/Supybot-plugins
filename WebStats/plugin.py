@@ -201,7 +201,7 @@ PAGE_SKELETON = """\
     <body %%s>
 %%s
         <p id="footer">
-            <a href="http://supybot.com">Supybot</a> and
+            <a href="https://github.com/ProgVal/Limnoria">Limnoria</a> and
             <a href="https://github.com/ProgVal/Supybot-plugins/tree/master/WebStats/">WebStats</a> powered.<br />
             Libre software available under BSD licence.<br />
             Page generated at %s.
