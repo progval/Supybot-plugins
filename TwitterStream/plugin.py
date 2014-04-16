@@ -28,9 +28,6 @@
 
 ###
 
-import twitter
-import requests
-
 import supybot.utils as utils
 import supybot.schedule as schedule
 from supybot.commands import *
@@ -38,6 +35,19 @@ import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 from supybot.i18n import PluginInternationalization, internationalizeDocstring
+try:
+    import twitter
+except ImportError:
+    raise callbacks.Error('You have to install python-twitter.')
+except Exception as e:
+    raise callbacks.Error('Unknown exception importing twitter: %r' % e)
+try:
+    import requests
+except ImportError:
+    raise callbacks.Error('You have to install python-requests.')
+except Exception as e:
+    raise callbacks.Error('Unknown exception importing requests: %r' % e)
+
 
 _ = PluginInternationalization('TwitterStream')
 
