@@ -7,7 +7,7 @@ python:
   - "pypy"
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
-  - pip install limnoria chardet django lxml simplejson beautifulsoup4 python-twitter requests
+  - pip install limnoria chardet django lxml beautifulsoup4 python-twitter requests
 # command to run tests, e.g. python setup.py test
 script:
   - echo $TRAVIS_PYTHON_VERSION
