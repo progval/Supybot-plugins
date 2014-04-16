@@ -42,6 +42,11 @@ _ = PluginInternationalization('WikiTrans')
 import urllib
 from xml.dom import minidom
 
+if sys.version_info[0] == 2:
+    quote_plus = urllib.quote_plus
+else:
+    quote_plus = urllib.parse.quote_plus
+
 class WordNotFound(Exception):
     pass
 class Untranslatable(Exception):
@@ -56,7 +61,7 @@ url = 'http://%s.wikipedia.org/w/api.php?action=query&format=xml&' + \
 def translate(src, target, word):
     try:
         node = minidom.parse(utils.web.getUrlFd(url % (src,
-                urllib.quote_plus(word))))
+                quote_plus(word))))
     except:
         # Usually an urllib error
         raise WordNotFound()
