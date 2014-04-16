@@ -67,6 +67,8 @@ try:
     import twitter
 except ImportError:
     raise callbacks.Error('You need the python-twitter library.')
+except Exception as e:
+    raise callbacks.Error('Unknown exception importing twitter: %r' % e)
 reload(twitter)
 if not hasattr(twitter, '__version__') or \
         twitter.__version__.split('.') < ['0', '8', '0']:
