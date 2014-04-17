@@ -34,21 +34,22 @@ class GitHubTestCase(PluginTestCase):
     plugins = ('GitHub', 'Config')
     def testAnnounceAdd(self):
         self.assertNotError('config supybot.plugins.GitHub.announces ""')
-        self.assertNotError('github announce add #foo ProgVal Supybot-fr')
+        self.assertNotError('github announce add #foo ProgVal Limnoria')
         self.assertResponse('config supybot.plugins.GitHub.announces',
-                            'ProgVal/Supybot-fr | #foo')
+                            'ProgVal/Limnoria | test | #foo')
         self.assertNotError('github announce add #bar ProgVal Supybot-plugins')
         self.assertResponse('config supybot.plugins.GitHub.announces',
-                            'ProgVal/Supybot-plugins | #bar || '
-                            'ProgVal/Supybot-fr | #foo')
+                            'ProgVal/Limnoria | test | #foo || '
+                            'ProgVal/Supybot-plugins | test | #bar')
+
 
     def testAnnounceRemove(self):
         self.assertNotError('config supybot.plugins.GitHub.announces '
-                            'ProgVal/Supybot-fr | #foo || '
+                            'ProgVal/Limnoria | test | #foo || '
                             'ProgVal/Supybot-plugins | #bar')
-        self.assertNotError('github announce remove #foo ProgVal Supybot-fr')
+        self.assertNotError('github announce remove #foo ProgVal Limnoria')
         self.assertResponse('config supybot.plugins.GitHub.announces',
-                            'ProgVal/Supybot-plugins | #bar')
+                            'ProgVal/Supybot-plugins |  | #bar')
         self.assertNotError('github announce remove #bar '
                             'ProgVal Supybot-plugins')
         self.assertResponse('config supybot.plugins.GitHub.announces', ' ')

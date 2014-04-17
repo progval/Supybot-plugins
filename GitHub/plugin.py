@@ -187,7 +187,6 @@ class GitHub(callbacks.Plugin):
         def _createPrivmsg(self, irc, channel, payload, event, hidden=None):
             bold = ircutils.bold
 
-
             format_ = self.plugin.registryValue('format.%s' % event, channel)
             if not format_.strip():
                 return
@@ -238,19 +237,33 @@ class GitHub(callbacks.Plugin):
                                   payload['repository']['name'])
             event = headers['X-GitHub-Event']
             announces = self._load()
-            if repo not in announces:
+            repoAnnounces = []
+            for (dbRepo, network, channel) in announces:
+                if dbRepo == repo:
+                    repoAnnounces.append((network, channel))
+            if len(repoAnnounces) == 0:
                 log.info('Commit for repo %s not announced anywhere' % repo)
                 return
-            for channel in announces[repo]:
-                for irc in world.ircs:
-                    if channel in irc.state.channels:
-                        break
+            for (network, channel) in repoAnnounces:
+                # Compatability with DBs without a network
+                if network == '':
+                    for irc in world.ircs:
+                        if channel in irc.state.channels:
+                            break
+                else:
+                    irc = world.getIrc(network)
+                    if not irc:
+                        log.warning('Received GitHub payload with announcing '
+                                    'enabled in %s on unloaded network %s.',
+                                    channel, network)
+                        return
+                if channel not in irc.state.channels:
+                    log.info(('Cannot announce event for repo '
+                             '%s in %s on %s because I\'m not in %s.') %
+                             (repo, channel, irc.network, channel))
                 if event == 'push':
                     commits = payload['commits']
-                    if channel not in irc.state.channels:
-                        log.info('Cannot announce commit for repo %s on %s' %
-                                 (repo, channel))
-                    elif len(commits) == 0:
+                    if len(commits) == 0:
                         log.warning('GitHub push hook called without any commit.')
                     else:
                         hidden = None
@@ -270,20 +283,26 @@ class GitHub(callbacks.Plugin):
         def _load(self):
             announces = instance.registryValue('announces').split(' || ')
             if announces == ['']:
-                return {}
+                return []
             announces = [x.split(' | ') for x in announces]
-            output = {}
-            for repo, chan in announces:
-                if repo not in output:
-                    output[repo] = []
-                output[repo].append(chan)
+            output = []
+            for annc in announces:
+                repo = annc[0]
+                # Compatibility with old DBs without a network set
+                if len(annc) < 3:
+                    net = ''
+                    chan = annc[1]
+                else:
+                    net = annc[1]
+                    chan = annc[2]
+                output.append((repo, net, chan))
             return output
 
         def _save(self, data):
-            list_ = []
-            for repo, chans in data.items():
-                list_.extend([' | '.join([repo,chan]) for chan in chans])
-            string = ' || '.join(list_)
+            stringList = []
+            for announcement in data:
+                stringList.extend([' | '.join(announcement)])
+            string = ' || '.join(stringList)
             instance.setRegistryValue('announces', value=string)
 
         @internationalizeDocstring
@@ -295,14 +314,14 @@ class GitHub(callbacks.Plugin):
             <channel> defaults to the current channel."""
             repo = '%s/%s' % (owner, name)
             announces = self._load()
-            if repo not in announces:
-                announces[repo] = [channel]
-            elif channel in announces[repo]:
-                irc.error(_('This repository is already announced to this '
-                            'channel.'))
-                return
-            else:
-                announces[repo].append(channel)
+            for (dbRepo, net, chan) in announces:
+                if dbRepo == repo and\
+                        (net == '' or net == irc.network) and\
+                        chan == channel:
+                    irc.error(_('This repository is already announced to '
+                                'this channel.'))
+                    return
+            announces.append((repo, irc.network, channel))
             self._save(announces)
             irc.replySuccess()
         add = wrap(add, ['channel', 'something', 'something'])
@@ -316,16 +335,16 @@ class GitHub(callbacks.Plugin):
             <channel> defaults to the current channel."""
             repo = '%s/%s' % (owner, name)
             announces = self._load()
-            if repo not in announces:
-                announces[repo] = []
-            elif channel not in announces[repo]:
-                irc.error(_('This repository is not yet announced to this '
-                            'channel.'))
-                return
-            else:
-                announces[repo].remove(channel)
-            self._save(announces)
-            irc.replySuccess()
+            for annc in announces:
+                if annc[0] == repo and\
+                        (annc[1] == '' or annc[1] == irc.network) and\
+                        annc[2] == channel:
+                    announces.remove(annc)
+                    self._save(announces)
+                    irc.replySuccess()
+                    return
+            irc.error(_('This repository is not yet announced to this '
+                        'channel.'))
         remove = wrap(remove, ['channel', 'something', 'something'])
 
 
