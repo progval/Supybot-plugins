@@ -220,7 +220,7 @@ class GitHub(callbacks.Plugin):
             if not tokens:
                 return
             fake_msg = ircmsgs.IrcMsg(command='PRIVMSG',
-                    args=(channel, 'GITHUB'))
+                    args=(channel, 'GITHUB'), prefix='github!github@github')
             try:
                 self.plugin.Proxy(irc, fake_msg, tokens)
             except Exception as  e:
