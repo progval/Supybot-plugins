@@ -211,16 +211,16 @@ class GitHub(callbacks.Plugin):
                 elif isinstance(value, str):
                     repl[key + '__firstline'] = value.split('\n', 1)[0]
             repl.update({'__hidden': hidden or 0})
-            command = Template(format_).safe_substitute(repl)
             #if hidden is not None:
             #    s += _(' (+ %i hidden commits)') % hidden
             #if sys.version_info[0] < 3:
             #        s = s.encode('utf-8')
-            tokens = callbacks.tokenize(command)
+            tokens = callbacks.tokenize(format_)
             if not tokens:
                 return
             fake_msg = ircmsgs.IrcMsg(command='PRIVMSG',
-                    args=(channel, 'GITHUB'), prefix='github!github@github')
+                    args=(channel, 'GITHUB'), prefix='github!github@github',
+                    reply_env=repl)
             try:
                 self.plugin.Proxy(irc, fake_msg, tokens)
             except Exception as  e:
