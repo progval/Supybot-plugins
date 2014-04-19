@@ -165,6 +165,11 @@ class GitHub(callbacks.Plugin):
         for cb in self.cbs:
             cb.plugin = self
 
+        if 'reply_env' not in ircmsgs.IrcMsg.__slots__:
+            log.error("Your version of Supybot is not compatible with "
+                      "reply environments. So, the GitHub plugin won't "
+                      "be able to announce events from GitHub.")
+
 
 
     class announce(callbacks.Commands):
@@ -227,6 +232,11 @@ class GitHub(callbacks.Plugin):
                 self.plugin.log.exception('Error occured while running triggered command:')
 
         def onPayload(self, headers, payload):
+            if 'reply_env' not in ircmsgs.IrcMsg.__slots__:
+                log.error("Got event payload from GitHub, but your version "
+                          "of Supybot is not compatible with reply "
+                          "environments, so, the GitHub plugin can't "
+                          "announce it.")
             if 'full_name' in payload['repository']:
                 repo = payload['repository']['full_name']
             elif 'name' in payload['repository']['owner']:
