@@ -71,12 +71,27 @@ conf.registerChannelValue(GitHub.format, 'push',
         '\x02$__commit__message__firstline\x02 $__commit__url__tiny') \
         .replace('\n        ', ' '),
         _("""Format for push events.""")))
+conf.registerChannelValue(GitHub.format, 'issues',
+        registry.String('echo ' +
+        _('$repository__owner__login/\x02$repository__name\x02: '
+        '\x02$sender__login\x02 $action issue #$issue__number: '
+        '\x02$issue__title\x02 $issue__html_url') \
+        .replace('\n        ', ' '),
+        _("""Format for issue events.""")))
+conf.registerChannelValue(GitHub.format, 'status',
+        registry.String('echo ' +
+        _('$repository__owner__login/\x02$repository__name\x02: Status '
+        'for commit \u201c\x02$commit__commit__message__firstline\x02\u201d '
+        'by \x02$commit__commit__committer__name\x02: \x02$description\x02 '
+        '$target_url__tiny') \
+        .replace('\n        ', ' '),
+        _("""Format for status events.""")))
 
 for event_type in ('commit_comment', 'create', 'delete', 'deployment',
         'deployment_status', 'download', 'follow', 'fork', 'fork_apply',
-        'gist', 'gollum', 'issue_comment', 'issues', 'member', 'public',
+        'gist', 'gollum', 'issue_comment', 'member', 'public',
         'pull_request', 'pull_request_review_comment', 'push', 'release',
-        'status', 'team_add', 'watch'):
+        'team_add', 'watch'):
     if event_type == 'push':
         continue
     conf.registerChannelValue(GitHub.format, event_type,
