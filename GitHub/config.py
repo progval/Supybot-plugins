@@ -86,11 +86,19 @@ conf.registerChannelValue(GitHub.format, 'status',
         '$target_url__tiny') \
         .replace('\n        ', ' '),
         _("""Format for status events.""")))
+conf.registerChannelValue(GitHub.format, 'status',
+        registry.String('echo ' +
+        _('$repository__owner__login/\x02$repository__name\x02: '
+        '\x02$sender__login\x02 $action pull request #$number (to '
+        '\x02$pull_request__base__ref\x02): \x02$pull_request__title\x02 '
+        '$pull_request__html_url') \
+        .replace('\n        ', ' '),
+        _("""Format for status events.""")))
 
 for event_type in ('commit_comment', 'create', 'delete', 'deployment',
         'deployment_status', 'download', 'follow', 'fork', 'fork_apply',
         'gist', 'gollum', 'issue_comment', 'member', 'public',
-        'pull_request', 'pull_request_review_comment', 'push', 'release',
+        'pull_request_review_comment', 'push', 'release',
         'team_add', 'watch'):
     if event_type == 'push':
         continue
