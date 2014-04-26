@@ -39,7 +39,7 @@ import datetime
 if sys.version_info[0] >= 3:
     from io import BytesIO
 else:
-    from cStringIO import StringIO as StringIO
+    from cStringIO import StringIO as BytesIO
 
 import supybot.conf as conf
 import supybot.world as world
