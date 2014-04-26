@@ -170,7 +170,7 @@ def getTable(firstColumn, items, channel, urlLevel, page, orderby):
             percentParameter += (firstColumn,)
     output = tableHeaders % percentParameter
     if orderby is not None:
-        if sys.version_info[0] >= 0:
+        if sys.version_info[0] >= 3:
             orderby = urllib.parse.unquote(orderby)
         else:
             orderby = urllib.unquote(orderby)
