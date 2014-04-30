@@ -1,0 +1,8 @@
+limnoria
+chardet
+django
+lxml
+beautifulsoup4
+python-twitter
+requests
+pysandbox
