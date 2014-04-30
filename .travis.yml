@@ -8,7 +8,6 @@ python:
   - "pypy"
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
-  - sudo apt-get install libgraphviz-dev
   - pip install -r requirements.txt
 # command to run tests, e.g. python setup.py test
 script:

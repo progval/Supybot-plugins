@@ -6,4 +6,3 @@ beautifulsoup4
 python-twitter
 requests
 pysandbox
-pygraphiz
