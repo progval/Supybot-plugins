@@ -1,6 +1,12 @@
 A bunch of plugins for Supybot / Limnoria I wrote myself or found on the
 net and improved.
 
+To install depedencies for these plugins, run
+
+```
+pip install -r requirements.txt
+```
+
 ## AttackProtector
 
 Provides configurable flood protection for channels.
