@@ -11,11 +11,11 @@ Please note that the names are case-sensitive. If you use mis-spelled repository
 To get the bot notified about events, you must tell GitHub to post to your bot. (GitHub explanation: http://help.github.com/post-receive-hooks/ )
 In order to do that, you must go admin page of repo, tab webhooks (direct link: https://github.com/<owner>/<repo>/settings/hooks ) and click “Add webhook“
 and add URL of your bot there. The URL is http://<IP or dynamicdns-service>:<port>/github .
+Set the “Content type” to “application/x-www-form-urlencoded” (the default, when I am writing this).
 Fill the other fields of the form according to what you want.
 
-Now your bot should announce all push events.
-To announce other events type, you have to set config variables `supybot.plugins.GitHub.format.<type>` (where `type` is a type referenced at http://developer.github.com/webhooks/#events to a template.
-A template is a string, which contains variables. Variable names are prefixed with a $.
+To announce other events type, you have to set config variables `supybot.plugins.GitHub.format.<type>` (where `type` is a type referenced at http://developer.github.com/webhooks/#events ) to a template.
+A template is a command, where you can use @echo to print variable content. Variable names are prefixed with a $.
 Replacements will be made using the data sent by GitHub. As this data contains lists and dictionnaries, it is “flattened”, ie. `data['foo']['bar']['baz']` can be accessed with `$foo__bar__baz` (note the douple underscores).
 There are also special variables:
 * if $foo is an url, $foo__tiny will be the tinyfied version of the URL
