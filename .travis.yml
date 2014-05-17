@@ -12,4 +12,4 @@ install:
 # command to run tests, e.g. python setup.py test
 script:
   - echo $TRAVIS_PYTHON_VERSION
-  - supybot-test --plugins-dir=. --no-network --exclude=WebStats --exclude=Seeks --exclude=Rbls --exclude=MilleBornes --exclude=Scheme --exclude=Twitter --exclude=TwitterStream --exclude=MegaHAL --exclude=Webstats --exclude=NoLatin1 --exclude=GUI
+  - supybot-test --plugins-dir=. --no-network --exclude=WebStats --exclude=Seeks --exclude=Rbls --exclude=MilleBornes --exclude=Scheme --exclude=Twitter --exclude=TwitterStream --exclude=MegaHAL --exclude=Webstats --exclude=NoLatin1 --exclude=GUI --exclude=SupySandbox
