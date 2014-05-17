@@ -98,7 +98,7 @@ def chooseColor(nick):
 def progressbar(item, max_):
     template = """<td class="progressbar">
                       <div class="text">%i</div>
-                      <div style="width: %ipx; background-color: %s"
+                      <div style="width: %i%%; background-color: %s"
                       class="color"></div>
                   </td>"""
     try:
