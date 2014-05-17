@@ -34,14 +34,15 @@ from supybot.test import *
 class WikipediaTestCase(PluginTestCase):
     plugins = ('Wikipedia',)
 
-    def testWiki(self):
-        self.assertRegexp('wiki Monty Python',
-                          '^Monty Python \(sometimes known as The Pythons\).*')
-        self.assertRegexp('wiki Python', '.*is a disambiguation page.*')
-        self.assertRegexp('wiki Foo', '"Foobar" \(Redirect from "Foo"\): '
-                                      'The terms foobar.*')
-        self.assertRegexp('wiki roegdfjpoepo',
-                          'Not found, or page bad formed.*')
+    if network:
+        def testWiki(self):
+            self.assertRegexp('wiki Monty Python',
+                              '^Monty Python \(sometimes known as The Pythons\).*')
+            self.assertRegexp('wiki Python', '.*is a disambiguation page.*')
+            self.assertRegexp('wiki Foo', '"Foobar" \(Redirect from "Foo"\): '
+                                          'The terms foobar.*')
+            self.assertRegexp('wiki roegdfjpoepo',
+                              'Not found, or page bad formed.*')
 
 
 
