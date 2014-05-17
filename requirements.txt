@@ -1,4 +1,3 @@
-limnoria
 chardet
 django
 lxml
