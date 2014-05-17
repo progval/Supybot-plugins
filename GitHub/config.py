@@ -71,6 +71,13 @@ conf.registerChannelValue(GitHub.format, 'push',
         '\x02$__commit__message__firstline\x02 $__commit__url__tiny') \
         .replace('\n        ', ' '),
         _("""Format for push events.""")))
+conf.registerChannelValue(GitHub.format, 'commit_comment',
+        registry.String('echo ' +
+        _('$repository__owner__name/\x02$repository__name\x02 '
+        '(in \x02$ref__branch\x02): $__comment__user__login commented on '
+        'commit \x02$__commit__message__firstline\x02 $comment__html_url__tiny') \
+        .replace('\n        ', ' '),
+        _("""Format for commit comment events.""")))
 conf.registerChannelValue(GitHub.format, 'issues',
         registry.String('echo ' +
         _('$repository__owner__login/\x02$repository__name\x02: '
@@ -78,6 +85,13 @@ conf.registerChannelValue(GitHub.format, 'issues',
         '\x02$issue__title\x02 $issue__html_url') \
         .replace('\n        ', ' '),
         _("""Format for issue events.""")))
+conf.registerChannelValue(GitHub.format, 'issue_comment',
+        registry.String('echo ' +
+        _('$repository__owner__login/\x02$repository__name\x02: '
+        '\x02$sender__login\x02 $action comment on issue #$issue__number: '
+        '\x02$issue__title\x02 $issue__url__tiny') \
+        .replace('\n        ', ' '),
+        _("""Format for issue comment events.""")))
 conf.registerChannelValue(GitHub.format, 'status',
         registry.String('echo ' +
         _('$repository__owner__login/\x02$repository__name\x02: Status '
@@ -86,22 +100,28 @@ conf.registerChannelValue(GitHub.format, 'status',
         '$target_url__tiny') \
         .replace('\n        ', ' '),
         _("""Format for status events.""")))
-conf.registerChannelValue(GitHub.format, 'pullrequest',
+conf.registerChannelValue(GitHub.format, 'pull_request',
         registry.String('echo ' +
         _('$repository__owner__login/\x02$repository__name\x02: '
         '\x02$sender__login\x02 $action pull request #$number (to '
         '\x02$pull_request__base__ref\x02): \x02$pull_request__title\x02 '
-        '$pull_request__html_url') \
+        '$pull_request__html_url__tiny') \
         .replace('\n        ', ' '),
-        _("""Format for status events.""")))
+        _("""Format for pullrequest events.""")))
+conf.registerChannelValue(GitHub.format, 'pull_request_review_comment',
+        registry.String('echo ' +
+        _('$repository__owner__login/\x02$repository__name\x02: '
+        '\x02$comment__user__login\x02 reviewed pull request #$number (to '
+        '\x02$pull_request__base__ref\x02): \x02$pull_request__title\x02 '
+        '$pull_request__html_url__tiny') \
+        .replace('\n        ', ' '),
+        _("""Format for pull_request review comment events.""")))
 
-for event_type in ('commit_comment', 'create', 'delete', 'deployment',
+for event_type in ('create', 'delete', 'deployment',
         'deployment_status', 'download', 'follow', 'fork', 'fork_apply',
-        'gist', 'gollum', 'issue_comment', 'member', 'public',
-        'pull_request_review_comment', 'push', 'release',
+        'gist', 'gollum', 'member', 'public',
+        'pull_request_review_comment', 'release',
         'team_add', 'watch'):
-    if event_type == 'push':
-        continue
     conf.registerChannelValue(GitHub.format, event_type,
             registry.String('', _("""Format for %s events.""") % event_type))
 
