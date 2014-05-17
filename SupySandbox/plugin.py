@@ -44,6 +44,9 @@ except ImportError:
     print('You need pysandbox in order to run SupySandbox plugin '
           '[http://github.com/haypo/pysandbox].')
     raise
+except SyntaxError:
+    raise callbacks.Error('the pysandbox is not compatible with your Python '
+            'version.')
 import re
 import os
 import sys
