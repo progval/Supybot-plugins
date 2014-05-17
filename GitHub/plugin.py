@@ -245,7 +245,11 @@ class GitHub(callbacks.Plugin):
             else:
                 repo = '%s/%s' % (payload['repository']['owner']['login'],
                                   payload['repository']['name'])
-            event = headers['X-GitHub-Event']
+            if 'X-GitHub-Event' in headers:
+                event = headers['X-GitHub-Event']
+            else:
+                # WTF?
+                event = headers['x-github-event']
             announces = self._load()
             repoAnnounces = []
             for (dbRepo, network, channel) in announces:
