@@ -221,7 +221,7 @@ class GitHub(callbacks.Plugin):
                         repl[key + '__branch'] = value.split('/', 2)[2]
                     except IndexError:
                         pass
-                elif isinstance(value, str):
+                elif isinstance(value, str) or isinstance(value, unicode):
                     repl[key + '__firstline'] = value.split('\n', 1)[0]
             repl.update({'__hidden': hidden or 0})
             #if hidden is not None:
