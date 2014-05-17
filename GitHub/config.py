@@ -86,7 +86,7 @@ conf.registerChannelValue(GitHub.format, 'status',
         '$target_url__tiny') \
         .replace('\n        ', ' '),
         _("""Format for status events.""")))
-conf.registerChannelValue(GitHub.format, 'status',
+conf.registerChannelValue(GitHub.format, 'pullrequest',
         registry.String('echo ' +
         _('$repository__owner__login/\x02$repository__name\x02: '
         '\x02$sender__login\x02 $action pull request #$number (to '
