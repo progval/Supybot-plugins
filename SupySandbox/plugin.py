@@ -38,15 +38,6 @@ TIMEOUT = 3  # seconds
 EVAL_MAXTIMESECONDS = TIMEOUT
 EVAL_MAXMEMORYBYTES = 75 * 1024 * 1024 # 10 MiB
 
-try:
-    import sandbox as S
-except ImportError:
-    print('You need pysandbox in order to run SupySandbox plugin '
-          '[http://github.com/haypo/pysandbox].')
-    raise
-except SyntaxError:
-    raise callbacks.Error('the pysandbox is not compatible with your Python '
-            'version.')
 import re
 import os
 import sys
@@ -62,6 +53,16 @@ import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 from cStringIO import StringIO
+
+try:
+    import sandbox as S
+except ImportError:
+    print('You need pysandbox in order to run SupySandbox plugin '
+          '[http://github.com/haypo/pysandbox].')
+    raise
+except SyntaxError:
+    raise callbacks.Error('the pysandbox is not compatible with your Python '
+            'version.')
 
 class SandboxError(Exception):
     pass
