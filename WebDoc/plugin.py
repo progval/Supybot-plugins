@@ -85,9 +85,10 @@ DEFAULT_TEMPLATES = {
 httpserver.set_default_templates(DEFAULT_TEMPLATES)
 
 class WebDocServerCallback(httpserver.SupyHTTPServerCallback):
-    def __init__(self, irc):
+    def __init__(self, plugin, irc):
         super(WebDocServerCallback, self).__init__()
         self._irc = irc
+        self._plugin = plugin
     name = 'WebDoc'
     def doGet(self, handler, path):
         splitted_path = path.split('/')
@@ -127,7 +128,11 @@ class WebDocServerCallback(httpserver.SupyHTTPServerCallback):
                         return '<tr><td>%s</td><td> </td></tr>' % \
                                 ' '.join(command)
                     doclines = doc.splitlines()
-                    s = cgi.escape('%s %s' % (name, doclines.pop(0)))
+                    if self._plugin.registryValue('withFullName'):
+                        s = '%s %s %s' % (name, ' '.join(command), doclines.pop(0))
+                    else:
+                        s = doclines.pop(0)
+                    s = cgi.escape(s)
                     if doclines:
                         help_ = cgi.escape('\n'.join(doclines))
                         s = '<strong>%s</strong><br />%s' % \
@@ -157,7 +162,7 @@ class WebDoc(callbacks.Plugin):
         self.__parent = super(WebDoc, self)
         callbacks.Plugin.__init__(self, irc)
 
-        callback = WebDocServerCallback(irc)
+        callback = WebDocServerCallback(self, irc)
         httpserver.hook('plugindoc', callback)
 
     def die(self):

@@ -49,8 +49,11 @@ def configure(advanced):
 
 WebDoc = conf.registerPlugin('WebDoc')
 # This is where your configuration variables (if any) should go.  For example:
-# conf.registerGlobalValue(WebDoc, 'someConfigVariableName',
-#     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
+# conf.registerglobalvalue(webdoc, 'someconfigvariablename',
+#     registry.boolean(false, _("""help for someconfigvariablename.""")))
+conf.registerGlobalValue(WebDoc, 'withFullName',
+    registry.Boolean(False, _("""Determines whether the name of the command
+    will be displayed in the same cell as the doc.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
