@@ -134,6 +134,10 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
                 event = headers['x-github-event']
             if event == 'ping':
                 log.info('Got ping event from GitHub.')
+                self.send_response(200)
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write(b('Thanks.'))
                 return
             self.plugin.announce.onPayload(headers, json.loads(form['payload'].value))
 
