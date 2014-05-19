@@ -15,5 +15,5 @@ script:
   - echo $TRAVIS_PYTHON_VERSION
   - supybot-test --plugins-dir=. --no-network --exclude=WebStats --exclude=Seeks --exclude=Rbls --exclude=MilleBornes --exclude=Scheme --exclude=Twitter --exclude=TwitterStream --exclude=MegaHAL --exclude=Webstats --exclude=NoLatin1 --exclude=GUI --exclude=SupySandbox
 notifications:
-    on_success: change
-    on_failure: change
+    on_success: never
+    on_failure: never
