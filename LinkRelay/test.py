@@ -71,8 +71,12 @@ class LinkRelayTestCase(ChannelPluginTestCase):
         self.assertResponse('config supybot.plugins.LinkRelay.substitutes',
                             'foobar | foo*bar')
         self.assertNotError('linkrelay substitute baz b*z')
-        self.assertResponse('config supybot.plugins.LinkRelay.substitutes',
-                            'foobar | foo*bar || baz | b*z')
+        try:
+            self.assertResponse('config supybot.plugins.LinkRelay.substitutes',
+                                'baz | b*z || foobar | foo*bar')
+        except AssertionError:
+            self.assertResponse('config supybot.plugins.LinkRelay.substitutes',
+                                'foobar | foo*bar || baz | b*z')
 
     def testNoSubstitute(self):
         self.assertNotError('config supybot.plugins.LinkRelay.substitutes '
