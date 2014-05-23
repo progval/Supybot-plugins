@@ -16,3 +16,6 @@ script:
   - export PYTHON_MAJOR_VERSION=$(echo $TRAVIS_PYTHON_VERSION|head -c 1)
   - if [ "$PYTHON_MAJOR_VERSION" = "3" ]; then export DISABLED_PLUGINS="--exclude=./NoLatin1"; else export DISABLED_PLUGINS=""; fi
   - supybot-test --plugins-dir=. --no-network $DISABLED_PLUGINS
+notifications:
+    on_success: never
+    on_failure: never
