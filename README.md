@@ -7,6 +7,8 @@ To install depedencies for these plugins, run
 pip install -r requirements.txt
 ```
 
+[![Build Status](https://travis-ci.org/ProgVal/Supybot-plugins.svg?branch=master)](https://travis-ci.org/ProgVal/Supybot-plugins)
+
 ## AttackProtector
 
 Provides configurable flood protection for channels.
