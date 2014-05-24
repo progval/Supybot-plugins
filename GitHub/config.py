@@ -95,7 +95,7 @@ conf.registerChannelValue(GitHub.format, 'issue_comment',
 conf.registerChannelValue(GitHub.format, 'status',
         registry.String('echo ' +
         _('$repository__owner__login/\x02$repository__name\x02: Status '
-        'for commit \u201c\x02$commit__commit__message__firstline\x02\u201d '
+        'for commit "\x02$commit__commit__message__firstline\x02" '
         'by \x02$commit__commit__committer__name\x02: \x02$description\x02 '
         '$target_url__tiny') \
         .replace('\n        ', ' '),
