@@ -237,7 +237,7 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
             splitted_path = path[1:].split('/')
         if len(splitted_path) == 0:
             self.send_response(200)
-            self.send_header('Content-type', 'text/html')
+            self.send_header('Content-type', 'text/html; charset=utf-8')
             self.end_headers()
             page_body = """Here is a list of available logs:<ul>"""
             for channel in WebLogsMiddleware.get_channel_list():
@@ -251,7 +251,7 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
             mode, channel, page = splitted_path
         else:
             self.send_response(404)
-            self.send_header('Content-type', 'text/plain')
+            self.send_header('Content-type', 'text/plain; charset=utf-8')
             self.end_headers()
             self.wfile.write(b('Bad URL.'))
             return
@@ -259,7 +259,7 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
         channel = utils.web.urlunquote(channel)
         if channel not in WebLogsMiddleware.get_channel_list():
             self.send_response(404)
-            self.send_header('Content-type', 'text/plain')
+            self.send_header('Content-type', 'text/plain; charset=utf-8')
             self.end_headers()
             self.wfile.write(b('This channel is not logged.'))
             return
@@ -267,7 +267,7 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
         middleware = WebLogsMiddleware(channel)
         if page == '':
             self.send_response(200)
-            self.send_header('Content-type', 'text/html')
+            self.send_header('Content-type', 'text/html; charset=utf-8')
             self.end_headers()
             self.wfile.write(b(page_template % {
                 'title': channel,
