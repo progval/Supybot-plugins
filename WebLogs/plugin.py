@@ -30,6 +30,7 @@
 
 import re
 import os
+import sys
 import cgi
 import time
 import urllib
@@ -46,6 +47,23 @@ import supybot.httpserver as httpserver
 from supybot.i18n import PluginInternationalization, internationalizeDocstring
 
 _ = PluginInternationalization('WebLogs')
+
+if sys.version_info[0] >= 3:
+    def b(s):
+        if isinstance(s, str):
+            return s.encode()
+        else:
+            return s
+    def s(b):
+        if isinstance(b, bytes):
+            return b.decode()
+        else:
+            return b
+else:
+    def b(s):
+        return s
+    def s(b):
+        return b
 
 page_template = """
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -202,7 +220,7 @@ class WebLogsMiddleware(object):
 
     def write(self, *args):
         self.fd.read()
-        self.fd.write('%i %s\n' % (time.time(), ' '.join(args)))
+        self.fd.write(s('%i %s\n' % (time.time(), ' '.join(args))))
 
 class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
     name = 'WebLogs'
@@ -226,8 +244,8 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
                 page_body += '<li><a href="./html/%s/">%s</a></li>' % (
                         utils.web.urlquote(channel), channel)
             page_body += '</ul>'
-            self.wfile.write(page_template %
-                    {'title': 'Index', 'body': page_body})
+            self.wfile.write(b(page_template %
+                    {'title': 'Index', 'body': page_body}))
             return
         elif len(splitted_path) == 3:
             mode, channel, page = splitted_path
@@ -235,7 +253,7 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
-            self.wfile.write('Bad URL.')
+            self.wfile.write(b('Bad URL.'))
             return
         assert mode in ('html', 'json')
         channel = utils.web.urlunquote(channel)
@@ -243,7 +261,7 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
-            self.wfile.write('This channel is not logged.')
+            self.wfile.write(b('This channel is not logged.'))
             return
 
         middleware = WebLogsMiddleware(channel)
@@ -251,9 +269,9 @@ class WebLogsServerCallback(httpserver.SupyHTTPServerCallback):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            self.wfile.write(page_template % {
+            self.wfile.write(b(page_template % {
                 'title': channel,
-                'body': format_logs(middleware.get_logs())})
+                'body': format_logs(middleware.get_logs())}))
 
 def check_enabled(f):
     def newf(self, irc, msg):
