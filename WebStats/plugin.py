@@ -364,6 +364,8 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                 output = httpserver.get_template('generic/error.html') % \
                     {'title': 'Internal server error',
                      'error': error}
+            import traceback
+            traceback.print_exc()
         finally:
             self.send_response(response)
             self.send_header('Content-type', content_type)
