@@ -74,7 +74,7 @@ except ImportError:
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
 
-DEBUG = False
+DEBUG = True
 
 testing = world.testing
 world.webStatsCacheLinks = {}
