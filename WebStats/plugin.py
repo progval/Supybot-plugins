@@ -315,12 +315,8 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                     except ImportError:
                         content_type = 'text/plain; charset=utf-8'
                         response = 501
-                        self.send_response(response)
-                        self.send_header('Content-type', content_type)
-                        self.end_headers()
-                        self.wfile.write('Links cannot be displayed; ask '
-                                'the bot owner to install python-pygraphviz.')
-                        self.wfile.close()
+                        output = 'Links cannot be displayed; ask ' \
+                                'the bot owner to install python-pygraphviz.'
                         return
                 assert len(splittedPath) > 2
                 chanName = splittedPath[2].replace('%20', '#')
