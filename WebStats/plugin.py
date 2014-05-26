@@ -118,14 +118,12 @@ def fillTable(items, page, orderby=None):
             max_[index_] = max(max_[index_], items[index][index_])
     rowsList = []
     while len(items) > 0:
-        maximumIndex = (0, 0, 0, 0, 0)
+        maximumIndex = max(items.keys())
         highScore = -1
         for index in items:
             if orderby is not None and items[index][orderby] > highScore:
                 maximumIndex = index
                 highScore = items[index][orderby]
-            if orderby is None and index < maximumIndex:
-                maximumIndex = index
         item = items.pop(maximumIndex)
         try:
             int(index)
