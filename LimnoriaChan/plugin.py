@@ -45,8 +45,8 @@ _ = PluginInternationalization('LimnoriaChan')
 WEB_REPO = 'https://github.com/ProgVal/Limnoria'
 PLUGINS_WEB_REPO = 'https://github.com/ProgVal/Supybot-plugins'
 staticFactoids = {
-        'git':          'git://github.com/ProgVal/Limnoria.git',
-        'git-pl':       'git://github.com/ProgVal/Supybot-plugins.git',
+        'git':          WEB_REPO + '.git',
+        'git-pl':       PLUGINS_WEB_REPO + '.git',
         'gh':           WEB_REPO,
         'gh-pl':        PLUGINS_WEB_REPO,
         'wiki':         WEB_REPO + '/wiki',
