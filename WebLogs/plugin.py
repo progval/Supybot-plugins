@@ -176,14 +176,14 @@ def format_logs(logs):
 
             # Timestamp handling
             gmtime = time.gmtime(int(words[0]))
-            gmtime_day = (gmtime.tm_mday, gmtime.tm_mon, gmtime.tm_year)
+            gmtime_day = (gmtime.tm_year, gmtime.tm_mon, gmtime.tm_mday)
             if old_gmtime_day != gmtime_day:
                 html_logs += '</div><div class="day">'
                 html_logs += """
                     <input type="button" value="reveal" class="reveal" />
                     <input type="button" value="hide" class="hide" />
                     """
-                html_logs += '<h1>%i/%i/%i</h1>' % \
+                html_logs += '<h1>%i-%i-%i</h1>' % \
                         gmtime_day
                 old_gmtime_day = gmtime_day
             timestamp = time.strftime('%H:%M:%S', gmtime)
