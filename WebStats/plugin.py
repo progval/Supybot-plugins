@@ -206,7 +206,7 @@ PAGE_SKELETON = """\
         </p>
     </body>
 </html>
-""" % time.strftime('%H:%M:%S')
+""" % time.strftime('%Y-%m-%d %H:%M:%S %Z')
 
 DEFAULT_TEMPLATES = {
         'webstats/design.css': """\
