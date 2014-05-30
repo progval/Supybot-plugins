@@ -133,7 +133,7 @@ class Wikipedia(callbacks.Plugin):
                         redirect = redirect.encode('utf-8','replace')
                 reply += '"%s" (Redirect from "%s"): ' % (title, redirect)
         # extract the address we got it from
-        addr = re.search(_('Retrieved from') + ' "<a href="([^"]*)">', article)
+        addr = re.search(_('Retrieved from') + ' "<a dir="ltr" href="([^"]*)">', article)
         addr = addr.group(1)
         # check if it's a disambiguation page
         disambig = tree.xpath('//table[@id="disambigbox"]')
