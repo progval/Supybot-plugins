@@ -58,7 +58,7 @@ conf.registerChannelValue(ChannelStatus, 'nicks',
     registry.Boolean(False, _("""Determines whether or not the list of users
     in this channel will be listed.""")))
 conf.registerChannelValue(ChannelStatus, 'topic',
-    registry.Boolean(False, _("""Determines whether or not the topic of this
+    registry.Boolean(True, _("""Determines whether or not the topic of this
     channel will be displayed.""")))
 
 
