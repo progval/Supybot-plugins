@@ -51,7 +51,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
         return False
     def _getIfAnswerIsThisBan(self, banmask=None):
         if banmask is None:
-            banmask = '*!' + (self.prefix.split('!')[1])
+            banmask = '*!*@' + (self.prefix.split('@')[1])
         return self._getIfAnswerIsEqual(ircmsgs.ban(self.channel, banmask))
     def _getIfAnswerIsThisKick(self, kind):
         reason = '%s flood detected' % kind
@@ -119,7 +119,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             msg = ircmsgs.nick(nick, prefix=self.prefix)
             self.irc.feedMsg(msg)
             self.prefix = nick + '!' + self.prefix.split('!')[1]
-        banmask = '*!' + self.prefix.split('!')[1]
+        banmask = '*!*@' + self.prefix.split('@')[1]
         self.failIf(self._getIfAnswerIsThisBan(banmask) == False,
                     'No reaction to nick flood.')
     def testPunishNotNoNickFlood(self):

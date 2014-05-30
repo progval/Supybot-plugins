@@ -28,12 +28,16 @@
 
 ###
 
+import sys
 import supybot.ircutils as ircutils
 from supybot.test import *
 from . import plugin
 assert hasattr(plugin, 'SudoDB')
 
-from cStringIO import StringIO
+if sys.version_info[0] < 3:
+    from cStringIO import StringIO
+else:
+    from io import StringIO
 
 # Disable Admin protection against giving the 'owner' capability.
 strEqual = ircutils.strEqual
@@ -54,7 +58,7 @@ class SudoTestCase(PluginTestCase):
         self.assertError('sudo whoami')
         self.assertNotError('Sudo add spam allow foo!bar@baz whoami.*')
         self.assertResponse('whoami', 'Prog')
-        self.assertResponse('sudo whoami', 'I don\'t recognize you.')
+        self.assertRegexp('sudo whoami', 'I don\'t recognize you.*')
         self.assertResponse('capabilities', '[owner]')
         self.assertResponse('sudo capabilities', 'Error: Sudo not granted.')
 
@@ -66,7 +70,7 @@ class SudoTestCase(PluginTestCase):
         self.assertResponse('capabilities', '[owner]')
         self.assertError('sudo whoami')
         self.assertNotError('Sudo add -1 spam allow foo!bar@baz .*i.*')
-        self.assertResponse('sudo whoami', 'I don\'t recognize you.')
+        self.assertRegexp('sudo whoami', 'I don\'t recognize you.*')
         self.assertNotError('Sudo add egg deny .*mi')
         self.assertResponse('whoami', 'Prog')
         self.assertError('sudo whoami')
@@ -115,8 +119,8 @@ class SudoTestCase(PluginTestCase):
         self.assertNotError('capability add Prog owner')
         self.assertResponse('whoami', 'Prog')
         self.assertResponse('fakehostmask %s whoami' % self.prefix, 'Prog')
-        self.assertResponse('fakehostmask prog!val@home whoami',
-                'I don\'t recognize you.')
+        self.assertRegexp('fakehostmask prog!val@home whoami',
+                'I don\'t recognize you.*')
 
 
 

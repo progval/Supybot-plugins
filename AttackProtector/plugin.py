@@ -179,7 +179,7 @@ class AttackProtector(callbacks.Plugin):
         kind = lastItem.kind
 
         if not ircutils.isChannel(channel):
-                return
+            return
         if not self.registryValue('enable', channel):
             return
 

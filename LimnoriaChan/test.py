@@ -35,10 +35,10 @@ class LimnoriaChanTestCase(ChannelPluginTestCase):
 
     def testFactoids(self):
         self.assertResponse('Hi, see the %%git repo!',
-                'git://github.com/ProgVal/Limnoria.git',
+                'https://github.com/ProgVal/Limnoria.git',
                 usePrefixChar=False)
         self.assertResponse('foobar: Hi, see the %%git-pl repo!',
-                'foobar: git://github.com/ProgVal/Supybot-plugins.git',
+                'foobar: https://github.com/ProgVal/Supybot-plugins.git',
                 usePrefixChar=False)
         self.assertNoResponse('This does %%not exist', usePrefixChar=False)
 

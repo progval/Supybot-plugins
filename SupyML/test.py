@@ -52,7 +52,7 @@ class SupyMLTestCase(ChannelPluginTestCase):
             '<tell><echo>ProgVal</echo> <echo>foo</echo></tell>',
                                   prefix=self.prefix)
         self.irc.feedMsg(msg)
-        answer = ircmsgs.IrcMsg(prefix="", command="PRIVMSG",
+        answer = ircmsgs.IrcMsg(prefix="", command='NOTICE',
                         args=('ProgVal', 'test wants me to tell you: foo'))
         self.failIf(self._getIfAnswerIsEqual(answer) == False)
         self.assertResponse('SupyML eval <nne>4 5</nne>', 'true')
