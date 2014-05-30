@@ -49,7 +49,7 @@ PAGE_SKELETON = """\
 <!DOCTYPE html>
  <html>
     <head>
-    <meta charset="UTF-8" />
+        <meta charset="UTF-8" />
         <title>Supybot web documentation</title>
         <link rel="stylesheet" media="screen" type="text/css" title="Design" href="/default.css" />
     </head>
