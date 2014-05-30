@@ -86,6 +86,18 @@ world.webStatsCacheLinks = {}
 class FooException(Exception):
     pass
 
+class CacheDict(utils.InsensitivePreservingDict):
+    """Subclass of dict to make key comparison IRC-case insensitive."""
+    def key(self, k):
+        if isinstance(k, str):
+            k = ircutils.toLower(k)
+        elif isinstance(k, tuple):
+            k = tuple([(ircutils.toLower(x) if isinstance(x, str) else x)
+                       for x in k])
+        else:
+            assert False
+        return k
+
 if not hasattr(world, 'webStatsCacheLinks'):
     world.webStatsCacheLinks = {}
 
@@ -552,9 +564,9 @@ class WebStatsDB:
         """Get a list of channels in the database"""
         cursor = self._conn.cursor()
         cursor.execute("""SELECT DISTINCT(chan) FROM chans_cache""")
-        results = []
+        results = ircutils.IrcSet()
         for row in cursor:
-            results.append(row[0])
+            results.add(row[0])
         cursor.close()
         return results
 
@@ -586,9 +598,9 @@ class WebStatsDB:
     def refreshCache(self):
         """Clears the cache tables, and populate them"""
         self._truncateCache()
-        tmp_chans_cache = {}
-        tmp_nicks_cache = {}
-        tmp_links_cache = {}
+        tmp_chans_cache = CacheDict()
+        tmp_nicks_cache = CacheDict()
+        tmp_links_cache = CacheDict()
         cursor = self._conn.cursor()
         cursor.execute("""SELECT * FROM messages""")
         for row in cursor:
@@ -681,6 +693,7 @@ class WebStatsDB:
     def getChanGlobalData(self, chanName):
         """Returns a tuple, containing the channel stats, on all the recording
         period."""
+        chanName = ircutils.toLower(chanName)
         cursor = self._conn.cursor()
         cursor.execute("""SELECT SUM(lines), SUM(words), SUM(chars),
                                  SUM(joins), SUM(parts), SUM(quits),
@@ -704,6 +717,7 @@ class WebStatsDB:
 
         Note that this data comes from the cache, so they might be a bit
         outdated if DEBUG is False."""
+        chanName = ircutils.toLower(chanName)
         cursor = self._conn.cursor()
         cursor.execute("""SELECT MIN(year), MIN(month), MIN(day),
                                  MIN(dayofweek), MIN(hour)
@@ -730,6 +744,7 @@ class WebStatsDB:
 
         For example, getChanXXlyData('#test', 'hour') returns a list of 24
         getChanGlobalData-like tuples."""
+        chanName = ircutils.toLower(chanName)
         sampleQuery = """SELECT SUM(lines), SUM(words), SUM(chars),
                          SUM(joins), SUM(parts), SUM(quits),
                          SUM(nicks), SUM(kickers), SUM(kickeds)
@@ -759,6 +774,7 @@ class WebStatsDB:
 
     def getChanNickGlobalData(self, chanName, nick):
         """Same as getChanGlobalData, but only for one nick."""
+        chanName = ircutils.toLower(chanName)
         cursor = self._conn.cursor()
         cursor.execute("""SELECT nick, lines, words, chars, joins, parts,
                                  quits, nicks, kickers, kickeds
@@ -821,6 +837,14 @@ class WebStats(callbacks.Plugin):
         self.db.clearChannel(channel)
         irc.replySuccess()
     clear = wrap(clear, ['channel', getopts({'confirm': ''})])
+
+    def refresh(self, irc, msg, args):
+        """takes no arguments
+
+        Refreshes WebStats cache."""
+        self.db.refreshCache()
+        irc.replySuccess()
+    refresh = wrap(refresh, ['admin'])
 
     def doPrivmsg(self, irc, msg):
         channel = msg.args[0]
