@@ -281,9 +281,10 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             msg = ircmsgs.privmsg(self.channel, 'Hi, this is a flood',
                                   prefix=self.prefix)
             self.irc.feedMsg(msg)
-        self.assertNotError('config plugin.AttackProtector.enable False')
+        self.assertNotError('config plugins.AttackProtector.enable False')
         self.failIf(self._getIfAnswerIsThisKick('message'),
                     'Punishment even if disabled')
+        self.assertNotError('config plugins.AttackProtector.enable True')
 
 
 
