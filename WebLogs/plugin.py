@@ -69,7 +69,7 @@ page_template = """
 <!DOCTYPE html>
 <html>
     <head>
-    <meta charset="UTF-8" />
+        <meta charset="UTF-8" />
         <title>%(title)s - WebLogs</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <style type="text/css">
