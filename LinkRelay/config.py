@@ -62,13 +62,13 @@ except TypeError:
 
 LinkRelay = conf.registerPlugin('LinkRelay')
 conf.registerChannelValue(LinkRelay, 'color',
-    registry.Boolean(False, _("""Determines whether the bot will color Relayed
+    registry.Boolean(True, _("""Determines whether the bot will color Relayed
     PRIVMSGs so as to make the messages easier to read.""")))
 conf.registerChannelValue(LinkRelay, 'topicSync',
     registry.Boolean(True, _("""Determines whether the bot will synchronize
     topics between networks in the channels it Relays.""")))
 conf.registerChannelValue(LinkRelay, 'hostmasks',
-    registry.Boolean(False, _("""Determines whether the bot will Relay the
+    registry.Boolean(True, _("""Determines whether the bot will Relay the
     hostmask of the person joining or parting the channel when he or she joins
     or parts.""")))
 conf.registerChannelValue(LinkRelay, 'nicks',
@@ -82,7 +82,7 @@ conf.registerChannelValue(LinkRelay, 'includeNetwork',
 class ValidNonPrivmsgsHandling(registry.OnlySomeStrings):
     validStrings = ('privmsg', 'notice', 'nothing')
 conf.registerChannelValue(LinkRelay, 'nonPrivmsgs',
-    ValidNonPrivmsgsHandling('privmsg', _("""Determines whether the
+    ValidNonPrivmsgsHandling('notice', _("""Determines whether the
     bot will use PRIVMSGs (privmsg), NOTICEs (notice), for non-PRIVMSG Relay
     messages (i.e., joins, parts, nicks, quits, modes, etc.), or whether it
     won't relay such messages (nothing)""")))
