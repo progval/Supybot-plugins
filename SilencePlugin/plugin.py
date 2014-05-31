@@ -82,7 +82,7 @@ class SilencePlugin(callbacks.Plugin):
         ircmsgs.IrcMsg = self._original_ircmsg
 
     def _pre_command_callback(self, plugin, command, irc, msg, *args, **kwargs):
-        return False
+        return plugin in self.registryValue('inblacklist')
 
     def outFilter(self, irc, msg):
         plugin = None

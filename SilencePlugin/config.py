@@ -54,6 +54,9 @@ SilencePlugin = conf.registerPlugin('SilencePlugin')
 conf.registerGlobalValue(SilencePlugin, 'outblacklist',
     registry.SpaceSeparatedListOfStrings([], _("""List of plugins that should
     be muted.""")))
+conf.registerGlobalValue(SilencePlugin, 'inblacklist',
+    registry.SpaceSeparatedListOfStrings([], _("""List of plugins that should
+    not get any command.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

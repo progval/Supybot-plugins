@@ -59,6 +59,13 @@ class SilencePluginTestCase(ChannelPluginTestCase):
             time.sleep(1.1)
             self.assertResponse(' ', 'foo')
 
+    def testInblacklist(self):
+        with conf.supybot.plugins.SilencePlugin.outblacklist.context(['Scheduler']):
+            # Check the command has an action but no output.
+            self.assertNoResponse('scheduler add 1 "reply foo"')
+            time.sleep(1.1)
+            self.assertNoResponse(' ')
+
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
