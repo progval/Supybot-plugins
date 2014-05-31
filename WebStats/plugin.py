@@ -208,17 +208,17 @@ PAGE_SKELETON = """\
         <link rel="stylesheet" media="screen" type="text/css" title="Design" href="/default.css" />
         <link rel="stylesheet" media="screen" type="text/css" title="Design" href="/webstats/design.css" />
     </head>
-    <body %%s>
-%%s
+    <body %s>
+%s
         <p id="footer">
             <a href="https://github.com/ProgVal/Limnoria">Limnoria</a> and
             <a href="https://github.com/ProgVal/Supybot-plugins/tree/master/WebStats/">WebStats</a> powered.<br />
             Libre software available under BSD licence.<br />
-            Page generated at %s.
+            Page generated at %%(date)s.
         </p>
     </body>
 </html>
-""" % time.strftime('%Y-%m-%d %H:%M:%S%z')
+"""
 
 DEFAULT_TEMPLATES = {
         'webstats/design.css': """\
@@ -358,7 +358,8 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                 content_type = 'text/html; charset=utf-8'
                 output = httpserver.get_template('generic/error.html') % \
                     {'title': 'WebStats - not found',
-                     'error': 'Requested page is not found. Sorry.'}
+                     'error': 'Requested page is not found. Sorry.',
+                     'date': time.strftime('%Y-%m-%d %H:%M:%S%z')}
         except Exception as e:
             response = 500
             content_type = 'text/html; charset=utf-8'
@@ -369,7 +370,8 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                             repr(e)
                 output = httpserver.get_template('generic/error.html') % \
                     {'title': 'Internal server error',
-                     'error': error}
+                     'error': error,
+                     'date': time.strftime('%Y-%m-%d %H:%M:%S%z')}
             import traceback
             traceback.print_exc()
         finally:
@@ -396,7 +398,8 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                       (channel[1:].replace('#', ' '), # Strip the leading #
                       _('View the stats for the %s channel') % channel,
                       channel)
-        return template % {'title': title, 'channels': channels_html}
+        return template % {'title': title, 'channels': channels_html,
+                           'date': time.strftime('%Y-%m-%d %H:%M:%S%z')}
 
     def get_global(self, urlLevel, channel, page, orderby=None):
         template = httpserver.get_template('webstats/global.html')
@@ -414,7 +417,8 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                     (items[6], _('nick change')),
                     (items[8], _('kick'))),
                 'table': getTable(_('Hour'), hourly_items, channel, urlLevel,
-                    page, orderby)[0]
+                    page, orderby)[0],
+                'date': time.strftime('%Y-%m-%d %H:%M:%S%z'),
                 }
         return template % replacement
 
@@ -452,6 +456,7 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
                 'escaped_channel': channel[1:].replace('#', ' '),
                 'table': table,
                 'pagination': pagination,
+                'date': time.strftime('%Y-%m-%d %H:%M:%S%z'),
                 }
         return template % replacement
 
