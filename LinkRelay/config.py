@@ -82,7 +82,7 @@ conf.registerChannelValue(LinkRelay, 'includeNetwork',
 class ValidNonPrivmsgsHandling(registry.OnlySomeStrings):
     validStrings = ('privmsg', 'notice', 'nothing')
 conf.registerChannelValue(LinkRelay, 'nonPrivmsgs',
-    ValidNonPrivmsgsHandling('notice', _("""Determines whether the
+    ValidNonPrivmsgsHandling('privmsg', _("""Determines whether the
     bot will use PRIVMSGs (privmsg), NOTICEs (notice), for non-PRIVMSG Relay
     messages (i.e., joins, parts, nicks, quits, modes, etc.), or whether it
     won't relay such messages (nothing)""")))
