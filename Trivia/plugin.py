@@ -114,6 +114,7 @@ class Trivia(callbacks.Plugin):
                 self.questions.append(line.strip('\n\r'))
                 line = f.readline()
             f.close()
+            random.shuffle(self.questions)
             try:
                 schedule.removeEvent('next_%s' % self.channel)
             except KeyError:
