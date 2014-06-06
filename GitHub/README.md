@@ -1,5 +1,7 @@
 This plugin announces events GitHub repositories to IRC.
 
+**This plugin requires Limnoria.**
+
 To use this plugin you must forward/open the port which is specified by 
 the configuration variable `supybot.servers.http.port` (8080 is the 
 default value).
