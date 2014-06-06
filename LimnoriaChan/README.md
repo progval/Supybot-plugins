@@ -1,5 +1,7 @@
 LimnoriaChan - #Limnoria factoids, Limnoria issues linker etc.
 
+**This plugin requires Limnoria.**
+
 # LimnoriaChan
 
 LimnoriaChan is meant for use on [#Limnoria] and is loaded on Limnoria there.
