@@ -1,5 +1,7 @@
 A bunch of plugins for Supybot / Limnoria I wrote myself or found on the
-net and improved.
+net and improved. Plugins that require HTTPd aren't compatible with 
+Supybot nor gribble. If you cannot load these plugins in Limnoria, please 
+check that you use recent version with the `version` command.
 
 To install depedencies for these plugins, run
 
@@ -39,7 +41,8 @@ Grabs quotes from web services.
 
 ##GitHub
 
-Plugin using the GitHub API & repo web hooks.
+Plugin using the GitHub API & repo web hooks. **This plugin requires 
+Limnoria**
 
 ##GoodFrench
 
@@ -96,11 +99,12 @@ URL unshortener plugin.
 
 ##WebLogs
 
-Display channel logs on the web (experimental!).
+Display channel logs on the web (experimental!). **This plugin requires 
+Limnoria.**
 
 ##WebStats
 
-Display channel stats on the web.
+Display channel stats on the web. **This plugin requires Limnoria.**
 
 ##WikiTrans
 
