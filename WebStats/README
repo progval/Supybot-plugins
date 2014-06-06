@@ -1,7 +1,0 @@
-WebStats is a plugin that provide a web access to channel based statistics.
-
-It is designed to be used on active channels, so it implements a cache system.
-Don't worry if you have enabled statistics and nothing happens on the Web
-interface in the following hour.
-
-You need pygraphviz (python-pygraphviz in Debian) for the "links" graph.
