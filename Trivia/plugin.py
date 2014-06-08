@@ -139,7 +139,7 @@ class Trivia(callbacks.Plugin):
             self.hints = 0
             self.num -= 1
             self.numAsked += 1
-            q = self.questions.pop(0)
+            q = self.questions.pop(len(self.questions)-1)
             sep = self.registryValue('questionFileSeparator')
             self.q = q[:q.find(sep)]
             self.a = q[q.find(sep)+len(sep):].split(sep)
