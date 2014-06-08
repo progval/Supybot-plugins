@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2011-10-22 14:07+CEST\n"
+"POT-Creation-Date: 2014-06-08 12:40+EEST\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,33 +20,39 @@ msgstr ""
 msgid "Value must be a valid color number (01, 02, 03, 04, ..., 16)"
 msgstr ""
 
-#: config.py:61
+#: config.py:65
 msgid ""
 "Determines whether the bot will color Relayed\n"
 "    PRIVMSGs so as to make the messages easier to read."
 msgstr ""
 
-#: config.py:64
+#: config.py:68
 msgid ""
 "Determines whether the bot will synchronize\n"
 "    topics between networks in the channels it Relays."
 msgstr ""
 
-#: config.py:67
+#: config.py:71
 msgid ""
 "Determines whether the bot will Relay the\n"
 "    hostmask of the person joining or parting the channel when he or she joins\n"
 "    or parts."
 msgstr ""
 
-#: config.py:71
+#: config.py:75
+msgid ""
+"Determines whether the bot will relay the\n"
+"    nick of the person sending a message."
+msgstr ""
+
+#: config.py:78
 msgid ""
 "Determines whether the bot will include the\n"
 "    network in Relayed PRIVMSGs; if you're only Relaying between two networks,\n"
 "    it's somewhat redundant, and you may wish to save the space."
 msgstr ""
 
-#: config.py:78
+#: config.py:85
 msgid ""
 "Determines whether the\n"
 "    bot will use PRIVMSGs (privmsg), NOTICEs (notice), for non-PRIVMSG Relay\n"
@@ -54,23 +60,28 @@ msgid ""
 "    won't relay such messages (nothing)"
 msgstr ""
 
-#: config.py:84
+#: config.py:91
 msgid ""
 "You shouldn't edit this configuration variable\n"
 "    yourself unless you know what you do. Use @LinkRelay {add|remove} instead."
 msgstr ""
 
-#: config.py:88
+#: config.py:95
 msgid ""
 "You shouldn't edit this configuration variable\n"
 "    yourself unless you know what you do. Use @LinkRelay (no)substitute instead."
 msgstr ""
 
-#: config.py:101
+#: config.py:108
 msgid "Color used for relaying %s."
 msgstr ""
 
-#: plugin.py:154
+#: plugin.py:57
+#, docstring
+msgid "Advanced message relay between channels."
+msgstr ""
+
+#: plugin.py:157
 #, docstring
 msgid ""
 "takes no arguments\n"
@@ -78,35 +89,43 @@ msgid ""
 "        Returns all the defined relay links"
 msgstr ""
 
-#: plugin.py:190
+#: plugin.py:161
+msgid "This is no relay enabled. Use \"linkrelay add\" to add one."
+msgstr ""
+
+#: plugin.py:198
 msgid "truncated"
 msgstr ""
 
-#: plugin.py:214
+#: plugin.py:218
 msgid "*/* %(nick)s changed mode on %(channel)s%(network)s to %(mode)s"
 msgstr ""
 
-#: plugin.py:223
+#: plugin.py:228
 msgid "--> %(nick)s has joined %(channel)s%(network)s"
 msgstr ""
 
-#: plugin.py:231
+#: plugin.py:237
 msgid "<-- %(nick)s has left %(channel)s%(network)s"
 msgstr ""
 
-#: plugin.py:241
+#: plugin.py:246
 msgid "<-- %(kicked)s has been kicked from %(channel)s%(network)s by %(kicker)s (%(message)s)"
 msgstr ""
 
-#: plugin.py:251
-msgid "*/* %(oldnick)s (%(network)s) changed his nickname to %(newnick)s"
+#: plugin.py:255
+msgid "*/* %(oldnick)s (%(network)s) changed their nickname to %(newnick)s"
 msgstr ""
 
-#: plugin.py:262
+#: plugin.py:266
 msgid "<-- %(nick)s has quit on %(network)s (%(message)s)"
 msgstr ""
 
-#: plugin.py:324
+#: plugin.py:300
+msgid "(continuation)"
+msgstr ""
+
+#: plugin.py:332
 #, docstring
 msgid ""
 "[<channel>]\n"
@@ -116,27 +135,27 @@ msgid ""
 "        isn't sent on the channel itself."
 msgstr ""
 
-#: plugin.py:333
-msgid "I haven't scraped the IRC object for %s yet. Try again in a minute or two."
+#: plugin.py:341
+msgid "Not connected to network %s."
 msgstr ""
 
-#: plugin.py:373
+#: plugin.py:380
 msgid "%d users in %s on %s:  %s"
 msgstr ""
 
-#: plugin.py:412
+#: plugin.py:419
 msgid "You must give at least --from or --to."
 msgstr ""
 
-#: plugin.py:424
+#: plugin.py:431
 msgid "--from should be like \"--from #channel@network\""
 msgstr ""
 
-#: plugin.py:427
+#: plugin.py:434
 msgid "--to should be like \"--to #channel@network\""
 msgstr ""
 
-#: plugin.py:433
+#: plugin.py:440
 #, docstring
 msgid ""
 "[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]\n"
@@ -149,11 +168,11 @@ msgid ""
 "        in the opposite direction."
 msgstr ""
 
-#: plugin.py:458
+#: plugin.py:465
 msgid "One (or more) relay(s) already exists and has not been added."
 msgstr ""
 
-#: plugin.py:468
+#: plugin.py:475
 #, docstring
 msgid ""
 "[--from <channel>@<network>] [--to <channel>@<network>] [--regexp <regexp>] [--reciprocal]\n"
@@ -166,11 +185,11 @@ msgid ""
 "        in the opposite direction."
 msgstr ""
 
-#: plugin.py:493
+#: plugin.py:500
 msgid "One (or more) relay(s) did not exist and has not been removed."
 msgstr ""
 
-#: plugin.py:526
+#: plugin.py:533
 #, docstring
 msgid ""
 "<regexp> <replacement>\n"
@@ -179,7 +198,7 @@ msgid ""
 "        string."
 msgstr ""
 
-#: plugin.py:543
+#: plugin.py:550
 #, docstring
 msgid ""
 "<regexp>\n"
@@ -187,7 +206,7 @@ msgid ""
 "        Undo a substitution."
 msgstr ""
 
-#: plugin.py:548
+#: plugin.py:555
 msgid "This regexp was not in the nick substitutions database"
 msgstr ""
 
