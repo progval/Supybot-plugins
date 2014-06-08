@@ -92,7 +92,7 @@ conf.registerGlobalValue(Trivia, 'questionFileSeparator',
         and answers in your trivia file.""")))
 
 conf.registerChannelValue(Trivia, 'randomize',
-        registery.Boolean('True', _("""This will determine whether or not the
+        registry.Boolean('True', _("""This will determine whether or not the
         bot will randomize the trivia questions.""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
