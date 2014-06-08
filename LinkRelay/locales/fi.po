@@ -1,6 +1,6 @@
 # LinkRelay plugin for Limnoria.
 # Copyright (C) 2011 Limnoria
-# Mika Suomalainen <mika.henrik.mainio@hotmail.com>, 2011.
+# Mikaela Suomalainen <mikaela.suomalainen@outlook.com>, 2011.
 #
 msgid ""
 msgstr ""
