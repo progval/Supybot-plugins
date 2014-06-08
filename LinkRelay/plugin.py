@@ -101,7 +101,7 @@ class LinkRelay(callbacks.Plugin):
                                           relay[2],
                                           relay[3],
                                           re.compile('^%s$' % relay[0], re.I),
-                                          re.compile('^%s$' % relay[1]),
+                                          re.compile('^%s$' % relay[1], re.I),
                                           re.compile(relay[4])))
             except:
                 log.error('Failed adding relay: %r' % relay)
@@ -336,7 +336,7 @@ class LinkRelay(callbacks.Plugin):
         isn't sent on the channel itself."""
         for relay in self.relays:
             if relay.sourceChannel == channel and \
-                    relay.sourceNetwork == irc.network:
+                    relay.sourceNetwork.lower() == irc.network.lower():
                 if not world.getIrc(relay.targetNetwork):
                     irc.reply(_('Not connected to network %s.') %
                               relay.targetNetwork)
@@ -396,7 +396,7 @@ class LinkRelay(callbacks.Plugin):
 
         currentConfig = self.registryValue('relays')
         config = list(map(ircutils.IrcString, currentConfig.split(' || ')))
-        if add == True:
+        if add:
             if s in config:
                 return False
             if currentConfig == '':
