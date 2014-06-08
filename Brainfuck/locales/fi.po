@@ -1,13 +1,13 @@
 # Brainfuck plugin for Limnoria
 # Copyright (C) 2012 ProgVal
-# Mika Suomalainen <mika.henrik.mainio@hotmail.com>, 2012.
+# Mikaela Suomalainen <mikaela.suomalainen@outlook.com>, 2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2012-04-17 15:44+EEST\n"
 "PO-Revision-Date: 2012-04-17 15:44+0200\n"
-"Last-Translator: Mika Suomalainen <mika.henrik.mainio@hotmail.com>\n"
+"Last-Translator: Mikaela Suomalainen <mikaela.suomalainen@outlook.com>\n"
 "Language-Team: Finnish <>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
