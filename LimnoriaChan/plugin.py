@@ -29,15 +29,18 @@
 ###
 
 import re
+import cgi
 import json
 import urllib
 
 import supybot.utils as utils
 import supybot.world as world
 from supybot.commands import *
+import supybot.ircmsgs as ircmsgs
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
+import supybot.httpserver as httpserver
 from supybot.i18n import PluginInternationalization, internationalizeDocstring
 
 _ = PluginInternationalization('LimnoriaChan')
@@ -66,10 +69,55 @@ dynamicFactoids = {
         'issue-pl':     PLUGINS_WEB_REPO + '/issues/%s',
         }
 
+class LimnoriaDebBuildsCallback(httpserver.SupyHTTPServerCallback):
+    name = "Limnoria builds notifications"
+    defaultResponse = """
+    You shouldn't be there, this subfolder is not for you. Go back to the
+    index and try out other plugins (if any)."""
+    def doPost(self, handler, path, form):
+        host = handler.address_string()
+        if host in ('localhost', '127.0.0.1', '::1'):
+            """
+            form = cgi.FieldStorage(
+                fp=self.rfile,
+                headers=self.headers,
+                environ={'REQUEST_METHOD':'POST',
+                'CONTENT_TYPE': self.headers['Content-Type'],
+                })"""
+            status = form['status']
+            self.plugin._announce_build_status(status.value)
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(b'Channel notified.')
+        else:
+            self.send_response(403)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(b'Not authorized.')
+
 @internationalizeDocstring
 class LimnoriaChan(callbacks.Plugin):
     """Add the help for "@plugin help LimnoriaChan" here
     This should describe *how* to use this plugin."""
+
+    def __init__(self, irc):
+        self.__parent = super(LimnoriaChan, self)
+        self.__parent.__init__( irc)
+
+        callback = LimnoriaDebBuildsCallback()
+        callback.plugin = self
+        httpserver.hook('limnoria_debian_builds', callback)
+        self._users = {}
+
+    def die(self):
+        self.__parent.die()
+        httpserver.unhook('limnoria_debian_builds')
+
+    def _announce_build_status(self, status):
+        msg = '\x02[Debian build]\x02 %s' % status
+        for (server, channel) in (('freenode', '#limnoria'),):
+            world.getIrc(server).sendMsg(ircmsgs.privmsg(channel, msg))
 
     def issue(self, irc, msg, args, user, title):
         """<title>
