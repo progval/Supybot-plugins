@@ -67,14 +67,10 @@ class Glob2ChanCallback(httpserver.SupyHTTPServerCallback):
             self.end_headers()
             self.wfile.write(b'Not authorized.')
 
-instance = None
-
 class Glob2Chan(callbacks.Plugin):
     def __init__(self, irc):
-        global instance
         self.__parent = super(Glob2Chan, self)
         callbacks.Plugin.__init__(self, irc)
-        instance = self
 
         callback = Glob2ChanCallback()
         callback.plugin = self
