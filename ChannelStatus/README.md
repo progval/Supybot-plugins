@@ -1,3 +1,3 @@
-Insert a description of your plugin here, with any notes, etc. about using it.
+Web interface for displaying channel-related data (topic, users, …)
 
 **This plugin requires Limnoria.**

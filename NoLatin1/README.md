@@ -1,1 +1,3 @@
-Insert a description of your plugin here, with any notes, etc. about using it.
+Notifies when latin1 encoding is used on a channel.
+
+May not work with all Python versions and languages.

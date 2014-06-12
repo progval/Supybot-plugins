@@ -1,1 +1,2 @@
-Insert a description of your plugin here, with any notes, etc. about using it.
+Run a telnet server and announce messages to a channel.
+

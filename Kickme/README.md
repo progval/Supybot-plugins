@@ -1,1 +1,3 @@
-Insert a description of your plugin here, with any notes, etc. about using it.
+Provides a command for users to be able to kick themselves.
+Useful as a trigger (using Conditional and MessageParser/Trigger,
+for instance).

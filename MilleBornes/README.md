@@ -1,1 +1,3 @@
-Insert a description of your plugin here, with any notes, etc. about using it.
+Mille Bornes game.
+
+Does not work yet and probably never will.

@@ -1,1 +1,1 @@
-Insert a description of your plugin here, with any notes, etc. about using it.
+Détecte des fautes de frappe, d’orthographe, de grammaire, et de typographie.

@@ -1,1 +1,2 @@
-Insert a description of your plugin here, with any notes, etc. about using it.
+Allows printing last stdout content to IRC.
+Useful if the bot is running as daemon.

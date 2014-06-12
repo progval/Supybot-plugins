@@ -1,1 +1,1 @@
-Insert a description of your plugin here, with any notes, etc. about using it.
+Graps data from the Online Encyclopedia of Integer Sequences.

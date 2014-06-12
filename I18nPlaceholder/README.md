@@ -1,1 +1,2 @@
-Insert a description of your plugin here, with any notes, etc. about using it.
+Provides a fake `supybot.i18n` to plugins requiring it, so they work on a
+stock Supybot instance.

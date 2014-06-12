@@ -1,1 +1,1 @@
-Insert a description of your plugin here, with any notes, etc. about using it.
+Extract original URL from a tinyfied URL, using the `untiny.me` service.

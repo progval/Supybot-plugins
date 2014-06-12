@@ -15,9 +15,17 @@ pip install -r requirements.txt
 
 Provides configurable flood protection for channels.
 
+## AutoTrans
+
+Sends in a query a translation of messages received in a channel.
+
 ##Brainfuck
 
 Brainfuck (a turing-complete programming language) interpreter.
+
+## ChannelStatus
+
+Web interface for displaying channel-related data (topic, users, …)
 
 ##Coffee
 
@@ -26,10 +34,6 @@ Makes coffee for the channel.
 ##Debian
 
 Grabs data from Debian website.
-
-##ERepublik
-
-Graps data from e-republik.
 
 ##Eureka
 
@@ -68,10 +72,18 @@ List empty channels (or with few people) the bot is on.
 
 Run a telnet server and announce messages to a channel.
 
+## OEIS
+
+Graps data from the Online Encyclopedia of Integer Sequences.
+
 ##Pinglist
 
 Keeps a list of people attending a meeting/game, and provides a `pingall`
 command to ping them all.
+
+## RateLimit
+
+Provides rate-limiting of commands.
 
 ##Seeks
 
