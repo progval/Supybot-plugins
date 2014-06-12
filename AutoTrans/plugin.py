@@ -78,6 +78,8 @@ class AutoTrans(callbacks.Plugin):
 
             try:
                 language = data[2]
+            except KeyboardInterrupt:
+                raise
             except:
                 language = 'unknown'
 
