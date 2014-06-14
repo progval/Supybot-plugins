@@ -1,0 +1,1 @@
+**This plugin requires Limnoria.**
