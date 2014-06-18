@@ -3,9 +3,10 @@ net and improved. Plugins that require HTTPd aren't compatible with
 Supybot nor gribble. If you cannot load these plugins in Limnoria, please 
 check that you use recent version with the `version` command.
 
-To install depedencies for these plugins, run
+To install depedencies for Limnoria and these plugins, run
 
 ```
+pip install -r https://raw.githubusercontent.com/ProgVal/Limnoria/master/requirements.txt
 pip install -r requirements.txt
 ```
 
