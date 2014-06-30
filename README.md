@@ -6,7 +6,7 @@ check that you use recent version with the `version` command.
 To install depedencies for these plugins, run
 
 ```
-pip install -r requirements.txt
+pip install -r requirements.txt --upgrade
 ```
 
 [![Build Status](https://travis-ci.org/ProgVal/Supybot-plugins.svg?branch=master)](https://travis-ci.org/ProgVal/Supybot-plugins)
