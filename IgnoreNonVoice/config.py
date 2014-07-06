@@ -54,6 +54,9 @@ IgnoreNonVoice = conf.registerPlugin('IgnoreNonVoice')
 conf.registerChannelValue(IgnoreNonVoice, 'enable',
     registry.Boolean(False, _("""Determines whether commands from people
     without +v, +h, and +o will be ignored.""")))
+conf.registerChannelValue(IgnoreNonVoice, 'enableIfModerated',
+    registry.Boolean(False, _("""Determines whether commands from people
+    without +v, +h, and +o will be ignored.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
