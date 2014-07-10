@@ -55,10 +55,12 @@ class IgnoreNonVoice(callbacks.Plugin):
 
     def _is_not_ignored(self, msg, irc):
         channel = msg.args[0]
+        if not ircutils.isChannel(channel):
+            return True
         enabled = self.registryValue('enable', channel) or \
                 (self.registryValue('enableIfModerated', channel) and \
                 'm' in irc.state.channels[channel].modes)
-        return ircutils.isChannel(channel) and enabled and \
+        return enabled and \
                 not irc.state.channels[channel].isVoicePlus(msg.nick)
     def _pre_command_callback(self, plugin, command, irc, msg, *args, **kwargs):
         return self._is_not_ignored(msg, irc)
