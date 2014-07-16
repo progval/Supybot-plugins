@@ -4,3 +4,4 @@ lxml
 beautifulsoup4
 python-twitter
 requests
+git+https://github.com/haypo/pysandbox.git
