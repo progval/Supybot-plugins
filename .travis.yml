@@ -18,8 +18,7 @@ script:
   - if [ "$PYTHON_MAJOR_VERSION" = "3" ]; then export DISABLED_PLUGINS="--exclude=./NoLatin1"; else export DISABLED_PLUGINS=""; fi
   - supybot-test --plugins-dir=. --no-network $DISABLED_PLUGINS
 notifications:
-    on_success: never
-    on_failure: never
+    email: false
 matrix:
     # REMOVE THIS SECTION WHEN ALL BUILDS ALWAYS PASS!
     allow_failures:
