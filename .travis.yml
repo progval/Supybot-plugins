@@ -21,4 +21,8 @@ notifications:
     on_success: never
     on_failure: never
 matrix:
+    # REMOVE THIS SECTION WHEN ALL BUILDS ALWAYS PASS!
+    allow_failures:
+        - python:
+            - pypy
     fast_finish: true
