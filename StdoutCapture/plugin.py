@@ -112,7 +112,11 @@ class StdoutCapture(callbacks.Plugin):
                     'code': ''.join(StdoutBuffer._buffer[-number:]),
                     }),
                 headers={'Content-Type': 'application/json'})
-        irc.reply('%s/show/%s' % (base, json.load(fd)['data']))
+        if sys.version_info.major >= 3:
+            obj = json.loads(fd.read().decode())
+        else:
+            obj = json.load(fd)
+        irc.reply('%s/show/%s' % (base, obj['data']))
 
     pastebin = wrap(pastebin, ['owner', 'positiveInt', optional('text')])
 
