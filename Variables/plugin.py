@@ -107,6 +107,28 @@ class Variables(callbacks.Plugin):
         else:
             return row[0]
 
+    def unset(self, irc, msg, args, opts, name):
+        """[--domain <domaintype>] [--name <domainname>] <name>
+
+        Unsets a variable called <name>, in the domain matching
+        the <domaintype> and the <domainname>.
+        If <domainname> is not given, it defaults to the current domain
+        matching the <domaintype>.
+        If <domaintype> is not given, it defaults to the global domain.
+        Valid domain types are 'global', 'channel', and 'network'.
+        Note that channel domains are channel-specific, but are cross-network.
+        """
+        domainType, domainName = self._getDomain(irc, msg, opts)
+        cursor = self._connection.cursor()
+        cursor.execute("""DELETE FROM variables WHERE
+                          domainType=? AND domainName=? AND
+                          variableName=?""",
+                      (domainType, domainName, name))
+        irc.replySuccess()
+    unset = wrap(unset, [getopts({'domain': ('literal', ('global', 'network', 'channel')),
+                              'name': 'something'}),
+                     'something'])
+
     @internationalizeDocstring
     def set(self, irc, msg, args, opts, name, value):
         """[--domain <domaintype>] [--name <domainname>] <name> <value>
