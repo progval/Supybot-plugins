@@ -230,7 +230,7 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             time.sleep(2)
             m = self.irc.takeMsg()
             self.assertEqual(m.command, 'MODE')
-        schedule.schedule.schedule = False
+        schedule.schedule.reset()
 
     #################################
     # 'Kicked' tests
