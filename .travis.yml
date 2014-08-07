@@ -6,22 +6,25 @@ python:
   - "3.3"
   - "3.4"
   - "pypy"
+  - "pypy3"
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
     - pip install -vr https://raw.githubusercontent.com/ProgVal/Limnoria/testing/requirements.txt
     - pip install -v git+https://github.com/ProgVal/Limnoria.git@testing
-    - pip install -vr requirements.txt
+    - pip install -vr requirements.txt||true
 # command to run tests, e.g. python setup.py test
 script:
   - echo $TRAVIS_PYTHON_VERSION
-  - export PYTHON_MAJOR_VERSION=$(echo $TRAVIS_PYTHON_VERSION|head -c 1)
+  - export PYTHON_MAJOR_VERSION=$(python -c "import sys;print(sys.version_info[0])")
+  - echo $PYTHON_MAJOR_VERSION
   - if [ "$PYTHON_MAJOR_VERSION" = "3" ]; then export DISABLED_PLUGINS="--exclude=./NoLatin1"; else export DISABLED_PLUGINS=""; fi
   - supybot-test --plugins-dir=. --no-network $DISABLED_PLUGINS
 notifications:
     email: false
 matrix:
     # REMOVE THIS SECTION WHEN ALL BUILDS ALWAYS PASS!
-    allow_failures:
-        - python:
-            - pypy
+    #allow_failures:
+        #- python:
+            #- pypy
+            #- pypy3
     fast_finish: true
