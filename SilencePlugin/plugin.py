@@ -89,7 +89,7 @@ class SilencePlugin(callbacks.Plugin):
         if msg.tagged(plugin_class_name_tag):
             plugin = msg.tagged(plugin_class_name_tag)
         else:
-            self.log.warning('Message from no plugin: %r' % msg)
+            self.log.warning('Message from no plugin: %r', msg)
             return msg
         if plugin in self.registryValue('outblacklist'):
             return None
