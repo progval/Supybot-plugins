@@ -517,7 +517,8 @@ class WebStatsDB:
             os.remove(filename)
             alreadyExists = False
         self._conn = sqlite3.connect(filename, check_same_thread = False)
-        self._conn.text_factory = str
+        if sys.version_info[0] < 3:
+            self._conn.text_factory = str
         if not alreadyExists:
             self.makeDb()
 

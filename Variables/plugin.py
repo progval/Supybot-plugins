@@ -29,6 +29,7 @@
 ###
 
 import os
+import sys
 
 import supybot.conf as conf
 import supybot.utils as utils
@@ -64,7 +65,8 @@ class Variables(callbacks.Plugin):
             self._connection.close()
         createDatabase = not os.path.exists(self._filename)
         self._connection = sqlite3.connect(self._filename)
-        self._connection.text_factory = str
+        if sys.version_info[0] < 3:
+            self._connection.text_factory = str
         if createDatabase:
             self._makeDb()
 
