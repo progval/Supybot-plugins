@@ -53,10 +53,10 @@ IgnoreNonVoice = conf.registerPlugin('IgnoreNonVoice')
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
 conf.registerChannelValue(IgnoreNonVoice, 'enable',
     registry.Boolean(False, _("""Determines whether commands from people
-    without +v, +h, and +o will be ignored.""")))
+    without +v, +h, or +o will be ignored.""")))
 conf.registerChannelValue(IgnoreNonVoice, 'enableIfModerated',
     registry.Boolean(False, _("""Determines whether commands from people
-    without +v, +h, and +o will be ignored if the channel is set +m
+    without +v, +h, or +o will be ignored if the channel is mode +m
     (moderated).""")))
 
 
