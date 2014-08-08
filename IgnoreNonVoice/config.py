@@ -56,7 +56,8 @@ conf.registerChannelValue(IgnoreNonVoice, 'enable',
     without +v, +h, and +o will be ignored.""")))
 conf.registerChannelValue(IgnoreNonVoice, 'enableIfModerated',
     registry.Boolean(False, _("""Determines whether commands from people
-    without +v, +h, and +o will be ignored.""")))
+    without +v, +h, and +o will be ignored if the channel is set +m
+    (moderated).""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
