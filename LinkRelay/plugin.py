@@ -55,7 +55,6 @@ except:
 @internationalizeDocstring
 class LinkRelay(callbacks.Plugin):
     """Advanced message relay between channels."""
-    noIgnore = True
     threaded = True
 
     class Relay():
