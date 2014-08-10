@@ -130,7 +130,7 @@ class Fortune(callbacks.Plugin):
         return parts
 
     def sample(self, irc, msg, args, amount, names):
-        """[<number>] [<name> [<name> ...]]
+        """[<number>] [<name> [<name> ...]]
 
         Fetches random fortunes from one of the databases whose name is
         given (uses supybot.plugins.Fortune.defaults.databases as a default).
