@@ -47,6 +47,11 @@ except ImportError:
     # without the i18n module
     _ = lambda x:x
 
+if sys.version_info[0] >= 3:
+    (imap, ifilter) = (map, filter)
+else:
+    (imap, ifilter) = (itertools.imap, itertools.ifilter)
+
 class Fortune(callbacks.Plugin):
     """Displays fortunes on a channel in a more flexible way than the
     Unix plugin."""
@@ -96,7 +101,7 @@ class Fortune(callbacks.Plugin):
                 key = registry.join(['databases', name])
                 url = self.plugin.registryValue(key)
                 return format('%s %u', name, url)
-            items = map(formatter, databases)
+            items = imap(formatter, databases)
             irc.reply(utils.str.commaAndify(items))
 
     def read_fortunes(self, name):
@@ -129,6 +134,15 @@ class Fortune(callbacks.Plugin):
             fd.close()
         return parts
 
+    def _search(self, names, pre_pred=None, post_pred=None):
+        fortunes = itertools.chain.from_iterable(imap(self.read_fortunes, names))
+        if pre_pred:
+            fortunes = ifilter(pre_pred, fortunes)
+        fortunes = imap(self.format_fortune, fortunes)
+        if post_pred:
+            fortunes = ifilter(post_pred, fortunes)
+        return fortunes
+
     def sample(self, irc, msg, args, amount, names):
         """[<number>] [<name> [<name> ...]]
 
@@ -143,8 +157,7 @@ class Fortune(callbacks.Plugin):
         if unknown_names:
             irc.error(format(_('This/these databases are unknown: %L'),
                     unknown_names), Raise=True)
-        all_fortunes = itertools.chain(map(self.read_fortunes, names))
-        all_fortunes = map(self.format_fortune, all_fortunes)
+        all_fortunes = self._search(names)
         fortunes = random.sample(list(all_fortunes), amount)
         irc.replies(fortunes)
     sample = wrap(sample, ['positiveInt', any('commandName')])
@@ -170,13 +183,11 @@ class Fortune(callbacks.Plugin):
             irc.error(format(_('This/these databases are unknown: %L'),
                     unknown_names), Raise=True)
 
-        all_fortunes = map(self.read_fortunes, names)
-        all_fortunes = itertools.chain.from_iterable(all_fortunes)
-        all_fortunes = map(self.format_fortune, all_fortunes)
-        short_fortunes = [x for x in all_fortunes if len(x) < max_length]
-        if not short_fortunes:
+        fortunes = self._search(names, post_pred=lambda x:len(x) < max_length)
+        fortunes = list(fortunes)
+        if not fortunes:
             irc.error(_('No fortune matched the search.'), Raise=True)
-        fortunes = random.choice(short_fortunes)
+        fortunes = random.choice(fortunes)
         irc.reply(fortunes, noLengthCheck=True)
     random = wrap(random, [optional('nonNegativeInt'), any('commandName')])
 
