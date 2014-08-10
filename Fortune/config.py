@@ -52,7 +52,7 @@ Fortune = conf.registerPlugin('Fortune')
 # conf.registerGlobalValue(Fortune, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
 conf.registerGlobalValue(Fortune, 'databases',
-    registry.CommaSeparatedSetOfStrings(set(), _("""The list of known
+    registry.SpaceSeparatedSetOfStrings(set(), _("""The list of known
     databases.""")))
 conf.registerGroup(Fortune, 'defaults')
 conf.registerChannelValue(Fortune.defaults, 'databases',
