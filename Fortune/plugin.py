@@ -52,6 +52,21 @@ if sys.version_info[0] >= 3:
 else:
     (imap, ifilter) = (itertools.imap, itertools.ifilter)
 
+def check_names(f):
+    def newf(self, irc, msg, args, *other_args):
+        channel = msg.args[0]
+        names = other_args[-1]
+        names = set(names) or self.registryValue('defaults.databases', channel)
+        if not names:
+            irc.error(_('No default database configured.'), Raise=True)
+        unknown_names = names - self.registryValue('databases')
+        if unknown_names:
+            irc.error(format(_('This/these databases are unknown: %L'),
+                    unknown_names), Raise=True)
+        f(self, irc, msg, args, *other_args)
+    newf.__doc__ = f.__doc__
+    return newf
+
 class Fortune(callbacks.Plugin):
     """Displays fortunes on a channel in a more flexible way than the
     Unix plugin."""
@@ -143,6 +158,7 @@ class Fortune(callbacks.Plugin):
             fortunes = ifilter(post_pred, fortunes)
         return fortunes
 
+    @check_names
     def sample(self, irc, msg, args, amount, names):
         """[<number>] [<name> [<name> ...]]
 
@@ -162,6 +178,7 @@ class Fortune(callbacks.Plugin):
         irc.replies(fortunes)
     sample = wrap(sample, ['positiveInt', any('commandName')])
 
+    @check_names
     def random(self, irc, msg, args, max_length, names):
         """[<maxlength>] [<name> [<name> ...]]
 
@@ -174,14 +191,6 @@ class Fortune(callbacks.Plugin):
         # TODO: Adapt to various config options, as irc.reply would.
         max_length = max_length or \
                 (510 - len('PRIVMSG %s :%s: ' % (channel, msg.nick)))
-
-        names = set(names) or self.registryValue('defaults.databases', channel)
-        if not names:
-            irc.error(_('No default database configured.'), Raise=True)
-        unknown_names = names - self.registryValue('databases')
-        if unknown_names:
-            irc.error(format(_('This/these databases are unknown: %L'),
-                    unknown_names), Raise=True)
 
         fortunes = self._search(names, post_pred=lambda x:len(x) < max_length)
         fortunes = list(fortunes)
