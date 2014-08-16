@@ -44,10 +44,26 @@ except:
     # without the i18n module
     _ = lambda x:x
 
-REGEXP = '[cçk]^([o0öôØ]^[i1ïî]|[i1]^[o0Ø])^[nñ]'
+def str_rev(s):
+    return s[::-1]
+
+def re_rev(r):
+    # Reverse terms
+    r = '^'.join(reversed(r.split('^')))
+    # swap parenthesis
+    r = utils.str.multipleReplacer({'(':')',')':'('})(r)
+    return r
+
+# Les caractères “^” sont par la suite remplacés soit par du vide, soit par
+# “espace*”, pour matcher aussi les caractères invisibles.
+REGEXP = '[cçk]^(^[o0öôØ]^[i1ïî]^|^[i1]^[o0Ø]^)^[nñ]'
+# Matcher aussi les “coin” inversés
+REGEXP = '%s|%s' % (REGEXP, re_rev(REGEXP))
 _regexp = re.compile(REGEXP.replace('^', ''), re.I)
-def replacer(match):
-    coin = match.group(0)
+def _replacer(coin):
+    assert coin, coin
+    if coin[0].lower() not in 'cçk':
+        return str_rev(_replacer(str_rev(coin)))
     assert len(coin) == 4
     reverse = coin[1] in 'i1I'
     if reverse:
@@ -112,6 +128,9 @@ def replacer(match):
         pan = pan.replace('A', '∀')
         pan = pan.replace('4', 'ㄣ')
     return pan
+def replacer(match):
+    assert match.group(0)
+    return _replacer(match.group(0))
 
 def snarfer_generator():
     def coinSnarfer(self, irc, msg, match):

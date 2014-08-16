@@ -57,6 +57,8 @@ class CoinpanTestCase(ChannelPluginTestCase):
         self.assertSnarfResponse('foo CION bar', 'foo P∀N bar')
         self.assertSnarfResponse('foo cion bar', 'foo pɐn bar')
 
+        self.assertSnarfResponse('foo nioc bar', 'foo nap bar')
+
     if sys.version_info < (2, 7, 0):
         def testCoinpan(self):
             pass
