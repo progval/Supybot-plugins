@@ -66,12 +66,13 @@ except TypeError:
 
 class Punishment(registry.String):
     """Value must be a valid punishment ('ban', 'kick', 'kban', 'mode+X',
-    'mode-X', 'umode+X', 'umode-X', 'command XXX', ...)"""
+    'mode-X', 'umode+X', 'umode-X', 'mmode+X', 'mmode-X', 'command XXX',
+    ...)"""
     def set(self, s):
         if s not in ('ban', 'kick', 'kban') and not s.startswith('mode+') and \
                 not s.startswith('mode-') and not s.startswith('umode-') and \
                 not s.startswith('umode+') and \
-                not s.startswith('mmode-') and not s.startswith('mmode-') and \
+                not s.startswith('mmode+') and not s.startswith('mmode-') and \
                 not s.startswith('command ') and \
                 not s.startswith('kban+') and not s.startswith('ban+') :
             self.error()
