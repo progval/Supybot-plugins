@@ -58,6 +58,9 @@ conf.registerGroup(Fortune, 'defaults')
 conf.registerChannelValue(Fortune.defaults, 'databases',
     registry.SpaceSeparatedSetOfStrings(set(), _("""The set of databases
     commands will look in if they have no argument.""")))
+conf.registerChannelValue(Fortune, 'removeNewline',
+    registry.Boolean(True, _("""Determines whether newline characters in
+    fortunes will be stripped.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

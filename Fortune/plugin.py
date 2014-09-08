@@ -30,6 +30,7 @@
 
 import sys
 import random
+import functools
 import itertools
 
 import supybot.conf as conf
@@ -79,8 +80,9 @@ class Fortune(callbacks.Plugin):
         for name in self.registryValue('databases'):
             self.register_database_config(name)
 
-    def format_fortune(self, lines):
-        return ' '.join(lines).strip()
+    def format_fortune(self, lines, removeNewline):
+        return utils.str.normalizeWhitespace('\n'.join(lines).strip(),
+                removeNewline=removeNewline)
 
     def register_database_config(self, name, url=''):
         conf.registerGlobalValue(conf.supybot.plugins.Fortune.databases, name,
@@ -130,7 +132,7 @@ class Fortune(callbacks.Plugin):
         try:
             parts = [[]]
             for line in fd.readlines():
-                if line == b'%\n':
+                if line in (b'%\n', b'%\r\n', b'%\r'):
                     parts.append([])
                 else:
                     for encoding in ('utf8', 'iso-8859-15',
@@ -144,16 +146,19 @@ class Fortune(callbacks.Plugin):
                             continue
                     else:
                         print(repr(line))
+                        continue
                     parts[-1].append(line.strip())
         finally:
             fd.close()
         return parts
 
-    def _search(self, names, pre_pred=None, post_pred=None):
+    def _search(self, names, removeNewline, pre_pred=None, post_pred=None):
         fortunes = itertools.chain.from_iterable(imap(self.read_fortunes, names))
         if pre_pred:
             fortunes = ifilter(pre_pred, fortunes)
-        fortunes = imap(self.format_fortune, fortunes)
+        pred = functools.partial(self.format_fortune,
+                removeNewline=removeNewline)
+        fortunes = imap(pred, fortunes)
         if post_pred:
             fortunes = ifilter(post_pred, fortunes)
         return fortunes
@@ -173,7 +178,7 @@ class Fortune(callbacks.Plugin):
         if unknown_names:
             irc.error(format(_('This/these databases are unknown: %L'),
                     unknown_names), Raise=True)
-        all_fortunes = self._search(names)
+        all_fortunes = self._search(names, True)
         fortunes = random.sample(list(all_fortunes), amount)
         irc.replies(fortunes)
     sample = wrap(sample, ['positiveInt', any('commandName')])
@@ -192,12 +197,32 @@ class Fortune(callbacks.Plugin):
         max_length = max_length or \
                 (510 - len('PRIVMSG %s :%s: ' % (channel, msg.nick)))
 
-        fortunes = self._search(names, post_pred=lambda x:len(x) < max_length)
+        names = set(names) or self.registryValue('defaults.databases', channel)
+        if not names:
+            irc.error(_('No default database configured.'), Raise=True)
+        unknown_names = names - self.registryValue('databases')
+        if unknown_names:
+            irc.error(format(_('This/these databases are unknown: %L'),
+                    unknown_names), Raise=True)
+
+        removeNewline = self.registryValue('removeNewline', channel)
+        if removeNewline:
+            def pred(fortune):
+                return len(fortune) < max_length
+        else:
+            def pred(fortune):
+                return all(len(line) < max_length
+                           for line in fortune.split('\n'))
+        fortunes = self._search(names, removeNewline, post_pred=pred)
         fortunes = list(fortunes)
         if not fortunes:
             irc.error(_('No fortune matched the search.'), Raise=True)
-        fortunes = random.choice(fortunes)
-        irc.reply(fortunes, noLengthCheck=True)
+        fortune = random.choice(fortunes)
+        if removeNewline:
+            irc.reply(fortune, noLengthCheck=True)
+        else:
+            for line in fortune.split('\n'):
+                irc.reply(line, noLengthCheck=True)
     random = wrap(random, [optional('nonNegativeInt'), any('commandName')])
 
 Class = Fortune
