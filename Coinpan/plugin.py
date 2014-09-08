@@ -139,6 +139,7 @@ def snarfer_generator():
             txt = txt.replace('\u200b', '')
             txt = txt.replace('Ο', 'O')
             txt = txt.replace('>o_/', '>x_/').replace('\_o<', '\_x<')
+            txt = txt.replace('>0_/', '>x_/').replace('\_0<', '\_x<')
             txt = txt.replace('>O_/', '>x_/').replace('\_O<', '\_x<')
             irc.reply(_regexp.sub(replacer, txt), prefixNick=False)
     regexp = '(?i).*(%s|>^o^_^/|\^_^[Oo]^<).*' % REGEXP
