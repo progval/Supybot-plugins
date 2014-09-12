@@ -57,7 +57,8 @@ class PingTime(callbacks.PluginRegexp):
         channel = msg.args[0]
         from_ = msg.nick
         to = match.group('nick') or match.group('nick2')
-        if not ircutils.isChannel(channel):
+        if not (ircutils.isChannel(channel) and self.registryValue('enable',
+            msg.args[0])):
             return
         if channel not in self._pings:
             self._pings[channel] = {}
@@ -68,7 +69,8 @@ class PingTime(callbacks.PluginRegexp):
         channel = msg.args[0]
         from_ = msg.nick
         to = match.group('nick') or match.group('nick2')
-        if not ircutils.isChannel(channel):
+        if not (ircutils.isChannel(channel) and self.registryValue('enable',
+            msg.args[0])):
             return
         try:
             pinged_at = self._pings[channel].pop((to, from_))
