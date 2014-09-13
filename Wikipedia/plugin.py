@@ -133,7 +133,7 @@ class Wikipedia(callbacks.Plugin):
                         redirect = redirect.encode('utf-8','replace')
                 reply += '"%s" (Redirect from "%s"): ' % (title, redirect)
         # extract the address we got it from
-        addr = re.search(_('Retrieved from') + ' "<a dir="ltr" href="([^"]*)">', article)
+        addr = re.search(' "?<a dir="ltr" href="([^"]*)"?>', article)
         addr = addr.group(1)
         # check if it's a disambiguation page
         disambig = tree.xpath('//table[@id="disambigbox"]')
@@ -165,7 +165,7 @@ class Wikipedia(callbacks.Plugin):
                         p = p.encode('utf-8', 'replace')
                     if isinstance(reply, unicode):
                         reply = reply.encode('utf-8','replace')
-                reply += '%s %s' % (p, ircutils.bold(addr))
+                reply += '%s %s %s' % (p, _('Retrieved from'), ircutils.bold(addr))
         reply = reply.replace('&amp;','&')
         irc.reply(reply)
     wiki = wrap(wiki, ['text'])

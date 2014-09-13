@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Supybot-fr\n"
 "POT-Creation-Date: 2011-02-26 09:49+CET\n"
 "PO-Revision-Date: 2011-07-29 17:43+0200\n"
-"Last-Translator: skizzhg <skizzhg@gmx.com>\n"
+"Last-Translator: James Lu <glolol1@hotmail.com>\n"
 "Language-Team: Italian <skizzhg@gmx.com>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -53,10 +53,6 @@ msgstr "Non trovo nulla per \"%s\", ma questi sono i risultati per \"%s\": "
 msgid "Redirected from"
 msgstr "Rediretto da"
 
-#: plugin.py:109
-msgid "Retrieved from"
-msgstr "Recuperato da"
-
 #: plugin.py:118
 msgid "%s is a disambiguation page. Possible results are: %s"
 msgstr "%s è una pagina di disambiguazione; i possibili risultati sono: %s"
@@ -73,3 +69,6 @@ msgstr "\"%s\" è una pagina piena di eventi accaduti quest'anno. Se stavi cerca
 msgid "Not found, or page bad formed."
 msgstr "Non trovato, o pagina non valida."
 
+#: plugin.py:168
+msgid "Retrieved from"
+msgstr "Recuperato da"
