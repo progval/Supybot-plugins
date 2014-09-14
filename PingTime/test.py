@@ -32,6 +32,7 @@ from supybot.test import *
 
 class PingTimeTestCase(ChannelPluginTestCase):
     plugins = ('PingTime',)
+    config = {'supybot.plugins.pingtime.enable': True}
 
     def testBasics(self):
         self.assertSnarfNoResponse('pong foo', frm='bar!a@a',)

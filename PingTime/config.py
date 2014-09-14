@@ -48,9 +48,8 @@ def configure(advanced):
 
 
 PingTime = conf.registerPlugin('PingTime')
-# This is where your configuration variables (if any) should go.  For example:
-# conf.registerGlobalValue(PingTime, 'someConfigVariableName',
-#     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
-
+conf.registerChannelValue(PingTime, 'enable',
+     registry.Boolean(False, _("""Determines whether this plugin should
+     be enabled.""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
