@@ -135,6 +135,10 @@ class Wikipedia(callbacks.Plugin):
         # extract the address we got it from
         addr = re.search(' "?<a dir="ltr" href="([^"]*)"?>', article)
         addr = addr.group(1)
+        # remove the &oldid part
+        addr = addr.split('&amp;oldid=')[0]
+        # force serving HTTPS links
+        addr = 'https://' + addr.split("//")[1]
         # check if it's a disambiguation page
         disambig = tree.xpath('//table[@id="disambigbox"]')
         if disambig:
