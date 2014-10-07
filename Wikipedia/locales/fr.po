@@ -68,7 +68,7 @@ msgid "\"%s\" is a page full of events that happened in that year.  If you were 
 msgstr "\"%s\" est une page pleine d'évènement qui se sont produits cette année. Si vous recherches des informations à propos du nombre lui-même, essayez de rechercher \"%s_(nombre)\", mais ne vous attendez pas à quelque chose d'utile..."
 
 #: plugin.py:131
-msgid "Not found, or page bad formed."
+msgid "Not found, or page malformed."
 msgstr "Non trouvé, ou page mal formée."
 
 #: plugin.py:168
