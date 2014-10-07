@@ -155,7 +155,7 @@ class Wikipedia(callbacks.Plugin):
             ##### etree!
             p = tree.xpath("//div[@id='mw-content-text']/p[1]")
             if len(p) == 0 or addr.endswith('Special:Search'):
-                reply += _('Not found, or page bad formed.')
+                reply += _('Not found, or page malformed.')
             else:
                 p = p[0]
                 p = p.text_content()
