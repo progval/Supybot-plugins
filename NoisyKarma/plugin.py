@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 ###
 # Copyright (c) 2013, Valentin Lorentz
 # All rights reserved.
@@ -28,6 +29,8 @@
 
 ###
 
+import re
+
 import supybot.conf as conf
 import supybot.utils as utils
 from supybot.commands import *
@@ -49,9 +52,10 @@ class NoisyKarma(callbacks.Plugin):
     def doPrivmsg(self, irc, msg):
         Karma = irc.getCallback('Karma')
         channel = msg.args[0]
+        regexp = re.compile(r'[  ,;&|\\.:/?!]')
         if Karma and not msg.addressed and not msg.repliedTo and \
                 irc.isChannel(channel):
-            (L, neutrals) = Karma.db.gets(channel, msg.args[1].split(' ')) 
+            (L, neutrals) = Karma.db.gets(channel, regexp.split(msg.args[1]))
             if not L:
                 return
             (thing, karma) = L[0] if abs(L[0][1]) > abs(L[-1][1]) else L[-1]
