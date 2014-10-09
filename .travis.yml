@@ -17,8 +17,8 @@ script:
   - echo $TRAVIS_PYTHON_VERSION
   - export PYTHON_MAJOR_VERSION=$(python -c "import sys;print(sys.version_info[0])")
   - echo $PYTHON_MAJOR_VERSION
-  - if [ "$PYTHON_MAJOR_VERSION" = "3" ]; then export DISABLED_PLUGINS="--exclude=./NoLatin1 --exclude ./Twitter --exclude ./TwitterStream --exclude ./MegaHAL --exclude GUI"; else export DISABLED_PLUGINS=""; fi
-  - supybot-test --plugins-dir=. --no-network $DISABLED_PLUGINS
+  - if [ "$PYTHON_MAJOR_VERSION" = "3" ]; then export DISABLED_PLUGINS="--exclude ./Twitter --exclude ./TwitterStream --exclude ./MegaHAL --exclude GUI"; else export DISABLED_PLUGINS=""; fi
+  - supybot-test --plugins-dir=. --no-network --exclude=./NoLatin1 $DISABLED_PLUGINS
 notifications:
     email: false
 matrix:
