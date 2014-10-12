@@ -73,7 +73,7 @@ class TriggerTestCase(ChannelPluginTestCase):
         self.failIf(not self._getIfAnswerIsEqual(msg), 'Does not reply to '
                 'triggered echo on notice')
 
-    def testSubstitude(self):
+    def testSubstitute(self):
         self.irc.feedMsg(ircmsgs.join(self.channel, prefix=self.prefix))
         msg = ircmsgs.privmsg(self.channel, 'Hi test')
         self.failIf(not self._getIfAnswerIsEqual(msg), 'Does not welcome me')
