@@ -9,9 +9,9 @@ python:
   - "pypy3"
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
-    - pip install -vr https://raw.githubusercontent.com/ProgVal/Limnoria/testing/requirements.txt
-    - pip install -v git+https://github.com/ProgVal/Limnoria.git@testing
-    - pip install -vr requirements.txt||true
+    - pip install -qr https://raw.githubusercontent.com/ProgVal/Limnoria/testing/requirements.txt
+    - pip install -q git+https://github.com/ProgVal/Limnoria.git@testing
+    - pip install -qr requirements.txt||true
 # command to run tests, e.g. python setup.py test
 script:
   - echo $TRAVIS_PYTHON_VERSION
