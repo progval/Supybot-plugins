@@ -220,7 +220,7 @@ class GitHub(callbacks.Plugin):
                     else:
                         repl[key + '__tiny'] = value
                         try_gitio = False
-                elif key.endswith('ref'):
+                elif key.endswith('ref') and value:
                     try:
                         repl[key + '__branch'] = value.split('/', 2)[2]
                     except IndexError:
