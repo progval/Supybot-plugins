@@ -53,7 +53,7 @@ conf.registerChannelValue(WunderWeather, 'showPressure',
     registry.Boolean(True, """Determines whether the bot will show pressures in its
     output. The type of pressure shown will depend on the metric/imperial settings."""))
 conf.registerChannelValue(WunderWeather, 'forecastDays',
-    registry.NonNegativeInteger(0, """Determines how many days the forecast shows, up to 7.
+    registry.NonNegativeInteger(2, """Determines how many days the forecast shows, up to 7.
     If set to 0, show all days. See showForecast configuration variable to turn off
     forecast display."""))
 conf.registerChannelValue(WunderWeather, 'showCurrentByDefault',
