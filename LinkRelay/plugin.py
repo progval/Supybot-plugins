@@ -29,8 +29,6 @@
 ###
 
 import re
-import time
-import copy
 import string
 import supybot.log as log
 import supybot.conf as conf
