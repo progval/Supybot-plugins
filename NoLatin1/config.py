@@ -57,7 +57,7 @@ conf.registerChannelValue(NoLatin1, 'maxWarningsBeforeAlert',
         registry.Integer(5, _("""After a certain number of warning, the bot
         will call someone (defined in supybot.plugins.NoLatin1.operator)""")))
 conf.registerChannelValue(NoLatin1, 'operator',
-        registry.String('KwisatzHaderach', _("""The person the bot will alert
+        registry.String('', _("""The person the bot will alert
         when a user insists in using Latin-1""")))
 
 

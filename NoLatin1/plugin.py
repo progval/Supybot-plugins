@@ -79,7 +79,7 @@ class NoLatin1(callbacks.Plugin):
         self._warnings.update({id_: (time.time(), warnLevel)})
         maxWarningsBeforeAlert = self.registryValue('maxWarningsBeforeAlert')
         operator = self.registryValue('operator')
-        if warnLevel >= maxWarningsBeforeAlert:
+        if operator and warnLevel >= maxWarningsBeforeAlert:
             irc.reply(_('User %s is still using Latin-1 after %i alerts') %
                       (nick, maxWarningsBeforeAlert), private=True, to=operator)
             warnLevel = 0
