@@ -33,6 +33,7 @@ import json
 import time
 import urllib
 import socket
+import fnmatch
 import threading
 from string import Template
 import supybot.log as log
@@ -266,7 +267,7 @@ class GitHub(callbacks.Plugin):
             announces = self._load()
             repoAnnounces = []
             for (dbRepo, network, channel) in announces:
-                if dbRepo == repo:
+                if fnmatch.fnmatch(repo, dbRepo):
                     repoAnnounces.append((network, channel))
             if len(repoAnnounces) == 0:
                 log.info('Commit for repo %s not announced anywhere' % repo)
