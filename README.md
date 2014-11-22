@@ -1,9 +1,9 @@
-A bunch of plugins for Supybot / Limnoria I wrote myself or found on the
+A bunch of plugins for Supybot / Limnoria I either wrote myself or found on the
 net and improved. Plugins that require HTTPd aren't compatible with 
-Supybot nor gribble. If you cannot load these plugins in Limnoria, please 
-check that you use recent version with the `version` command.
+Supybot or gribble. If you cannot load these plugins in Limnoria, please 
+make sure you are using a recent version with the `version` command.
 
-To install depedencies for Limnoria and these plugins, run
+To install dependencies for Limnoria and these plugins, run
 
 ```
 pip install -r https://raw.githubusercontent.com/ProgVal/Limnoria/master/requirements.txt
@@ -20,7 +20,7 @@ Provides configurable flood protection for channels.
 
 Sends in a query a translation of messages received in a channel.
 
-##Brainfuck
+## Brainfuck
 
 Brainfuck (a turing-complete programming language) interpreter.
 
@@ -28,54 +28,50 @@ Brainfuck (a turing-complete programming language) interpreter.
 
 Web interface for displaying channel-related data (topic, users, …)
 
-##Coffee
+## Coffee
 
 Makes coffee for the channel.
 
-##Debian
+## Debian
 
-Grabs data from Debian website.
+Grabs data from Debian's website.
 
-##Eureka
+## Eureka
 
 Trivia plugin, with a new take on file design.
 
-##GeekQuote
-
-Grabs quotes from web services.
-
-##GitHub
+## GitHub
 
 Plugin using the GitHub API & repo web hooks. **This plugin requires 
 Limnoria**
 
-##GoodFrench
+## GoodFrench
 
 French typo/spelling checker.
 
-##IgnoreNonVoice
+## IgnoreNonVoice
 
 This plugin ignores users who aren't voiced. Can also be configured to 
 only work when the channel is moderated `mode +m`. Useful with lesser 
 moderation (`mode +z`).
 
-##Iwant
+## Iwant
 
 Wishlist.
 
-##Kickme
+## Kickme
 
 Utility plugin, useful in nested commands.
 
-##LinkRelay
+## LinkRelay
 
 Highly configurable relay plugin.
 
-##ListEmpty
+## ListEmpty
 
 List empty channels (or with few people) the bot is on.
 
-##Listener
+## Listener
 
 Run a telnet server and announce messages to a channel.
 
@@ -83,7 +79,7 @@ Run a telnet server and announce messages to a channel.
 
 Graps data from the Online Encyclopedia of Integer Sequences.
 
-##Pinglist
+## Pinglist
 
 Keeps a list of people attending a meeting/game, and provides a `pingall`
 command to ping them all.
@@ -92,43 +88,43 @@ command to ping them all.
 
 Provides rate-limiting of commands.
 
-##Seeks
+## Seeks
 
 Plugin for the Seeks search engine.
 
-##SupyML
+## SupyML
 
 Markup-based Supybot language supporting variables and loops.
 
-##Trigger
+## Trigger
 
 Utility plugin that runs commands when a join/part/whatever occurs.
 
-##Trivia
+## Trivia
 
 Trivia plugin.
 
-##Twitter
+## Twitter
 
 Advanced Twitter plugin, with multiple account support.
 
-##Untiny
+## Untiny
 
 URL unshortener plugin.
 
-##WebLogs
+## WebLogs
 
 Display channel logs on the web (experimental!). **This plugin requires 
 Limnoria.**
 
-##WebStats
+## WebStats
 
 Display channel stats on the web. **This plugin requires Limnoria.**
 
-##WikiTrans
+## WikiTrans
 
 Translates words/expressions using Wikipedia inter-language links.
 
-##Wikipedia
+## Wikipedia
 
 Wikipedia plugin.
