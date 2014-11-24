@@ -56,7 +56,7 @@ msgid "Redirected from"
 msgstr "Redirigé de"
 
 #: plugin.py:118
-msgid "%s is a disambiguation page. Possible results are: %s"
+msgid "%s is a disambiguation page. Possible results include: %s"
 msgstr "%s est une page de désambiguation. Les résultats possibles son : %s"
 
 #: plugin.py:121
