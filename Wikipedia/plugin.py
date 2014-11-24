@@ -142,7 +142,7 @@ class Wikipedia(callbacks.Plugin):
         # check if it's a disambiguation page
         disambig = tree.xpath('//table[@id="disambigbox"]')
         if disambig:
-            disambig = tree.xpath('//div[@id="bodyContent"]/ul/li/a')
+            disambig = tree.xpath('//div[@id="bodyContent"]/div/ul/li/a')
             disambig = disambig[:5]
             disambig = [item.text_content() for item in disambig]
             r = utils.str.commaAndify(disambig)
