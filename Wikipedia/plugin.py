@@ -147,7 +147,7 @@ class Wikipedia(callbacks.Plugin):
             disambig = [item.text_content() for item in disambig]
             r = utils.str.commaAndify(disambig)
             reply += _('%s is a disambiguation page. '
-                       'Possible results are: %s') % (addr, r)
+                       'Possible results include: %s') % (addr, r)
         # or just as bad, a page listing events in that year
         elif re.search(_('This article is about the year [\d]*\. '
                        'For the [a-zA-Z ]* [\d]*, see'), article):
