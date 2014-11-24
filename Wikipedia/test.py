@@ -42,7 +42,7 @@ class WikipediaTestCase(PluginTestCase):
             self.assertRegexp('wiki Foo', '"Foobar" \(Redirect from "Foo"\): '
                                           'The terms foobar.*')
             self.assertRegexp('wiki roegdfjpoepo',
-                              'Not found, or page bad formed.*')
+                              'Not found, or page malformed.*')
 
 
 
