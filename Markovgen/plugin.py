@@ -114,7 +114,8 @@ class Markovgen(callbacks.Plugin):
 
 
     def _answer(self, irc, message, m):
-        message_tuples = set(zip(*2*[iter(message.split(' '))]))
+        words = message.split(' ')
+        message_tuples = set(zip(words, words[1:]))
         if not message_tuples:
             return
         possibilities = [x for x in m.available_seeds() if x in message_tuples]
