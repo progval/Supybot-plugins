@@ -89,9 +89,9 @@ class Markovgen(callbacks.Plugin):
 
     def doPrivmsg(self, irc, msg):
         (channel, message) = msg.args
-        probability = self.registryValue('probability', channel)
         if not irc.isChannel(channel):
             return
+        probability = self.registryValue('probability', channel)
         if probability == 0:
             return
         m = self._get_markov(irc, channel)
@@ -99,14 +99,35 @@ class Markovgen(callbacks.Plugin):
         if random.random() < probability:
             self._answer(irc, message, m)
 
+    @wrap(['channel', 'text'])
+    def gen(self, irc, msg, args, channel, message):
+        """[<channel>] <seed>
+
+        Generates a random message based on the logs of a channel
+        and a seed"""
+        probability = self.registryValue('probability', channel)
+        if probability == 0:
+            irc.error(_('Markovgen is disabled for this channel.'))
+        m = self._get_markov(irc, channel)
+        m.feed(message)
+        self._answer(irc, message, m)
+
+
     def _answer(self, irc, message, m):
-        seed = random.choice(message.split(' '))
+        message_tuples = set(zip(*2*[iter(message.split(' '))]))
+        if not message_tuples:
+            return
+        possibilities = [x for x in m.available_seeds() if x in message_tuples]
+        seed = list(random.choice(possibilities))
+        backward_seed = list(reversed(seed))
         forward = m.generate_markov_text(seed_word=seed, backward=False)
-        backward = m.generate_markov_text(seed_word=seed, backward=True)
-        assert forward.split(' ', 1)[0] == seed
-        assert backward.rsplit(' ', 1)[-1] == seed
+        backward = m.generate_markov_text(seed_word=backward_seed,
+                backward=True)
+        assert forward.split(' ', 2)[0:2] == seed, (forward, seed)
+        assert backward.rsplit(' ', 1)[-1] == backward_seed[0], \
+                (backward, backward_seed)
         try:
-            answer = '%s %s' % (backward, forward.split(' ', 1)[1])
+            answer = '%s %s' % (backward, forward.split(' ', 2)[2])
         except IndexError:
             answer = backward
         irc.reply(answer, prefixNick=False)
