@@ -123,9 +123,6 @@ class Markovgen(callbacks.Plugin):
         forward = m.generate_markov_text(seed_word=seed, backward=False)
         backward = m.generate_markov_text(seed_word=backward_seed,
                 backward=True)
-        assert forward.split(' ', 2)[0:2] == seed, (forward, seed)
-        assert backward.rsplit(' ', 1)[-1] == backward_seed[0], \
-                (backward, backward_seed)
         try:
             answer = '%s %s' % (backward, forward.split(' ', 2)[2])
         except IndexError:
