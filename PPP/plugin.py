@@ -31,10 +31,11 @@
 
 import uuid
 import string
+import operator
 import requests
 import functools
 from ppp_datamodel.communication import Response, Request
-from ppp_datamodel import Resource, Sentence
+from ppp_datamodel import Resource, Sentence, Triple, Missing
 
 import supybot.utils as utils
 from supybot.commands import *
@@ -48,6 +49,21 @@ except ImportError:
     # Placeholder that allows to run the plugin on a bot
     # without the i18n module
     _ = lambda x:x
+
+def format_triple(triple, bold):
+    if isinstance(triple, Missing):
+        if bold:
+            return ircutils.bold('?')
+        else:
+            return '?'
+    elif isinstance(triple, Resource):
+        return triple.value
+    elif isinstance(triple, Triple):
+        subtrees = triple.subject, triple.predicate, triple.object
+        subtrees = tuple(format_triple(x, bold) for x in subtrees)
+        return '(%s, %s, %s)' % subtrees
+    else:
+        raise ValueError('%r' % triple)
 
 class PPP(callbacks.Plugin):
     """A simple plugin to query the API of the Projet Pensées Profondes."""
@@ -72,10 +88,24 @@ class PPP(callbacks.Plugin):
                 language=self.registryValue('language', channel),
                 tree=Sentence(value=sentence))
         format_ = self.registryValue('formats.query', channel)
-        predicate = functools.partial(self.format_response, channel, format_)
         responses = self.request(channel, r)
         responses = filter(lambda x:isinstance(x.tree, Resource), responses)
-        irc.replies(map(predicate, responses))
+        formatter = functools.partial(self.format_response, channel, format_)
+        irc.replies(map(formatter, responses))
+
+    @wrap([optional('channel'), 'text'])
+    def triples(self, irc, msg, args, channel, sentence):
+        """<request>
+
+        Sends a request to the PPP and returns the triples."""
+        r = Request(id='supybot-%s' % uuid.uuid4().hex,
+                language=self.registryValue('language', channel),
+                tree=Sentence(value=sentence))
+        responses = self.request(channel, r)
+        responses = map(operator.attrgetter('tree'), responses)
+        responses = filter(lambda x:isinstance(x, Triple), responses)
+        bold = self.registryValue('formats.bold')
+        irc.replies([format_triple(x, bold) for x in responses])
 
 
 

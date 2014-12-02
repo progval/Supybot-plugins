@@ -37,6 +37,10 @@ class PPPTestCase(PluginTestCase):
         self.assertResponse('query What is the capital of Australia?',
                 'Canberra')
 
+    def testBold(self):
+        self.assertResponse('triples What is the capital of Australia?',
+                '(Australia, capital, \x02?\x02)')
+
 
 if not network:
     class PPPTestCase(PluginTestCase):

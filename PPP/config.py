@@ -58,6 +58,9 @@ conf.registerChannelValue(PPP, 'language',
     registry.String('en', _("""The language sent with requests to the PPP
     API.""")))
 conf.registerGroup(PPP, 'formats')
+conf.registerChannelValue(PPP.formats, 'bold',
+    registry.Boolean(True, _("""Whether or not bold should be used in
+    outputs.""")))
 conf.registerChannelValue(PPP.formats, 'query',
     registry.String('$value', _("""The format used by the @query command.""")))
 
