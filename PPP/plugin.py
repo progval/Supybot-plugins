@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 ###
 # Copyright (c) 2014, Valentin Lorentz
 # All rights reserved.
