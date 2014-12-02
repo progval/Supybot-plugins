@@ -49,8 +49,7 @@ except ImportError:
     _ = lambda x:x
 
 class PPP(callbacks.Plugin):
-    """Add the help for "@plugin help PPP" here
-    This should describe *how* to use this plugin."""
+    """A simple plugin to query the API of the Projet Pensées Profondes."""
     threaded = True
 
     def request(self, channel, request):
