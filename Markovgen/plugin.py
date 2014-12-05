@@ -121,8 +121,8 @@ class Markovgen(callbacks.Plugin):
         possibilities = [x for x in m.available_seeds() if x in message_tuples]
         seed = list(random.choice(possibilities))
         backward_seed = list(reversed(seed))
-        forward = m.generate_markov_text(seed_word=seed, backward=False)
-        backward = m.generate_markov_text(seed_word=backward_seed,
+        forward = m.generate_markov_text(seed=seed, backward=False)
+        backward = m.generate_markov_text(seed=backward_seed,
                 backward=True)
         try:
             answer = '%s %s' % (backward, forward.split(' ', 2)[2])
