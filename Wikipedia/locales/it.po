@@ -42,7 +42,7 @@ msgstr ""
 "        Restituisce il primo paragrafo di un articolo di Wikipedia."
 
 #: plugin.py:79
-msgid "I didn't find anything for \"%s\".Did you mean \"%s\"? "
+msgid "I didn't find anything for \"%s\". Did you mean \"%s\"? "
 msgstr "Non trovo nulla per \"%s\"; intendevi \"%s\"? "
 
 #: plugin.py:91

@@ -32,7 +32,6 @@
 
 import re
 import sys
-import string
 import urllib
 import lxml.html
 from lxml import etree
@@ -41,10 +40,6 @@ from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
-if sys.version_info[0] < 3:
-    import StringIO
-else:
-    from io import StringIO
 try:
     from supybot.i18n import PluginInternationalization
     from supybot.i18n import internationalizeDocstring
@@ -92,7 +87,7 @@ class Wikipedia(callbacks.Plugin):
                     redirect = redirect.encode('utf-8','replace')
                 if isinstance(search, unicode):
                     search = search.encode('utf-8','replace')
-            reply += _('I didn\'t find anything for "%s".'
+            reply += _('I didn\'t find anything for "%s". '
                        'Did you mean "%s"? ') % (search, redirect)
             addr = self.registryValue('url', msg.args[0]) + \
                    didyoumean[0].get('href')
