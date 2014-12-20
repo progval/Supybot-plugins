@@ -47,7 +47,7 @@ class ListEmpty(callbacks.Plugin):
 
         Returns the list of channels with a few users."""
         results = []
-        for (channel, c) in irc.state.channels.iteritems():
+        for (channel, c) in irc.state.channels.items():
             if len(c.users) < max_:
                 results.append('%s (%i)' % (channel, len(c.users)))
         irc.reply(', '.join(results))
