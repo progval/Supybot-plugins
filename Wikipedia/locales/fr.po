@@ -44,7 +44,7 @@ msgstr ""
 "Retourne le premier paragraphe d'un article de Wikipedia."
 
 #: plugin.py:79
-msgid "I didn't find anything for \"%s\".Did you mean \"%s\"? "
+msgid "I didn't find anything for \"%s\". Did you mean \"%s\"? "
 msgstr "Je ne peux rien trouver pour \"%s\". Vouliez-vous dire \"%s\" ?"
 
 #: plugin.py:91
