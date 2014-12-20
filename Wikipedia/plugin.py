@@ -146,8 +146,8 @@ class Wikipedia(callbacks.Plugin):
             disambig = disambig[:5]
             disambig = [item.text_content() for item in disambig]
             r = utils.str.commaAndify(disambig)
-            reply += _('%s is a disambiguation page. '
-                       'Possible results include: %s') % (addr, r)
+            reply += format(_('%u is a disambiguation page. '
+                       'Possible results include: %s'), addr, r)
         # or just as bad, a page listing events in that year
         elif re.search(_('This article is about the year [\d]*\. '
                        'For the [a-zA-Z ]* [\d]*, see'), article):
@@ -169,7 +169,7 @@ class Wikipedia(callbacks.Plugin):
                         p = p.encode('utf-8', 'replace')
                     if isinstance(reply, unicode):
                         reply = reply.encode('utf-8','replace')
-                reply += '%s %s %s' % (p, _('Retrieved from'), ircutils.bold(addr))
+                reply += format('%s %s %u', p, _('Retrieved from'), addr)
         reply = reply.replace('&amp;','&')
         irc.reply(reply)
     wiki = wrap(wiki, ['text'])
