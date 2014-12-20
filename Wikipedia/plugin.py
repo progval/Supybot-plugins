@@ -171,6 +171,8 @@ class Wikipedia(callbacks.Plugin):
                         reply = reply.encode('utf-8','replace')
                 reply += '%s %s %s' % (p, _('Retrieved from'), ircutils.bold(addr))
         reply = reply.replace('&amp;','&')
+        # Remove inline citations (text[1][2][3], etc.)
+        reply = re.sub('\[\d+\]', '', reply)
         irc.reply(reply)
     wiki = wrap(wiki, ['text'])
 
