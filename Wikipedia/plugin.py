@@ -122,7 +122,7 @@ class Wikipedia(callbacks.Plugin):
             redirect = re.search('\(%s <a href=[^>]*>([^<]*)</a>\)' %
                                  _('Redirected from'), article)
             if redirect:
-                redirect = tree.xpath('//div[@id="contentSub"]/a')[0]
+                redirect = tree.xpath('//span[@class="mw-redirectedfrom"]/a')[0]
                 redirect = redirect.text_content().strip()
                 title = tree.xpath('//*[@class="firstHeading"]')
                 title = title[0].text_content().strip()
@@ -131,7 +131,7 @@ class Wikipedia(callbacks.Plugin):
                         title = title.encode('utf-8','replace')
                     if isinstance(redirect, unicode):
                         redirect = redirect.encode('utf-8','replace')
-                reply += '"%s" (Redirect from "%s"): ' % (title, redirect)
+                reply += '"%s" (Redirected from "%s"): ' % (title, redirect)
         # extract the address we got it from
         addr = re.search(' "?<a dir="ltr" href="([^"]*)"?>', article)
         addr = addr.group(1)
