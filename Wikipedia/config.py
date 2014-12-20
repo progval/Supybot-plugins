@@ -59,5 +59,8 @@ conf.registerChannelValue(Wikipedia, 'url',
         registry.String(_('en.wikipedia.org'), _("""URL of the website from
         where you want to pull pages (usually: your language's
         wikipedia)""")))
+conf.registerChannelValue(Wikipedia, 'showRedirects',
+        registry.Boolean(True, _("""Determines whether redirect paths will
+        be shown in the output.)""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
