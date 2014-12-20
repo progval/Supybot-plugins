@@ -44,6 +44,7 @@ class WikipediaTestCase(PluginTestCase):
             self.assertRegexp('wiki roegdfjpoepo',
                               'Not found, or page malformed.*')
 
-
+        def testStripInlineCitations(self):
+            self.assertNotRegexp('wiki UNICEF', '\[\d+\]')
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
