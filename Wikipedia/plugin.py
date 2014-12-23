@@ -135,7 +135,8 @@ class Wikipedia(callbacks.Plugin):
         # force serving HTTPS links
         addr = 'https://' + addr.split("//")[1]
         # check if it's a disambiguation page
-        disambig = tree.xpath('//table[@id="disambigbox"]')
+        disambig = tree.xpath('//table[@id="disambigbox"]') or \
+            tree.xpath('//table[@id="setindexbox"]')
         if disambig:
             disambig = tree.xpath('//div[@id="bodyContent"]/div/ul/li/a')
             disambig = disambig[:5]
