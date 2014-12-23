@@ -158,7 +158,12 @@ class Wikipedia(callbacks.Plugin):
                 reply += _('Not found, or page malformed.')
             else:
                 p = p[0]
+                # Replace <b> tags with IRC-style bold, this has to be
+                # done indirectly because unescaped '\x02' is invalid in XML
+                for b_tag in p.xpath('//b'):
+                    b_tag.text = "&#x02;%s&#x02;" % b_tag.text
                 p = p.text_content()
+                p = p.replace('&#x02;', '\x02')
                 p = p.strip()
                 if sys.version_info[0] < 3:
                     if isinstance(p, unicode):
