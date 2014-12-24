@@ -46,7 +46,10 @@ class Kickme(callbacks.Plugin):
         """[<reason>]
 
         Kick yourself."""
-        irc.queueMsg(ircmsgs.kick(msg.args[0], msg.nick, reason or ''))
+        if ircutils.isChannel(msg.args[0]):
+            irc.queueMsg(ircmsgs.kick(msg.args[0], msg.nick, reason or ''))
+        else:
+            irc.error(_("This command must be run in a channel."))
     kickme = wrap(kickme, [optional('text')])
 
 
