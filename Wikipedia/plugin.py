@@ -87,8 +87,9 @@ class Wikipedia(callbacks.Plugin):
                     redirect = redirect.encode('utf-8','replace')
                 if isinstance(search, unicode):
                     search = search.encode('utf-8','replace')
-            reply += _('I didn\'t find anything for "%s". '
-                       'Did you mean "%s"? ') % (search, redirect)
+            if self.registryValue('showRedirects', msg.args[0]):
+                reply += _('I didn\'t find anything for "%s". '
+                           'Did you mean "%s"? ') % (search, redirect)
             addr = self.registryValue('url', msg.args[0]) + \
                    didyoumean[0].get('href')
             if not article.startswith('http'):
@@ -102,8 +103,9 @@ class Wikipedia(callbacks.Plugin):
         searchresults = tree.xpath('//div[@class="searchresults"]/ul/li/a')
         if searchresults:
             redirect = searchresults[0].text_content().strip()
-            reply += _('I didn\'t find anything for "%s", but here\'s the '
-                     'result for "%s": ') % (search, redirect)
+            if self.registryValue('showRedirects', msg.args[0]):
+                reply += _('I didn\'t find anything for "%s", but here\'s the '
+                           'result for "%s": ') % (search, redirect)
             addr = self.registryValue('url', msg.args[0]) + \
                    searchresults[0].get('href')
             article = utils.web.getUrl(addr)
@@ -113,7 +115,7 @@ class Wikipedia(callbacks.Plugin):
             tree = lxml.html.document_fromstring(article)
             search = redirect
         # otherwise, simply return the title and whether it redirected
-        else:
+        elif self.registryValue('showRedirects', msg.args[0]):
             redirect = re.search('\(%s <a href=[^>]*>([^<]*)</a>\)' %
                                  _('Redirected from'), article)
             if redirect:
