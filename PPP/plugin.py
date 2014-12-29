@@ -34,8 +34,9 @@ import string
 import operator
 import requests
 import functools
+import unicode_tex
 from ppp_datamodel.communication import Response, Request
-from ppp_datamodel import Resource, Sentence, Triple, Missing
+from ppp_datamodel import Resource, Sentence, Triple, Missing, List
 
 import supybot.utils as utils
 from supybot.commands import *
@@ -74,9 +75,19 @@ class PPP(callbacks.Plugin):
                 data=request.as_json()).json()
         return map(Response.from_dict, responses)
 
-    def format_response(self, channel, format_, response):
-        keys = response.tree._attributes
-        return string.Template(format_).safe_substitute(keys)
+    def format_response(self, channel, format_, tree):
+        keys = tree._attributes
+        if isinstance(tree, Resource):
+            if keys.get('value_type', None) == 'math-latex':
+                pred = lambda x:unicode_tex.tex_to_unicode_map.get(x, x)
+                v = ' '.join(map(pred, keys['value'].split(' ')))
+                keys['value'] = v
+            return string.Template(format_).safe_substitute(keys)
+        elif isinstance(tree, List):
+            pred = functools.partial(self.format_response, channel, format_)
+            return format('%L', filter(bool, map(pred, tree.list)))
+        else:
+            return ''
 
 
     @wrap([optional('channel'), 'text'])
@@ -88,10 +99,9 @@ class PPP(callbacks.Plugin):
                 language=self.registryValue('language', channel),
                 tree=Sentence(value=sentence))
         format_ = self.registryValue('formats.query', channel)
-        responses = self.request(channel, r)
-        responses = filter(lambda x:isinstance(x.tree, Resource), responses)
+        responses = (x.tree for x in self.request(channel, r))
         formatter = functools.partial(self.format_response, channel, format_)
-        irc.replies(map(formatter, responses))
+        irc.replies(filter(bool, map(formatter, responses)))
 
     @wrap([optional('channel'), 'text'])
     def triples(self, irc, msg, args, channel, sentence):

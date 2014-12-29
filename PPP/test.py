@@ -41,6 +41,10 @@ class PPPTestCase(PluginTestCase):
         self.assertResponse('triples What is the capital of Australia?',
                 '(Australia, capital, \x02?\x02)')
 
+    def testList(self):
+        self.assertRegexp('query What are the capitals of the European Union?',
+                '^(Brussels and Strasbourg|Strasbourg and Brussels)$')
+
 
 if not network:
     class PPPTestCase(PluginTestCase):
