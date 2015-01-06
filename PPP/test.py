@@ -31,7 +31,7 @@
 from supybot.test import *
 
 class PPPTestCase(PluginTestCase):
-    plugins = ('PPP',)
+    plugins = ('PPP', 'Config')
 
     def testBasics(self):
         self.assertResponse('query What is the capital of Australia?',
@@ -44,6 +44,14 @@ class PPPTestCase(PluginTestCase):
     def testList(self):
         self.assertRegexp('query What are the capitals of the European Union?',
                 '^(Brussels and Strasbourg|Strasbourg and Brussels)$')
+
+    def testBadApi(self):
+        self.assertNotError('config plugins.PPP.api http://foo/')
+        try:
+            self.assertResponse('query foo',
+                    'Error: Could not connect to the API.')
+        finally:
+            self.assertNotError('config setdefault plugins.PPP.api')
 
 
 if not network:

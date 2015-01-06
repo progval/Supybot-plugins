@@ -66,6 +66,17 @@ def format_triple(triple, bold):
     else:
         raise ValueError('%r' % triple)
 
+def handle_badapi(f):
+    def newf(self, irc, *args, **kwargs):
+        try:
+            f(self, irc, *args, **kwargs)
+        except requests.exceptions.ConnectionError:
+            irc.error('Could not connect to the API.')
+    newf.__name__ = f.__name__
+    newf.__doc__ = f.__doc__
+    return newf
+
+
 class PPP(callbacks.Plugin):
     """A simple plugin to query the API of the Projet Pensées Profondes."""
     threaded = True
@@ -91,6 +102,7 @@ class PPP(callbacks.Plugin):
 
 
     @wrap([optional('channel'), 'text'])
+    @handle_badapi
     def query(self, irc, msg, args, channel, sentence):
         """<request>
 
@@ -104,6 +116,7 @@ class PPP(callbacks.Plugin):
         irc.replies(filter(bool, map(formatter, responses)))
 
     @wrap([optional('channel'), 'text'])
+    @handle_badapi
     def triples(self, irc, msg, args, channel, sentence):
         """<request>
 
