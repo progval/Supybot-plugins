@@ -9,12 +9,14 @@ Detection types
 
 There are two kind of detections:
 
-**individual floods**: they are the most common type of flood, involving floods
-   from one user. Options controlling these detections exist in the configuration
-   as the name of the flood type (e.g. `config plugins.attackprotector.{join,message,etc.}`).
+**Individual floods**: are the most common types of flood, involving floods
+from one user. Options controlling these detections exist in the
+configuration as the name of the flood type (e.g.
+`config plugins.attackprotector.{join,message,etc.}`).
 
-**grouped**: it's a flood from several nicks. Their names in the configuration
-   are the flood type, prepended by 'group' (e.g. `config plugins.attackprotector.group{join,message,etc.}`).
+**grouped floods**: are floods from several nicks. Their names in the
+configuration are the flood type, prepended by 'group' (e.g.
+`config plugins.attackprotector.group{join,message,etc.}`).
 
 Of course, the detection value of group floods should be greater than the
 individual floods'.
@@ -23,8 +25,9 @@ Punishment types
 ----------------
 
 For each flood type, you can define a punishment. More common are `ban`,
-`kick`, or `kban`. You also can define modes, such as the default punishment
-for group joins: `mode+i`, which sets the mode `+i`. You also can remove
-a mode, with the syntax `mode-i`, or set/unset modes to the user, with
-`mode-v' or 'mode+v`.
-For a complete list of available modes, see your IRC network's help pages.
+`kick`, or `kban`. You also can define modes, such as the default
+punishment for group joins: `mode+i`, which sets the mode `+i`. You can
+also remove a mode, with the syntax `mode-i`, or set/unset modes to the
+user, with `mode-v' or 'mode+v`.
+For a complete list of available modes, see your IRC network's help pages
+or try `/quote help`.
