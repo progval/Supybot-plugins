@@ -9,11 +9,12 @@ Detection types
 
 There are two kind of detections:
 
-**individual**: they are the most common type of flood, so their names in the configuration
-   are the name of the flood type.
+**individual floods**: they are the most common type of flood, involving floods
+   from one user. Options controlling these detections exist in the configuration
+   as the name of the flood type (e.g. `config plugins.attackprotector.{join,message,etc.}`).
 
 **grouped**: it's a flood from several nicks. Their names in the configuration
-   are the flood type, prepended by 'group'.
+   are the flood type, prepended by 'group' (e.g. `config plugins.attackprotector.group{join,message,etc.}`).
 
 Of course, the detection value of group floods should be greater than the
 individual floods'.
