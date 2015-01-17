@@ -130,12 +130,13 @@ class Wikipedia(callbacks.Plugin):
                         redirect = redirect.encode('utf-8','replace')
                 reply += '"%s" (Redirected from "%s"): ' % (title, redirect)
         # extract the address we got it from
-        addr = re.search(' "?<a dir="ltr" href="([^"]*)"?>', article)
-        addr = addr.group(1)
-        # remove the &oldid part
-        addr = addr.split('&amp;oldid=')[0]
-        # force serving HTTPS links
-        addr = 'https://' + addr.split("//")[1]
+        addr = tree.find(".//link[@rel='canonical']")
+        addr = addr.attrib['href']
+        try:
+            # force serving HTTPS links
+            addr = 'https://' + addr.split("//")[1]
+        except:
+            pass
         # check if it's a disambiguation page
         disambig = tree.xpath('//table[@id="disambigbox"]') or \
             tree.xpath('//table[@id="setindexbox"]')
