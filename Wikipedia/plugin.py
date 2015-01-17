@@ -152,7 +152,7 @@ class Wikipedia(callbacks.Plugin):
                       'number itself, try searching for "%s_(number)", but '
                       'don\'t expect anything useful...') % (search, search)
         # Catch talk pages
-        elif 'talk:' in addr.lower():
+        elif 'ns-talk' in tree.find("body").attrib['class']:
             reply += format(_('This article appears to be a talk page: %u'), addr)
         else:
             ##### etree!
