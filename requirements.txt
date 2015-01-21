@@ -5,4 +5,5 @@ beautifulsoup4
 python-twitter
 requests
 pygraphviz
+oauth2
 git+https://github.com/haypo/pysandbox.git
