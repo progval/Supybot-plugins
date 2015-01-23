@@ -91,7 +91,7 @@ class ExtendedApi(twitter.Api):
         Returns:
         A twitter.Status instance representing the retweet posted
         '''
-        if hasattr(api, '_oauth_consumer') and not api._oauth_consumer:
+        if hasattr(self, '_oauth_consumer') and not self._oauth_consumer:
             raise TwitterError("The twitter.Api instance must be authenticated.")
         try:
             if int(id) <= 0:
