@@ -28,13 +28,16 @@
 
 ###
 
+import sys
 from supybot.test import *
 
 
 class CrousLyonTestCase(PluginTestCase):
     plugins = ('CrousLyon',)
-    def testFoo(self):
-        self.assertNotError('menus monod')
+
+    if sys.version_info[0] >= 3:
+        def testFoo(self):
+            self.assertNotError('menus monod')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
