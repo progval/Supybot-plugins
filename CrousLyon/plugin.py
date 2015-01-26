@@ -52,7 +52,7 @@ except ImportError:
 
 NAMES = {
         'monod': 351,
-        'descartes': 351,
+        'descartes': 230,
         }
 INTERESTING = {
         351: # Monod
@@ -73,12 +73,8 @@ def get(id_):
         date = menu.attrib['date']
         parsed_date = datetime.datetime.strptime(date, '%Y-%m-%d')
         day_limit = datetime.datetime.now() - datetime.timedelta(hours=14)
-        print('--')
-        print(parsed_date)
-        print(day_limit)
         if parsed_date < day_limit:
             continue
-        print('cont')
         midi = menu[0]
         assert midi.tag == 'midi', midi
         interesting = INTERESTING.get(id_, None)
@@ -90,8 +86,6 @@ def get(id_):
                      if not any(y in x.text.lower() for y in BLACKLIST)]
         meals = [x.strip().replace('\n', ' ; ').strip() for x in meals
                  if x.strip()]
-        print(repr([x.text for x in midi]))
-        print(repr(meals))
         res.append((date, meals))
     return res
 
@@ -109,7 +103,7 @@ class CrousLyon(callbacks.Plugin):
 
 
     @wrap([first('int', ('literal', tuple(NAMES.keys())))])
-    def plats(self, irc, msg, args, id_):
+    def menus(self, irc, msg, args, id_):
         """<id>
 
         Renvoit le menu d’un RU, identifié par un entier."""

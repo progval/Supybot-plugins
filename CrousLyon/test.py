@@ -34,7 +34,7 @@ from supybot.test import *
 class CrousLyonTestCase(PluginTestCase):
     plugins = ('CrousLyon',)
     def testFoo(self):
-        self.assertNotError('plats monod')
+        self.assertNotError('menus monod')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
