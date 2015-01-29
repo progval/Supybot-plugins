@@ -37,8 +37,8 @@ except ImportError:
     from xml.etree import ElementTree
 
 import supybot.utils as utils
-from supybot.commands import *
 import supybot.plugins as plugins
+from supybot.commands import first, wrap
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 try:
@@ -49,7 +49,7 @@ except ImportError:
     # without the i18n module
     _ = lambda x: x
 
-
+any == __builtins__['any']
 
 NAMES = {
         'monod': 351,
@@ -83,7 +83,7 @@ def get(id_):
             meals = [x.text for x in midi
                      if x.attrib['nom'] in interesting]
         else:
-            meals = [x for x in midi
+            meals = [x.text for x in midi
                      if not any(y in x.text.lower() for y in BLACKLIST)]
         meals = [x.strip().replace('\n', ' ; ').strip() for x in meals
                  if x.strip()]
