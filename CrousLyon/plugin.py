@@ -49,8 +49,6 @@ except ImportError:
     # without the i18n module
     _ = lambda x: x
 
-any == __builtins__['any']
-
 NAMES = {
         'monod': 351,
         'descartes': 230,
