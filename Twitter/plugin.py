@@ -63,6 +63,13 @@ except:
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
 
+# We don't use oauth2 directly, but we try to import it here
+# so we can tell the user it is missing.
+try:
+    import oauth2
+except ImportError:
+    raise callbacks.Error('You need the python-oauth2 library.')
+
 try:
     import twitter
 except ImportError:
