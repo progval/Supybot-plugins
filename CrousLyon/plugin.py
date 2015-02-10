@@ -52,6 +52,7 @@ except ImportError:
 NAMES = {
         'monod': 351,
         'descartes': 230,
+        'jussieu': 240,
         }
 INTERESTING = {
         351: # Monod
