@@ -38,27 +38,75 @@ class WikiTransTestCase(PluginTestCase):
 
     def testTranslate(self):
         self.assertResponse('translate en be IRC', 'IRC')
-        self.assertResponse('translate en fr IRC', 'Internet Relay Chat')
+        self.assertRegexp('translate en fr IRC', 'Internet Relay Chat')
 
         self.assertResponse('translate en fr IRC bot', 'Robot IRC')
         self.assertResponse('translate fr en robot IRC', 'IRC bot')
 
         self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
         try:
-            self.assertResponse('translate en fr Masterpiece', 'Chef-d\'œuvre')
-            self.assertResponse('translate en fr Master (Doctor Who)',
-                    'Le Maître (Doctor Who)')
-        except AssertionError:
-            self.assertResponse('translate en fr Masterpiece',
+            self.assertRegexp('translate en fr Masterpiece', 'Chef-d\'œuvre')
+            self.assertRegexp('translate en fr The Master',
+                    'Le Maître')
+        except TypeError:
+            self.assertRegexp('translate en fr Masterpiece',
                     'Chef-d\'œuvre'.encode('utf8'))
-            self.assertResponse('translate en fr Master (Doctor Who)',
-                    'Le Maître (Doctor Who)'.encode('utf8'))
+            self.assertRegexp('translate en fr The Master',
+                    'Le Maître'.encode('utf8'))
 
 
         self.assertRegexp('translate fi en paremmin', 'This word can\'t be found')
 
         self.assertError('translate fr de Supybot')
         self.assertError('translate fr en pogjoeregml')
+
+    def testWikidataTranslate(self):
+        self.assertResponse('wikidata en be IRC', 'IRC')
+        self.assertRegexp('wikidata en fr IRC', 'Internet Relay Chat')
+
+        self.assertResponse('wikidata en fr IRC bot', 'Robot IRC')
+        self.assertResponse('wikidata fr en robot IRC', 'IRC bot')
+
+        self.assertResponse('wikidata fr en Chef-d\'œuvre', 'Masterpiece')
+        try:
+            self.assertRegexp('wikidata en fr Masterpiece', 'Chef-d\'œuvre')
+            self.assertRegexp('wikidata en fr The Master',
+                    'Le Maître')
+        except TypeError:
+            self.assertRegexp('wikidata en fr Masterpiece',
+                    'Chef-d\'œuvre'.encode('utf8'))
+            self.assertRegexp('wikidata en fr The Master',
+                    'Le Maître'.encode('utf8'))
+
+
+        self.assertRegexp('wikidata fi en paremmin', 'This word can\'t be found')
+
+        self.assertError('wikidata fr de Supybot')
+        self.assertError('wikidata fr en pogjoeregml')
+
+    def testWikipediaTranslate(self):
+        self.assertResponse('wikipedia en be IRC', 'IRC')
+        self.assertResponse('wikipedia en fr IRC', 'Internet Relay Chat')
+
+        self.assertResponse('wikipedia en fr IRC bot', 'Robot IRC')
+        self.assertResponse('wikipedia fr en robot IRC', 'IRC bot')
+
+        self.assertResponse('wikipedia fr en Chef-d\'œuvre', 'Masterpiece')
+        try:
+            self.assertResponse('wikipedia en fr Masterpiece', 'Chef-d\'œuvre')
+            self.assertResponse('wikipedia en fr Master (Doctor Who)',
+                    'Le Maître (Doctor Who)')
+        except AssertionError:
+            self.assertResponse('wikipedia en fr Masterpiece',
+                    'Chef-d\'œuvre'.encode('utf8'))
+            self.assertResponse('wikipedia en fr Master (Doctor Who)',
+                    'Le Maître (Doctor Who)'.encode('utf8'))
+
+
+        self.assertRegexp('wikipedia fi en paremmin', 'This word can\'t be found')
+
+        self.assertError('wikipedia fr de Supybot')
+        self.assertError('wikipedia fr en pogjoeregml')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
