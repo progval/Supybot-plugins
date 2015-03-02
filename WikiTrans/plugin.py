@@ -64,19 +64,31 @@ wikidata_query_url = 'https://www.wikidata.org/w/api.php?format=json&' + \
         'action=wbgetentities&ids=%(ids)s&props=aliases|labels&' + \
         'languages=%(languages)s'
 def wikidata_translate(src, target, word):
+    # Get matching entity IDs
     url = wikidata_search_url % {'language': src, 'search': quote_plus(word)}
     data = json.loads(utils.web.getUrl(url).decode())
+    if not data['search']:
+        raise WordNotFound()
     entities = map(operator.itemgetter('id'), data['search'])
+
+    # Get labels of those entities
     entities_str = '|'.join(itertools.islice(entities, MAX_ENTITIES_SEARCH))
     url = wikidata_query_url % {'languages': target, 'ids': entities_str}
     data = json.loads(utils.web.getUrl(url).decode())
+
     if 'entities' not in data:
-        raise WordNotFound()
+        # No 'entity' attribute -> those entities have no labels
+        # in the desired langues.
+        raise Untranslatable()
+
+    # Join all possible translations
     r = _('; ').join(_(', ').join(y['value']
                                   for y in x['labels'].values())
                      for x in data['entities'].values()
                      if 'labels' in x)
+
     if not r:
+        # Should never happen
         raise Untranslatable()
     else:
         return r
