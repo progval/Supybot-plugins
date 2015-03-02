@@ -48,7 +48,7 @@ class WikiTransTestCase(PluginTestCase):
             self.assertRegexp('translate en fr Masterpiece', 'Chef-d\'œuvre')
             self.assertRegexp('translate en fr The Master',
                     'Le Maître')
-        except TypeError:
+        except (TypeError, AssertionError):
             self.assertRegexp('translate en fr Masterpiece',
                     'Chef-d\'œuvre'.encode('utf8'))
             self.assertRegexp('translate en fr The Master',
@@ -72,7 +72,7 @@ class WikiTransTestCase(PluginTestCase):
             self.assertRegexp('wikidata en fr Masterpiece', 'Chef-d\'œuvre')
             self.assertRegexp('wikidata en fr The Master',
                     'Le Maître')
-        except TypeError:
+        except (TypeError, AssertionError):
             self.assertRegexp('wikidata en fr Masterpiece',
                     'Chef-d\'œuvre'.encode('utf8'))
             self.assertRegexp('wikidata en fr The Master',
