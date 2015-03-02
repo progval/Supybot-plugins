@@ -73,7 +73,8 @@ def wikidata_translate(src, target, word):
 
     # Get labels of those entities
     entities_str = '|'.join(itertools.islice(entities, MAX_ENTITIES_SEARCH))
-    url = wikidata_query_url % {'languages': target, 'ids': entities_str}
+    url = wikidata_query_url % {'languages': '%s|%s' % (src, target),
+                                'ids': entities_str}
     data = json.loads(utils.web.getUrl(url).decode())
 
     if 'entities' not in data:
@@ -81,13 +82,20 @@ def wikidata_translate(src, target, word):
         # in the desired langues.
         raise Untranslatable()
 
+    # Remove entities whose label/aliases do not match exactly
+    entities = data['entities']
+    word = word.lower()
+    pred = lambda x: (word == x['labels'][src]['value'].lower() or
+                      word in (y['value'].lower()
+                               for y in x.get('aliases', {}).get(src, [])))
+    entities = filter(pred, entities.values())
+
     # Join all possible translations
-    r = format('%L', [next(iter(x['labels'].values()))['value']
-                      for x in data['entities'].values()
-                      if 'labels' in x])
+    r = format('%L', [x['labels'][target]['value']
+                      for x in entities
+                      if target in x.get('labels', {})])
 
     if not r:
-        # Should never happen
         raise Untranslatable()
     else:
         return r
