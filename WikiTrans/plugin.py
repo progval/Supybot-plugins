@@ -84,6 +84,8 @@ def wikidata_translate(src, target, word):
 
     # Remove entities whose label/aliases do not match exactly
     entities = data['entities']
+    if sys.version_info[0] < 3:
+        word = word.decode('utf8')
     word = word.lower()
     pred = lambda x: (word == x['labels'][src]['value'].lower() or
                       word in (y['value'].lower()
