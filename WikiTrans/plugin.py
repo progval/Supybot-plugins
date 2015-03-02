@@ -82,10 +82,9 @@ def wikidata_translate(src, target, word):
         raise Untranslatable()
 
     # Join all possible translations
-    r = _('; ').join(_(', ').join(y['value']
-                                  for y in x['labels'].values())
-                     for x in data['entities'].values()
-                     if 'labels' in x)
+    r = format('%L', [next(iter(x['labels'].values()))['value']
+                      for x in data['entities'].values()
+                      if 'labels' in x])
 
     if not r:
         # Should never happen
