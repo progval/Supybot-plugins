@@ -105,7 +105,7 @@ class ExtendedApi(twitter.Api):
                 raise TwitterError("'id' must be a positive number")
         except ValueError:
             raise TwitterError("'id' must be an integer")
-        url = 'http://api.twitter.com/1.1/statuses/retweet/%s.json' % id
+        url = 'https://api.twitter.com/1.1/statuses/retweet/%s.json' % id
         data = self._FetchUrl(url, post_data={'dummy': None})
         data = json.loads(data)
         self._CheckForTwitterError(data)
