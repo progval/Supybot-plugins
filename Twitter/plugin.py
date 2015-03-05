@@ -424,7 +424,7 @@ class Twitter(callbacks.Plugin):
             api.PostRetweet(id_)
             irc.replySuccess()
         except twitter.TwitterError as e:
-            irc.error(e.args[0])
+            irc.error(str(e.args[0]))
     retweet = wrap(retweet, ['user', ('checkChannelCapability', 'twitterpost'),
             'somethingWithoutSpaces'])
 
