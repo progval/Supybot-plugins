@@ -121,7 +121,7 @@ for event_type in ('create', 'delete', 'deployment',
         'deployment_status', 'download', 'follow', 'fork', 'fork_apply',
         'gist', 'gollum', 'member', 'public',
         'pull_request_review_comment', 'release',
-        'team_add', 'watch'):
+        'team_add', 'watch', 'page_build'):
     conf.registerChannelValue(GitHub.format, event_type,
             registry.String('', _("""Format for %s events.""") % event_type))
 
