@@ -44,6 +44,10 @@ class PPPTestCase(PluginTestCase):
     def testList(self):
         self.assertRegexp('query What are the capitals of the European Union?',
                 '^(Brussels and Strasbourg|Strasbourg and Brussels)$')
+        self.assertRegexp('query '
+                'Who is the author of “Use of A Network Enabled Server System '
+                'for a Sparse Linear Algebra Application”?',
+                'Eddy Caron')
 
     def testBadApi(self):
         self.assertNotError('config plugins.PPP.api http://foo/')
