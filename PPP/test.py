@@ -57,6 +57,15 @@ class PPPTestCase(PluginTestCase):
         finally:
             self.assertNotError('config setdefault plugins.PPP.api')
 
+    def testHeadline(self):
+        self.assertNotError('config plugins.PPP.formats.query '
+                            '"$value ($headline)"')
+        try:
+            self.assertRegexp('query What is Brussels?',
+                    '^Brussels.*The City of Brussels')
+        finally:
+            self.assertNotError('config setdefault plugins.PPP.formats.query')
+
 
 if not network:
     class PPPTestCase(PluginTestCase):

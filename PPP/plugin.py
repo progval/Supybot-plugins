@@ -102,6 +102,12 @@ class PPP(callbacks.Plugin):
                 pred = lambda x:unicode_tex.tex_to_unicode_map.get(x, x)
                 v = ' '.join(map(pred, keys['value'].split(' ')))
                 keys['value'] = v
+            try:
+                graph = tree.graph
+                keys['headline'] = graph['@reverse']['about']['headline'] \
+                        .split('\n', 1)[0]
+            except (AttributeError, KeyError, IndexError):
+                keys['headline'] = _('no headline')
             return [string.Template(format_).safe_substitute(keys)]
         elif isinstance(tree, List):
             pred = functools.partial(self.format_response, channel, format_)
