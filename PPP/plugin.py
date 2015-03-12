@@ -33,6 +33,7 @@ import uuid
 import string
 import operator
 import requests
+import itertools
 import functools
 import unicode_tex
 from ppp_datamodel.communication import Response, Request
@@ -63,6 +64,8 @@ def format_triple(triple, bold):
         subtrees = triple.subject, triple.predicate, triple.object
         subtrees = tuple(format_triple(x, bold) for x in subtrees)
         return '(%s, %s, %s)' % subtrees
+    elif isinstance(triple, List):
+        return '[%s]' % (', '.join(map(format_triple, triple.list)))
     else:
         raise ValueError('%r' % triple)
 
@@ -76,6 +79,12 @@ def handle_badapi(f):
     newf.__doc__ = f.__doc__
     return newf
 
+def unique(L):
+    seen = set()
+    for item in L:
+        if item not in seen:
+            seen.add( item )
+            yield item
 
 class PPP(callbacks.Plugin):
     """A simple plugin to query the API of the Projet Pensées Profondes."""
@@ -93,12 +102,13 @@ class PPP(callbacks.Plugin):
                 pred = lambda x:unicode_tex.tex_to_unicode_map.get(x, x)
                 v = ' '.join(map(pred, keys['value'].split(' ')))
                 keys['value'] = v
-            return string.Template(format_).safe_substitute(keys)
+            return [string.Template(format_).safe_substitute(keys)]
         elif isinstance(tree, List):
             pred = functools.partial(self.format_response, channel, format_)
-            return format('%L', filter(bool, map(pred, tree.list)))
+            return filter(bool,
+                    itertools.chain.from_iterable(map(pred, tree.list)))
         else:
-            return ''
+            return []
 
 
     @wrap([optional('channel'), 'text'])
@@ -113,7 +123,12 @@ class PPP(callbacks.Plugin):
         format_ = self.registryValue('formats.query', channel)
         responses = (x.tree for x in self.request(channel, r))
         formatter = functools.partial(self.format_response, channel, format_)
-        irc.replies(filter(bool, map(formatter, responses)))
+        L = list(unique(filter(bool,
+            itertools.chain.from_iterable(map(formatter, responses)))))
+        if L:
+            irc.replies(L)
+        else:
+            irc.error(_('No response'))
 
     @wrap([optional('channel'), 'text'])
     @handle_badapi
@@ -128,7 +143,11 @@ class PPP(callbacks.Plugin):
         responses = map(operator.attrgetter('tree'), responses)
         responses = filter(lambda x:isinstance(x, Triple), responses)
         bold = self.registryValue('formats.bold')
-        irc.replies([format_triple(x, bold) for x in responses])
+        L = [format_triple(x, bold) for x in responses]
+        if L:
+            irc.replies(L)
+        else:
+            irc.error(_('No response'))
 
 
 
