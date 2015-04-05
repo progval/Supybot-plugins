@@ -29,6 +29,7 @@
 ###
 
 import re
+import copy
 import string
 import supybot.log as log
 import supybot.conf as conf
@@ -66,7 +67,6 @@ class LinkRelay(callbacks.Plugin):
             self.channelRegex = channelRegex
             self.networkRegex = networkRegex
             self.messageRegex = messageRegex
-            self.hasSourceIRCChannels = False
 
 
     def __init__(self, irc):
@@ -307,8 +307,6 @@ class LinkRelay(callbacks.Plugin):
 
         if channel is None:
             for relay in self.relays:
-                if not relay.hasSourceIRCChannels:
-                    continue
                 for channel in relay.sourceIRCChannels:
                     new_s = format_(relay, s, args)
                     if nick in relay.sourceIRCChannels[channel].users and \
@@ -323,6 +321,9 @@ class LinkRelay(callbacks.Plugin):
                         relay.networkRegex.match(irc.network)and \
                         relay.messageRegex.search(new_s):
                     send(new_s)
+        for relay in self.relays:
+            if relay.sourceNetwork == irc.network:
+                relay.sourceIRCChannels = copy.deepcopy(irc.state.channels)
 
 
     @internationalizeDocstring
