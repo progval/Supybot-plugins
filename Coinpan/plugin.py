@@ -44,8 +44,12 @@ except:
     # without the i18n module
     _ = lambda x:x
 
+STRIKE_SWAP = re.compile('(.)\u0336')
 def str_rev(s):
-    return s[::-1].replace('\u0336p', 'p\u0336')
+    def replacer(x):
+        print(repr(x))
+        return '\u0336' + x.group(1)
+    return STRIKE_SWAP.sub(replacer, s[::-1])
 
 def re_rev(r):
     # Reverse terms
