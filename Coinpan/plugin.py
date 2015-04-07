@@ -45,7 +45,7 @@ except:
     _ = lambda x:x
 
 def str_rev(s):
-    return s[::-1]
+    return s[::-1].replace('\u0336p', 'p\u0336')
 
 def re_rev(r):
     # Reverse terms
