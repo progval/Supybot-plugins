@@ -75,5 +75,5 @@ msgstr "Rien n'a cet id."
 
 #: plugin.py:94
 msgid "Wish #%i is %s."
-msgstr "Le souhait #%i is %s."
+msgstr "Le souhait #%i est %s."
 

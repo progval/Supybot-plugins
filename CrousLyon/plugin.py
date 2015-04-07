@@ -63,7 +63,9 @@ INTERESTING = {
 URL = 'http://irestos.crous-amiens.fr//generation.php?crous=21&resto=%d&ext=xml'
 BLACKLIST = ['variées', 'variés', 'du chef', 'buffet']
 def get(id_):
-    root = ElementTree.fromstring(requests.get(URL % id_).text)
+    text = requests.get(URL % id_, stream=True).raw.read()
+    text = text.decode(utils.web.getEncoding(text) or 'utf8')
+    root = ElementTree.fromstring(text)
     assert root.tag == 'root', root
     resto = root[0]
     assert resto.tag == 'resto', resto

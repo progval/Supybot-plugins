@@ -97,7 +97,7 @@ class Markovgen(callbacks.Plugin):
         m = self._get_markov(irc, channel)
         m.feed(message)
         if random.random() < probability:
-            self._answer(irc, message, m)
+            self._answer(irc, message, m, False)
 
     @wrap(['channel', 'text'])
     def gen(self, irc, msg, args, channel, message):
@@ -110,10 +110,10 @@ class Markovgen(callbacks.Plugin):
             irc.error(_('Markovgen is disabled for this channel.'))
         m = self._get_markov(irc, channel)
         m.feed(message)
-        self._answer(irc, message, m)
+        self._answer(irc, message, m, True)
 
 
-    def _answer(self, irc, message, m):
+    def _answer(self, irc, message, m, allow_duplicate):
         words = message.split(' ')
         message_tuples = set(zip(words, words[1:]))
         if not message_tuples:
@@ -128,7 +128,8 @@ class Markovgen(callbacks.Plugin):
             answer = '%s %s' % (backward, forward.split(' ', 2)[2])
         except IndexError:
             answer = backward
-        irc.reply(answer, prefixNick=False)
+        if allow_duplicate or m != answer:
+            irc.reply(answer, prefixNick=False)
 
 
 

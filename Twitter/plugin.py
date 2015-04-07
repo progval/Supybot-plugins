@@ -380,17 +380,21 @@ class Twitter(callbacks.Plugin):
                    'somethingWithoutSpaces', 'text'])
 
     @internationalizeDocstring
-    def post(self, irc, msg, args, user, channel, message):
-        """[<channel>] <message>
+    def post(self, irc, msg, args, user, channel, id_, message):
+        """[<channel>] [<id>] <message>
 
         Updates the status of the account associated with the given <channel>
         to the <message>. If <channel> is not given, it defaults to the
-        current channel."""
+        current channel. If <id> is given, replies to this tweet id."""
         api = self._getApi(channel)
         if hasattr(api, '_oauth_consumer') and not api._oauth_consumer:
             irc.error(_('No account is associated with this channel. Ask '
                         'an op or try with another channel.'))
             return
+        if id_:
+            id_ = self.get_id(id_)
+            if not id_:
+                irc.error(_('Invalid id.'), Raise=True)
         tweet = message
         if self.registryValue('prefixusername', channel):
             tweet = '[%s] %s' % (user.name, tweet)
@@ -398,9 +402,24 @@ class Twitter(callbacks.Plugin):
             irc.error(_('Sorry, your tweet exceeds 140 characters (%i)') %
                     len(tweet))
         else:
-            api.PostUpdate(tweet)
+            api.PostUpdate(tweet, continuation=id_)
             irc.replySuccess()
-    post = wrap(post, ['user', ('checkChannelCapability', 'twitterpost'), 'text'])
+    post = wrap(post, ['user', ('checkChannelCapability', 'twitterpost'),
+        optional('somethingWithoutSpaces'), 'text'])
+
+    def get_id(self, id_):
+        if len(id_) <= 3:
+            try:
+                return self._shortids[id_]
+            except KeyError:
+                irc.error(_('This is not a valid ID.'))
+                return
+        else:
+            try:
+                return int(id_)
+            except ValueError:
+                irc.error(_('This is not a valid ID.'))
+                return
 
     @internationalizeDocstring
     def retweet(self, irc, msg, args, user, channel, id_):
@@ -409,18 +428,9 @@ class Twitter(callbacks.Plugin):
         Retweets the message with the given ID."""
         api = self._getApi(channel)
         try:
-            if len(id_) <= 3:
-                try:
-                    id_ = self._shortids[id_]
-                except KeyError:
-                    irc.error(_('This is not a valid ID.'))
-                    return
-            else:
-                try:
-                    id_ = int(id_)
-                except ValueError:
-                    irc.error(_('This is not a valid ID.'))
-                    return
+            id_ = self.get_id(id_)
+            if not id_:
+                irc.error(_('Invalid id.'), Raise=True)
             api.PostRetweet(id_)
             irc.replySuccess()
         except twitter.TwitterError as e:

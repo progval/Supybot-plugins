@@ -90,6 +90,14 @@ class NoisyKarmaTestCase(ChannelPluginTestCase):
         self.assertNotError('noisykarma add -2 Eww, %s.')
         self.assertNoResponse('qux--')
         self.assertSnarfResponse('qux', 'Eww, qux.')
-        
+
+    def testList(self):
+        self.assertNotError('noisykarma add -2 --action doesn\'t like %s.')
+        self.assertNotError('noisykarma add -4 --action doesn\'t like %s.')
+        self.assertNotError('noisykarma add 2 %s is nice')
+        self.assertResponse('noisykarma list',
+                "-4: doesn't like %s. (action: True), "
+                "-2: doesn't like %s. (action: True), "
+                "and 2: %s is nice (action: False)")
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

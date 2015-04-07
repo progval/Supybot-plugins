@@ -65,7 +65,8 @@ def format_triple(triple, bold):
         subtrees = tuple(format_triple(x, bold) for x in subtrees)
         return '(%s, %s, %s)' % subtrees
     elif isinstance(triple, List):
-        return '[%s]' % (', '.join(map(format_triple, triple.list)))
+        return '[%s]' % (', '.join(format_triple(x, bold)
+                                   for x in triple.list))
     else:
         raise ValueError('%r' % triple)
 

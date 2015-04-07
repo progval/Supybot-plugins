@@ -226,7 +226,8 @@ class GitHub(callbacks.Plugin):
                         try_gitio = False
                 elif key.endswith('ref'):
                     try:
-                        repl[key + '__branch'] = value.split('/', 2)[2]
+                        repl[key + '__branch'] = value.split('/', 2)[2] \
+                                if value else None
                     except IndexError:
                         pass
                 elif isinstance(value, str) or \

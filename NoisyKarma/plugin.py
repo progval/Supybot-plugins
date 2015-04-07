@@ -127,6 +127,33 @@ class NoisyKarma(callbacks.Plugin):
             del rv[karma]
         irc.replySuccess()
 
+    @wrap(['channel', optional('int')])
+    def list(self, irc, msg, args, channel, minimum):
+        """[<channel>] [<minimum>]
+
+        Returns the list of messages for karma >=minimum (in absolute
+        value)."""
+        minimum = minimum or 0
+        if minimum > 0:
+            val = self.registryValue('messages.positive', channel)
+            val = [(int(x), y) for (x,y) in val.items()]
+            val = sorted(val, key=lambda x:x[0])
+        elif minimum < 0:
+            val = self.registryValue('messages.negative', channel)
+            val = [(-int(x), y) for (x,y) in val.items()]
+            val = sorted(val, key=lambda x:abs(x[0]))
+        else:
+            pos = self.registryValue('messages.positive', channel)
+            pos = [(int(x), y) for (x,y) in pos.items()]
+            neg = self.registryValue('messages.negative', channel)
+            neg = [(-int(x), y) for (x,y) in neg.items()]
+            val = pos + neg
+            val = sorted(val, key=lambda x:x[0])
+        L = [_('%d: %s (action: %r)') % (karma, message['message'], message['action'])
+             for (karma, message) in val
+             if abs(karma) >= abs(minimum)]
+        irc.reply(format('%L', L))
+
 
 Class = NoisyKarma
 
