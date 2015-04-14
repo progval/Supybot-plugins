@@ -214,7 +214,7 @@ class GitHub(callbacks.Plugin):
             repl = flatten_subdicts(payload)
             try_gitio = True
             for (key, value) in dict(repl).items():
-                if key.endswith('url'):
+                if key.endswith('commit__url'):
                     if try_gitio:
                         url = self._shorten_url(value)
                     else:
