@@ -52,12 +52,20 @@ Loops
 =====
 
 Loops are the main feature provided by SupyML. Here is the global syntax:
- <loop><loopType>boolean</loopType>command arg1 arg2 arg3</loop>
+
+```
+<loop><loopType>boolean</loopType>command arg1 arg2 arg3</loop>
+```
+
 Use conditions to have changing booleans ;)
 
 While loop
 ----------
 
 The syntax of the while loop is:
- <loop><while>boolean</while>command arg1 arg2 arg3</loop>
+
+```
+<loop><while>boolean</while>command arg1 arg2 arg3</loop>
+```
+
 The command is run while the boolean is true.
