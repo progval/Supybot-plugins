@@ -19,10 +19,16 @@ Variables
 =========
 
 To get the value of a variable, type:
- <var name="variableName" />
+
+```
+<var name="variableName" />
+```
 
 To set the value, type:
- <set name="variableName">newValue</set>
+
+```
+<set name="variableName">newValue</set>
+```
 
 Note that all variable are strings, because SupyML and SupyBot commands
 processing both use only strings.
