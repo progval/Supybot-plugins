@@ -214,7 +214,7 @@ class GitHub(callbacks.Plugin):
             repl = flatten_subdicts(payload)
             try_gitio = True
             for (key, value) in dict(repl).items():
-                if key.endswith('commit__url'):
+                if key.endswith(('__commit__url', '__html_url', 'target_url')):
                     if try_gitio:
                         url = self._shorten_url(value)
                     else:
@@ -306,9 +306,21 @@ class GitHub(callbacks.Plugin):
                             commits = [last_commit]
                         payload2 = dict(payload)
                         for commit in commits:
+                            # trim the commit hash down to 7 char long
+                            if len(commit['id']) > 7:
+                                 commit['id'] = commit['id'][:-33]
                             payload2['__commit'] = commit
                             self._createPrivmsg(irc, channel, payload2,
                                     'push', hidden)
+                elif event == 'commit_comment':
+                    # Here we get the commit name
+                    commit_url = 'https://api.github.com/repos/%s/git/commits/%s' % (payload['repository']['full_name'],
+                                                                                 payload['comment']['commit_id'])
+                    response = urllib.urlopen(commit_url);
+                    data = json.loads(response.read())
+                    commit_name = data['message']
+                    payload['comment']['commit_name'] = commit_name
+                    self._createPrivmsg(irc, channel, payload, event)
                 else:
                     self._createPrivmsg(irc, channel, payload, event)
 

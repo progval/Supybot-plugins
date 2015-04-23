@@ -43,3 +43,5 @@ There are also special variables:
 
 Concerning push events, one line is formatted per commit; it is given extra
  variables: `$__commit__foo` for each `data['commits'][X]['foo']`.
+Thereis also a variable called inserted here for each commit names commit_name
+wich reads the commit name from it's hash.
