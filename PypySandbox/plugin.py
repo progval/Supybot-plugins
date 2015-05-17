@@ -30,6 +30,7 @@
 
 import os
 import io
+import sys
 import signal
 import tempfile
 import subprocess
@@ -62,8 +63,7 @@ except Exception as e:
 """
 
 def run(code, heapsize, timeout):
-    with tempfile.TemporaryFile() as stderr, \
-            tempfile.TemporaryDirectory() as dirname:
+    with tempfile.TemporaryDirectory() as dirname:
         command = ['pypy-sandbox',
                 '--tmp', dirname,
                 '--heapsize', str(heapsize),
@@ -91,8 +91,7 @@ def run(code, heapsize, timeout):
             # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=785559
             os.killpg(proc.pid, signal.SIGTERM)
             proc.kill()
-            stderr.seek(0)
-            raise TimeoutException(stderr)
+            raise TimeoutException()
         except subprocess.CalledProcessError:
             raise
         finally:
