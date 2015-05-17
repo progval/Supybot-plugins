@@ -48,6 +48,9 @@ except ImportError:
     # without the i18n module
     _ = lambda x: x
 
+if not hasattr(tempfile, 'TemporaryDirectory'):
+    raise callbacks.Error('Python 3.2 >= is required.')
+
 class TimeoutException(Exception):
     pass
 
