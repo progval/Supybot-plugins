@@ -114,8 +114,10 @@ class PypySandbox(callbacks.Plugin):
         """<code>
 
         Runs Python code safely thanks to Pypy's sandbox."""
+        heapsize = self.registryValue('heapsize')
+        timeout = self.registryValue('timeout')
         try:
-            output = run(code, 1000, 3)
+            output = run(code, heapsize, timeout)
         except TimeoutException:
             irc.error(_('Timeout.'))
         else:

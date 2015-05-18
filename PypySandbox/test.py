@@ -32,7 +32,8 @@ from supybot.test import *
 
 
 class PypySandboxTestCase(PluginTestCase):
-    plugins = ('PypySandbox',)
+    plugins = ('PypySandbox', 'Config')
+    config = {'supybot.plugins.PypySandbox.timeout': 1}
 
     def testBase(self):
         self.assertResponse('sandbox print(4+5)', '9')

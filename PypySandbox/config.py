@@ -52,6 +52,12 @@ PypySandbox = conf.registerPlugin('PypySandbox')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(PypySandbox, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
+conf.registerGlobalValue(PypySandbox, 'heapsize',
+    registry.PositiveInteger(1000000, _("""Maximum memory allowed for
+    sandboxed processes.""")))
+conf.registerGlobalValue(PypySandbox, 'timeout',
+    registry.PositiveInteger(3, _("""Maximum execution time allowed for
+    sandboxed processes.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
