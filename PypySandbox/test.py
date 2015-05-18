@@ -34,7 +34,7 @@ from supybot.test import *
 class PypySandboxTestCase(PluginTestCase):
     plugins = ('PypySandbox', 'Config')
     config = {
-            'supybot.plugins.PypySandbox.timeout': 1,
+            'supybot.plugins.PypySandbox.timeout': 3,
             'supybot.plugins.PypySandbox.heapsize': 1000,
             }
 
