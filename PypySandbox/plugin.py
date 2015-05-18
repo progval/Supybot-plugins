@@ -48,8 +48,11 @@ except ImportError:
     # without the i18n module
     _ = lambda x: x
 
+if not hasattr(subprocess, 'TimeoutExpired'):
+    raise callbacks.Error('Python >= 3.3 is required.')
 if not hasattr(tempfile, 'TemporaryDirectory'):
-    raise callbacks.Error('Python 3.2 >= is required.')
+    # You have some weird setup...
+    raise callbacks.Error('Python >= 3.2 is required.')
 
 class TimeoutException(Exception):
     pass
