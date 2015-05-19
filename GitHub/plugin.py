@@ -202,7 +202,7 @@ class GitHub(callbacks.Plugin):
                     url = filter(lambda x:x.startswith('Location: '),
                             f.headers.headers)[0].split(': ', 1)[1].strip()
             except Exception as e:
-                log.error('Cannot connect to git.io: %s' % e)
+                log.error('Cannot connect to git.io: %s (%s)' % (e, url))
                 return None
             return url
         def _createPrivmsg(self, irc, channel, payload, event, hidden=None):
@@ -212,18 +212,17 @@ class GitHub(callbacks.Plugin):
             if not format_.strip():
                 return
             repl = flatten_subdicts(payload)
-            try_gitio = True
             for (key, value) in dict(repl).items():
-                if key.endswith('commit__url'):
-                    if try_gitio:
-                        url = self._shorten_url(value)
-                    else:
-                        url = None
+                if key.endswith('url') and value and \
+                        value.startswith('http') and \
+                        'github.com' in value.split('/')[0:3]:
+                    url = self._shorten_url(value)
                     if url:
                         repl[key + '__tiny'] = url
                     else:
                         repl[key + '__tiny'] = value
-                        try_gitio = False
+                elif key.endswith('url'):
+                    repl[key + '__tiny'] = value
                 elif key.endswith('ref'):
                     try:
                         repl[key + '__branch'] = value.split('/', 2)[2] \
