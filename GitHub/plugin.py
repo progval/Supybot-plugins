@@ -308,6 +308,16 @@ class GitHub(callbacks.Plugin):
                             payload2['__commit'] = commit
                             self._createPrivmsg(irc, channel, payload2,
                                     'push', hidden)
+                elif event == 'gollum':
+                    pages = payload['pages']
+                    if len(pages) == 0:
+                        log.warning('GitHub gollum hook called without any page.')
+                    else:
+                        payload2 = dict(payload)
+                        for page in pages:
+                            payload2['__page'] = page
+                            self._createPrivmsg(irc, channel, payload2,
+                                    'gollum', None)
                 else:
                     self._createPrivmsg(irc, channel, payload, event)
 
