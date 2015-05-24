@@ -121,7 +121,7 @@ class PypySandbox(callbacks.Plugin):
         except TimeoutException:
             irc.error(_('Timeout.'))
         else:
-            irc.reply(output.split('\n')[-1])
+            irc.replies(output.split('\n'))
 
 
 Class = PypySandbox
