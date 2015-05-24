@@ -73,9 +73,9 @@ conf.registerChannelValue(GitHub.format, 'push',
         _("""Format for push events.""")))
 conf.registerChannelValue(GitHub.format, 'commit_comment',
         registry.String('echo ' +
-        _('$repository__owner__name/\x02$repository__name\x02 '
-        '(in \x02$ref__branch\x02): $__comment__user__login commented on '
-        'commit \x02$__commit__message__firstline\x02 $comment__html_url__tiny') \
+        _('$repository__owner__login/\x02$repository__name\x02: '
+        '$comment__user__login commented on '
+        'commit \x02$comment__commit_id__short\x02 $comment__html_url__tiny') \
         .replace('\n        ', ' '),
         _("""Format for commit comment events.""")))
 conf.registerChannelValue(GitHub.format, 'issues',
