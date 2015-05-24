@@ -223,6 +223,8 @@ class GitHub(callbacks.Plugin):
                         repl[key + '__tiny'] = value
                 elif key.endswith('url'):
                     repl[key + '__tiny'] = value
+                elif key.endswith(('commit__id', 'commit_id')):
+                    repl[key + '__short'] = value[0:7]
                 elif key.endswith('ref'):
                     try:
                         repl[key + '__branch'] = value.split('/', 2)[2] \
