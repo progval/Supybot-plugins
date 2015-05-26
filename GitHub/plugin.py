@@ -48,10 +48,13 @@ import supybot.httpserver as httpserver
 
 if sys.version_info[0] < 3:
     from cStringIO import StringIO
+    from urlparse import urlparse
     quote_plus = urllib.quote_plus
 else:
     from io import StringIO
+    from urllib.parse import urlparse
     quote_plus = urllib.parse.quote_plus
+    basestring = str
 try:
     from supybot.i18n import PluginInternationalization
     from supybot.i18n import internationalizeDocstring
@@ -213,16 +216,22 @@ class GitHub(callbacks.Plugin):
                 return
             repl = flatten_subdicts(payload)
             for (key, value) in dict(repl).items():
-                if key.endswith('url') and value and \
-                        value.startswith('http') and \
-                        'github.com' in value.split('/')[0:3]:
-                    url = self._shorten_url(value)
-                    if url:
-                        repl[key + '__tiny'] = url
+                if isinstance(value, basestring) and \
+                        value.startswith(('http://', 'https://')):
+                    host = urlparse(value).netloc
+                    # NOTE: Shortening api.github.com URLs causes too much
+                    # overhead and it becomes really slow. At some point, we
+                    # should probably check which keys are actually referenced
+                    # in the format string and only shorten those.
+                    #if host == 'github.com' or host.endswith('.github.com'):
+                    if host == 'github.com':
+                        url = self._shorten_url(value)
+                        if url:
+                            repl[key + '__tiny'] = url
+                        else:
+                            repl[key + '__tiny'] = value
                     else:
                         repl[key + '__tiny'] = value
-                elif key.endswith('url'):
-                    repl[key + '__tiny'] = value
                 elif key.endswith(('commit__id', 'commit_id')):
                     repl[key + '__short'] = value[0:7]
                 elif key.endswith('ref'):
