@@ -234,6 +234,8 @@ class GitHub(callbacks.Plugin):
                         repl[key + '__tiny'] = value
                 elif key.endswith(('commit__id', 'commit_id')):
                     repl[key + '__short'] = value[0:7]
+                elif key == 'commits':
+                    repl['__num_commits'] = len(value)
                 elif key.endswith('ref'):
                     try:
                         repl[key + '__branch'] = value.split('/', 2)[2] \
@@ -315,6 +317,8 @@ class GitHub(callbacks.Plugin):
                             hidden = len(commits) + 1
                             commits = [last_commit]
                         payload2 = dict(payload)
+                        self._createPrivmsg(irc, channel, payload2,
+                            'before.push', None)
                         for commit in commits:
                             payload2['__commit'] = commit
                             self._createPrivmsg(irc, channel, payload2,

@@ -64,6 +64,12 @@ conf.registerGlobalValue(GitHub, 'announces',
         add' or '@Github announce remove' instead.""")))
 
 conf.registerGroup(GitHub, 'format')
+conf.registerGroup(GitHub.format, 'before')
+conf.registerChannelValue(GitHub.format.before, 'push',
+        registry.String('',
+        _("""Format for an optional summary line before the individual commits
+        in the push event.""")))
+
 conf.registerChannelValue(GitHub.format, 'push',
         registry.String('echo ' +
         _('$repository__owner__name/\x02$repository__name\x02 '
