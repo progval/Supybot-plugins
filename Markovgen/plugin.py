@@ -132,6 +132,24 @@ class Markovgen(callbacks.Plugin):
         if allow_duplicate or m != answer:
             irc.reply(answer, prefixNick=False)
 
+    @wrap(['channel'])
+    def doge(self, irc, msg, args, channel):
+        """takes no arguments
+
+        Generates a doge."""
+        r = re.compile('^[a-zA-Zéèàù]{5,}$')
+        def pred(x):
+            if not r.match(x):
+                return None
+            else:
+                return x
+        m = self._get_markov(irc, channel)
+        words = m.words
+        words = filter(bool, map(pred, words))
+        words = [x.strip(',?;.:/!') for x in m.words if pred(x)]
+        w2 = random.choice(words)
+        w1 = random.choice(['such', 'many', 'very'])
+        irc.reply('%s %s' % (w1, w2))
 
 
 Class = Markovgen
