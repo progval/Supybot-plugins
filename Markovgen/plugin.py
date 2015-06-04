@@ -1,3 +1,4 @@
+# coding: utf8
 ###
 # Copyright (c) 2014, Valentin Lorentz
 # All rights reserved.
@@ -137,7 +138,7 @@ class Markovgen(callbacks.Plugin):
         """takes no arguments
 
         Generates a doge."""
-        r = re.compile('^[a-zA-Zéèàù]{5,}$')
+        r = re.compile(u'^[a-zA-Zéèàù]{5,}$')
         def pred(x):
             if not r.match(x):
                 return None
