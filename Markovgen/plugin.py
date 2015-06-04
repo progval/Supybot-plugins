@@ -118,7 +118,8 @@ class Markovgen(callbacks.Plugin):
         message_tuples = set(zip(words, words[1:]))
         if not message_tuples:
             return
-        possibilities = [x for x in m.available_seeds() if x in message_tuples]
+        seeds = list(m.available_seeds())
+        possibilities = [x for x in seeds if x in message_tuples]
         seed = list(random.choice(possibilities))
         backward_seed = list(reversed(seed))
         forward = m.generate_markov_text(seed=seed, backward=False)
