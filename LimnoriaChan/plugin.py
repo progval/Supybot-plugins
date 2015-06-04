@@ -115,7 +115,7 @@ class LimnoriaChan(callbacks.Plugin):
         httpserver.unhook('limnoria_debian_builds')
 
     def _announce_build_status(self, status):
-        msg = '\x02[Debian build]\x02 %s' % status
+        msg = '\x02[Nightly builds]\x02 %s' % status
         for (server, channel) in (('freenode', '#limnoria'),):
             world.getIrc(server).sendMsg(ircmsgs.privmsg(channel, msg))
 
