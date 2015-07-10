@@ -1,4 +1,5 @@
 language: python
+sudo: false
 python:
   - "2.6"
   - "2.7"
@@ -7,12 +8,14 @@ python:
   - "3.4"
   - "pypy"
   - "pypy3"
-# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+addons:
+  apt:
+    packages:
+    - python-pypy.translator.sandbox
 install:
     - travis_retry pip install -vr https://raw.githubusercontent.com/ProgVal/Limnoria/testing/requirements.txt
     - travis_retry pip install -v git+https://github.com/ProgVal/Limnoria.git@testing
     - travis_retry pip install -vr requirements.txt||true
-    - sudo apt-get install -u python-pypy.translator.sandbox
 # command to run tests, e.g. python setup.py test
 script:
   - echo $TRAVIS_PYTHON_VERSION
