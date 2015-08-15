@@ -208,6 +208,7 @@ class Sudo(callbacks.Plugin):
         of the command is restricted to the owner."""
         log.info('fakehostmask used to run "%s" as %s' % (command, hostmask))
         msg.prefix = hostmask
+        (msg.nick, msg.user, msg.host)=ircutils.splitHostmask(hostmask)
         tokens = callbacks.tokenize(command)
         self.Proxy(irc.irc, msg, tokens)
     fakehostmask = wrap(fakehostmask, ['owner', 'hostmask', 'text'])

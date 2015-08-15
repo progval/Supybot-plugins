@@ -121,6 +121,7 @@ class SudoTestCase(PluginTestCase):
         self.assertResponse('fakehostmask %s whoami' % self.prefix, 'Prog')
         self.assertRegexp('fakehostmask prog!val@home whoami',
                 'I don\'t recognize you.*')
+        self.assertResponse('fakehostmask prog!val@home echo $nick', 'prog')
 
 
 
