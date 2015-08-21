@@ -117,11 +117,11 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
                 not handler.address_string().startswith('192.30.252.') and \
                 not handler.address_string().startswith('192.30.253.') and \
                 not handler.address_string().startswith('192.30.254.') and \
-                not handler.address_string().startswith('::ffff:192.30.252.') and \ 
-                not handler.address_string().startswith('::ffff:192.30.253.') and \ 
-                not handler.address_string().startswith('::ffff:192.30.254.') and \ 
-                not handler.address_string().startswith('::ffff:192.30.255.') and \ 
- 		        not handler.address_string().startswith('::ffff:204.232.175.') and \                 
+                not handler.address_string().startswith('::ffff:192.30.252.') and \
+                not handler.address_string().startswith('::ffff:192.30.253.') and \
+                not handler.address_string().startswith('::ffff:192.30.254.') and \
+                not handler.address_string().startswith('::ffff:192.30.255.') and \
+ 		        not handler.address_string().startswith('::ffff:204.232.175.') and \      
                 not handler.address_string().startswith('192.30.255.') and \
                 not handler.address_string().startswith('204.232.175.'):
             log.warning("""'%s' tried to act as a web hook for Github,
