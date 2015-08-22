@@ -95,7 +95,7 @@ conf.registerChannelValue(GitHub.format, 'issue_comment',
         registry.String('echo ' +
         _('$repository__owner__login/\x02$repository__name\x02: '
         '\x02$sender__login\x02 $action comment on issue #$issue__number: '
-        '\x02$issue__title\x02 $issue__url__tiny') \
+        '\x02$issue__title\x02 $issue__html_url__tiny') \
         .replace('\n        ', ' '),
         _("""Format for issue comment events.""")))
 conf.registerChannelValue(GitHub.format, 'status',
