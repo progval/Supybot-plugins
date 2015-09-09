@@ -58,36 +58,17 @@ class AutoTrans(callbacks.Plugin):
         conf = list(map(lambda x:x.split(':'),
             self.registryValue('queries', channel)))
 
-        headers = utils.web.defaultHeaders
-        headers['User-Agent'] = ('Mozilla/5.0 (X11; U; Linux i686) '
-                                 'Gecko/20071127 Firefox/2.0.0.11')
+        cb = irc.getCallback('Google')
+        if conf and cb is None:
+            self.log.error('WikiTrans used but Google plugin not loaded.')
+            return
 
-        origin_text = quote(msg.args[1])
-
-        
         for lang in set(map(operator.itemgetter(1), conf)):
-            result = utils.web.getUrlFd('http://translate.google.com/translate_a/t'
-                                        '?client=t&hl=en&sl=auto&tl=%s&multires=1'
-                                        '&otf=1&ssel=0&tsel=0&uptl=%s&sc=1&text='
-                                        '%s' % (lang, lang, origin_text),
-                                        headers).read().decode('utf8')
-
-            while ',,' in result:
-                result = result.replace(',,', ',null,')
-            data = json.loads(result)
-
-            try:
-                language = data[2]
-            except KeyboardInterrupt:
-                raise
-            except:
-                language = 'unknown'
-
-            text = ''.join(x[0] for x in data[0])
+            (text, language) = cb._translate('auto', lang, msg.args[1])
             text = '<%s@%s> %s' % (msg.nick, channel, text)
             for (nick, user_lang) in conf:
                 if user_lang != language and user_lang == lang:
-                    irc.reply(text, to=nick, private=True)
+                    irc.reply(text, to=nick, private=True, notice=False)
 
 
 Class = AutoTrans
