@@ -57,6 +57,10 @@ conf.registerChannelValue(AutoTrans, 'queries',
     want to have a translated version of messages in a channel if the
     messages are not in their native language.
     Format: nick1:lang1 nick2:lang2.""")))
+conf.registerChannelValue(AutoTrans, 'authorWhitelist',
+    registry.SpaceSeparatedListOfStrings({}, _("""List of
+    hostmasks such that messages will be translated only if they match
+    one of the hostmasks. Empty list disables this check.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

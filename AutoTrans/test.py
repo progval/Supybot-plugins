@@ -72,5 +72,20 @@ class AutoTransTestCase(ChannelPluginTestCase):
 
             self.assertEqual(self.irc.takeMsg(), None)
 
+            with conf.supybot.plugins.AutoTrans.authorWhitelist.context(
+                    ['test!*@*']):
+                m = feedMsg('Dies ist ein Test')
+                self.assertEqual(m.command, 'NOTICE', m)
+                self.assertEqual(m.args[0], 'foo', m)
+                self.assertEqual(m.args[1], '<test@#test> This is a test', m)
+
+            self.assertEqual(self.irc.takeMsg(), None)
+
+            with conf.supybot.plugins.AutoTrans.authorWhitelist.context(
+                    ['test2!*@*']):
+                m = feedMsg('Dies ist ein Test')
+
+            self.assertEqual(self.irc.takeMsg(), None)
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

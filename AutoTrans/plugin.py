@@ -55,18 +55,23 @@ class AutoTrans(callbacks.Plugin):
 
     def doPrivmsg(self, irc, msg):
         channel = msg.args[0]
-        conf = list(map(lambda x:x.split(':'),
+        targets = list(map(lambda x:x.split(':'),
             self.registryValue('queries', channel)))
+        whitelist = self.registryValue('authorWhitelist', channel)
+        if whitelist:
+            if all(not ircutils.hostmaskPatternEqual(pattern, msg.prefix)
+                   for pattern in whitelist):
+                return
 
         cb = irc.getCallback('Google')
-        if conf and cb is None:
+        if targets and cb is None:
             self.log.error('WikiTrans used but Google plugin not loaded.')
             return
 
-        for lang in set(map(operator.itemgetter(1), conf)):
+        for lang in set(map(operator.itemgetter(1), targets)):
             (text, language) = cb._translate('auto', lang, msg.args[1])
             text = '<%s@%s> %s' % (msg.nick, channel, text)
-            for (nick, user_lang) in conf:
+            for (nick, user_lang) in targets:
                 if user_lang != language and user_lang == lang:
                     irc.reply(text, to=nick, private=True, notice=False)
 
