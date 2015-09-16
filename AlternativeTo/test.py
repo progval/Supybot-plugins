@@ -35,7 +35,11 @@ class AlternativeToTestCase(PluginTestCase):
     plugins = ('AlternativeTo',)
 
     def testBase(self):
-        self.assertRegexp('alternatives avidemux', 'handbraake')
+        self.assertRegexp('alternatives avidemux', 'handbrake')
+        self.assertRegexp('alternatives avidemux', 'lightworks')
+        self.assertRegexp('alternatives --license opensource avidemux', 'handbrake')
+        self.assertNotRegexp('alternatives --license opensource avidemux',
+                'lightworks')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

@@ -58,17 +58,20 @@ class AlternativeTo(callbacks.PluginRegexp):
                 self.get_alternatives('http://alternativeto.net/software/%s/' %
                 software))
 
-    def alternatives(self, irc, msg, args, software):
-        """<software>
+    def alternatives(self, irc, msg, args, optlist, software):
+        """[--platform <platform>] [--license <free|opensource|commercial]] <software>
 
         Returns a list of alternatives to the <software>."""
         if '/' in software:
             irc.error(_('Software name may not contain a / character.'),
                     Raise=True)
-        irc.replies(
-                self.get_alternatives('http://alternativeto.net/software/%s/' %
-                software))
-    alternatives = wrap(alternatives, ['somethingWithoutSpaces'])
+        url = 'http://alternativeto.net/software/%s/?%s' % (software,
+                '&'.join('%s=%s' % x for x in optlist))
+        irc.replies(self.get_alternatives(url))
+    alternatives = wrap(alternatives, [
+        getopts({'platform': 'somethingWithoutSpaces',
+                 'license': ('literal', ['free', 'opensource', 'commercial'])}),
+        'somethingWithoutSpaces'])
 
     def get_alternatives(self, url):
         page = utils.web.getUrl(url)
