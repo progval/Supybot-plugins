@@ -40,6 +40,8 @@ class AlternativeToTestCase(PluginTestCase):
         self.assertRegexp('alternatives --license opensource avidemux', 'handbrake')
         self.assertNotRegexp('alternatives --license opensource avidemux',
                 'lightworks')
+        self.assertResponse('alternatives ergjerpoergpg',
+                'Error: Software not found.')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

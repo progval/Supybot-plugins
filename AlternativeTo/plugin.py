@@ -54,9 +54,12 @@ class AlternativeTo(callbacks.PluginRegexp):
         if not self.registryValue('snarf', channel):
             return
         url = match(0)
-        irc.replies(
-                self.get_alternatives('http://alternativeto.net/software/%s/' %
-                software))
+        try:
+            alt = self.get_alternatives(url)
+        except utils.web.Error:
+            pass
+        else:
+            irc.replies(alt)
 
     def alternatives(self, irc, msg, args, optlist, software):
         """[--platform <platform>] [--license <free|opensource|commercial]] <software>
@@ -67,7 +70,10 @@ class AlternativeTo(callbacks.PluginRegexp):
                     Raise=True)
         url = 'http://alternativeto.net/software/%s/?%s' % (software,
                 '&'.join('%s=%s' % x for x in optlist))
-        irc.replies(self.get_alternatives(url))
+        try:
+            irc.replies(self.get_alternatives(url))
+        except utils.web.Error:
+            irc.error(_('Software not found.'), Raise=True)
     alternatives = wrap(alternatives, [
         getopts({'platform': 'somethingWithoutSpaces',
                  'license': ('literal', ['free', 'opensource', 'commercial'])}),
