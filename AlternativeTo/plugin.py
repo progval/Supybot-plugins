@@ -90,7 +90,7 @@ class AlternativeTo(callbacks.PluginRegexp):
         L = [x.split('---')[0].replace('-', ' ')
                 for x in useful.split("','")]
         if limit and len(L) > limit:
-            L = L[0:limit] + [_('%d more') % len(L) - limit]
+            L = L[0:limit] + [_('%d more') % (len(L) - limit)]
         return L
 
 
