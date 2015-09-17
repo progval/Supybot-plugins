@@ -29,6 +29,7 @@
 ###
 
 import re
+import sys
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
@@ -81,8 +82,10 @@ class AlternativeTo(callbacks.PluginRegexp):
 
     def get_alternatives(self, url):
         page = utils.web.getUrl(url)
-        useful = page.split(r".setTargeting('Alts', [", 1)[1] \
-                .split(r"]);", 1)[0]
+        if sys.version_info[0] >= 3 and isinstance(page, bytes):
+            page = page.decode()
+        useful = page.split(r".setTargeting('Alts', ['", 1)[1] \
+                .split(r"']);", 1)[0]
         return [x.split('---')[0].replace('-', ' ')
                 for x in useful.split("','")]
 
