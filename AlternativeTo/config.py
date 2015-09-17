@@ -51,6 +51,9 @@ def configure(advanced):
 AlternativeTo = conf.registerPlugin('AlternativeTo')
 conf.registerChannelValue(AlternativeTo, 'snarf',
     registry.Boolean(False, _("""Enable the URL snarfer.""")))
+conf.registerChannelValue(AlternativeTo, 'limit',
+    registry.NonNegativeInteger(0, _("""Maximum number of alternatives
+    to fetch. Set to 0 to disable this limit.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

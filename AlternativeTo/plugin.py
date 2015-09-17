@@ -55,12 +55,11 @@ class AlternativeTo(callbacks.PluginRegexp):
         if not self.registryValue('snarf', channel):
             return
         url = match(0)
+        limit = self.registryValue('limit', channel)
         try:
-            alt = self.get_alternatives(url)
+            irc.reply(self.get_alternatives(url, limit))
         except utils.web.Error:
             pass
-        else:
-            irc.replies(alt)
 
     def alternatives(self, irc, msg, args, optlist, software):
         """[--platform <platform>] [--license <free|opensource|commercial]] <software>
@@ -71,8 +70,10 @@ class AlternativeTo(callbacks.PluginRegexp):
                     Raise=True)
         url = 'http://alternativeto.net/software/%s/?%s' % (software,
                 '&'.join('%s=%s' % x for x in optlist))
+        channel = msg.args[0]
+        limit = self.registryValue('limit', channel)
         try:
-            irc.replies(self.get_alternatives(url))
+            irc.replies(self.get_alternatives(url, limit))
         except utils.web.Error:
             irc.error(_('Software not found.'), Raise=True)
     alternatives = wrap(alternatives, [
@@ -80,14 +81,17 @@ class AlternativeTo(callbacks.PluginRegexp):
                  'license': ('literal', ['free', 'opensource', 'commercial'])}),
         'somethingWithoutSpaces'])
 
-    def get_alternatives(self, url):
+    def get_alternatives(self, url, limit):
         page = utils.web.getUrl(url)
         if sys.version_info[0] >= 3 and isinstance(page, bytes):
             page = page.decode()
         useful = page.split(r".setTargeting('Alts', ['", 1)[1] \
                 .split(r"']);", 1)[0]
-        return [x.split('---')[0].replace('-', ' ')
+        L = [x.split('---')[0].replace('-', ' ')
                 for x in useful.split("','")]
+        if limit and len(L) > limit:
+            L = L[0:limit] + [_('%d more') % len(L) - limit]
+        return L
 
 
 Class = AlternativeTo
