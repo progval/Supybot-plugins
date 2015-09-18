@@ -42,6 +42,8 @@ class AlternativeToTestCase(PluginTestCase):
                 'lightworks')
         self.assertResponse('alternatives ergjerpoergpg',
                 'Error: Software not found.')
+        self.assertResponse('alternatives lightdm',
+                'No alternative found.')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

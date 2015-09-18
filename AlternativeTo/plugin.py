@@ -57,9 +57,13 @@ class AlternativeTo(callbacks.PluginRegexp):
         url = match(0)
         limit = self.registryValue('limit', channel)
         try:
-            irc.reply(self.get_alternatives(url, limit))
+            alt = (self.get_alternatives(url, limit))
         except utils.web.Error:
-            pass
+            return
+        if alt:
+            irc.replies(alt)
+        else:
+            irc.reply(_('No alternative found.'))
 
     def alternatives(self, irc, msg, args, optlist, software):
         """[--platform <platform>] [--license <free|opensource|commercial]] <software>
@@ -73,9 +77,13 @@ class AlternativeTo(callbacks.PluginRegexp):
         channel = msg.args[0]
         limit = self.registryValue('limit', channel)
         try:
-            irc.replies(self.get_alternatives(url, limit))
+            alt = self.get_alternatives(url, limit)
         except utils.web.Error:
             irc.error(_('Software not found.'), Raise=True)
+        if alt:
+            irc.replies(alt)
+        else:
+            irc.reply(_('No alternative found.'))
     alternatives = wrap(alternatives, [
         getopts({'platform': 'somethingWithoutSpaces',
                  'license': ('literal', ['free', 'opensource', 'commercial'])}),
@@ -85,8 +93,11 @@ class AlternativeTo(callbacks.PluginRegexp):
         page = utils.web.getUrl(url)
         if sys.version_info[0] >= 3 and isinstance(page, bytes):
             page = page.decode()
-        useful = page.split(r".setTargeting('Alts', ['", 1)[1] \
-                .split(r"']);", 1)[0]
+        try:
+            useful = page.split(r".setTargeting('Alts', ['", 1)[1] \
+                    .split(r"']);", 1)[0]
+        except IndexError:
+            return []
         L = [x.split('---')[0].replace('-', ' ')
                 for x in useful.split("','")]
         if limit and len(L) > limit:
