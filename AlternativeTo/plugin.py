@@ -87,20 +87,23 @@ class AlternativeTo(callbacks.PluginRegexp):
             # However, we still have to make a new request if we have filters,
             # because the redirect will not take them into account.
             if options:
-                url = 'http://alternativeto.net/browse/search/?q=%s' % (
-                        software.replace(' ', '-').lower())
+                url = 'http://alternativeto.net/browse/search/?%s' % (
+                        utils.web.urlencode({'q': software}))
                 page = utils.web.getUrl(url)
                 if sys.version_info[0] >= 3:
                     page = page.decode()
                 s = '<link rel="canonical" href="//alternativeto.net/software/'
-                software = page.split(s, 1)[1].split('/" />', 1)[0]
+                try:
+                    software = page.split(s, 1)[1].split('/" />', 1)[0]
+                except IndexError:
+                    # No direct result, give up
+                    irc.error(_('Software not found.'), Raise=True)
                 url = 'http://alternativeto.net/software/%s/?%s' % (
                         software.replace(' ', '-').lower(),
                         utils.web.urlencode(options))
             else:
-                options['q'] = software
                 url = 'http://alternativeto.net/browse/search/?%s' % (
-                        utils.web.urlencode(options))
+                        utils.web.urlencode({'q': software}))
         channel = msg.args[0]
         limit = self.registryValue('limit', channel)
         try:

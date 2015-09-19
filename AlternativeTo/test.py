@@ -61,6 +61,8 @@ class AlternativeToTestCase(PluginTestCase):
         self.assertRegexp('alternatives Word', 'google docs')
         self.assertNotRegexp('alternatives --license opensource Word',
             'google docs')
+        self.assertRegexp('alternatives --license opensource Word',
+            'libreoffice')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
