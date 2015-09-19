@@ -72,7 +72,8 @@ class AlternativeTo(callbacks.PluginRegexp):
         if '/' in software:
             irc.error(_('Software name may not contain a / character.'),
                     Raise=True)
-        url = 'http://alternativeto.net/software/%s/?%s' % (software,
+        url = 'http://alternativeto.net/software/%s/?%s' % (
+                software.replace(' ', '-').lower(),
                 '&'.join('%s=%s' % x for x in optlist))
         channel = msg.args[0]
         limit = self.registryValue('limit', channel)
@@ -87,7 +88,7 @@ class AlternativeTo(callbacks.PluginRegexp):
     alternatives = wrap(alternatives, [
         getopts({'platform': 'somethingWithoutSpaces',
                  'license': ('literal', ['free', 'opensource', 'commercial'])}),
-        'somethingWithoutSpaces'])
+        'text'])
 
     def get_alternatives(self, url, limit):
         page = utils.web.getUrl(url)

@@ -44,6 +44,7 @@ class AlternativeToTestCase(PluginTestCase):
                 'Error: Software not found.')
         self.assertResponse('alternatives lightdm',
                 'No alternative found.')
+        self.assertRegexp('alternatives Microsoft Word', 'LibreOffice')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
