@@ -90,6 +90,8 @@ class AlternativeTo(callbacks.PluginRegexp):
                 url = 'http://alternativeto.net/browse/search/?q=%s' % (
                         software.replace(' ', '-').lower())
                 page = utils.web.getUrl(url)
+                if sys.version_info[0] >= 3:
+                    page = page.decode()
                 s = '<link rel="canonical" href="//alternativeto.net/software/'
                 software = page.split(s, 1)[1].split('/" />', 1)[0]
                 url = 'http://alternativeto.net/software/%s/?%s' % (
@@ -120,6 +122,8 @@ class AlternativeTo(callbacks.PluginRegexp):
             page = utils.web.getUrl(url)
         except utils.web.Error:
             raise SoftwareNotFound()
+        if sys.version_info[0] >= 3:
+            page = page.decode()
         if 'No results for this search' in page:
             raise SoftwareNotFound()
         if sys.version_info[0] >= 3 and isinstance(page, bytes):
