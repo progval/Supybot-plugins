@@ -43,6 +43,8 @@ except ImportError:
     # without the i18n module
     _ = lambda x: x
 
+class SoftwareNotFound(Exception):
+    pass
 
 class AlternativeTo(callbacks.PluginRegexp):
     """Access to alternativeto.net"""
@@ -66,32 +68,60 @@ class AlternativeTo(callbacks.PluginRegexp):
             irc.reply(_('No alternative found.'))
 
     def alternatives(self, irc, msg, args, optlist, software):
-        """[--platform <platform>] [--license <free|opensource|commercial]] <software>
+        """[--exact] [--platform <platform>] [--license <free|opensource|commercial]] <software>
 
         Returns a list of alternatives to the <software>."""
         if '/' in software:
             irc.error(_('Software name may not contain a / character.'),
                     Raise=True)
-        url = 'http://alternativeto.net/software/%s/?%s' % (
-                software.replace(' ', '-').lower(),
-                '&'.join('%s=%s' % x for x in optlist))
+        options = dict(optlist)
+        if 'exact' in options:
+            del options['exact']
+            # Direct query
+            url = 'http://alternativeto.net/software/%s/?%s' % (
+                    software.replace(' ', '-').lower(),
+                    utils.web.urlencode(options))
+        else:
+            # If there is a good match, AlternativeTo will redirect us to it,
+            # so we don't have to make a second request.
+            # However, we still have to make a new request if we have filters,
+            # because the redirect will not take them into account.
+            if options:
+                url = 'http://alternativeto.net/browse/search/?q=%s' % (
+                        software.replace(' ', '-').lower())
+                page = utils.web.getUrl(url)
+                s = '<link rel="canonical" href="//alternativeto.net/software/'
+                software = page.split(s, 1)[1].split('/" />', 1)[0]
+                url = 'http://alternativeto.net/software/%s/?%s' % (
+                        software.replace(' ', '-').lower(),
+                        utils.web.urlencode(options))
+            else:
+                options['q'] = software
+                url = 'http://alternativeto.net/browse/search/?%s' % (
+                        utils.web.urlencode(options))
         channel = msg.args[0]
         limit = self.registryValue('limit', channel)
         try:
             alt = self.get_alternatives(url, limit)
-        except utils.web.Error:
+        except SoftwareNotFound:
             irc.error(_('Software not found.'), Raise=True)
         if alt:
             irc.replies(alt)
         else:
             irc.reply(_('No alternative found.'))
     alternatives = wrap(alternatives, [
-        getopts({'platform': 'somethingWithoutSpaces',
+        getopts({'exact': None,
+                 'platform': 'somethingWithoutSpaces',
                  'license': ('literal', ['free', 'opensource', 'commercial'])}),
         'text'])
 
     def get_alternatives(self, url, limit):
-        page = utils.web.getUrl(url)
+        try:
+            page = utils.web.getUrl(url)
+        except utils.web.Error:
+            raise SoftwareNotFound()
+        if 'No results for this search' in page:
+            raise SoftwareNotFound()
         if sys.version_info[0] >= 3 and isinstance(page, bytes):
             page = page.decode()
         try:

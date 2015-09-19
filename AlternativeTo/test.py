@@ -36,15 +36,26 @@ class AlternativeToTestCase(PluginTestCase):
 
     def testBase(self):
         self.assertRegexp('alternatives avidemux', 'handbrake')
+
+    def testFiltersBase(self):
         self.assertRegexp('alternatives avidemux', 'lightworks')
         self.assertRegexp('alternatives --license opensource avidemux', 'handbrake')
         self.assertNotRegexp('alternatives --license opensource avidemux',
                 'lightworks')
+
+    def testNotFound(self):
         self.assertResponse('alternatives ergjerpoergpg',
                 'Error: Software not found.')
         self.assertResponse('alternatives lightdm',
                 'No alternative found.')
-        self.assertRegexp('alternatives Microsoft Word', 'LibreOffice')
+
+    def testSearch(self):
+        self.assertRegexp('alternatives Microsoft Word', 'google docs')
+
+    def testFiltersSearch(self):
+        self.assertRegexp('alternatives Word', 'google docs')
+        self.assertNotRegexp('alternatives --license opensource Word',
+            'google docs')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
