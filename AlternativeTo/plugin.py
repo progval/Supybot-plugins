@@ -110,7 +110,7 @@ class AlternativeTo(callbacks.PluginRegexp):
         else:
             irc.reply(_('No alternative found.'))
     alternatives = wrap(alternatives, [
-        getopts({'exact': None,
+        getopts({'exact': '',
                  'platform': 'somethingWithoutSpaces',
                  'license': ('literal', ['free', 'opensource', 'commercial'])}),
         'text'])

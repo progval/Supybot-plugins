@@ -36,11 +36,16 @@ class AlternativeToTestCase(PluginTestCase):
 
     def testBase(self):
         self.assertRegexp('alternatives avidemux', 'handbrake')
+        self.assertRegexp('alternatives --exact avidemux', 'handbrake')
 
     def testFiltersBase(self):
         self.assertRegexp('alternatives avidemux', 'lightworks')
         self.assertRegexp('alternatives --license opensource avidemux', 'handbrake')
+        self.assertRegexp('alternatives --exact --license opensource avidemux',
+                'handbrake')
         self.assertNotRegexp('alternatives --license opensource avidemux',
+                'lightworks')
+        self.assertNotRegexp('alternatives --exact --license opensource avidemux',
                 'lightworks')
 
     def testNotFound(self):
