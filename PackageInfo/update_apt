@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+
+# Either set DIR to the same value as supybot.plugins.PackageInfo.aptdir,
+# or use the --dir command-line option.
+DIR=""
+
+# Be quiet by default.
+VERBOSE=0
+
+
+## Please don't change anything below this line, unless you really know what
+## you are doing and don't bother me with whatever errors it produces :)
+
+# Print usage information.
+usage() {
+    echo "Usage $0 [OPTION]..."
+    echo "Updates the APT package cache for PackageInfo"
+    echo ""
+    echo "-h, --help            Display this message and exit."
+    echo "-v, --verbose         Be more verbose than normal."
+    echo "-V, --very-verbose    Be even more verbose than normal."
+    echo "-d, --dir[=DIR]       Sets the directory to use when updating the APT package cache."
+    echo ""
+    echo "Note:"
+    echo "  Please separate each option with a space, eg:"
+    echo "      $0 -v -d /home/bot/aptdir"
+    echo "  Rather than:"
+    echo "      $0 -vd /home/bot/aptdir"
+    echo ""
+    echo "This script is intended to be ran automatically (eg: cron), so it shows no output by default."
+    echo "You can make the script more verbose with either the -v/--verbose or -V/--very-verbose options."
+    echo "The -d/--dir option sets the directory where this script looks for *.list files for apt-get."
+}
+
+# Prints an error message, usage (above), then exit with the specified exit value.
+error() {
+    local exit_val=$1
+    shift
+    echo $@ >&2
+    usage >&2
+    exit $exit_val
+}
+
+# Runs apt-get update in the specified directory for the specified distribution.
+update_apt() {
+    local apt_dir="$1"
+    local dist="$2"
+    local apt_args=""
+
+    if [ $VERBOSE -eq 0 ]; then
+        apt_args="-qq"
+    elif [ $VERBOSE -eq 1 ]; then
+        apt_args="-q"
+    fi
+
+    apt-get $apt_args -o="APT::Architecture=i386" \
+        -o="APT::Architectures::=i386" \
+        -o "APT::Architectures::=amd64" \
+        -o="Dir::State::Lists=$apt_dir/$dist" \
+        -o="Dir::State::Status=$apt_dir/$dist.status" \
+        -o="Dir::Cache=$apt_dir/cache" \
+        -o="Dir::Etc::SourceList=$apt_dir/$dist.list" \
+        -o="Dir::Etc::SourceParts=\"\"" \
+        update
+
+    return $?
+}
+
+# main()
+
+# Acepted arguments are:
+# -h,--help
+# -v,--verbose
+# -V,--very-verbose
+# -d,--dir[=DIR]
+
+# Check command-line arguments
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -v|--verbose)
+            VERBOSE=1
+            ;;
+        -V|--very-verbose)
+            VERBOSE=2
+            ;;
+        -d|--dir)
+            [ -z "$2" ] && error 1 "\"-d|--dir\" requires an argument."
+            shift
+            DIR="$1"
+            ;;
+        --dir=*)
+            DIR="${1:6}"
+            [ -z "$DIR" ] && error 1 "\"--dir\" requires an argument."
+            ;;
+        -*)
+            error 1 "Unknown option \"$1\"."
+            ;;
+        *)
+            error 1 "This script takes no non-argument parameters."
+            ;;
+    esac
+    shift
+done
+
+apt_get=$(which apt-get 2>/dev/null)
+
+# Check that apt-get exists and bail if it doesn't.
+if [ $? -ne 0 ]; then
+    echo "ERROR: apt-get not found. Please install apt-get in your \$PATH." >&2
+    exit 1
+fi
+
+#TODO: Remove this section and error out if DIR is not set,
+#      This could hide errors where DIR/-d was not set, an error message.
+if [ -z "$DIR" ]; then
+    DIR=/home/bot/aptdir
+    echo "WARNING: No DIR set and no -d/--dir option given, defaulting to \"$DIR\"" >&2
+    echo "WARNING: Please set DIR on line 5 of $(readlink -f $0) or use the -d/--dir option" >&2
+fi
+
+#[ -z "$DIR" ] && error 1 "ERROT: Please set DIR on line 5 of $(readlink -f $0) or use the -d/--dir option"
+
+DIR="$(echo $DIR | sed 's,/*$,,')" # Normalize $DIR
+
+items=$(ls "${DIR}"/*.list 2>/dev/null)
+[ $? -ne 0 ] && error 1 "Could not find \"*.list\" files in \"$DIR\"."
+
+for DIST in $items; do
+    [ -h "$DIST" ] && continue # Ignore symbolic links
+    # Extract the distribution name from the .list file name.
+    DIST="${DIST:${#DIR}}"
+    DIST="${DIST/.list}"
+    DIST="${DIST:1}"
+
+    touch "${DIR}/${DIST}.status" # Create APT status file
+    mkdir -p "${DIR}/${DIST}/partial" # APT needs this to exist
+    update_apt "$DIR" "$DIST" # Update the package list with apt-get
+done
+

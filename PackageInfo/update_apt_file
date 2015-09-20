@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+
+# Either set DIR to the same value as supybot.plugins.PackageInfo.aptdir,
+# or use the --dir command-line option.
+DIR=""
+
+# Be quiet by default
+VERBOSE=0
+
+## Please don't change anything below this line, unless you really know what
+## you are doing and don't bother me with whatever errors it produces :)
+
+# Print usage information.
+usage() {
+    echo "Usage $0 [OPTION]..."
+    echo "Updates the apt-file cache for PackageInfo"
+    echo ""
+    echo "-h, --help            Display this message and exit."
+    echo "-v, --verbose         Be more verbose than normal."
+    echo "-d, --dir[=DIR]       Sets the directory to use when updating the apt-file cache."
+    echo ""
+    echo "Note:"
+    echo "  Please separate each option with a space, eg:"
+    echo "      $0 -v -d /home/bot/aptdir"
+    echo "  Rather than:"
+    echo "      $0 -vd /home/bot/aptdir"
+    echo ""
+    echo "This script is intended to be ran automatically (eg: cron), so it shows no output by default."
+    echo "You can make the script more verbose with the -v/--verbose option."
+    echo "The -d/--dir option sets the directory where this script looks for *.list files for apt-file."
+}
+
+# Prints an error message, usage (above), then exit with the specified exit value.
+error() {
+    local exit_val=$1
+    shift
+    echo $@ >&2
+    usage >&2
+    exit $exit_val
+}
+
+# Runs apt-file in the specified directory against the specified distribution.
+update_apt() {
+    local DIST="$1"
+    if [ $VERBOSE -eq 0 ]; then
+        apt-file -N -l -c "$DIR/apt-file/$DIST" -s "$DIR/$DIST.list" -a i386 update >/dev/null 2>&1
+    else
+        apt-file -N -l -c "$DIR/apt-file/$DIST" -s "$DIR/$DIST.list" -a i386 update
+    fi
+}
+
+# main()
+
+# Acepted arguments are:
+# -h,--help
+# -v,--verbose
+# -d,--dir[=DIR]
+
+# Check command-line arguments
+while [ $# -ne 0 ]; do
+    case "$1" in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -v|--verbose)
+            VERBOSE=1
+            ;;
+        -d|--dir)
+            [ -z "$2" ] && error 1 "\"-d|--dir\" requires an argument."
+            shift
+            DIR="$1"
+            ;;
+        --dir=*)
+            DIR="${1:6}"
+            [ -z "$DIR" ] && error 1 "\"--dir\" requires an argument."
+            ;;
+        -*)
+            error 1 "Unknown option \"$1\"."
+            ;;
+        *)
+            error 1 "This script takes no non-argument parameterss."
+            ;;
+    esac
+    shift
+done
+
+apt_file=$(which apt-file 2>/dev/null)
+
+# Check if apt-file is installed and bail if it isn't.
+if [ $? -ne 0 ]; then
+    echo "ERROR: apt-file not found. Please install apt-file in your \$PATH." >&2
+    exit 1
+fi
+
+#TODO: Remove this and error out if DIR is not set,
+#      This is legacy code and needs to disappear sometime.
+if [ -z "$DIR" ]; then
+    DIR=/home/bot/aptdir
+    echo "WARNING: No DIR set and no -d/--dir option given, defaulting to \"$DIR\"" >&2
+    echo "WARNING: Please set DIR on line 5 of $(readlink -f $0) or use the -d/--dir option" >&2
+fi
+
+#[ -z "$DIR" ] && error 1 "Please set DIR on line 5 of $(readlink -f $0) or use the -d/--dir option"
+
+DIR="$(echo $DIR | sed 's,/*$,,')" # Normalize $DIR
+
+items=$(ls "${DIR}"/*.list 2>/dev/null)
+[ $? -ne 0 ] && error 1 "ERROR: Could not find \"*.list\" files in \"$DIR\"."
+
+for DIST in $items; do
+    [ -h $DIST ] && continue # Ignore symbolic links
+    # Extract the distribution from the .list file name
+    DIST="${DIST:${#DIR}}"
+    DIST="${DIST/.list}"
+    DIST="${DIST:1}"
+
+    mkdir -p "$DIR/apt-file/$DIST" # Create apt-file directory, if it doesn't exist
+
+    [ $VERBOSE -ne 0 ] && echo "INFO: Processing $DIST"
+    update_apt "$DIST" # Update apt-file database
+    if [ $? -ne 0 ]; then
+        [ $VERBOSE -eq 0 ] && echo "Try passing -v to get the error message." >&2
+        error 1 "ERROR: apt-file failed for ${DIST}!."
+    fi
+done
+
