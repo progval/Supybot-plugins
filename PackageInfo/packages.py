@@ -46,8 +46,6 @@ class Apt:
         self.log = plugin.log
         os.environ["LANG"] = "C"
         if self.aptdir:
-            print(repr(self.aptdir))
-            print(repr(os.listdir(self.aptdir)))
             self.distros = [x[:-5] for x in os.listdir(self.aptdir) if x.endswith('.list')]
             self.distros.sort()
             self.aptcommand = """apt-cache\\
@@ -71,10 +69,16 @@ class Apt:
             return "%s is not a valid distribution: %s" % (distro, ", ".join(self.distros))
         pkg = _pkg
 
-        data = subprocess.getoutput(self.aptcommand % (distro, distro, distro, distro, 'search -n', pkg))
+        try:
+            data = subprocess.check_output(self.aptcommand % (distro, distro, distro, distro, 'search -n', pkg), shell=True).check_output('utf8')
+        except subprocess.CalledProcessError as e:
+            data = e.output
         if not data:
             if filelookup:
-                data = subprocess.getoutput(self.aptfilecommand % (distro, distro, pkg)).split()
+                try:
+                    data = subprocess.check_output(self.aptfilecommand % (distro, distro, pkg), shell=True).decode('utf8').split()
+                except subprocess.CalledProcessError as e:
+                    data = e.output
                 if data:
                     if data[0] == 'sh:': # apt-file isn't installed
                       self.log.error("PackageInfo/packages: apt-file is not installed")
@@ -108,8 +112,14 @@ class Apt:
 
         pkg = _pkg
 
-        data = subprocess.getoutput(self.aptcommand % (distro, distro, distro, distro, 'show', pkg))
-        data2 = subprocess.getoutput(self.aptcommand % (distro, distro, distro, distro, 'showsrc', pkg))
+        try:
+            data = subprocess.check_output(self.aptcommand % (distro, distro, distro, distro, 'show', pkg), shell=True).decode('utf8')
+        except subprocess.CalledProcessError as e:
+            data = e.output
+        try:
+            data2 = subprocess.check_output(self.aptcommand % (distro, distro, distro, distro, 'showsrc', pkg), shell=True).decode('utf8')
+        except subprocess.CalledProcessError as e:
+            data2 = e.output
         if not data or 'E: No packages found' in data:
             return 'Package %s does not exist in %s' % (pkg, distro)
         maxp = {'Version': '0~'}
