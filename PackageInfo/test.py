@@ -17,6 +17,14 @@ from supybot.test import *
 
 class PackageInfoTestCase(PluginTestCase):
     plugins = ('PackageInfo',)
+    cleanConfDir = True
+    cleanDataDir = False
+
+    def testBase(self):
+        self.assertRegexp('info gstreamer1.0-libav',
+                r'gstreamer1.0-libav \(source: gst-libav1.0\)')
+        self.assertRegexp('info rjegegjierigj', 'does not exist')
+        self.assertRegexp('find irssi', 'Found: .*irssi-dev')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

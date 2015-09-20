@@ -94,7 +94,7 @@ class Apt:
                     return "File %s found in %s" % (pkg, ', '.join(data))
                 return 'Package/file %s does not exist in %s' % (pkg, distro)
             return "No packages matching '%s' could be found" % pkg
-        pkgs = [x.split()[0] for x in data.split('\n')]
+        pkgs = [x.split()[0] for x in data.split('\n') if x.split()]
         if len(pkgs) > 10:
             return "Found: %s (and %d others) http://packages.ubuntu.com/search?keywords=%s&searchon=names&suite=%s&section=all" % (', '.join(pkgs[:10]), len(pkgs)-10, urllib.parse.quote(pkg), distro)
         else:

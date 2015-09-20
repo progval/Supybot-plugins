@@ -115,7 +115,7 @@ conf.registerChannelValue(PackageInfo, 'enabled',
 conf.registerChannelValue(PackageInfo, 'prefixchar',
     conf.ValidPrefixChars('!', "Character the bot will respond to"))
 conf.registerChannelValue(PackageInfo, 'defaultRelease',
-    registry.String('natty', "Default release to use when none is specified"))
+    registry.String('jessie', "Default release to use when none is specified"))
 conf.registerGlobalValue(PackageInfo, 'aptdir',
     conf.Directory(conf.supybot.directories.data.dirize('aptdir'), "Path to the apt directory", private=True))
 

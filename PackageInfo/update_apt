@@ -53,7 +53,7 @@ update_apt() {
         apt_args="-q"
     fi
 
-    apt-get $apt_args -o="APT::Architecture=i386" \
+    apt-get --allow-unauthenticated $apt_args -o="APT::Architecture=i386" \
         -o="APT::Architectures::=i386" \
         -o "APT::Architectures::=amd64" \
         -o="Dir::State::Lists=$apt_dir/$dist" \
