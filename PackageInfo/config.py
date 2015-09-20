@@ -28,7 +28,7 @@ deb-src http://archive.ubuntu.com/ubuntu/ %s main restricted universe multiverse
 #"""
 
     from supybot.questions import output, expect, something, yn
-    import commands
+    import subprocess
     import os
 
     def anything(prompt, default=None):
@@ -93,20 +93,20 @@ deb-src http://archive.ubuntu.com/ubuntu/ %s main restricted universe multiverse
                 fd.write("# Apt sources list for Ubuntu %s\n" % release)
                 fd.write(makeSource(sub_release))
                 fd.close()
-        except Exception, e:
+        except Exception as e:
             output("Error writing to %r: %r (%s)" % (filename, str(e), type(e)))
 
     if yn("In order for the plugin to use these sources, you must run the 'update_apt' script, do you want to do this now?", default=True):
         os.environ['DIR'] = aptdir # the update_apt script checks if DIR is set and uses it if it is
-        if commands.getstatus(update_apt) != 0:
+        if subprocess.getstatus(update_apt) != 0:
             output("There was an error running update_apt, please run '%s -v' to get more information" % update_apt)
 
-    if commands.getstatusoutput('which apt-file') != 0:
+    if subprocess.getstatusoutput('which apt-file') != 0:
         output("You need to install apt-file in order to use the !find command of this plugin")
     else:
         if yn("In order for the !find command to work, you must run the 'update_apt_file' script, do you want to do this now?", default=True):
             os.environ['DIR'] = aptdir # the update_apt_file script checks if DIR is set and uses it if it is
-            if commands.getstatusoutput(update_apt_file) != 0:
+            if subprocess.getstatusoutput(update_apt_file) != 0:
                 output("There was an error running update_apt_file, please run '%s -v' to get more information" % update_apt_file)
 
 PackageInfo = conf.registerPlugin('PackageInfo')

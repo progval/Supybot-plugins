@@ -25,7 +25,8 @@ import supybot.conf as conf
 import os
 import re
 import time
-import packages
+from imp import reload
+from . import packages
 reload(packages)
 
 def get_user(msg):
@@ -46,7 +47,7 @@ def stripNick(nick):
 msgcache = {}
 def queue(irc, to, msg):
     now = time.time()
-    for m in msgcache.keys():
+    for m in list(msgcache.keys()):
         if msgcache[m] < now - 30:
             msgcache.pop(m)
     for m in msgcache:
@@ -130,7 +131,7 @@ class PackageInfo(callbacks.Plugin):
                         target = msg.nick
                     queue(irc, reply_target, "%s: %s" % (target, reply))
                     return
-                except Exception, e:
+                except Exception as e:
                     self.log.info("PackageInfo: (info) Exception in pipe: %r" % e)
                     pass
             elif rest[0] == '>':
@@ -142,10 +143,10 @@ class PackageInfo(callbacks.Plugin):
                     if target.lower() == "me":
                         target = msg.nick # redirect
                     if not target: # Throw error
-                        raise Exception, 'No target'
+                        raise Exception('No target')
                     queue(irc, target, "<%s> wants you to know: %s" % (msg.nick, reply))
                     return
-                except Exception, e:
+                except Exception as e:
                     self.log.info("PackageInfo: (info) Exception in redirect: %r" % e)
                     pass
 
@@ -175,7 +176,7 @@ class PackageInfo(callbacks.Plugin):
                         target = msg.nick
                     queue(irc, reply_target, "%s: %s" % (target, reply))
                     return
-                except Exception, e:
+                except Exception as e:
                     self.log.info("PackageInfo: (find) Exception in pipe: %r" % e)
                     pass
             elif rest[0] == '>':
@@ -187,10 +188,10 @@ class PackageInfo(callbacks.Plugin):
                     if target.lower() == "me":
                         target = msg.nick # redirect
                     if not target: # Throw error
-                        raise Exception, 'No target'
+                        raise Exception('No target')
                     queue(irc, target, "<%s> wants you to know: %s" % (msg.nick, reply))
                     return
-                except Exception, e:
+                except Exception as e:
                     self.log.info("PackageInfo: (find) Exception in redirect: %r" % e)
                     pass
 

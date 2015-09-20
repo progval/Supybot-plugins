@@ -15,11 +15,15 @@
 #
 ###
 
-import exceptions
+import sys
 import warnings
-warnings.filterwarnings("ignore", "apt API not stable yet", exceptions.FutureWarning)
-import commands, os, apt, urllib
-from email import FeedParser
+warnings.filterwarnings("ignore", "apt API not stable yet", FutureWarning)
+import subprocess, os, apt, urllib.request, urllib.parse, urllib.error
+
+if sys.version_info[0] >= 3:
+    from email import feedparser
+else:
+    from email import feedparser as FeedParser
 
 def component(arg):
     if '/' in arg: return arg[:arg.find('/')]
@@ -28,9 +32,9 @@ def component(arg):
 def description(pkg):
     if not pkg:
         return None
-    if pkg.has_key('Description-en'):
+    if 'Description-en' in pkg:
         return pkg['Description-en'].split('\n')[0]
-    elif pkg.has_key('Description'):
+    elif 'Description' in pkg:
         return pkg['Description'].split('\n')[0]
     return None
 
@@ -42,6 +46,8 @@ class Apt:
         self.log = plugin.log
         os.environ["LANG"] = "C"
         if self.aptdir:
+            print(repr(self.aptdir))
+            print(repr(os.listdir(self.aptdir)))
             self.distros = [x[:-5] for x in os.listdir(self.aptdir) if x.endswith('.list')]
             self.distros.sort()
             self.aptcommand = """apt-cache\\
@@ -65,10 +71,10 @@ class Apt:
             return "%s is not a valid distribution: %s" % (distro, ", ".join(self.distros))
         pkg = _pkg
 
-        data = commands.getoutput(self.aptcommand % (distro, distro, distro, distro, 'search -n', pkg))
+        data = subprocess.getoutput(self.aptcommand % (distro, distro, distro, distro, 'search -n', pkg))
         if not data:
             if filelookup:
-                data = commands.getoutput(self.aptfilecommand % (distro, distro, pkg)).split()
+                data = subprocess.getoutput(self.aptfilecommand % (distro, distro, pkg)).split()
                 if data:
                     if data[0] == 'sh:': # apt-file isn't installed
                       self.log.error("PackageInfo/packages: apt-file is not installed")
@@ -77,16 +83,16 @@ class Apt:
                       self.log.error("PackageInfo/packages: Please run the 'update_apt_file' script")
                       return "Cache out of date, please contact the administrator"
                     if data[0] == "Use" and data[1] == "of":
-                        url = "http://packages.ubuntu.com/search?searchon=contents&keywords=%s&mode=&suite=%s&arch=any" % (urllib.quote(pkg), distro)
+                        url = "http://packages.ubuntu.com/search?searchon=contents&keywords=%s&mode=&suite=%s&arch=any" % (urllib.parse.quote(pkg), distro)
                         return url
                     if len(data) > 10:
-                        return "File %s found in %s (and %d others) http://packages.ubuntu.com/search?searchon=contents&keywords=%s&mode=&suite=%s&arch=any" % (pkg, ', '.join(data[:10]), len(data)-10, urllib.quote(pkg), distro)
+                        return "File %s found in %s (and %d others) http://packages.ubuntu.com/search?searchon=contents&keywords=%s&mode=&suite=%s&arch=any" % (pkg, ', '.join(data[:10]), len(data)-10, urllib.parse.quote(pkg), distro)
                     return "File %s found in %s" % (pkg, ', '.join(data))
                 return 'Package/file %s does not exist in %s' % (pkg, distro)
             return "No packages matching '%s' could be found" % pkg
         pkgs = [x.split()[0] for x in data.split('\n')]
         if len(pkgs) > 10:
-            return "Found: %s (and %d others) http://packages.ubuntu.com/search?keywords=%s&searchon=names&suite=%s&section=all" % (', '.join(pkgs[:10]), len(pkgs)-10, urllib.quote(pkg), distro)
+            return "Found: %s (and %d others) http://packages.ubuntu.com/search?keywords=%s&searchon=names&suite=%s&section=all" % (', '.join(pkgs[:10]), len(pkgs)-10, urllib.parse.quote(pkg), distro)
         else:
             return "Found: %s" % ', '.join(pkgs[:5])
 
@@ -102,8 +108,8 @@ class Apt:
 
         pkg = _pkg
 
-        data = commands.getoutput(self.aptcommand % (distro, distro, distro, distro, 'show', pkg))
-        data2 = commands.getoutput(self.aptcommand % (distro, distro, distro, distro, 'showsrc', pkg))
+        data = subprocess.getoutput(self.aptcommand % (distro, distro, distro, distro, 'show', pkg))
+        data2 = subprocess.getoutput(self.aptcommand % (distro, distro, distro, distro, 'showsrc', pkg))
         if not data or 'E: No packages found' in data:
             return 'Package %s does not exist in %s' % (pkg, distro)
         maxp = {'Version': '0~'}
@@ -111,7 +117,7 @@ class Apt:
         for p in packages:
             if not p.strip():
                 continue
-            parser = FeedParser.FeedParser()
+            parser = feedparser.FeedParser()
             parser.feed(p)
             p = parser.close()
             if type(p) == type(""):
@@ -127,7 +133,7 @@ class Apt:
         for p in packages2:
             if not p.strip():
                 continue
-            parser = FeedParser.FeedParser()
+            parser = feedparser.FeedParser()
             parser.feed(p)
             p = parser.close()
             if type(p) == type(""):
@@ -139,7 +145,7 @@ class Apt:
                 maxp2 = p
             del parser
         archs = ''
-        if maxp2.has_key('Architecture'):
+        if 'Architecture' in maxp2:
             archs = [_.strip() for _ in maxp2['Architecture'].split() if _.strip()]
             for arch in archs:
                 if arch not in ('any', 'all'):
@@ -162,10 +168,10 @@ if __name__ == "__main__":
     argv = sys.argv
     argc = len(argv)
     if argc == 1:
-        print "Need at least one arg"
+        print("Need at least one arg")
         sys.exit(1)
     if argc > 3:
-        print "Only takes 2 args"
+        print("Only takes 2 args")
         sys.exit(1)
     class FakePlugin:
         class FakeLog:
@@ -180,7 +186,7 @@ if __name__ == "__main__":
     try:
         lookup = argv[1].split(None, 1)[1]
     except:
-        print "Need something to lookup"
+        print("Need something to lookup")
         sys.exit(1)
     dists = "hardy"
     if argc == 3:
@@ -188,7 +194,7 @@ if __name__ == "__main__":
     plugin = FakePlugin()
     aptlookup = Apt(plugin)
     if command == "find":
-        print aptlookup.find(lookup, dists)
+        print(aptlookup.find(lookup, dists))
     else:
-        print aptlookup.info(lookup, dists)
+        print(aptlookup.info(lookup, dists))
 
