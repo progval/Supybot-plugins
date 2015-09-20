@@ -70,7 +70,7 @@ class Apt:
         pkg = _pkg
 
         try:
-            data = subprocess.check_output(self.aptcommand % (distro, distro, distro, distro, 'search -n', pkg), shell=True).check_output('utf8')
+            data = subprocess.check_output(self.aptcommand % (distro, distro, distro, distro, 'search -n', pkg), shell=True).decode('utf8')
         except subprocess.CalledProcessError as e:
             data = e.output
         if not data:
