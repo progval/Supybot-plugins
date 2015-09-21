@@ -25,9 +25,7 @@ import supybot.conf as conf
 import os
 import re
 import time
-from imp import reload
 from . import packages
-reload(packages)
 
 def get_user(msg):
     try:
