@@ -100,7 +100,7 @@ class Apt:
         else:
             return "Found: %s" % ', '.join(pkgs[:5])
 
-    def info(self, pkg, chkdistro):
+    def raw_info(self, pkg, chkdistro):
         if not pkg.strip():
             return ''
         _pkg = ''.join([x for x in pkg.strip().split(None,1)[0] if x.isalnum() or x in '.-_+'])
@@ -167,10 +167,24 @@ class Apt:
             if archs:
                 archs = ' (Only available for %s)' % '; '.join(archs)
 
-        maxp["Distrobution"] = distro
+        maxp["Distribution"] = distro
+        maxp["Architectures"] = archs
+        return maxp
+
+    def info(self, pkg, chkdistro):
+        maxp = self.raw_info(pkg, chkdistro)
+        if isinstance(maxp, str):
+            return maxp
         return("%s (source: %s): %s. In component %s, is %s. Version %s (%s), package size %s kB, installed size %s kB%s" %
                (maxp['Package'], maxp['Source'] or maxp['Package'], description(maxp), component(maxp['Section']),
-                maxp['Priority'], maxp['Version'], distro, int(maxp['Size'])/1024, maxp['Installed-Size'], archs))
+                maxp['Priority'], maxp['Version'], maxp["Distribution"], int(maxp['Size'])/1024, maxp['Installed-Size'], maxp["Architectures"]))
+
+    def depends(self, pkg, chkdistro):
+        maxp = self.raw_info(pkg, chkdistro)
+        if isinstance(maxp, str):
+            return maxp
+        return("%s (version %s in %s) depends on: %s" %
+                (maxp['Package'], maxp["Version"], maxp["Distribution"], maxp["Depends"]))
                        
 # Simple test
 if __name__ == "__main__":

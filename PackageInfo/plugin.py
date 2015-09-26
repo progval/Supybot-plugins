@@ -152,6 +152,50 @@ class PackageInfo(callbacks.Plugin):
 
     info = wrap(real_info, ['anything', optional('text')])
 
+    def real_depends(self, irc, msg, args, package, release):
+        """<package> [<release>]
+
+        Lookup dependencies for <package>, optionally in <release>
+        """
+        channel = self.__getChannel(msg.args[0])
+        reply_target = ircutils.replyTo(msg)
+        (release, rest) = self.__getRelease(irc, release, channel)
+        if not release:
+            return
+        reply = self.Apt.depends(package, release)
+        if rest:
+            if rest[0] == '|':
+                try:
+                    target = rest
+                    while target[0] == '|':
+                        target = target[1:].strip()
+                    if target.lower() == "me":
+                        target = msg.nick
+                    queue(irc, reply_target, "%s: %s" % (target, reply))
+                    return
+                except Exception as e:
+                    self.log.info("PackageInfo: (depends) Exception in pipe: %r" % e)
+                    pass
+            elif rest[0] == '>':
+                try:
+                    while rest[0] == '>':
+                        rest = rest[1:].strip()
+                    targets = [_ for _ in rest.split() if _] # Split and discard empty parts
+                    target = stripNick(targets[0]) # Take the first "nick" and strip off bad chars
+                    if target.lower() == "me":
+                        target = msg.nick # redirect
+                    if not target: # Throw error
+                        raise Exception('No target')
+                    queue(irc, target, "<%s> wants you to know: %s" % (msg.nick, reply))
+                    return
+                except Exception as e:
+                    self.log.info("PackageInfo: (depends) Exception in redirect: %r" % e)
+                    pass
+
+        queue(irc, reply_target, reply)
+
+    depends = wrap(real_depends, ['anything', optional('text')])
+
     def real_find(self, irc, msg, args, package, release):
         """<package/filename> [<release>]
 

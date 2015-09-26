@@ -25,6 +25,7 @@ class PackageInfoTestCase(PluginTestCase):
                 r'gstreamer1.0-libav \(source: gst-libav1.0\)')
         self.assertRegexp('info rjegegjierigj', 'does not exist')
         self.assertRegexp('find irssi', 'Found: .*irssi-dev')
+        self.assertRegexp('depends supybot', 'python')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
