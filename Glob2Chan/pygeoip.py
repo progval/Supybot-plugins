@@ -11,7 +11,7 @@ import os
 import sys
 import struct
 
-if sys.version_info[0] >= 3:
+if sys.version_info[0] < 3:
     from io import BytesIO
 else:
     from cBytesIO import BytesIO as BytesIO
