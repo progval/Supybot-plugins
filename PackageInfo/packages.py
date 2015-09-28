@@ -38,6 +38,23 @@ def description(pkg):
         return pkg['Description'].split('\n')[0]
     return None
 
+def apt_cache(aptdir, distro, extra):
+    return subprocess.check_output(['apt-cache',
+             '-oDir::State::Lists=%s/%s' % (aptdir, distro),
+             '-oDir::etc::sourcelist=%s/%s.list' % (aptdir, distro),
+             '-oDir::etc::SourceParts=%s/%s.list.d' % (aptdir, distro),
+             '-oDir::State::status=%s/%s.status' % (aptdir, distro),
+             '-oDir::Cache=%s/cache' % aptdir,
+             '-oAPT::Architecture=i386'] +
+             extra).decode('utf8')
+
+def apt_file(aptdir, distro, pkg):
+    return subprocess.check_output(['apt-file',
+            '-s', '%s/%s.list' % (aptdir, distro),
+            '-c', '%s/apt-file/%s' % (aptdir, distro),
+            '-l', '-a', 'i386',
+            'search', pkg]).decode('utf8')
+
 class Apt:
     def __init__(self, plugin):
         self.aptdir = plugin.registryValue('aptdir')
@@ -48,15 +65,6 @@ class Apt:
         if self.aptdir:
             self.distros = [x[:-5] for x in os.listdir(self.aptdir) if x.endswith('.list')]
             self.distros.sort()
-            self.aptcommand = """apt-cache\\
-                                 -o"Dir::State::Lists=%s/%%s"\\
-                                 -o"Dir::etc::sourcelist=%s/%%s.list"\\
-                                 -o"Dir::etc::SourceParts=%s/%%s.list.d"\\
-                                 -o"Dir::State::status=%s/%%s.status"\\
-                                 -o"Dir::Cache=%s/cache"\\
-                                 -o"APT::Architecture=i386"\\
-                                 %%s %%s""" % tuple([self.aptdir]*5)
-            self.aptfilecommand = """apt-file -s %s/%%s.list -c %s/apt-file/%%s -l -a i386 search %%s""" % (self.aptdir, self.aptdir)
 
     def find(self, pkg, chkdistro, filelookup=True):
         _pkg = ''.join([x for x in pkg.strip().split(None,1)[0] if x.isalnum() or x in '.-_+/'])
@@ -70,13 +78,13 @@ class Apt:
         pkg = _pkg
 
         try:
-            data = subprocess.check_output(self.aptcommand % (distro, distro, distro, distro, 'search -n', pkg), shell=True).decode('utf8')
+            data = apt_cache(self.aptdir, distro, ['search', '-n', pkg])
         except subprocess.CalledProcessError as e:
             data = e.output
         if not data:
             if filelookup:
                 try:
-                    data = subprocess.check_output(self.aptfilecommand % (distro, distro, pkg), shell=True).decode('utf8').split()
+                    data = apt_file(self.aptdir, distro, pkg).split()
                 except subprocess.CalledProcessError as e:
                     data = e.output
                 if data:
@@ -113,11 +121,11 @@ class Apt:
         pkg = _pkg
 
         try:
-            data = subprocess.check_output(self.aptcommand % (distro, distro, distro, distro, 'show', pkg), shell=True).decode('utf8')
+            data = apt_cache(self.aptdir, distro, ['show', pkg])
         except subprocess.CalledProcessError as e:
             data = e.output
         try:
-            data2 = subprocess.check_output(self.aptcommand % (distro, distro, distro, distro, 'showsrc', pkg), shell=True).decode('utf8')
+            data2 = apt_cache(self.aptdir, distro, ['showsrc', pkg])
         except subprocess.CalledProcessError as e:
             data2 = e.output
         if not data or 'E: No packages found' in data:
