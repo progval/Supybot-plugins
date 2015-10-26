@@ -32,6 +32,7 @@
 import re
 import glob
 import random
+import functools
 
 import supybot.conf as conf
 import supybot.utils as utils
@@ -55,12 +56,20 @@ except ImportError:
 from imp import reload as r
 r(markovgen)
 
-CHANNELLOGER_REGEXP = re.compile('^[^ ]*  (<[^ ]+> )?(?P<message>.*)$')
-@markovgen.mixed_encoding_extracting
-def channelloger_extracter(x):
-    m = CHANNELLOGER_REGEXP.match(x)
-    if m:
-        return m.group('message')
+MATCH_MESSAGE_STRIPNICK = re.compile('^(<[^ ]+> )?(?P<message>.*)$')
+
+CHANNELLOGER_REGEXP_BASE = re.compile('^[^ ]*  (<[^ ]+> )?(?P<message>.*)$')
+CHANNELLOGER_REGEXP_STRIPNICK = re.compile('^[^ ]*  (<[^ ]+> )?(<[^ ]+> )?(?P<message>.*)$')
+
+def get_channelloger_extracter(stripRelayedNick):
+    @markovgen.mixed_encoding_extracting
+    def channelloger_extracter(x):
+        regexp = CHANNELLOGER_REGEXP_STRIPNICK if stripRelayedNick else \
+                CHANNELLOGER_REGEXP_BASE
+        m = regexp.match(x)
+        if m:
+            return m.group('message')
+    return channelloger_extracter
 
 class Markovgen(callbacks.Plugin):
     """Add the help for "@plugin help Markovgen" here
@@ -75,9 +84,11 @@ class Markovgen(callbacks.Plugin):
         cb = irc.getCallback('ChannelLogger')
         if not cb:
             return
+        extracter = get_channelloger_extracter(
+                self.registryValue('stripRelayedNick', channel))
         for filename in glob.glob(cb.getLogDir(irc, channel) + '/*.log'):
             with open(filename, 'rb') as fd:
-                m.feed_from_file(fd, channelloger_extracter)
+                m.feed_from_file(fd, extracter)
 
     def _get_markov(self, irc, channel):
         if channel not in self._markovs:
@@ -96,6 +107,8 @@ class Markovgen(callbacks.Plugin):
         if probability == 0:
             return
         m = self._get_markov(irc, channel)
+        if self.registryValue('stripRelayedNick', channel):
+            message = MATCH_MESSAGE_STRIPNICK.match(message).group('message')
         m.feed(message)
         if random.random() < probability:
             self._answer(irc, message, m, False)

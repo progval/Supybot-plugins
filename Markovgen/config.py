@@ -52,8 +52,11 @@ Markovgen = conf.registerPlugin('Markovgen')
 # conf.registerGlobalValue(Markovgen, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
 conf.registerChannelValue(Markovgen, 'probability',
-    registry.Probability(0, _("""Determine the probably the bot has to
+    registry.Probability(0, _("""Determine the probability the bot has to
     reply to a message.""")))
+conf.registerChannelValue(Markovgen, 'stripRelayedNick',
+    registry.Boolean(True, _("""Determines whether the bot will strip
+    strings like <XXX> at the beginning of messages.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
