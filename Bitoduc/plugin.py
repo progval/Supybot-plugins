@@ -45,7 +45,7 @@ except ImportError:
     # without the i18n module
     _ = lambda x: x
 
-SOURCE = 'https://raw.githubusercontent.com/p0nce/bitoduc.fr/master/www.bitoduc.fr/creuille.js'
+SOURCE = 'https://raw.githubusercontent.com/p0nce/bitoduc.fr/gh-pages/creuille.js'
 PATTERN = re.compile(r" *{anglais: '(?P<en>[^(]*)( \(.*\))?' *, francais: '(?P<fr>.*)'}.*")
 
 class Bitoduc(callbacks.Plugin):
