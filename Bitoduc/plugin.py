@@ -56,7 +56,7 @@ class Bitoduc(callbacks.Plugin):
 
     def fetch_dict(self):
         with self._lock:
-            self._dict = ircutils.IrcDict()
+            self._dict = utils.InsensitivePreservingDict()
             fd = utils.web.getUrlFd(SOURCE)
             for line in fd:
                 matched = PATTERN.match(line.decode('utf8'))
