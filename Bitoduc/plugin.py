@@ -55,13 +55,24 @@ class Bitoduc(callbacks.Plugin):
         super(Bitoduc, self).__init__(irc)
 
     def fetch_dict(self):
-        with self._lock:
-            self._dict = utils.InsensitivePreservingDict()
-            fd = utils.web.getUrlFd(SOURCE)
-            for line in fd:
-                matched = PATTERN.match(line.decode('utf8'))
-                if matched:
-                    self._dict[matched.group('en')] = matched.group('fr')
+        print('Getting lock')
+        if self._lock.acquire(blocking=False):
+            print('Got lock')
+            try:
+                self._dict = utils.InsensitivePreservingDict()
+                fd = utils.web.getUrlFd(SOURCE)
+                for line in fd:
+                    matched = PATTERN.match(line.decode('utf8'))
+                    if matched:
+                        self._dict[matched.group('en')] = matched.group('fr')
+                self._re = re.compile(r'(\b%s\b)' % (
+                    r'\b|\b'.join(map(re.escape, self._dict))))
+            finally:
+                self._lock.release()
+            return True
+        else:
+            print('Someone already has it.')
+            return False
 
     @thread
     @wrap(['text'])
@@ -70,11 +81,37 @@ class Bitoduc(callbacks.Plugin):
 
         Renvoie la traduction française d’un mot."""
         if not hasattr(self, '_dict'):
-            self.fetch_dict()
+            r = self.fetch_dict()
+            if not r:
+                # _dict not yet available
+                return
         if word in self._dict:
             irc.reply(self._dict[word])
         else:
             irc.error('Pas de traduction')
+
+    def doPrivmsg(self, irc, msg):
+        if callbacks.addressed(irc.nick, msg): #message is not direct command
+            return
+        channel = msg.args[0]
+        if not self.registryValue('correct.enable', channel):
+            return
+        if not hasattr(self, '_re'):
+            threading.Thread(target=self.fetch_dict).start()
+            return
+        occurences = self._re.findall(msg.args[1])
+        if not occurences:
+            return
+        unique_occurences = []
+        occurences_set = set()
+        for occurence in occurences:
+            if occurence not in occurences_set:
+                unique_occurences.append(occurence)
+                occurences_set.add(occurence)
+        irc.reply(format('Utilise %L plutôt que %L.',
+            ['« %s »' % self._dict[x] for x in occurences],
+            ['« %s »' % x for x in occurences])
+            .replace(' and ', ' et ')) # fix i18n
 
 
 Class = Bitoduc

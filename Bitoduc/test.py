@@ -32,7 +32,7 @@
 from supybot.test import *
 
 
-class BitoducTestCase(PluginTestCase):
+class BitoducTestCase(ChannelPluginTestCase):
     plugins = ('Bitoduc',)
 
     def testBasics(self):
@@ -40,6 +40,22 @@ class BitoducTestCase(PluginTestCase):
         self.assertResponse('bitoduc URL', 'adresse réticulaire')
         self.assertResponse('bitoduc commit', 'atome de code')
         self.assertResponse('bitoduc ROM', 'mémoire morte')
+
+    def testSnarfer(self):
+        # Fill the cache
+        self.assertResponse('bitoduc backdoor', 'porte dérobée')
+        self.assertResponse('bitoduc commit', 'atome de code')
+
+        self.assertNotError('config plugins.Bitoduc.correct.enable True')
+        try:
+            self.feedMsg('Il y a une backdoor dans le commit')
+            m = self.getMsg(' ')
+            self.assertTrue(m is not None)
+            s = 'Utilise « porte dérobée » et « atome de code » plutôt ' \
+                    'que « backdoor » et « commit ».'
+            self.assertEqual(str(m), 'PRIVMSG #test :%s\r\n' % s)
+        finally:
+            self.assertNotError('config plugins.Bitoduc.correct.enable True')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

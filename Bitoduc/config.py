@@ -52,6 +52,10 @@ Bitoduc = conf.registerPlugin('Bitoduc')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(Bitoduc, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
+conf.registerGroup(Bitoduc, 'correct')
+conf.registerChannelValue(Bitoduc.correct, 'enable',
+    registry.Boolean(False, _("""Détermine si le bot corrigera les personnes
+    utilisant un mot anglais avec une traduction connue.""")))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
