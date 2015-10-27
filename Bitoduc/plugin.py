@@ -55,9 +55,7 @@ class Bitoduc(callbacks.Plugin):
         super(Bitoduc, self).__init__(irc)
 
     def fetch_dict(self):
-        print('Getting lock')
         if self._lock.acquire(blocking=False):
-            print('Got lock')
             try:
                 self._dict = utils.InsensitivePreservingDict()
                 fd = utils.web.getUrlFd(SOURCE)
@@ -65,13 +63,12 @@ class Bitoduc(callbacks.Plugin):
                     matched = PATTERN.match(line.decode('utf8'))
                     if matched:
                         self._dict[matched.group('en')] = matched.group('fr')
-                self._re = re.compile(r'(\b%s\b)' % (
-                    r'\b|\b'.join(map(re.escape, self._dict))))
+                self._re = re.compile(r'(\b%ss?\b)' % (
+                    r's?\b|\b'.join(map(re.escape, self._dict))))
             finally:
                 self._lock.release()
             return True
         else:
-            print('Someone already has it.')
             return False
 
     @thread
@@ -105,12 +102,15 @@ class Bitoduc(callbacks.Plugin):
         unique_occurences = []
         occurences_set = set()
         for occurence in occurences:
+            if not occurence in self._dict and \
+                    occurence.endswith('s') and occurence[0:-1] in self._dict:
+                occurence = occurence[0:-1]
             if occurence not in occurences_set:
                 unique_occurences.append(occurence)
                 occurences_set.add(occurence)
         irc.reply(format('Utilise %L plutôt que %L.',
-            ['« %s »' % self._dict[x] for x in occurences],
-            ['« %s »' % x for x in occurences])
+            ['« %s »' % self._dict[x] for x in unique_occurences],
+            ['« %s »' % x for x in unique_occurences])
             .replace(' and ', ' et ')) # fix i18n
 
 

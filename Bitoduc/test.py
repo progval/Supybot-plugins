@@ -48,7 +48,7 @@ class BitoducTestCase(ChannelPluginTestCase):
 
         self.assertNotError('config plugins.Bitoduc.correct.enable True')
         try:
-            self.feedMsg('Il y a une backdoor dans le commit')
+            self.feedMsg('Il y a une backdoor dans les commits')
             m = self.getMsg(' ')
             self.assertTrue(m is not None)
             s = 'Utilise « porte dérobée » et « atome de code » plutôt ' \
