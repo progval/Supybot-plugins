@@ -30,6 +30,8 @@
 ###
 
 import re
+import json
+import itertools
 import threading
 
 import supybot.utils as utils
@@ -45,8 +47,7 @@ except ImportError:
     # without the i18n module
     _ = lambda x: x
 
-SOURCE = 'https://raw.githubusercontent.com/p0nce/bitoduc.fr/gh-pages/creuille.js'
-PATTERN = re.compile(r" *{anglais: '(?P<en>[^(]*)( \(.*\))?' *, francais: '(?P<fr>.*)'}.*")
+SOURCE = 'http://bitoduc.fr/traductions.json'
 
 class Bitoduc(callbacks.Plugin):
     """Interface à bitoduc.fr"""
@@ -57,12 +58,10 @@ class Bitoduc(callbacks.Plugin):
     def fetch_dict(self):
         if self._lock.acquire(blocking=False):
             try:
+                data = json.loads(utils.web.getUrl(SOURCE).decode())
                 self._dict = utils.InsensitivePreservingDict()
-                fd = utils.web.getUrlFd(SOURCE)
-                for line in fd:
-                    matched = PATTERN.match(line.decode('utf8'))
-                    if matched:
-                        self._dict[matched.group('en')] = matched.group('fr')
+                for d in itertools.chain(data['vrais mots'], data['faux mots']):
+                    self._dict[d['anglais'].split(' (')[0]] = d['francais']
                 self._re = re.compile(r'(\b%ss?\b)' % (
                     r's?\b|\b'.join(map(re.escape, self._dict))))
             finally:
