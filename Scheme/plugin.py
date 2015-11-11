@@ -52,6 +52,9 @@ NUMBER_TYPES = (
         ('number', str),
         )
 
+if utils.minisix.PY2:
+    range = xrange
+
 class SchemeException(Exception):
     pass
 
@@ -87,6 +90,7 @@ def schemify_math(f):
     # Makes a two-arguments function an *args function, with correct
     # type parsing.
     def rec(args):
+        args = list(args)
         if args[2:]:
             return f(args[0], rec(args[1:]))
         else:
@@ -176,7 +180,7 @@ def parse_scheme(code, start=0, end=None, unpack=False):
     escaped = False
     tokens = []
     token_start = start
-    for i in xrange(start, end+1):
+    for i in range(start, end+1):
         if code[i] == '"' and not escaped:
             in_string = not in_string
         elif in_string:
@@ -205,7 +209,7 @@ def parse_scheme(code, start=0, end=None, unpack=False):
         return code[start:end+1]
     elif start < end:
         tokens.append(parse_scheme(code, token_start, end))
-    tokens = filter(bool, tokens)
+    tokens = list(filter(bool, tokens))
     if unpack:
         assert len(tokens) == 1, tokens
         tokens = tokens[0]

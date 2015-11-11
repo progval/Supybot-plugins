@@ -58,4 +58,5 @@ class SchemeTestCase(PluginTestCase):
     def testSet(self):
         self.assertResponse('scheme (begin (set! x 42) x)', '42')
 
+
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
