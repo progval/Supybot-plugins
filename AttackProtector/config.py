@@ -65,9 +65,9 @@ except TypeError:
     pass
 
 class Punishment(registry.String):
-    """Value must be a valid punishment ('ban', 'kick', 'kban', 'mode+X',
-    'mode-X', 'umode+X', 'umode-X', 'mmode+X', 'mmode-X', 'command XXX',
-    ...)"""
+    """Value must be a valid punishment ('ban', 'ban+X', 'kick', 'kban',
+    'kban+C', 'mode+X', 'mode-X', 'umode+X', 'umode-X', 'mmode+X', 'mmode-X',
+    'command XXX', ...)"""
     def set(self, s):
         if s not in ('ban', 'kick', 'kban') and not s.startswith('mode+') and \
                 not s.startswith('mode-') and not s.startswith('umode-') and \
