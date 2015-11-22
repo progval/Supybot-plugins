@@ -33,4 +33,4 @@ For a complete list of available modes, see your IRC network's help pages
 or try `/quote help`.
 
 For `ban` and `kban`, you can also add a timeout this way: `ban+X` and
-`kban+X`, with `X` the number of seconds.
+`kban+X`, where `X` is the number of seconds.
