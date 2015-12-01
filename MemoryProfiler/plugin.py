@@ -54,7 +54,7 @@ except ImportError:
     pass
 
 # from https://code.activestate.com/recipes/577504/
-def total_size(o, handlers={}, verbose=False, module_filter=None):
+def total_size(obj, handlers={}, verbose=False, object_filter=None):
     """ Returns the approximate memory footprint an object and all of its contents.
 
     Automatically finds the contents of the following builtin containers and
@@ -65,11 +65,8 @@ def total_size(o, handlers={}, verbose=False, module_filter=None):
                     OtherContainerClass: OtherContainerClass.get_elements}
 
     """
-    module_filter = module_filter or (lambda n: False)
     dict_handler = lambda d: chain.from_iterable(list(d.items()))
     object_handler = lambda o: chain.from_iterable(list(o.__dict__.items()))
-    module_handler = lambda m: (chain.from_iterable(list(m.__dict__.items()))
-                                if module_filter(m) else [])
     all_handlers = {tuple: iter,
                     list: iter,
                     deque: iter,
@@ -77,8 +74,6 @@ def total_size(o, handlers={}, verbose=False, module_filter=None):
                     set: iter,
                     frozenset: iter,
                     str: None,
-                    irclib.Irc: None,
-                    type(sys): module_handler,
                    }
     all_handlers.update(handlers)     # user handlers take precedence
     seen = set()                      # track which object id's have already been seen
@@ -99,11 +94,12 @@ def total_size(o, handlers={}, verbose=False, module_filter=None):
                     s += sum(map(sizeof, handler(o)))
                 break
         else:
-            if hasattr(o, '__dict__') and o.__dict__:
+            if hasattr(o, '__dict__') and o.__dict__ and \
+                    (not object_filter or object_filter(o)):
                 s += sum(map(sizeof, object_handler(o)))
         return s
 
-    return sizeof(o)
+    return sizeof(obj)
 
 class MemoryProfiler(callbacks.Plugin):
     """Collects informations about memory usage."""
@@ -112,14 +108,33 @@ class MemoryProfiler(callbacks.Plugin):
     def plugins(self, irc, msg, args):
         """takes no arguments
 
-        Collects informations about memory usage of plugins and dumps it."""
+        Collects informations about memory usage of plugins and shows it."""
         data = []
         for callback in irc.callbacks:
-            size = total_size(callback,
-                    module_filter=lambda m:callback.name() in m.__name__.split('.'))
+            module_filter=lambda m:callback.name() in m.__name__.split('.')
+            module_handler = lambda m: (chain.from_iterable(list(m.__dict__.items()))
+                                        if module_filter(m) else [])
+            size = total_size(callback, handlers={
+                type(sys): module_handler,
+                irclib.Irc: None,
+                })
             data.append((size, callback.name()))
         data.sort(reverse=True)
         irc.replies([format('%s: %S', x[1], x[0]) for x in data])
+
+    def modules(self, irc, msg, args):
+        """takes no arguments
+
+        Collects informations about memory usage of modules and shows it."""
+        data = []
+        for (name, module) in sys.modules.items():
+            size = total_size(module,
+                    object_filter=lambda o:o is module or
+                    (hasattr(o, '__module__') and o.__module__ is module))
+            data.append((size, name))
+        data.sort(reverse=True)
+        irc.replies([format('%s: %S', x[1], x[0]) for x in data])
+
 
 
 Class = MemoryProfiler
