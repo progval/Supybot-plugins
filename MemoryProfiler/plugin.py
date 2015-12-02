@@ -131,6 +131,7 @@ class MemoryProfiler(callbacks.Plugin):
         Collects informations about memory usage of structures defined in each
         module and shows it."""
         module_sizes = collections.defaultdict(lambda: 0)
+        gc.collect()
         for obj in gc.get_objects():
             if not hasattr(obj, '__module__'):
                 continue
