@@ -32,6 +32,7 @@ from __future__ import print_function
 
 import gc
 import sys
+import collections
 
 import supybot.utils as utils
 from supybot.commands import *
@@ -56,7 +57,7 @@ except ImportError:
     pass
 
 # from https://code.activestate.com/recipes/577504/
-def total_size(obj, handlers={}, verbose=False, object_filter=None):
+def total_size(objects, handlers={}, verbose=False, object_filter=None):
     """ Returns the approximate memory footprint an object and all of its contents.
 
     Automatically finds the contents of the following builtin containers and
@@ -101,7 +102,7 @@ def total_size(obj, handlers={}, verbose=False, object_filter=None):
                 s += sum(map(sizeof, object_handler(o)))
         return s
 
-    return sizeof(obj)
+    return sum(map(sizeof, objects))
 
 class MemoryProfiler(callbacks.Plugin):
     """Collects informations about memory usage."""
@@ -116,7 +117,7 @@ class MemoryProfiler(callbacks.Plugin):
             module_filter=lambda m:callback.name() in m.__name__.split('.')
             module_handler = lambda m: (chain.from_iterable(list(m.__dict__.items()))
                                         if module_filter(m) else [])
-            size = total_size(callback, handlers={
+            size = total_size([callback], handlers={
                 type(sys): module_handler,
                 irclib.Irc: None,
                 })
@@ -127,12 +128,18 @@ class MemoryProfiler(callbacks.Plugin):
     def modules(self, irc, msg, args):
         """takes no arguments
 
-        Collects informations about memory usage of modules and shows it."""
-        data = []
-        for (name, module) in sys.modules.items():
-            size = total_size(module,
+        Collects informations about memory usage of structures defined in each
+        module and shows it."""
+        module_sizes = collections.defaultdict(lambda: 0)
+        for obj in gc.get_objects():
+            if not hasattr(obj, '__module__'):
+                continue
+            module = obj.__module__
+            module_sizes[module] += total_size([obj],
                     object_filter=lambda o:o is module or
                     (hasattr(o, '__module__') and o.__module__ is module))
+        data = []
+        for (name, size) in module_sizes.items():
             data.append((size, name))
         data.sort(reverse=True)
         irc.replies([format('%s: %S', x[1], x[0]) for x in data])
