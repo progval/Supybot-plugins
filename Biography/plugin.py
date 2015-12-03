@@ -63,7 +63,8 @@ class Biography(callbacks.Plugin):
     This should describe *how* to use this plugin."""
 
     def __init__(self, irc):
-        super(Biography, self).__init__(irc)
+        self.__parent = super(Biography, self)
+        self.__parent.__init__(irc)
 
         filename = conf.supybot.directories.data.dirize('Biography.db')
         self.db = BiographyDB(filename)
@@ -73,7 +74,7 @@ class Biography(callbacks.Plugin):
         if self.db.flush in world.flushers:
             world.flushers.remove(self.db.flush)
         self.db.close()
-        super(Biography, self).die()
+        self.__parent.die()
 
     def _preCheck(self, irc, msg, user):
         # Stolen from Herald plugin
