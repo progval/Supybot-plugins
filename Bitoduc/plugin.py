@@ -61,7 +61,8 @@ class Bitoduc(callbacks.Plugin):
                 data = json.loads(utils.web.getUrl(SOURCE).decode())
                 self._dict = utils.InsensitivePreservingDict()
                 for d in itertools.chain(data['vrais mots'], data['faux mots']):
-                    self._dict[d['anglais'].split(' (')[0]] = d['français']
+                    self._dict[d['anglais'].split(' (')[0]] = d['français'] \
+                            .lower()
                 self._re = re.compile(r'(\b%ss?\b)' % (
                     r's?\b|\b'.join(map(re.escape, self._dict))))
             finally:
