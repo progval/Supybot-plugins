@@ -57,5 +57,19 @@ class BiographyTestCase(ChannelPluginTestCase):
         self.assertRegexp('biography get ProgVal facebook', 'not available')
         self.assertRegexp('biography get ProgVal', '@ProgVal')
 
+    def testReload(self):
+        self.assertRegexp('biography get ProgVal foo', 'not a valid field')
+        self.assertRegexp('biography set ProgVal foo bar', 'not a valid field')
+        self.assertRegexp('biography get ProgVal twitter', 'No information')
+        self.assertRegexp('biography get ProgVal facebook', 'No information')
+        self.assertRegexp('biography get ProgVal', 'No information')
+        self.assertNotError('biography set ProgVal twitter @ProgVal')
+        self.assertRegexp('biography get ProgVal twitter', '@ProgVal')
+        self.assertRegexp('biography get ProgVal facebook', 'not available')
+        self.assertRegexp('biography get ProgVal', '@ProgVal')
+        self.assertNotError('reload Biography')
+        self.assertRegexp('biography get ProgVal twitter', '@ProgVal')
+        self.assertRegexp('biography get ProgVal facebook', 'not available')
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

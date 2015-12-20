@@ -28,6 +28,8 @@
 
 ###
 
+import json
+
 import supybot.conf as conf
 import supybot.world as world
 import supybot.utils as utils
@@ -50,12 +52,12 @@ except:
 
 class BiographyDB(plugins.ChannelUserDB):
     def serialize(self, v):
-        return [v]
+        return [json.dumps(v)]
 
     def deserialize(self, channel, id, L):
         if len(L) != 1:
             raise ValueError
-        return L[0]
+        return json.loads(L[0])
 
 @internationalizeDocstring
 class Biography(callbacks.Plugin):
