@@ -119,7 +119,8 @@ class Markovgen(callbacks.Plugin):
         Generates a random message based on the logs of a channel
         and a seed"""
         if not self.registryValue('enable', channel):
-            irc.error(_('Markovgen is disabled for this channel.'))
+            irc.error(_('Markovgen is disabled for this channel.'),
+                    Raise=True)
         m = self._get_markov(irc, channel)
         m.feed(message)
         self._answer(irc, message, m, True)
