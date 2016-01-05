@@ -35,6 +35,7 @@ import random
 import functools
 
 import supybot.conf as conf
+import supybot.world as world
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
@@ -86,9 +87,10 @@ class Markovgen(callbacks.Plugin):
             return
         extracter = get_channelloger_extracter(
                 self.registryValue('stripRelayedNick', channel))
-        for filename in glob.glob(cb.getLogDir(irc, channel) + '/*.log'):
-            with open(filename, 'rb') as fd:
-                m.feed_from_file(fd, extracter)
+        for irc in world.ircs:
+            for filename in glob.glob(cb.getLogDir(irc, channel) + '/*.log'):
+                with open(filename, 'rb') as fd:
+                    m.feed_from_file(fd, extracter)
 
     def _get_markov(self, irc, channel):
         if channel not in self._markovs:
