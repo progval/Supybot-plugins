@@ -22,7 +22,7 @@ script:
   - export PYTHON_MAJOR_VERSION=$(python -c "import sys;print(sys.version_info[0])")
   - echo $PYTHON_MAJOR_VERSION
   - if [ "$PYTHON_MAJOR_VERSION" = "3" ]; then export DISABLED_PLUGINS="--exclude ./Twitter --exclude ./TwitterStream --exclude ./MegaHAL --exclude GUI --exclude WebStats"; else export DISABLED_PLUGINS="--exclude Bitoduc --exclude PypySandbox"; fi
-  - supybot-test --plugins-dir=. --no-network --exclude=./NoLatin1 --exclude AlternativeTo $DISABLED_PLUGINS
+  - supybot-test --plugins-dir=. --no-network --exclude=./NoLatin1 --exclude ./AlternativeTo $DISABLED_PLUGINS
 notifications:
     email: false
 matrix:
