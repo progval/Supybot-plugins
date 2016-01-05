@@ -103,24 +103,22 @@ class Markovgen(callbacks.Plugin):
         (channel, message) = msg.args
         if not irc.isChannel(channel):
             return
-        probability = self.registryValue('probability', channel)
-        if probability == 0:
+        if not self.registryValue('enable', channel):
             return
         m = self._get_markov(irc, channel)
         if self.registryValue('stripRelayedNick', channel):
             message = MATCH_MESSAGE_STRIPNICK.match(message).group('message')
         m.feed(message)
-        if random.random() < probability:
+        if random.random() < self.registryValue('probability', channel):
             self._answer(irc, message, m, False)
 
-    @wrap(['channel', 'text'])
+    @wrap(['channel', optional('text')])
     def gen(self, irc, msg, args, channel, message):
         """[<channel>] <seed>
 
         Generates a random message based on the logs of a channel
         and a seed"""
-        probability = self.registryValue('probability', channel)
-        if probability == 0:
+        if not self.registryValue('enable', channel):
             irc.error(_('Markovgen is disabled for this channel.'))
         m = self._get_markov(irc, channel)
         m.feed(message)

@@ -51,6 +51,10 @@ Markovgen = conf.registerPlugin('Markovgen')
 # This is where your configuration variables (if any) should go.  For example:
 # conf.registerGlobalValue(Markovgen, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
+conf.registerChannelValue(Markovgen, 'enable',
+    registry.Boolean(False, _("""Determines whether the plugin is enabled
+    on a channel. This defaults to False to avoid useless resources
+    consumption.""")))
 conf.registerChannelValue(Markovgen, 'probability',
     registry.Probability(0, _("""Determine the probability the bot has to
     reply to a message.""")))
