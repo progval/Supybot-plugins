@@ -15,7 +15,7 @@ addons:
 install:
     - travis_retry pip install -vr https://raw.githubusercontent.com/ProgVal/Limnoria/testing/requirements.txt > /dev/null
     - travis_retry pip install -v git+https://github.com/ProgVal/Limnoria.git@testing > /dev/null
-    - travis_retry pip install -vr requirements.txt > /dev/null
+    - travis_retry pip install -vr requirements.txt
 # command to run tests, e.g. python setup.py test
 script:
   - echo $TRAVIS_PYTHON_VERSION
