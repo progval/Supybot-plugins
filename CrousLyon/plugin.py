@@ -56,11 +56,11 @@ NAMES = {
         }
 INTERESTING = {
         351: # Monod
-            ['Plats du jour'],
+            ('Plats',),
         230: # Descartes
-            ['PLATS'],
+            ('PLATS',),
         }
-URL = 'http://irestos.crous-amiens.fr//generation.php?crous=21&resto=%d&ext=xml'
+URL = 'http://irestos.nuonet.fr/generation.php?crous=21&resto=%d&ext=xml'
 BLACKLIST = ['variées', 'variés', 'du chef', 'buffet']
 def get(id_):
     text = requests.get(URL % id_, stream=True).raw.read()
@@ -82,7 +82,7 @@ def get(id_):
         interesting = INTERESTING.get(id_, None)
         if interesting:
             meals = [x.text for x in midi
-                     if x.attrib['nom'] in interesting]
+                     if x.attrib['nom'].startswith(interesting)]
         else:
             meals = [x.text for x in midi
                      if not any(y in x.text.lower() for y in BLACKLIST)]
