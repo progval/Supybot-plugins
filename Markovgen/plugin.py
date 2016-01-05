@@ -152,6 +152,9 @@ class Markovgen(callbacks.Plugin):
         """takes no arguments
 
         Generates a doge."""
+        if not self.registryValue('enable', channel):
+            irc.error(_('Markovgen is disabled for this channel.'),
+                    Raise=True)
         r = re.compile('^[a-zA-Zéèàù]{5,}$')
         def pred(x):
             if not r.match(x):
