@@ -154,11 +154,18 @@ class Wikipedia(callbacks.Plugin):
                       'year.  If you were looking for information about the '
                       'number itself, try searching for "%s_(number)", but '
                       'don\'t expect anything useful...') % (search, search)
+        # Catch talk pages
+        elif 'ns-talk' in tree.find("body").attrib['class']:
+            reply += format(_('This article appears to be a talk page: %u'), addr)
         else:
             ##### etree!
             p = tree.xpath("//div[@id='mw-content-text']/p[1]")
             if len(p) == 0 or addr.endswith('Special:Search'):
-                reply += _('Not found, or page malformed.')
+                if 'wikipedia:wikiproject' in addr.lower():
+                    reply += format(_('This page appears to be a WikiProject page, '
+                               'but it is too complex for us to parse: %u'), addr)
+                else:
+                    reply += _('Not found, or page malformed.')
             else:
                 p = p[0]
                 # Replace <b> tags with IRC-style bold, this has to be
