@@ -202,11 +202,11 @@ class GitHub(callbacks.Plugin):
                 data = urlencode({'url': url})
                 if sys.version_info[0] >= 3:
                     data = data.encode()
-                    f = utils.web.getUrlFd('http://git.io/', data=data)
+                    f = utils.web.getUrlFd('https://git.io/', data=data)
                     url = list(filter(lambda x:x[0] == 'Location',
                         f.headers._headers))[0][1].strip()
                 else:
-                    f = utils.web.getUrlFd('http://git.io/', data=data)
+                    f = utils.web.getUrlFd('https://git.io/', data=data)
                     url = filter(lambda x:x.startswith('Location: '),
                             f.headers.headers)[0].split(': ', 1)[1].strip()
             except Exception as e:
