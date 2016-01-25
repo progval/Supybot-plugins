@@ -86,7 +86,7 @@ def get(id_):
         else:
             meals = [x.text for x in midi
                      if not any(y in x.text.lower() for y in BLACKLIST)]
-        meals = [x.strip().replace('\n', ' ; ').strip() for x in meals
+        meals = [x.strip().replace('<br>', ' ; ').strip() for x in meals
                  if x.strip()]
         res.append((date, meals))
     return res
