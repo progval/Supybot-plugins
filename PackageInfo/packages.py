@@ -19,13 +19,12 @@ import sys
 import warnings
 warnings.filterwarnings("ignore", "apt API not stable yet", FutureWarning)
 import subprocess, os, apt
+from email import feedparser as FeedParser
 
 if sys.version_info[0] >= 3:
-    from email import feedparser
     import urllib.parse
     urlquote = urllib.parse.quote
 else:
-    from email import feedparser as FeedParser
     import urllib
     urlquote = urllib.quote
 
