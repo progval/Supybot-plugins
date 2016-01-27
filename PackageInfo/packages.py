@@ -22,9 +22,11 @@ import subprocess, os, apt
 
 if sys.version_info[0] >= 3:
     from email import feedparser
+    import urllib.parse
     urlquote = urllib.parse.quote
 else:
     from email import feedparser as FeedParser
+    import urllib
     urlquote = urllib.quote
 
 def component(arg):
