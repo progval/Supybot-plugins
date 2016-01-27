@@ -18,12 +18,14 @@
 import sys
 import warnings
 warnings.filterwarnings("ignore", "apt API not stable yet", FutureWarning)
-import subprocess, os, apt, urllib.request, urllib.parse, urllib.error
+import subprocess, os, apt
 
 if sys.version_info[0] >= 3:
     from email import feedparser
+    urlquote = urllib.parse.quote
 else:
     from email import feedparser as FeedParser
+    urlquote = urllib.quote
 
 def component(arg):
     if '/' in arg: return arg[:arg.find('/')]
@@ -95,16 +97,16 @@ class Apt:
                       self.log.error("PackageInfo/packages: Please run the 'update_apt_file' script")
                       return "Cache out of date, please contact the administrator"
                     if data[0] == "Use" and data[1] == "of":
-                        url = "http://packages.ubuntu.com/search?searchon=contents&keywords=%s&mode=&suite=%s&arch=any" % (urllib.parse.quote(pkg), distro)
+                        url = "http://packages.ubuntu.com/search?searchon=contents&keywords=%s&mode=&suite=%s&arch=any" % (urlquote(pkg), distro)
                         return url
                     if len(data) > 10:
-                        return "File %s found in %s (and %d others) http://packages.ubuntu.com/search?searchon=contents&keywords=%s&mode=&suite=%s&arch=any" % (pkg, ', '.join(data[:10]), len(data)-10, urllib.parse.quote(pkg), distro)
+                        return "File %s found in %s (and %d others) http://packages.ubuntu.com/search?searchon=contents&keywords=%s&mode=&suite=%s&arch=any" % (pkg, ', '.join(data[:10]), len(data)-10, urlquote(pkg), distro)
                     return "File %s found in %s" % (pkg, ', '.join(data))
                 return 'Package/file %s does not exist in %s' % (pkg, distro)
             return "No packages matching '%s' could be found" % pkg
         pkgs = [x.split()[0] for x in data.split('\n') if x.split()]
         if len(pkgs) > 10:
-            return "Found: %s (and %d others) http://packages.ubuntu.com/search?keywords=%s&searchon=names&suite=%s&section=all" % (', '.join(pkgs[:10]), len(pkgs)-10, urllib.parse.quote(pkg), distro)
+            return "Found: %s (and %d others) http://packages.ubuntu.com/search?keywords=%s&searchon=names&suite=%s&section=all" % (', '.join(pkgs[:10]), len(pkgs)-10, urlquote(pkg), distro)
         else:
             return "Found: %s" % ', '.join(pkgs[:5])
 
