@@ -105,7 +105,7 @@ class IMDb(callbacks.Plugin):
 
         root = html.parse(page)
 
-        elem = root.xpath('//h1/span[@itemprop="name"]')
+        elem = root.xpath('//h1[@itemprop="name"]')
         name = unid(elem[0].text.strip())
 
         elem = root.xpath('//h2[@class="tv_header"]')
@@ -132,11 +132,11 @@ class IMDb(callbacks.Plugin):
         else:
             plot_keywords = ''
 
-        elem = root.xpath('//h1[span/@itemprop="name"]/span[last()]/a')
+        elem = root.xpath('//h1[@itemprop="name"][last()]/a')
         if elem:
             year = elem[0].text
         else:
-            year = unid(root.xpath('//h1[span/@itemprop="name"]/span[last()]')[0].text.strip().strip(')(').replace(u('\u2013'), '-'))
+            year = unid(root.xpath('//h1[@itemprop="name"][last()]')[0].text.strip().strip(')(').replace(u('\u2013'), '-'))
 
         elem = root.xpath('//div[@class="star-box-details"]/strong/span|//div[@class="star-box-details"]/span[@class="mellow"]/span')
         if elem:
