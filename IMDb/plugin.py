@@ -122,42 +122,42 @@ class IMDb(callbacks.Plugin):
 
         elem = root.xpath('//div[h4="Stars:"]')
         if elem:
-            stars = unid(' '.join(elem[0].text_content().split()).replace('Stars: ', '').replace(' | See full cast and crew', ''))
+            stars = unid(' '.join(elem[0].text_content().split()).replace('Stars: ', '').replace(' | See full cast & crew', ''))
         else:
             stars = ''
 
         elem = root.xpath('//div[h4="Plot Keywords:"]')
         if elem:
-            plot_keywords = unid(' '.join(elem[0].text_content().replace(u('\xbb'), '').split()).strip().replace(' | See more', '').replace('Plot Keywords: ', ''))
+            plot_keywords = unid(' '.join(elem[0].text_content().replace(u('\xbb'), '').split()).strip().replace(' | See All', '').replace('Plot Keywords: ', ''))
         else:
             plot_keywords = ''
 
-        elem = root.xpath('//h1[@itemprop="name"][last()]/a')
+        elem = root.xpath('//h1[@itemprop="name"]/span/a')
         if elem:
             year = elem[0].text
         else:
             year = unid(root.xpath('//h1[@itemprop="name"][last()]')[0].text.strip().strip(')(').replace(u('\u2013'), '-'))
 
-        elem = root.xpath('//div[@class="star-box-details"]/strong/span|//div[@class="star-box-details"]/span[@class="mellow"]/span')
+        elem = root.xpath('//span[@itemprop="ratingValue"]')
         if elem:
-            rating = elem[0].text + '/' + elem[1].text
+            rating = elem[0].text + '/10'
         else:
             rating = '-/10'
 
-        elem = root.xpath('//p[@itemprop="description"]')
+        elem = root.xpath('//div[@itemprop="description"]')
         if elem:
             description = elem[0].text_content()
             description = unid(description.replace(u('\xbb'), '').strip().replace('See full summary', '').strip())
         else:
             description = ''
 
-        elem = root.xpath('//div[@itemprop="director"]/a/span')
+        elem = root.xpath('//span[@itemprop="director"]/a/span')
         if elem:
             director = unid(elem[0].text)
         else:
             director = ''
 
-        elem = root.xpath('//div[h4="\n  Creator:\n  "]/a')
+        elem = root.xpath('//span[@itemprop="creator"]/a/span')
         if elem:
             creator = unid(elem[0].text)
         else:
