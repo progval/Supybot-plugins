@@ -321,13 +321,16 @@ class GitHub(callbacks.Plugin):
                                 len(commits) > 5:
                             hidden = len(commits) + 1
                             commits = [last_commit]
-                        payload2 = dict(payload)
+
+                    payload2 = dict(payload)
+
+                    self._createPrivmsg(irc, channel, payload2,
+                        'before.push', None)
+
+                    for commit in commits:
+                        payload2['__commit'] = commit
                         self._createPrivmsg(irc, channel, payload2,
-                            'before.push', None)
-                        for commit in commits:
-                            payload2['__commit'] = commit
-                            self._createPrivmsg(irc, channel, payload2,
-                                    'push', hidden)
+                                'push', hidden)
                 elif event == 'gollum':
                     pages = payload['pages']
                     if len(pages) == 0:
