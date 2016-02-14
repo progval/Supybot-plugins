@@ -28,6 +28,7 @@
 
 ###
 
+import re
 import sys
 import json
 import time
@@ -237,7 +238,10 @@ class GitHub(callbacks.Plugin):
                             repl[key + '__tiny'] = value
                     else:
                         repl[key + '__tiny'] = value
-                elif key.endswith(('commit__id', 'commit_id')):
+                elif isinstance(value, basestring) and \
+                        re.search(r'^[a-f0-9]{40}$', value):
+                    # Check if it looks like a commit ID, because there are key
+                    # names such as "before" and "after" containing commit IDs.
                     repl[key + '__short'] = value[0:7]
                 elif key == 'commits':
                     repl['__num_commits'] = len(value)
