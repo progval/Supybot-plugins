@@ -20,9 +20,9 @@ In order to do that, you must go admin page of repo, tab webhooks
 (direct link: ` https://github.com/<owner>/<repo>/settings/hooks ` ) and 
 click `Add webhook` and add the URL of your bot there. The URL is 
 ` http://<IP or dynamicdns-service>:<port>/github `.
-Set the `Content type` to `application/x-www-form-urlencoded`!
+Let the `Content type` be `application/json`!
 
-**NOTE:** The default has been changed to `application/json` !
+**NOTE:** Previous versions of this plugin used `application/x-www-form-urlencoded`!
 
 
 Fill the other fields of the form according to what you want.

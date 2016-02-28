@@ -32,8 +32,10 @@ import re
 import sys
 import json
 import time
+import hmac
 import urllib
 import socket
+import hashlib
 import fnmatch
 import threading
 from string import Template
@@ -111,28 +113,29 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
     You shouldn't be here, this subfolder is not for you. Go back to the
     index and try out other plugins (if any).""")
     def doPost(self, handler, path, form):
-        if not handler.address_string().endswith('.rs.github.com') and \
-                not handler.address_string().endswith('.cloud-ips.com') and \
-                not handler.address_string() == 'localhost' and \
-                not handler.address_string().startswith('127.0.0.') and \
-                not handler.address_string().startswith('::ffff:192.30.252.') and \
-                not handler.address_string().startswith('::ffff:192.30.253.') and \
-                not handler.address_string().startswith('::ffff:192.30.254.') and \
-                not handler.address_string().startswith('::ffff:192.30.255.') and \
-                not handler.address_string().startswith('::ffff:204.232.175.') and \
-                not handler.address_string().startswith('192.30.252.') and \
-                not handler.address_string().startswith('192.30.253.') and \
-                not handler.address_string().startswith('192.30.254.') and \
-                not handler.address_string().startswith('192.30.255.') and \
-                not handler.address_string().startswith('204.232.175.'):
+        headers = dict(self.headers)
+        if sys.version_info[0] >= 3 and isinstance(form, bytes):
+            # JSON mode
+            valid_signatures = ['sha1='+hmac.new(s.encode(), form, hashlib.sha1).hexdigest()
+                                for s in self.plugin.registryValue('announces.secret')]
+        elif sys.version_info[0] == 2 and isinstance(form, str):
+            # JSON mode
+            valid_signatures = ['sha1='+hmac.new(s.encode(), form, hashlib.sha1).hexdigest()
+                                for s in self.plugin.registryValue('announces.secret')]
+        else:
+            valid_signatures = []
+        if valid_signatures and \
+                headers.get('X-Hub-Signature', None) not in valid_signatures:
+            log.warning('%s', valid_signatures)
+            log.warning('%s', headers.get('X-Hub-Signature', None))
             log.warning("""'%s' tried to act as a web hook for Github,
-            but is not GitHub.""" % handler.address_string())
+            but is not GitHub (no secret or invalid secret).""" %
+            handler.address_string())
             self.send_response(403)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write(b('Error: you are not a GitHub server.'))
         else:
-            headers = dict(self.headers)
             try:
                 self.send_response(200)
                 self.send_header('Content-type', 'text/plain')
@@ -152,7 +155,7 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
                 self.end_headers()
                 self.wfile.write(b('Thanks.'))
                 return
-            self.plugin.announce.onPayload(headers, json.loads(form['payload'].value))
+            self.plugin.announce.onPayload(headers, json.loads(form.decode()))
 
 #####################
 # API access stuff

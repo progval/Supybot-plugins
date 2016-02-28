@@ -62,6 +62,9 @@ conf.registerGlobalValue(GitHub, 'announces',
         registry.String('', _("""You shouldn't edit this configuration
         variable yourself, unless you know what you do. Use '@Github announce
         add' or '@Github announce remove' instead.""")))
+conf.registerGlobalValue(GitHub.announces, 'secret',
+        registry.SpaceSeparatedSetOfStrings(set(), _("""Set of space-separated
+        secret payloads used to authenticate GitHub."""), private=True))
 
 conf.registerGroup(GitHub, 'format')
 conf.registerGroup(GitHub.format, 'before')
