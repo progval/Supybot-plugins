@@ -6,7 +6,6 @@ python-twitter
 requests
 pygraphviz
 oauth2
-jsonselect
 python-oauth2
 git+https://github.com/haypo/pysandbox.git
 unicode_tex
