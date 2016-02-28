@@ -43,9 +43,9 @@ class WikiTransTestCase(PluginTestCase):
         self.assertResponse('translate en fr IRC bot', 'Robot IRC')
         self.assertResponse('translate fr en robot IRC', 'IRC bot')
 
-        self.assertResponse('translate fr en Chef-d\'œuvre', 'Masterpiece')
+        self.assertResponse('translate fr en Chef-d\'œuvre', 'masterpiece')
         try:
-            self.assertRegexp('translate en fr Masterpiece', 'Chef-d\'œuvre')
+            self.assertRegexp('translate en fr Masterpiece', 'chef-d\'œuvre')
             self.assertRegexp('translate en fr The Master',
                     'Le Maître')
         except (TypeError, AssertionError):
@@ -67,9 +67,9 @@ class WikiTransTestCase(PluginTestCase):
         self.assertResponse('wikidata en fr IRC bot', 'Robot IRC')
         self.assertResponse('wikidata fr en robot IRC', 'IRC bot')
 
-        self.assertResponse('wikidata fr en Chef-d\'œuvre', 'Masterpiece')
+        self.assertResponse('wikidata fr en Chef-d\'œuvre', 'masterpiece')
         try:
-            self.assertRegexp('wikidata en fr Masterpiece', 'Chef-d\'œuvre')
+            self.assertRegexp('wikidata en fr Masterpiece', 'chef-d\'œuvre')
             self.assertRegexp('wikidata en fr The Master',
                     'Le Maître')
         except (TypeError, AssertionError):
