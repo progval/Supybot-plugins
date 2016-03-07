@@ -29,6 +29,7 @@
 
 ###
 
+import os
 import re
 import glob
 import random
@@ -72,6 +73,20 @@ def get_channelloger_extracter(stripRelayedNick):
             return m.group('message')
     return channelloger_extracter
 
+def get_extracter(name):
+    regexp = re.compile(markovgen.REGEXPS[name])
+    @markovgen.mixed_encoding_extracting
+    def extracter(x):
+        msg = regexp.match(x)
+        if msg:
+            return msg.group('message')
+    return extracter
+
+def rec_list_files(path):
+    return (os.path.join(dp, f)
+            for dp, dn, filenames in os.walk(path)
+            for f in filenames)
+
 class Markovgen(callbacks.Plugin):
     """Add the help for "@plugin help Markovgen" here
     This should describe *how* to use this plugin."""
@@ -92,11 +107,26 @@ class Markovgen(callbacks.Plugin):
                 with open(filename, 'rb') as fd:
                     m.feed_from_file(fd, extracter)
 
+    def _load_from_data(self, irc, channel, m):
+        base_path = os.path.join(conf.supybot.directories.data(), 'Markovgen', channel)
+        if not os.path.isdir(base_path):
+            return
+        for extracter_name in os.listdir(base_path):
+            extracter = get_extracter(extracter_name)
+            path = os.path.join(base_path, extracter_name)
+            path = glob.escape(path)
+            filenames = rec_list_files(path)
+            for filename in filenames:
+                with open(filename, 'rb') as fd:
+                    m.feed_from_file(fd, extracter)
+
+
     def _get_markov(self, irc, channel):
         if channel not in self._markovs:
             m = markovgen.Markov()
             self._markovs[channel] = m
             self._load_from_channellogger(irc, channel, m)
+            self._load_from_data(irc, channel, m)
         else:
             m = self._markovs[channel]
         return m
