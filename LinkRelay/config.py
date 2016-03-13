@@ -69,8 +69,8 @@ conf.registerChannelValue(LinkRelay, 'topicSync',
     topics between networks in the channels it Relays.""")))
 conf.registerChannelValue(LinkRelay, 'hostmasks',
     registry.Boolean(True, _("""Determines whether the bot will Relay the
-    hostmask of the person joining or parting the channel when he or she joins
-    or parts.""")))
+    hostmask of the person joining or parting the channel when they join
+    or part.""")))
 conf.registerChannelValue(LinkRelay, 'nicks',
     registry.Boolean(True, _("""Determines whether the bot will relay the
     nick of the person sending a message.""")))
