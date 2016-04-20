@@ -60,10 +60,10 @@ INTERESTING = {
         230: # Descartes
             ('PLATS',),
         }
-URL = 'http://irestos.nuonet.fr/generation.php?crous=21&resto=%d&ext=xml'
+URL = 'https://irestos.nuonet.fr/generation.php?crous=21&resto=%d&ext=xml'
 BLACKLIST = ['variées', 'variés', 'du chef', 'buffet']
 def get(id_):
-    text = requests.get(URL % id_, stream=True).raw.read()
+    text = requests.get(URL % id_, stream=True, verify=False).raw.read()
     text = text.decode(utils.web.getEncoding(text) or 'utf8')
     root = ElementTree.fromstring(text)
     assert root.tag == 'root', root
