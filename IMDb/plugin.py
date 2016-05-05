@@ -56,30 +56,15 @@ class IMDb(callbacks.Plugin):
         """<movie>
         output info from IMDb about a movie"""
 
-        textencoded = urlencode({'q': 'site:http://www.imdb.com/title/ %s' % text})
-        url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s' % (textencoded)
-        request = Request(url)
-        try:
-            page = urlopen(request)
-        except socket.timeout as e:
-            irc.error('\x0304Connection timed out.\x03', prefixNick=False)
-            return
-        except HTTPError as e:
-            irc.error('\x0304HTTP Error\x03', prefixNick=False)
-            return
-        except URLError as e:
-            irc.error('\x0304URL Error\x03', prefixNick=False)
-            return
-
-        result = json.loads(page.read().decode('utf-8'))
-
-        if result['responseStatus'] != 200:
-            irc.error('\x0304Google search didnt work, returned status %s' % result['responseStatus'])
-            return
+        query = 'site:http://www.imdb.com/title/ %s' % text
+        google_plugin = irc.getCallback('Google')
+        if not google_plugin:
+            irc.error('Google plugin is not loaded.')
+        results = google_plugin.decode(google_plugin.search(query, msg.args[0]))
 
         imdb_url = None
 
-        for r in result['responseData']['results']:
+        for r in results:
             if r['url'][-1] == '/':
                 imdb_url = r['url']
                 break
