@@ -209,7 +209,7 @@ class Glob2Chan(callbacks.Plugin):
     def ask4help(self, irc, msg, args):
         """takes no arguments
 
-        Notifies the helers who subscribed to the alert list you want
+        Notifies the helpers who subscribed to the alert list you want
         to play."""
         channel = msg.args[0]
         if channel != '#glob2':
