@@ -45,13 +45,13 @@ class PypySandboxTestCase(PluginTestCase):
         self.assertResponse('sandbox while True: pass', 'Error: Timeout.')
 
     def testException(self):
-        self.assertResponse('sandbox raise ValueError("foo")',
-                'ValueError: foo')
+        self.assertRegexp('sandbox raise ValueError("foo")',
+                '.*ValueError: foo')
 
     def testMemory(self):
-        self.assertResponse("""sandbox "while True: """
+        self.assertRegexp("""sandbox "while True: """
                 """s = s+'a'*10000 if 's' in locals() else ''" """,
-                'MemoryError')
+                '.*MemoryError')
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
