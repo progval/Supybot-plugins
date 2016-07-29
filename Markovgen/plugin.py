@@ -146,7 +146,7 @@ class Markovgen(callbacks.Plugin):
 
     @wrap(['channel', optional('text')])
     def gen(self, irc, msg, args, channel, message):
-        """[<channel>] <seed>
+        """[<channel>] [<seed>]
 
         Generates a random message based on the logs of a channel
         and a seed"""
@@ -154,17 +154,25 @@ class Markovgen(callbacks.Plugin):
             irc.error(_('Markovgen is disabled for this channel.'),
                     Raise=True)
         m = self._get_markov(irc, channel)
-        m.feed(message)
-        self._answer(irc, message, m, True)
+        if message:
+            m.feed(message)
+        self._answer(irc, message or '', m, True)
 
 
     def _answer(self, irc, message, m, allow_duplicate):
         words = message.split(' ')
-        message_tuples = set(zip(words, words[1:]))
-        if not message_tuples:
-            return
-        seeds = list(m.available_seeds())
-        possibilities = [x for x in seeds if x in message_tuples]
+        if len(words) == 0:
+            possibilities = list(m.available_seeds())
+        elif len(words) == 1:
+            word = words[0]
+            seeds = list(m.available_seeds())
+            possibilities = [x for x in seeds if word in x]
+        else:
+            message_tuples = set(zip(words, words[1:]))
+            if not message_tuples:
+                return
+            seeds = list(m.available_seeds())
+            possibilities = [x for x in seeds if x in message_tuples]
         seed = list(random.choice(possibilities))
         backward_seed = list(reversed(seed))
         forward = m.generate_markov_text(seed=seed, backward=False)
