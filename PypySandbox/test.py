@@ -41,6 +41,9 @@ class PypySandboxTestCase(PluginTestCase):
     def testBase(self):
         self.assertResponse('sandbox print(4+5)', '9')
 
+    def testStderr(self):
+        self.assertNotError('sandbox "import datetime; print(\'foo\')"')
+
     def testTimeout(self):
         self.assertResponse('sandbox while True: pass', 'Error: Timeout.')
 

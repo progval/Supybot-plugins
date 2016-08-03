@@ -86,7 +86,7 @@ def run(code, heapsize, timeout):
             proc = subprocess.Popen(command,
                     universal_newlines=True,
                     stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
                     # http://stackoverflow.com/a/4791612/539465
                     preexec_fn=os.setsid,
                     )
