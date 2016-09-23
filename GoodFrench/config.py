@@ -48,8 +48,7 @@ GoodFrench = conf.registerPlugin('GoodFrench')
 conf.registerChannelValue(GoodFrench, 'kick',
     registry.Boolean(False, """Détermine si un utilisateur faisant une faute
     de Français sera kické (au lieu de recevoir un avertissement)."""))
-conf.registerChannelValue(GoodFrench, 'level',
-    registry.Integer(0, """Le niveau de filtrage. Le niveau N filtre
+s = """Le niveau de filtrage. Le niveau N filtre
     ce que le niveau N-1 filtrait, avec des choses en plus.
     0 : pas de filtrage ;
     1 : filtre le langage SMS
@@ -59,7 +58,9 @@ conf.registerChannelValue(GoodFrench, 'level',
     5 : filtre les abbréviations ("t'as" au lieu de "tu as") ;
     6 : filtre les erreurs de typographie (note : a tendance à avoir la
     gachette facile)
-    7 : filtre les 'lol'"""))
+    7 : filtre les 'lol'"""
+conf.registerChannelValue(GoodFrench, 'level',
+    registry.Integer(0, s))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

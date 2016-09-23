@@ -259,7 +259,7 @@ class LinkRelay(callbacks.Plugin):
     def doQuit(self, irc, msg):
         args = {'nick': msg.nick, 'network': irc.network,
                 'message': msg.args[0], 'color': ''}
-        if self.registryValue('color', msg.args[0]):
+        if self.registryValue('color'):
             args['color'] = '\x03%s' % self.registryValue('colors.quit', msg.args[0])
         s = _('<-- %(nick)s has quit on %(network)s (%(message)s)')
         self.sendToOthers(irc, None, s, args, msg.nick)
