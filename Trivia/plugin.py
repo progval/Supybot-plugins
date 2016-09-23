@@ -254,7 +254,7 @@ class Trivia(callbacks.Plugin):
 
         def DL(self, seq1, seq2):
             oneago = None
-            thisrow = range(1, len(seq2) + 1) + [0]
+            thisrow = list(range(1, len(seq2) + 1)) + [0]
             for x in xrange(len(seq1)):
                 # Python lists wrap around for negative indices, so put the
                 # leftmost column at the *end* of the list. This matches with
