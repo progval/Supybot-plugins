@@ -162,10 +162,10 @@ class Trivia(callbacks.Plugin):
                 schedule.removeEvent('next_%s' % self.channel)
             except KeyError:
                 pass
-            scores = self.roundscores.iteritems()
+            scores = iter(self.roundscores.items())
             sorted = []
             for i in range(0, len(self.roundscores)):
-                item = scores.next()
+                item = next(scores)
                 sorted.append(item)
             def cmp(a, b):
                 return b[1] - a[1]
@@ -245,9 +245,9 @@ class Trivia(callbacks.Plugin):
 
         def writeScores(self):
             f = open(self.scorefile, 'w')
-            scores = self.scores.iteritems()
+            scores = iter(self.scores.items())
             for i in range(0, len(self.scores)):
-                score = scores.next()
+                score = next(scores)
                 f.write('%s %s\n' % (score[0], score[1]))
             f.close()
 
