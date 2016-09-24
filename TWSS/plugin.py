@@ -55,7 +55,7 @@ class TWSS(callbacks.Plugin):
         threading.Thread(target=self._import_twss).start()
 
     def _import_twss(self):
-        import twss
+        from . import twss
         self._twss = twss
 
     def doPrivmsg(self, irc, msg):
