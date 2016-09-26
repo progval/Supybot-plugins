@@ -16,7 +16,6 @@ by following any appropriate statement with ".twss".
 """
 
 import supybot.conf as conf
-import urllib2
 import re
 import os
 import sys
@@ -48,7 +47,7 @@ say_it.rule = r"(.*)"
 say_it.priority = "low"
 
 def add_twss(jenni, input):
-    print last
+    print(last)
     with open(path('TWSS.txt'), "a") as f:
         f.write(re.sub(r"[^\w\s]", "", last.lower()) + "\n")
         f.close()
@@ -58,4 +57,4 @@ add_twss.priority = "low"
 add_twss.threading = False
 
 if __name__ == '__main__':
-    print __doc__.strip()
+    print(__doc__.strip())
