@@ -155,7 +155,8 @@ class GithubCallback(httpserver.SupyHTTPServerCallback):
                 self.end_headers()
                 self.wfile.write(b('Thanks.'))
                 return
-            self.plugin.announce.onPayload(headers, json.loads(form.decode()))
+            payload = json.loads(form.decode('utf8'))
+            self.plugin.announce.onPayload(headers, payload)
 
 #####################
 # API access stuff
