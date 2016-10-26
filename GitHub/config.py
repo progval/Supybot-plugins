@@ -116,21 +116,28 @@ conf.registerChannelValue(GitHub.format, 'pull_request',
         '\x02$pull_request__base__ref\x02): \x02$pull_request__title\x02 '
         '$pull_request__html_url__tiny') \
         .replace('\n        ', ' '),
-        _("""Format for pullrequest events.""")))
-conf.registerChannelValue(GitHub.format, 'pull_request_review_comment',
+        _("""Format for pull request events.""")))
+conf.registerChannelValue(GitHub.format, 'pull_request_review',
         registry.String('echo ' +
         _('$repository__owner__login/\x02$repository__name\x02: '
         '\x02$comment__user__login\x02 reviewed pull request #$pull_request__number (to '
         '\x02$pull_request__base__ref\x02): \x02$pull_request__title\x02 '
         '$pull_request__html_url__tiny') \
         .replace('\n        ', ' '),
-        _("""Format for pull_request review comment events.""")))
+        _("""Format for pull request review events. This is triggered when
+        a pull request review is finished. If you want to be notified about
+        individual comments during a review, use the
+        pull_request_review_comment event.""")))
+conf.registerChannelValue(GitHub.format, 'pull_request_review_comment',
+        registry.String('',
+        _("""Format for pull request review comment events. This is for
+        individual review comments, you probably only want to use the
+        pull_request_review event to avoid clutter.""")))
 
 for event_type in ('create', 'delete', 'deployment',
         'deployment_status', 'download', 'follow', 'fork', 'fork_apply',
         'gist', 'gollum', 'member', 'public',
-        'pull_request_review_comment', 'release',
-        'team_add', 'watch', 'page_build'):
+        'release', 'team_add', 'watch', 'page_build'):
     conf.registerChannelValue(GitHub.format, event_type,
             registry.String('', _("""Format for %s events.""") % event_type))
 
