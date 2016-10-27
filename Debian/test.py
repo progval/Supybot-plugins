@@ -81,9 +81,6 @@ class DebianTestCase(PluginTestCase):
             self.assertRegexp('debian file --branch stable /bin/sh',
                               r'2 matches found:.*(?:dash.*|klibc-utils.*)')
 
-        def testDebincoming(self):
-            self.assertNotError('incoming')
-
         def testDebstats(self):
             self.assertNotError('stats supybot')
 

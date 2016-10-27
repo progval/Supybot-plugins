@@ -209,48 +209,6 @@ class Debian(callbacks.Plugin):
                                                            'non-free'))}),
                                       'text'])
 
-    _incomingRe = re.compile(r'<a href="(.*?\.deb)">', re.I)
-    def incoming(self, irc, msg, args, optlist, globs):
-        """[--{regexp,arch} <value>] [<glob> ...]
-
-        Checks debian incoming for a matching package name.  The arch
-        parameter defaults to i386; --regexp returns only those package names
-        that match a given regexp, and normal matches use standard *nix
-        globbing.
-        """
-        predicates = []
-        archPredicate = lambda s: ('_i386.' in s)
-        for (option, arg) in optlist:
-            if option == 'regexp':
-                predicates.append(r.search)
-            elif option == 'arch':
-                arg = '_%s.' % arg
-                archPredicate = lambda s, arg=arg: (arg in s)
-        predicates.append(archPredicate)
-        for glob in globs:
-            glob = fnmatch.translate(glob)
-            predicates.append(re.compile(glob).search)
-        packages = []
-        try:
-            fd = utils.web.getUrlFd('http://incoming.debian.org/')
-        except utils.web.Error as e:
-            irc.error(str(e), Raise=True)
-        for line in fd:
-            m = self._incomingRe.search(line.decode())
-            if m:
-                name = m.group(1)
-                if all(None, map(lambda p: p(name), predicates)):
-                    realname = utils.str.rsplit(name, '_', 1)[0]
-                    packages.append(realname)
-        if len(packages) == 0:
-            irc.error('No packages matched that search.')
-        else:
-            irc.reply(format('%L', packages))
-    incoming = thread(wrap(incoming,
-                           [getopts({'regexp': 'regexpMatcher',
-                                     'arch': 'something'}),
-                            any('glob')]))
-
     _description = re.compile(r'<h1>(.*)</h1>')
     def description(self, irc, msg, args, pkg):
         """<source package>
