@@ -251,6 +251,30 @@ class Debian(callbacks.Plugin):
                                      'arch': 'something'}),
                             any('glob')]))
 
+    _description = re.compile(r'<h1>(.*)</h1>')
+    def description(self, irc, msg, args, pkg):
+        """<source package>
+
+        Reports the description of the <source package>.
+        """
+        pkg = pkg.lower()
+        try:
+            text = utils.web.getUrl('http://packages.qa.debian.org/%s/%s.html' %
+                                    (pkg[0], pkg)).decode('utf8')
+        except utils.web.Error:
+            irc.errorInvalid('source package name')
+        for line in text.split('\n'):
+            match = self._description.search(text)
+            if match is not None:
+                break
+        assert match is not None
+        description = match.group(1)
+        description = description.replace('<br />', ':')
+        description = utils.web.htmlToText(description)
+        irc.reply(description)
+    description = wrap(description, ['somethingWithoutSpaces'])
+
+
     def bold(self, s):
         if self.registryValue('bold', dynamic.channel):
             return ircutils.bold(s)

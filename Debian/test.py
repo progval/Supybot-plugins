@@ -87,5 +87,9 @@ class DebianTestCase(PluginTestCase):
         def testDebstats(self):
             self.assertNotError('stats supybot')
 
+        def testDescription(self):
+            self.assertRegexp('description limnoria',
+                    'limnoria: robust and user-friendly')
+
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
