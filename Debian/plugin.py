@@ -181,7 +181,7 @@ class Debian(callbacks.Plugin):
                 versions = []
                 def branchVers(br):
                     vers = [b.next.string.strip() for b in br]
-                    return [utils.str.rsplit(v, ':', 1)[0] for v in vers]
+                    return [utils.str.rsplit(v, ':', 1)[0].split('[', 1)[0] for v in vers]
                 for li in liBranches:
                     branches.append(li.a.string)
                     versions.append(branchVers(li.find_all('br')))
