@@ -67,7 +67,7 @@ class DebianTestCase(PluginTestCase):
             self.assertRegexp('debian version --exact linux-wlan',
                               r'^No package.*\(all\)')
             self.assertNotError('debian version unstable')
-            self.assertRegexp('debian version --branch stable unstable',
+            self.assertRegexp('debian version --branch stable oldstable',
                               r'^No package.*')
 
         def testDebfile(self):
