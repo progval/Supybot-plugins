@@ -179,18 +179,30 @@ class Debian(callbacks.Plugin):
                 liBranches = soup.find_all('li')
                 branches = []
                 versions = []
+                provided_by = []
                 def branchVers(br):
                     vers = [b.next.string.strip() for b in br]
-                    return [utils.str.rsplit(v, ':', 1)[0].split('[', 1)[0] for v in vers]
+                    return [utils.str.rsplit(v, ':', 1)[0].split('[', 1)[0].strip() for v in vers]
                 for li in liBranches:
                     branches.append(li.a.string)
-                    versions.append(branchVers(li.find_all('br')))
+                    lines = li.find_all('br')
+                    versions.append(branchVers(l for l in lines
+                            if not str(l.next).startswith('also provided by')))
+                    provided_by.append([l.next.next.string for l in lines
+                            if str(l.next).startswith('also provided by')])
+
                 if branches and versions:
-                    for pairs in  zip(branches, versions):
-                        branch = pairs[0]
-                        ver = ', '.join(pairs[1])
-                        s = format('%s (%s)', pkgMatch,
-                                   ': '.join([branch, ver]))
+                    for triples in  zip(branches, versions, provided_by):
+                        branch = triples[0]
+                        ver = ', '.join(triples[1])
+                        if triples[2]:
+                            provided_by = format('; also provided by: %L',
+                                    triples[2])
+                        else:
+                            provided_by = ''
+                        s = format('%s (%s%s)', pkgMatch,
+                                   ': '.join([branch, ver]),
+                                   provided_by)
                         responses.append(s)
             resp = format('%i matches found: %s',
                           len(responses), '; '.join(responses))

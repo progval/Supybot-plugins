@@ -69,6 +69,8 @@ class DebianTestCase(PluginTestCase):
             self.assertNotError('debian version unstable')
             self.assertRegexp('debian version --branch stable oldstable',
                               r'^No package.*')
+            self.assertRegexp('debian version --branch unstable --exact libc6',
+                              r'also provided by: libc6-udeb')
 
         def testDebfile(self):
             self.assertHelp('debian file')
