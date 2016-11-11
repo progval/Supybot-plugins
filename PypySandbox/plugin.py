@@ -86,11 +86,13 @@ def run(code, heapsize, timeout):
             proc = subprocess.Popen(command,
                     universal_newlines=True,
                     stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
                     # http://stackoverflow.com/a/4791612/539465
                     preexec_fn=os.setsid,
                     )
             (outs, errs) = proc.communicate(None, timeout=timeout)
+            if errs:
+                outs += errs
         except subprocess.TimeoutExpired:
             # --timeout is ignored in Debian 8.0, so we have to kill
             # the child process of pypy-sandbox ourselves.
@@ -102,8 +104,9 @@ def run(code, heapsize, timeout):
             raise
         finally:
             source.close()
-    if outs.endswith('\n'):
-        outs = outs[:-1]
+    if outs.startswith("'import site' failed"):
+        outs = outs[len("'import site' failed"):]
+    outs = outs.strip()
     return outs
 
 class PypySandbox(callbacks.Plugin):
