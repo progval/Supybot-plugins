@@ -65,6 +65,11 @@ conf.registerGlobalValue(GitHub, 'announces',
 conf.registerGlobalValue(GitHub.announces, 'secret',
         registry.SpaceSeparatedSetOfStrings(set(), _("""Set of space-separated
         secret payloads used to authenticate GitHub."""), private=True))
+conf.registerChannelValue(GitHub, 'max_announce_commits',
+        registry.Integer(3, _("""Determines the maximum number of commits that
+        will be announced for a single push. Note that if the number of commits
+        is only one over the limit, it will be announced anyway instead of
+        saying "1 more commit".""")))
 
 conf.registerGroup(GitHub, 'format')
 conf.registerGroup(GitHub.format, 'before')
@@ -80,6 +85,9 @@ conf.registerChannelValue(GitHub.format, 'push',
         '\x02$__commit__message__firstline\x02 $__commit__url__tiny') \
         .replace('\n        ', ' '),
         _("""Format for push events.""")))
+conf.registerChannelValue(GitHub.format, 'push_hidden',
+        registry.String('echo (+$__hidden_commits hidden commits)',
+        _("""Format for the hidden commits message for push events.""")))
 conf.registerChannelValue(GitHub.format, 'commit_comment',
         registry.String('echo ' +
         _('$repository__owner__login/\x02$repository__name\x02: '

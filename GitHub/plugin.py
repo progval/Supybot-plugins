@@ -218,7 +218,7 @@ class GitHub(callbacks.Plugin):
                 log.error('Cannot connect to git.io: %s (%s)' % (e, url))
                 return None
             return url
-        def _createPrivmsg(self, irc, channel, payload, event, hidden=None):
+        def _createPrivmsg(self, irc, channel, payload, event):
             bold = ircutils.bold
 
             format_ = self.plugin.registryValue('format.%s' % event, channel)
@@ -258,11 +258,6 @@ class GitHub(callbacks.Plugin):
                 elif isinstance(value, str) or \
                         (sys.version_info[0] < 3 and isinstance(value, unicode)):
                     repl[key + '__firstline'] = value.split('\n', 1)[0]
-            repl.update({'__hidden': hidden or 0})
-            #if hidden is not None:
-            #    s += _(' (+ %i hidden commits)') % hidden
-            #if sys.version_info[0] < 3:
-            #        s = s.encode('utf-8')
             tokens = callbacks.tokenize(format_)
             if not tokens:
                 return
@@ -325,20 +320,27 @@ class GitHub(callbacks.Plugin):
                     else:
                         hidden = None
                         last_commit = commits[-1]
-                        if last_commit['message'].startswith('Merge ') and \
-                                len(commits) > 5:
-                            hidden = len(commits) + 1
-                            commits = [last_commit]
+
+                        max_comm = self.registryValue('max_announce_commits')
+
+                        if len(commits) > max_comm + 1:
+                            # Limit to the specified number of commits,
+                            # but if there's only one more, show it
+                            hidden = len(commits) - max_comm
+                            commits = commits[:max_comm]
 
                     payload2 = dict(payload)
 
-                    self._createPrivmsg(irc, channel, payload2,
-                        'before.push', None)
+                    self._createPrivmsg(irc, channel, payload2, 'before.push')
 
                     for commit in commits:
                         payload2['__commit'] = commit
+                        self._createPrivmsg(irc, channel, payload2, 'push')
+
+                    if hidden:
+                        payload2['__hidden_commits'] = hidden
                         self._createPrivmsg(irc, channel, payload2,
-                                'push', hidden)
+                                'push_hidden')
                 elif event == 'gollum':
                     pages = payload['pages']
                     if len(pages) == 0:
@@ -347,8 +349,7 @@ class GitHub(callbacks.Plugin):
                         payload2 = dict(payload)
                         for page in pages:
                             payload2['__page'] = page
-                            self._createPrivmsg(irc, channel, payload2,
-                                    'gollum', None)
+                            self._createPrivmsg(irc, channel, payload2, 'gollum')
                 else:
                     self._createPrivmsg(irc, channel, payload, event)
 
