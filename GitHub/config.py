@@ -85,7 +85,7 @@ conf.registerChannelValue(GitHub.format, 'push',
         '\x02$__commit__message__firstline\x02 $__commit__url__tiny') \
         .replace('\n        ', ' '),
         _("""Format for push events.""")))
-conf.registerChannelValue(GitHub.format, 'push_hidden',
+conf.registerChannelValue(GitHub.format.push, 'hidden',
         registry.String('echo (+$__hidden_commits hidden commits)',
         _("""Format for the hidden commits message for push events.""")))
 conf.registerChannelValue(GitHub.format, 'commit_comment',

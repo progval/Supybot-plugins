@@ -321,7 +321,8 @@ class GitHub(callbacks.Plugin):
                         hidden = None
                         last_commit = commits[-1]
 
-                        max_comm = self.registryValue('max_announce_commits')
+                        max_comm = self.plugin.registryValue(
+                                'max_announce_commits', channel)
 
                         if len(commits) > max_comm + 1:
                             # Limit to the specified number of commits,
@@ -340,7 +341,7 @@ class GitHub(callbacks.Plugin):
                     if hidden:
                         payload2['__hidden_commits'] = hidden
                         self._createPrivmsg(irc, channel, payload2,
-                                'push_hidden')
+                                'push.hidden')
                 elif event == 'gollum':
                     pages = payload['pages']
                     if len(pages) == 0:
