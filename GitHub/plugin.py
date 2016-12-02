@@ -227,14 +227,10 @@ class GitHub(callbacks.Plugin):
             repl = flatten_subdicts(payload)
             for (key, value) in dict(repl).items():
                 if isinstance(value, basestring) and \
-                        value.startswith(('http://', 'https://')):
+                        value.startswith(('http://', 'https://')) and \
+                        key + '__tiny' in format_:
                     host = urlparse(value).netloc
-                    # NOTE: Shortening api.github.com URLs causes too much
-                    # overhead and it becomes really slow. At some point, we
-                    # should probably check which keys are actually referenced
-                    # in the format string and only shorten those.
-                    #if host == 'github.com' or host.endswith('.github.com'):
-                    if host == 'github.com':
+                    if host == 'github.com' or host.endswith('.github.com'):
                         url = self._shorten_url(value)
                         if url:
                             repl[key + '__tiny'] = url
