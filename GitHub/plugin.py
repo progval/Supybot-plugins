@@ -315,10 +315,10 @@ class GitHub(callbacks.Plugin):
                              (repo, channel, irc.network, channel))
                 if event == 'push':
                     commits = payload['commits']
+                    hidden = None
                     if len(commits) == 0:
                         log.warning('GitHub push hook called without any commit.')
                     else:
-                        hidden = None
                         last_commit = commits[-1]
 
                         max_comm = self.plugin.registryValue(
