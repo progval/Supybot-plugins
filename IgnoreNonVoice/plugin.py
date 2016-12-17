@@ -42,8 +42,13 @@ except ImportError:
     _ = lambda x:x
 
 class IgnoreNonVoice(callbacks.Plugin):
-    """Add the help for "@plugin help IgnoreNonVoice" here
-    This should describe *how* to use this plugin."""
+    """
+    This plugin ignores users who aren't voiced. Can also be configured
+    to only work when the channel is moderated `mode +m`. Useful with
+    reduced moderation (`mode +z`) on charybdis-based IRCds (including
+    freenode's ircd-seven).
+    """
+
     def __init__(self, irc):
         super(IgnoreNonVoice, self).__init__(irc)
         callbacks.Commands.pre_command_callbacks.append(
@@ -53,7 +58,7 @@ class IgnoreNonVoice(callbacks.Plugin):
         callbacks.Commands.pre_command_callbacks.remove(
                 self._pre_command_callback)
 
-    def _is_not_ignored(self, irc, msg):
+    def _is_ignored(self, irc, msg):
         channel = msg.args[0]
         if not ircutils.isChannel(channel) or \
                 channel not in irc.state.channels:
@@ -63,11 +68,13 @@ class IgnoreNonVoice(callbacks.Plugin):
                 'm' in irc.state.channels[channel].modes)
         return enabled and \
                 not irc.state.channels[channel].isVoicePlus(msg.nick)
+
     def _pre_command_callback(self, plugin, command, irc, msg, *args, **kwargs):
-        return self._is_not_ignored(irc, msg)
+        # Prevent the command from executing if the user is ignored
+        return self._is_ignored(irc, msg)
 
     def invalidCommand(self, irc, msg, tokens):
-        if not self._is_not_ignored(irc, msg):
+        if self._is_ignored(irc, msg):
             irc.noReply()
 
 

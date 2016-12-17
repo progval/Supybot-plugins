@@ -29,8 +29,10 @@
 ###
 
 """
-Add a description of the plugin (to be presented to the user inside the wizard)
-here.  This should describe *what* the plugin does.
+This plugin ignores users who aren't voiced. Can also be configured to
+only work when the channel is moderated `mode +m`. Useful with reduced
+moderation (`mode +z`) on charybdis-based IRCds (including freenode's
+ircd-seven).
 """
 
 import supybot
