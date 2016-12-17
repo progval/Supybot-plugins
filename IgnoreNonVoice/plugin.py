@@ -42,8 +42,13 @@ except ImportError:
     _ = lambda x:x
 
 class IgnoreNonVoice(callbacks.Plugin):
-    """Add the help for "@plugin help IgnoreNonVoice" here
-    This should describe *how* to use this plugin."""
+    """
+    This plugin ignores users who aren't voiced. Can also be configured
+    to only work when the channel is moderated `mode +m`. Useful with
+    reduced moderation (`mode +z`) on charybdis-based IRCds (including
+    freenode's ircd-seven).
+    """
+
     def __init__(self, irc):
         super(IgnoreNonVoice, self).__init__(irc)
         callbacks.Commands.pre_command_callbacks.append(
