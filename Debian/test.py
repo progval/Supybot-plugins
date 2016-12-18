@@ -52,7 +52,7 @@ class DebianTestCase(PluginTestCase):
                                 '\x02Tags\x02: fixed-upstream; '
                                 '<http://bugs.debian.org/cgi-bin/'
                                 'bugreport.cgi?bug=539859>'.replace('AT', '@'))
-            self.assertError('debian bug 551215216542')
+            self.assertRegexp('debian bug 551215216542', 'Not Found')
 
         def testDebversion(self):
             self.assertHelp('debian version')
@@ -85,10 +85,14 @@ class DebianTestCase(PluginTestCase):
 
         def testDebstats(self):
             self.assertNotError('stats supybot')
+            self.assertRegexp('stats rigjeojgoiejeo', 'Error.*package name')
+            self.assertRegexp('stats xfce', 'Error.*not exist anymore')
 
         def testDescription(self):
             self.assertRegexp('description limnoria',
                     'limnoria: robust and user-friendly')
+            self.assertRegexp('description rigjeojgoiejeo', 'Error.*package name')
+            self.assertRegexp('description xfce', 'Error.*not exist anymore')
 
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:

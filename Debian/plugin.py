@@ -233,6 +233,8 @@ class Debian(callbacks.Plugin):
                                     (pkg[0], pkg)).decode('utf8')
         except utils.web.Error:
             irc.errorInvalid('source package name')
+        if 'This package is not part of any Debian' in text:
+            irc.error('This package does not exist anymore.', Raise=True)
         for line in text.split('\n'):
             match = self._description.search(text)
             if match is not None:
@@ -268,6 +270,8 @@ class Debian(callbacks.Plugin):
                                     (pkg[0], pkg)).decode('utf8')
         except utils.web.Error:
             irc.errorInvalid('source package name')
+        if 'This package is not part of any Debian' in text:
+            irc.error('This package does not exist anymore.', Raise=True)
         for line in text.split('\n'):
             match = self._latestVersion.search(text)
             if match is not None:
