@@ -144,8 +144,8 @@ conf.registerChannelValue(GitHub.format, 'pull_request_review_comment',
 
 for event_type in ('create', 'delete', 'deployment',
         'deployment_status', 'download', 'follow', 'fork', 'fork_apply',
-        'gist', 'gollum', 'member', 'public',
-        'release', 'team_add', 'watch', 'page_build'):
+        'gist', 'gollum', 'member', 'membership', 'organization', 'public',
+        'release', 'repository', 'team', 'team_add', 'watch', 'page_build'):
     conf.registerChannelValue(GitHub.format, event_type,
             registry.String('', _("""Format for %s events.""") % event_type))
 
