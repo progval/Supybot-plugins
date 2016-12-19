@@ -12,7 +12,8 @@ and repo what git repository the bot should announce. When you want to
 remove announce, use the command `github announce remove <owner> <repo>`.
 
 Please note that the names are case-sensitive. If you use mis-spelled 
-repository names, the bot will not announce commits to that repository.
+repository names, the bot will not announce commits to that repository. Globs are
+also supported in the `<owner>` and `<repo>` fields.
 
 To get the bot notified about events, you must tell GitHub to post to your 
 bot. [GitHub explanation](http://help.github.com/post-receive-hooks/)
