@@ -384,7 +384,8 @@ class GitHub(callbacks.Plugin):
             """[<channel>] <owner> <name>
 
             Announce the commits of the GitHub repository called
-            <owner>/<name> in the <channel>.
+            <owner>/<name> in the <channel>. Globs are also supported for
+            <owner> and <name>.
             <channel> defaults to the current channel."""
             repo = '%s/%s' % (owner, name)
             announces = self._load()
