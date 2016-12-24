@@ -40,25 +40,6 @@ def stripNick(nick):
         nick = nick[:-1]
     return nick
 
-## Taken from Encyclopedia ##
-# Repeat filtering message queue
-msgcache = {}
-def queue(irc, to, msg):
-    now = time.time()
-    for m in list(msgcache.keys()):
-        if msgcache[m] < now - 30:
-            msgcache.pop(m)
-    for m in msgcache:
-        if m[0] == irc and m[1] == to:
-            oldmsg = m[2]
-            if msg == oldmsg or oldmsg.endswith(msg):
-                break
-            if msg.endswith(oldmsg):
-                msg = msg[:-len(oldmsg)] + 'please see above'
-    else:
-        msgcache[(irc, to, msg)] = now
-        irc.queueMsg(ircmsgs.privmsg(to, msg))
-
 class PackageInfo(callbacks.Plugin):
     """Lookup package information via apt-cache/apt-file"""
     threaded = True
@@ -79,17 +60,12 @@ class PackageInfo(callbacks.Plugin):
     def __getRelease(self, irc, release, channel, doError=True):
         if release:
             release = release.strip()
-        defaultRelease = self.registryValue("defaultRelease", channel)
-        if not defaultRelease:
-            if doError:
-                irc.error("'supybot.plugins.PackageInfo.defaultRelease' is not set")
-            return (None, None)
         if not release:
-            return (defaultRelease, None)
-        (release, rest) = (release.split(' ', 1) + [None])[:2]
-        if release[0] in ('|', '>'):
-            return (defaultRelease, "%s %s" % (release, rest))
-        return (release, rest)
+            release = self.registryValue("defaultRelease", channel)
+        if not release and doError:
+            irc.error("'supybot.plugins.PackageInfo.defaultRelease' is not set",
+                    Raise=True)
+        return release
 
     def __getChannel(self, channel):
         return ircutils.isChannel(channel) and channel or None
@@ -114,42 +90,9 @@ class PackageInfo(callbacks.Plugin):
         Lookup information for <package>, optionally in <release>
         """
         channel = self.__getChannel(msg.args[0])
-        reply_target = ircutils.replyTo(msg)
-        (release, rest) = self.__getRelease(irc, release, channel)
-        if not release:
-            return
+        release = self.__getRelease(irc, release, channel)
         reply = self.Apt.info(package, release)
-        if rest:
-            if rest[0] == '|':
-                try:
-                    target = rest
-                    while target[0] == '|':
-                        target = target[1:].strip()
-                    if target.lower() == "me":
-                        target = msg.nick
-                    queue(irc, reply_target, "%s: %s" % (target, reply))
-                    return
-                except Exception as e:
-                    self.log.info("PackageInfo: (info) Exception in pipe: %r" % e)
-                    pass
-            elif rest[0] == '>':
-                try:
-                    while rest[0] == '>':
-                        rest = rest[1:].strip()
-                    targets = [_ for _ in rest.split() if _] # Split and discard empty parts
-                    target = stripNick(targets[0]) # Take the first "nick" and strip off bad chars
-                    if target.lower() == "me":
-                        target = msg.nick # redirect
-                    if not target: # Throw error
-                        raise Exception('No target')
-                    queue(irc, target, "<%s> wants you to know: %s" % (msg.nick, reply))
-                    return
-                except Exception as e:
-                    self.log.info("PackageInfo: (info) Exception in redirect: %r" % e)
-                    pass
-
-        queue(irc, reply_target, reply)
-
+        irc.reply(reply)
     info = wrap(real_info, ['anything', optional('text')])
 
     def real_depends(self, irc, msg, args, package, release):
@@ -158,42 +101,9 @@ class PackageInfo(callbacks.Plugin):
         Lookup dependencies for <package>, optionally in <release>
         """
         channel = self.__getChannel(msg.args[0])
-        reply_target = ircutils.replyTo(msg)
-        (release, rest) = self.__getRelease(irc, release, channel)
-        if not release:
-            return
+        release = self.__getRelease(irc, release, channel)
         reply = self.Apt.depends(package, release)
-        if rest:
-            if rest[0] == '|':
-                try:
-                    target = rest
-                    while target[0] == '|':
-                        target = target[1:].strip()
-                    if target.lower() == "me":
-                        target = msg.nick
-                    queue(irc, reply_target, "%s: %s" % (target, reply))
-                    return
-                except Exception as e:
-                    self.log.info("PackageInfo: (depends) Exception in pipe: %r" % e)
-                    pass
-            elif rest[0] == '>':
-                try:
-                    while rest[0] == '>':
-                        rest = rest[1:].strip()
-                    targets = [_ for _ in rest.split() if _] # Split and discard empty parts
-                    target = stripNick(targets[0]) # Take the first "nick" and strip off bad chars
-                    if target.lower() == "me":
-                        target = msg.nick # redirect
-                    if not target: # Throw error
-                        raise Exception('No target')
-                    queue(irc, target, "<%s> wants you to know: %s" % (msg.nick, reply))
-                    return
-                except Exception as e:
-                    self.log.info("PackageInfo: (depends) Exception in redirect: %r" % e)
-                    pass
-
-        queue(irc, reply_target, reply)
-
+        irc.reply(reply)
     depends = wrap(real_depends, ['anything', optional('text')])
 
     def real_find(self, irc, msg, args, package, release):
@@ -203,42 +113,9 @@ class PackageInfo(callbacks.Plugin):
         Optionally in <release>
         """
         channel = self.__getChannel(msg.args[0])
-        reply_target = ircutils.replyTo(msg)
-        (release, rest) = self.__getRelease(irc, release, channel)
-        if not release:
-            return
+        release = self.__getRelease(irc, release, channel)
         reply = self.Apt.find(package, release)
-        if rest:
-            if rest[0] == '|':
-                try:
-                    target = rest
-                    while target[0] == '|':
-                        target = target[1:].strip()
-                    if target.lower() == "me":
-                        target = msg.nick
-                    queue(irc, reply_target, "%s: %s" % (target, reply))
-                    return
-                except Exception as e:
-                    self.log.info("PackageInfo: (find) Exception in pipe: %r" % e)
-                    pass
-            elif rest[0] == '>':
-                try:
-                    while rest[0] == '>':
-                        rest = rest[1:].strip()
-                    targets = [_ for _ in rest.split() if _] # Split and discard empty parts
-                    target = stripNick(targets[0]) # Take the first "nick" and strip off bad chars
-                    if target.lower() == "me":
-                        target = msg.nick # redirect
-                    if not target: # Throw error
-                        raise Exception('No target')
-                    queue(irc, target, "<%s> wants you to know: %s" % (msg.nick, reply))
-                    return
-                except Exception as e:
-                    self.log.info("PackageInfo: (find) Exception in redirect: %r" % e)
-                    pass
-
-        queue(irc, reply_target, reply)
-
+        irc.reply(reply)
     find = wrap(real_find, ['anything', optional('text')])
 
     def privmsg(self, irc, msg, user):
