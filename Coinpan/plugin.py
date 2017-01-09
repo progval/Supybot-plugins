@@ -146,7 +146,7 @@ def snarfer_generator():
             txt = txt.replace('>0_/', '>x_/').replace('\_0<', '\_x<')
             txt = txt.replace('>O_/', '>x_/').replace('\_O<', '\_x<')
             irc.reply(_regexp.sub(replacer, txt), prefixNick=False)
-    regexp = '(?i).*(%s|>^o^_^/|\^_^[Oo]^<).*' % REGEXP
+    regexp = '(?i).*(%s|>^o^_^/|\^_^[O0o]^<).*' % REGEXP
     regexp = regexp.replace('^', '\u200b*')
     coinSnarfer.__doc__ = regexp
     return coinSnarfer
