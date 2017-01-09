@@ -31,6 +31,7 @@
 
 import os
 import re
+import sys
 import glob
 import random
 import functools
@@ -54,7 +55,8 @@ try:
     import markovgen
 except ImportError:
     raise callbacks.Error('Cannot load markovgen library. Make sure you '
-                          'installed it.')
+                          'installed it (%s -m pip install markovgen).'
+                          % sys.executable)
 from imp import reload as r
 r(markovgen)
 
