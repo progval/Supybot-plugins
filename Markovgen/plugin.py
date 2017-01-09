@@ -141,8 +141,15 @@ class Markovgen(callbacks.Plugin):
         if self.registryValue('stripRelayedNick', channel):
             message = MATCH_MESSAGE_STRIPNICK.match(message).group('message')
         m.feed(message)
-        if random.random() < self.registryValue('probability', channel):
-            self._answer(irc, message, m, False)
+        if irc.nick.lower() in message.lower().split():
+            if random.random() < self.registryValue('onNick.probability', channel):
+                def replace_nick(s):
+                    return re.sub(irc.nick, msg.nick, s, re.IGNORECASE)
+                self._answer(irc, message, m, False,
+                        postprocessing=replace_nick)
+        else:
+            if random.random() < self.registryValue('probability', channel):
+                self._answer(irc, message, m, False)
 
     @wrap(['channel', optional('text')])
     def gen(self, irc, msg, args, channel, message):
@@ -159,7 +166,8 @@ class Markovgen(callbacks.Plugin):
         self._answer(irc, message or '', m, True)
 
 
-    def _answer(self, irc, message, m, allow_duplicate):
+    def _answer(self, irc, message, m, allow_duplicate,
+            postprocessing=lambda x: x):
         words = message.split(' ')
         if len(words) == 0:
             possibilities = list(m.available_seeds())
@@ -183,7 +191,7 @@ class Markovgen(callbacks.Plugin):
         except IndexError:
             answer = backward
         if allow_duplicate or m != answer:
-            irc.reply(answer, prefixNick=False)
+            irc.reply(postprocessing(answer), prefixNick=False)
 
     @wrap(['channel'])
     def doge(self, irc, msg, args, channel):
