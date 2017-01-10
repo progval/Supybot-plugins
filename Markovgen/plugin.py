@@ -146,7 +146,7 @@ class Markovgen(callbacks.Plugin):
         if irc.nick.lower() in message.lower().split():
             if random.random() < self.registryValue('onNick.probability', channel):
                 def replace_nick(s):
-                    return re.sub(irc.nick, msg.nick, s, re.IGNORECASE)
+                    return re.sub(re.escape(irc.nick), msg.nick, s, re.IGNORECASE)
                 self._answer(irc, message, m, False,
                         postprocessing=replace_nick)
         else:
