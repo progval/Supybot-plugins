@@ -138,7 +138,7 @@ class Apt:
         for p in packages:
             if not p.strip():
                 continue
-            parser = feedparser.FeedParser()
+            parser = FeedParser()
             parser.feed(p)
             p = parser.close()
             if type(p) == type(""):
@@ -154,7 +154,7 @@ class Apt:
         for p in packages2:
             if not p.strip():
                 continue
-            parser = feedparser.FeedParser()
+            parser = FeedParser()
             parser.feed(p)
             p = parser.close()
             if type(p) == type(""):
