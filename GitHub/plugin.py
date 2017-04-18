@@ -285,10 +285,10 @@ class GitHub(callbacks.Plugin):
                 # WTF?
                 event = headers['x-github-event']
             announces = self._load()
-            repoAnnounces = []
+            repoAnnounces = set()
             for (dbRepo, network, channel) in announces:
                 if fnmatch.fnmatch(repo, dbRepo):
-                    repoAnnounces.append((network, channel))
+                    repoAnnounces.add((network, channel))
             if len(repoAnnounces) == 0:
                 log.info('Commit for repo %s not announced anywhere' % repo)
                 return
