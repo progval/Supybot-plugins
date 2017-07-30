@@ -35,12 +35,12 @@ class PPPTestCase(PluginTestCase):
     plugins = ('PPP', 'Config')
 
     def testBasics(self):
-        self.assertResponse('query What is the capital of Australia?',
-                'Canberra')
+        self.assertRegexp('query What is the capital of Australia?',
+                '\x02Canberra\x02 (.*)')
 
     def testList(self):
         self.assertRegexp('query What are the capitals of the European Union?',
-                '^(Brussels and Strasbourg|Strasbourg and Brussels)$')
+                '^\x02(Brussels\x02 \(.*\) and \x02Strasbourg|Strasbourg\x02 (.*) and \x02Brussels)\x02 \(.*\)$')
 
     @unittest.skip('HAL not supported anymore')
     def testHal(self):
@@ -57,19 +57,14 @@ class PPPTestCase(PluginTestCase):
         finally:
             self.assertNotError('config setdefault plugins.PPP.api')
 
-    @unittest.skip('Headlines not supported anymore')
     def testHeadline(self):
         self.assertNotError('config plugins.PPP.formats.query '
                             '"$value ($headline)"')
         try:
             self.assertRegexp('query What is Brussels?',
-                    '^Brussels.*The City of Brussels')
+                    '^\x02Brussels\x02 \(city and municipality')
         finally:
             self.assertNotError('config setdefault plugins.PPP.formats.query')
-
-    def testNoDuplicate(self):
-        self.assertRegexp('query What is love?', 'LOVE', flags=0)
-        self.assertNotRegexp('query What is love?', 'LOVE.*LOVE', flags=0)
 
 
 if not network:

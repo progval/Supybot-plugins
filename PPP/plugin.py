@@ -70,6 +70,52 @@ def unique(L):
             seen.add( item )
             yield item
 
+def best_locale(available, expected):
+    if expected in available:
+        # language + country match
+        return expected
+    languages = {a.split('-')[0] for a in available}
+    languages = {l for l in languages if l == expected}
+    if languages:
+        # language match
+        return list(languages)[0]
+
+    # no match
+    return list(available)[0]
+
+def format_result(result, expected_locale, bold):
+    names = {d['@language']: d['@value']
+             for d in result.get('http://schema.org/name', [])}
+    alt_names = {d['@language']: d['@value']
+             for d in result.get('http://schema.org/alternateName', [])}
+
+    if names or alt_names:
+        name_locale = best_locale(set(names) | set(alt_names), expected_locale)
+        name = names.get(name_locale, alt_names.get(name_locale))
+    else:
+        name = None
+
+    descriptions = {d['@language']: d['@value']
+             for d in result.get('http://schema.org/description', [])}
+    if descriptions:
+        desc_locale = best_locale(set(descriptions), expected_locale)
+        description = descriptions[desc_locale]
+    else:
+        description = None
+
+    if bold:
+        name = ircutils.bold(name)
+
+    if name and description:
+        return '%s (%s)' % (name, description)
+    elif name:
+        return name
+    elif description:
+        return description
+    else:
+        return None
+
+
 class PPP(callbacks.Plugin):
     """A simple plugin to query the API of the Projet Pensées Profondes."""
     threaded = True
@@ -80,36 +126,15 @@ class PPP(callbacks.Plugin):
 
         return requests.get(url).json()
 
-    def format_response(self, channel, format_, tree):
-        keys = tree._attributes
-        if isinstance(tree, Resource):
-            if keys.get('value_type', None) == 'math-latex':
-                pred = lambda x:unicode_tex.tex_to_unicode_map.get(x, x)
-                v = ' '.join(map(pred, keys['value'].split(' ')))
-                keys['value'] = v
-            try:
-                graph = tree.graph
-                keys['headline'] = graph['@reverse']['about']['headline'] \
-                        .split('\n', 1)[0]
-            except (AttributeError, KeyError, IndexError):
-                keys['headline'] = _('no headline')
-            return [string.Template(format_).safe_substitute(keys)]
-        elif isinstance(tree, List):
-            pred = functools.partial(self.format_response, channel, format_)
-            return filter(bool,
-                    itertools.chain.from_iterable(map(pred, tree.list)))
-        else:
-            return []
-
-
     @wrap([optional('channel'), 'text'])
     @handle_badapi
     def query(self, irc, msg, args, channel, request):
         """<request>
 
         Sends a request to the PPP and returns answers."""
-        response = self.request(channel, request, \
-                self.registryValue('language', channel))
+        language = self.registryValue('language', channel)
+        bold = self.registryValue('formats.bold', channel)
+        response = self.request(channel, request, language)
         response = jsonld.expand(response)
         seen = set()
         replies = []
@@ -122,13 +147,9 @@ class PPP(callbacks.Plugin):
         for collection in response:
             for member in collection['http://www.w3.org/ns/hydra/core#member']:
                 for result in member['http://schema.org/result']:
-                    for d in result.get('http://schema.org/name', []):
-                        add_reply(d['@value'])
-                        break
-                    else:
-                        for name in result.get('http://schema.org/alternateName', []):
-                            add_reply(d['@value'])
-                            break
+                    add_reply(format_result(result, language, bold))
+
+
         irc.replies(replies)
 
 
