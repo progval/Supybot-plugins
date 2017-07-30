@@ -30,12 +30,14 @@
 ###
 
 import uuid
+import json
 import string
 import operator
 import requests
 import itertools
 import functools
 import urllib.parse
+import urllib.error
 
 import unicode_tex
 from pyld import jsonld
@@ -57,7 +59,7 @@ def handle_badapi(f):
     def newf(self, irc, *args, **kwargs):
         try:
             f(self, irc, *args, **kwargs)
-        except requests.exceptions.ConnectionError:
+        except utils.web.Error:
             irc.error('Could not connect to the API.')
     newf.__name__ = f.__name__
     newf.__doc__ = f.__doc__
@@ -124,17 +126,28 @@ class PPP(callbacks.Plugin):
         params = urllib.parse.urlencode({'q': request, 'lang': language})
         url = self.registryValue('api', channel) + '?' + params
 
-        return requests.get(url).json()
+        content = utils.web.getUrlContent(url, size=10**7, headers={
+            'Accept-Language': language})
+        return json.loads(content.decode())
 
-    @wrap([optional('channel'), 'text'])
+    _opts = {'locale': 'somethingWithoutSpaces',
+            'lang': 'somethingWithoutSpaces',
+            'language': 'somethingWithoutSpaces',
+            }
+    @wrap([optional('channel'), getopts(_opts), 'text'])
     @handle_badapi
-    def query(self, irc, msg, args, channel, request):
-        """<request>
+    def query(self, irc, msg, args, channel, optlist, request):
+        """[--locale <language>] <request>
 
         Sends a request to the PPP and returns answers."""
-        language = self.registryValue('language', channel)
+        locale = self.registryValue('language', channel)
         bold = self.registryValue('formats.bold', channel)
-        response = self.request(channel, request, language)
+
+        for (key, value) in optlist:
+            if key in ('locale', 'lang', 'language'):
+                locale = value
+
+        response = self.request(channel, request, locale)
         response = jsonld.expand(response)
         seen = set()
         replies = []
@@ -147,7 +160,7 @@ class PPP(callbacks.Plugin):
         for collection in response:
             for member in collection['http://www.w3.org/ns/hydra/core#member']:
                 for result in member['http://schema.org/result']:
-                    add_reply(format_result(result, language, bold))
+                    add_reply(format_result(result, locale, bold))
 
 
         irc.replies(replies)

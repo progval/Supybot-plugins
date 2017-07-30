@@ -66,6 +66,10 @@ class PPPTestCase(PluginTestCase):
         finally:
             self.assertNotError('config setdefault plugins.PPP.formats.query')
 
+    def testLocale(self):
+        self.assertRegexp('query --locale fr Quelles sont les capitales de l\'Union Européenne ?',
+                '^\x02Bruxelles\x02')
+
 
 if not network:
     class PPPTestCase(PluginTestCase):
