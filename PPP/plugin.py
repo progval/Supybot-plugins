@@ -111,16 +111,23 @@ class PPP(callbacks.Plugin):
         response = self.request(channel, request, \
                 self.registryValue('language', channel))
         response = jsonld.expand(response)
+        seen = set()
         replies = []
+        def add_reply(r):
+            normalized = r.strip()
+            if normalized in seen:
+                return
+            replies.append(r)
+            seen.add(normalized)
         for collection in response:
             for member in collection['http://www.w3.org/ns/hydra/core#member']:
                 for result in member['http://schema.org/result']:
                     for d in result.get('http://schema.org/name', []):
-                        replies.append(d['@value'])
+                        add_reply(d['@value'])
                         break
                     else:
                         for name in result.get('http://schema.org/alternateName', []):
-                            replies.append(d['@value'])
+                            add_reply(d['@value'])
                             break
         irc.replies(replies)
 

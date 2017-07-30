@@ -67,6 +67,10 @@ class PPPTestCase(PluginTestCase):
         finally:
             self.assertNotError('config setdefault plugins.PPP.formats.query')
 
+    def testNoDuplicate(self):
+        self.assertRegexp('query What is love?', 'LOVE', flags=0)
+        self.assertNotRegexp('query What is love?', 'LOVE.*LOVE', flags=0)
+
 
 if not network:
     class PPPTestCase(PluginTestCase):
