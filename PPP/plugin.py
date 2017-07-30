@@ -35,9 +35,10 @@ import operator
 import requests
 import itertools
 import functools
+import urllib.parse
+
 import unicode_tex
-from ppp_datamodel.communication import Response, Request
-from ppp_datamodel import Resource, Sentence, Triple, Missing, List
+from pyld import jsonld
 
 import supybot.utils as utils
 from supybot.commands import *
@@ -51,24 +52,6 @@ except ImportError:
     # Placeholder that allows to run the plugin on a bot
     # without the i18n module
     _ = lambda x:x
-
-def format_triple(triple, bold):
-    if isinstance(triple, Missing):
-        if bold:
-            return ircutils.bold('?')
-        else:
-            return '?'
-    elif isinstance(triple, Resource):
-        return triple.value
-    elif isinstance(triple, Triple):
-        subtrees = triple.subject, triple.predicate, triple.object
-        subtrees = tuple(format_triple(x, bold) for x in subtrees)
-        return '(%s, %s, %s)' % subtrees
-    elif isinstance(triple, List):
-        return '[%s]' % (', '.join(format_triple(x, bold)
-                                   for x in triple.list))
-    else:
-        raise ValueError('%r' % triple)
 
 def handle_badapi(f):
     def newf(self, irc, *args, **kwargs):
@@ -91,10 +74,11 @@ class PPP(callbacks.Plugin):
     """A simple plugin to query the API of the Projet Pensées Profondes."""
     threaded = True
 
-    def request(self, channel, request):
-        responses = requests.post(self.registryValue('api', channel),
-                data=request.as_json()).json()
-        return map(Response.from_dict, responses)
+    def request(self, channel, request, language):
+        params = urllib.parse.urlencode({'q': request, 'lang': language})
+        url = self.registryValue('api', channel) + '?' + params
+
+        return requests.get(url).json()
 
     def format_response(self, channel, format_, tree):
         keys = tree._attributes
@@ -120,41 +104,25 @@ class PPP(callbacks.Plugin):
 
     @wrap([optional('channel'), 'text'])
     @handle_badapi
-    def query(self, irc, msg, args, channel, sentence):
+    def query(self, irc, msg, args, channel, request):
         """<request>
 
         Sends a request to the PPP and returns answers."""
-        r = Request(id='supybot-%s' % uuid.uuid4().hex,
-                language=self.registryValue('language', channel),
-                tree=Sentence(value=sentence))
-        format_ = self.registryValue('formats.query', channel)
-        responses = (x.tree for x in self.request(channel, r))
-        formatter = functools.partial(self.format_response, channel, format_)
-        L = list(unique(filter(bool,
-            itertools.chain.from_iterable(map(formatter, responses)))))
-        if L:
-            irc.replies(L)
-        else:
-            irc.error(_('No response'))
-
-    @wrap([optional('channel'), 'text'])
-    @handle_badapi
-    def triples(self, irc, msg, args, channel, sentence):
-        """<request>
-
-        Sends a request to the PPP and returns the triples."""
-        r = Request(id='supybot-%s' % uuid.uuid4().hex,
-                language=self.registryValue('language', channel),
-                tree=Sentence(value=sentence))
-        responses = self.request(channel, r)
-        responses = map(operator.attrgetter('tree'), responses)
-        responses = filter(lambda x:isinstance(x, Triple), responses)
-        bold = self.registryValue('formats.bold')
-        L = [format_triple(x, bold) for x in responses]
-        if L:
-            irc.replies(L)
-        else:
-            irc.error(_('No response'))
+        response = self.request(channel, request, \
+                self.registryValue('language', channel))
+        response = jsonld.expand(response)
+        replies = []
+        for collection in response:
+            for member in collection['http://www.w3.org/ns/hydra/core#member']:
+                for result in member['http://schema.org/result']:
+                    for d in result.get('http://schema.org/name', []):
+                        replies.append(d['@value'])
+                        break
+                    else:
+                        for name in result.get('http://schema.org/alternateName', []):
+                            replies.append(d['@value'])
+                            break
+        irc.replies(replies)
 
 
 

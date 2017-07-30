@@ -28,6 +28,7 @@
 
 ###
 
+import unittest
 from supybot.test import *
 
 class PPPTestCase(PluginTestCase):
@@ -37,13 +38,12 @@ class PPPTestCase(PluginTestCase):
         self.assertResponse('query What is the capital of Australia?',
                 'Canberra')
 
-    def testBold(self):
-        self.assertResponse('triples What is the capital of Australia?',
-                '(Australia, capital, \x02?\x02)')
-
     def testList(self):
         self.assertRegexp('query What are the capitals of the European Union?',
                 '^(Brussels and Strasbourg|Strasbourg and Brussels)$')
+
+    @unittest.skip('HAL not supported anymore')
+    def testHal(self):
         self.assertRegexp('query '
                 'Who is the author of “Use of A Network Enabled Server System '
                 'for a Sparse Linear Algebra Application”?',
@@ -57,6 +57,7 @@ class PPPTestCase(PluginTestCase):
         finally:
             self.assertNotError('config setdefault plugins.PPP.api')
 
+    @unittest.skip('Headlines not supported anymore')
     def testHeadline(self):
         self.assertNotError('config plugins.PPP.formats.query '
                             '"$value ($headline)"')

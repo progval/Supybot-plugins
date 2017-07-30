@@ -52,7 +52,7 @@ PPP = conf.registerPlugin('PPP')
 # conf.registerGlobalValue(PPP, 'someConfigVariableName',
 #     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
 conf.registerChannelValue(PPP, 'api',
-    registry.String('http://core.frontend.askplatyp.us', _("""The URL to the API
+    registry.String('https://qa.askplatyp.us/v0/ask', _("""The URL to the API
     to which requests will be sent.""")))
 conf.registerChannelValue(PPP, 'language',
     registry.String('en', _("""The language sent with requests to the PPP
