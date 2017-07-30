@@ -35,7 +35,7 @@ class JsonTestCase(PluginTestCase):
     plugins = ('Json',)
 
     def testGet(self):
-        self.assertResponse(r'get ".bar string:first-child" '
+        self.assertResponse(r'get ".bar[0]" '
                 r'"{\"foo\": [\"foobar\"], \"bar\": [\"baz\", \"qux\"]}"''',
                 'baz')
 

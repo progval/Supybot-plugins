@@ -43,9 +43,10 @@ except ImportError:
     # without the i18n module
     _ = lambda x: x
 try:
-    import jsonselect
+    import pyjq
 except ImportError:
-    raise callbacks.Error('You have to install python-jsonselect.')
+    raise callbacks.Error('You have to install pyjq (not to be confused '
+                          'with "jq" or "python-jq").')
 
 
 class Json(callbacks.Plugin):
@@ -56,10 +57,11 @@ class Json(callbacks.Plugin):
 
         Uses the selector against the json data and returns the selected
         value.
-        See http://jsonselect.org/ to know about the selector syntax."""
-        irc.reply(jsonselect.select(selector, json.loads(data)))
+        See http://stedolan.github.io/jq/tutorial/ to learn about the
+        selector syntax."""
+        irc.reply(pyjq.first(selector, json.loads(data)))
     get = wrap(get, ['something', 'text'])
-    
+
 
 Class = Json
 
