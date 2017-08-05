@@ -29,6 +29,7 @@
 ###
 
 import time
+import uuid
 from supybot.test import *
 import supybot.conf as conf
 import supybot.ircdb as ircdb
@@ -94,6 +95,19 @@ class AttackProtectorTestCase(ChannelPluginTestCase):
             self.irc.feedMsg(msg)
         self.failIf(self._getIfAnswerIsMode('+i'),
                     'Reaction to no groupjoin flood.')
+    def testNetjoin(self):
+        batch_id = uuid.uuid4().hex
+        self.irc.feedMsg(ircmsgs.IrcMsg(command='BATCH',
+            args=('+' + batch_id, 'netjoin')))
+        for i in range(1, 20):
+            prefix = self.prefix.split('@')
+            prefix = '@'.join(['%s%i' % (prefix[0], i), prefix[1]])
+            msg = ircmsgs.join(self.channel, prefix=prefix)
+            msg.server_tags['batch'] = batch_id
+            self.irc.feedMsg(msg)
+        self.failIf(self._getIfAnswerIsMode('+i'),
+                    'Reaction to netjoin.')
+
 
     #################################
     # Part tests

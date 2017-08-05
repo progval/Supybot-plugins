@@ -158,6 +158,11 @@ class AttackProtector(callbacks.Plugin):
             pass
 
     def doJoin(self, irc, msg):
+        if 'batch' in msg.server_tags and \
+                msg.server_tags['batch'] in irc.state.batches and \
+                irc.state.batches[msg.server_tags['batch']].type == 'netjoin':
+            # This join is part of a netjoin. Ignore it.
+            return
         self._eventCatcher(irc, msg, 'join')
     def do710(self, irc, msg):
         self._eventCatcher(irc, msg, 'knock')
