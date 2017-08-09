@@ -197,9 +197,14 @@ class LinkRelay(callbacks.Plugin):
             s = '(via PM) %s' % s
         self.sendToOthers(irc, channel, s, args, isPrivmsg=True)
 
+    def doNotice(self, irc, msg):
+        if self.registryValue('relayNotices', msg.args[0]):
+            self.doPrivmsg(irc, msg)
 
     def outFilter(self, irc, msg):
-        if msg.command == 'PRIVMSG':
+        relay_notices = self.registryValue('relayNotices', msg.args[0])
+        if msg.command == 'PRIVMSG' or \
+                (relay_notices and msg.command == 'NOTICE'):
             if not msg.relayedMsg:
                 if msg.args[0] in irc.state.channels:
                     s, args = self.getPrivmsgData(msg.args[0], irc.nick, msg.args[1],
