@@ -58,7 +58,7 @@ INTERESTING = {
         351: # Monod
             ('Plats',),
         230: # Descartes
-            ('PLATS',),
+            ('Plats',),
         }
 URL = 'https://irestos.nuonet.fr/generation.php?crous=21&resto=%d&ext=xml'
 BLACKLIST = ['variées', 'variés', 'du chef', 'buffet']
