@@ -203,9 +203,10 @@ class LinkRelay(callbacks.Plugin):
 
     def outFilter(self, irc, msg):
         relay_notices = self.registryValue('relayNotices', msg.args[0])
+        relay_outgoing = self.registryValue('relayOutgoing', msg.args[0])
         if msg.command == 'PRIVMSG' or \
                 (relay_notices and msg.command == 'NOTICE'):
-            if not msg.relayedMsg:
+            if not msg.relayedMsg and relay_outgoing:
                 if msg.args[0] in irc.state.channels:
                     s, args = self.getPrivmsgData(msg.args[0], irc.nick, msg.args[1],
                                     self.registryValue('color', msg.args[0]))

@@ -90,6 +90,10 @@ conf.registerChannelValue(LinkRelay, 'relayNotices',
     registry.Boolean(False, _("""Determines whether the bot will relay NOTICE
     messages.""")))
 
+conf.registerChannelValue(LinkRelay, 'relayOutgoing',
+    registry.Boolean(True, _("""Determines whether the bot will relay messages
+    from itself.""")))
+
 conf.registerGlobalValue(LinkRelay, 'relays',
     registry.String('', _("""You shouldn't edit this configuration variable
     yourself unless you know what you do. Use @LinkRelay {add|remove} instead.""")))
