@@ -143,7 +143,9 @@ class Markovgen(callbacks.Plugin):
         if self.registryValue('stripRelayedNick', channel):
             message = MATCH_MESSAGE_STRIPNICK.match(message).group('message')
         m.feed(message)
-        if irc.nick.lower() in message.lower().split():
+        tokenized_message = (w.strip(':;,.!?')
+                for w in message.lower().split())
+        if irc.nick.lower() in tokenized_message:
             if random.random() < self.registryValue('onNick.probability', channel):
                 def replace_nick(s):
                     return re.sub(re.escape(irc.nick), msg.nick, s, re.IGNORECASE)
