@@ -170,7 +170,7 @@ class Markovgen(callbacks.Plugin):
 
     def _answer(self, irc, message, m, allow_duplicate,
             postprocessing=lambda x: x):
-        words = message.split(' ')
+        words = message.split()
         if len(words) == 0:
             possibilities = list(m.available_seeds())
         elif len(words) == 1:
