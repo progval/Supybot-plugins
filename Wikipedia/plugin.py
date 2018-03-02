@@ -159,7 +159,7 @@ class Wikipedia(callbacks.Plugin):
             reply += format(_('This article appears to be a talk page: %u'), addr)
         else:
             ##### etree!
-            p = tree.xpath("//div[@id='mw-content-text']/p[1]")
+            p = tree.xpath("//div[@id='mw-content-text']//p[1]")
             if len(p) == 0 or addr.endswith('Special:Search'):
                 if 'wikipedia:wikiproject' in addr.lower():
                     reply += format(_('This page appears to be a WikiProject page, '
