@@ -142,7 +142,7 @@ conf.registerChannelValue(GitHub.format, 'pull_request_review_comment',
         individual review comments, you probably only want to use the
         pull_request_review event to avoid clutter.""")))
 
-for event_type in ('create', 'delete', 'deployment',
+for event_type in ('create', 'delete', 'deployment', 'label',
         'deployment_status', 'download', 'follow', 'fork', 'fork_apply',
         'gist', 'gollum', 'member', 'membership', 'organization', 'public',
         'release', 'repository', 'team', 'team_add', 'watch', 'page_build'):
