@@ -136,7 +136,7 @@ class WebDocServerCallback(httpserver.SupyHTTPServerCallback):
                     if doclines:
                         help_ = cgi.escape('\n'.join(doclines))
                         s = '<strong>%s</strong><br />%s' % \
-                                (ircutils.bold(s), help_)
+                                (s, help_)
                     return '<tr><td>%s</td><td>%s</td></tr>' % \
                             (' '.join(command), s)
 
