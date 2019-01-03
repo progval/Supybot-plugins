@@ -64,7 +64,8 @@ class Variables(callbacks.Plugin):
         if hasattr(self, '_connection'):
             self._connection.close()
         createDatabase = not os.path.exists(self._filename)
-        self._connection = sqlite3.connect(self._filename)
+        self._connection = sqlite3.connect(self._filename,
+            check_same_thread=False)
         if sys.version_info[0] < 3:
             self._connection.text_factory = str
         if createDatabase:

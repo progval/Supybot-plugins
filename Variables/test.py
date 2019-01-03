@@ -28,6 +28,7 @@
 
 ###
 
+import supybot.callbacks as callbacks
 from supybot.test import *
 
 class VariablesTestCase(ChannelPluginTestCase):
@@ -38,6 +39,16 @@ class VariablesTestCase(ChannelPluginTestCase):
         self.assertNotError('set foo bar')
         self.assertResponse('get foo', 'bar')
         self.assertNotError('set foo baz')
+        self.assertResponse('get foo', 'baz')
+
+    def testThread(self):
+        class ThreadedPlugin(callbacks.Plugin):
+            threaded = True
+            def bar(self, irc, msg, args):
+                irc.reply('baz')
+        self.irc.addCallback(ThreadedPlugin(self.irc))
+
+        self.assertNotError('set foo [bar]')
         self.assertResponse('get foo', 'baz')
 
     def testChannel(self):
