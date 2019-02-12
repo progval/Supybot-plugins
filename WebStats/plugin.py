@@ -380,7 +380,10 @@ class WebStatsServerCallback(httpserver.SupyHTTPServerCallback):
             self.send_header('Content-type', content_type)
             self.end_headers()
             if sys.version_info[0] >= 3:
-                output = output.encode()
+                try:
+                    output = output.encode()
+                except:
+                    pass
             self.wfile.write(output)
 
     def get_index(self):
