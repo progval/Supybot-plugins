@@ -169,7 +169,7 @@ class Trivia(callbacks.Plugin):
                 sorted.append(item)
             def cmp(a, b):
                 return b[1] - a[1]
-            sorted.sort(cmp)
+            sorted.sort(key=lambda item: item[1], reverse=True)
             max = 3
             if len(sorted) < max:
                 max = len(sorted)
