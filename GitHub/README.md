@@ -44,3 +44,8 @@ There are also special variables:
 
 Concerning push events, one line is formatted per commit; it is given extra
  variables: `$__commit__foo` for each `data['commits'][X]['foo']`.
+
+The plugin can validate if the payload was sent by GitHub with a proper secret if `supybot.plugins.Github.announces.secret`
+is set.
+
+The Utilities plugin is required to be active for this plugin to work.
