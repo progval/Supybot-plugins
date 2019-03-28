@@ -66,7 +66,10 @@ def list_attrs(obj):
             # Probably class attribute, skip it
             continue
         yield attr_name
-        yield getattr(obj, attr_name, None)
+        try:
+            yield getattr(obj, attr_name, None)
+        except Exception:
+            pass
 
 # from https://code.activestate.com/recipes/577504/
 def total_size(objects, handlers={}, verbose=False, object_filter=None):
