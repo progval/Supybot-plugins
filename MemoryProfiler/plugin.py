@@ -62,11 +62,11 @@ def list_attrs(obj):
         if attr_name.startswith('__'):
             # Magic method, don't touch that
             continue
-        if hasattr(type(obj), attr_name):
-            # Probably class attribute, skip it
-            continue
-        yield attr_name
         try:
+            if hasattr(type(obj), attr_name):
+                # Probably class attribute, skip it
+                continue
+            yield attr_name
             yield getattr(obj, attr_name, None)
         except Exception:
             pass
