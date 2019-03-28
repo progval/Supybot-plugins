@@ -34,5 +34,11 @@ from supybot.test import *
 class MemoryProfilerTestCase(PluginTestCase):
     plugins = ('MemoryProfiler',)
 
+    def testPlugins(self):
+        self.assertNotError('memoryprofiler plugins')
+
+    def testModules(self):
+        self.assertNotError('memoryprofiler modules')
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

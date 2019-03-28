@@ -56,6 +56,18 @@ try:
 except ImportError:
     pass
 
+
+def list_attrs(obj):
+    for attr_name in dir(obj):
+        if attr_name.startswith('__'):
+            # Magic method, don't touch that
+            continue
+        if hasattr(type(obj), attr_name):
+            # Probably class attribute, skip it
+            continue
+        yield attr_name
+        yield getattr(obj, attr_name, None)
+
 # from https://code.activestate.com/recipes/577504/
 def total_size(objects, handlers={}, verbose=False, object_filter=None):
     """ Returns the approximate memory footprint an object and all of its contents.
@@ -69,7 +81,6 @@ def total_size(objects, handlers={}, verbose=False, object_filter=None):
 
     """
     dict_handler = lambda d: chain.from_iterable(list(d.items()))
-    object_handler = lambda o: chain.from_iterable(list(o.__dict__.items()))
     all_handlers = {tuple: iter,
                     list: iter,
                     deque: iter,
@@ -94,12 +105,17 @@ def total_size(objects, handlers={}, verbose=False, object_filter=None):
         for typ, handler in all_handlers.items():
             if isinstance(o, typ):
                 if handler:
-                    s += sum(map(sizeof, handler(o)))
+                    try:
+                        s += sum(map(sizeof, handler(o)))
+                    except RuntimeError:
+                        pass
                 break
         else:
-            if hasattr(o, '__dict__') and o.__dict__ and \
-                    (not object_filter or object_filter(o)):
-                s += sum(map(sizeof, object_handler(o)))
+            if not object_filter or object_filter(o):
+                try:
+                    s += sum(map(sizeof, list_attrs(o)))
+                except RuntimeError:
+                    pass
         return s
 
     return sum(map(sizeof, objects))
@@ -115,7 +131,7 @@ class MemoryProfiler(callbacks.Plugin):
         data = []
         for callback in irc.callbacks:
             module_filter=lambda m:callback.name() in m.__name__.split('.')
-            module_handler = lambda m: (chain.from_iterable(list(m.__dict__.items()))
+            module_handler = lambda m: (list_attrs(m)
                                         if module_filter(m) else [])
             size = total_size([callback], handlers={
                 type(sys): module_handler,
