@@ -194,7 +194,7 @@ class Markovgen(callbacks.Plugin):
             answer = '%s %s' % (backward, forward.split(' ', 2)[2])
         except IndexError:
             answer = backward
-        if allow_duplicate or m != answer:
+        if allow_duplicate or message != answer:
             irc.reply(postprocessing(answer), prefixNick=False)
 
     @wrap(['channel'])
