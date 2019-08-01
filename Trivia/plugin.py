@@ -108,7 +108,7 @@ class Trivia(callbacks.Plugin):
             self.questions = []
             self.roundscores = {}
             self.unanswered = 0
-            f = open(self.questionfile, 'r')
+            f = open(self.questionfile, 'r', encoding='utf8')
             line = f.readline()
             while line:
                 self.questions.append(line.strip('\n\r'))
