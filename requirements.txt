@@ -7,6 +7,5 @@ requests
 pygraphviz
 oauth2
 python-oauth2
-git+https://github.com/haypo/pysandbox.git
 unicode_tex
 markovgen
