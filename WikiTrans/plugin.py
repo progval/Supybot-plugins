@@ -87,9 +87,10 @@ def wikidata_translate(src, target, word):
     if sys.version_info[0] < 3:
         word = word.decode('utf8')
     word = word.lower()
-    pred = lambda x: (word == x['labels'][src]['value'].lower() or
-                      word in (y['value'].lower()
-                               for y in x.get('aliases', {}).get(src, [])))
+    pred = lambda x: (src in x['labels'] and
+                      (word == x['labels'][src]['value'].lower() or
+                       word in (y['value'].lower()
+                                for y in x.get('aliases', {}).get(src, []))))
     entities = filter(pred, entities.values())
 
     # Join all possible translations

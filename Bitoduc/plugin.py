@@ -47,7 +47,7 @@ except ImportError:
     # without the i18n module
     _ = lambda x: x
 
-SOURCE = 'http://bitoduc.fr/traductions.json'
+SOURCE = 'https://bitoduc.fr/liste_de_traductions.json'
 
 class Bitoduc(callbacks.Plugin):
     """Interface à bitoduc.fr"""
@@ -60,7 +60,7 @@ class Bitoduc(callbacks.Plugin):
             try:
                 data = json.loads(utils.web.getUrl(SOURCE).decode())
                 self._dict = utils.InsensitivePreservingDict()
-                for d in itertools.chain(data['vrais mots'], data['faux mots']):
+                for d in data:
                     self._dict[d['anglais'].split(' (')[0]] = d['français'] \
                             .lower()
                 self._re = re.compile(r'(\b%ss?\b)' % (

@@ -57,7 +57,7 @@ class IrcMsg(ircmsgs.IrcMsg):
         plugin = None
         f = sys._getframe().f_back
         while f:
-            if 'irc' in f.f_locals and \
+            if 'irc' in f.f_locals and 'self' in f.f_locals and \
                     isinstance(f.f_locals['self'], callbacks.Commands):
                 plugin = f.f_locals['self']
                 break

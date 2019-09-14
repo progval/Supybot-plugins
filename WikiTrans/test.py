@@ -37,13 +37,13 @@ class WikiTransTestCase(PluginTestCase):
     plugins = ('WikiTrans',)
 
     def testTranslate(self):
-        self.assertResponse('translate en be IRC', 'IRC')
+        self.assertRegexp('translate en be IRC', 'IRC')
         self.assertRegexp('translate en fr IRC', 'Internet Relay Chat')
 
-        self.assertResponse('translate en fr IRC bot', 'Robot IRC')
+        self.assertResponse('translate en fr IRC bot', 'robot IRC')
         self.assertResponse('translate fr en robot IRC', 'IRC bot')
 
-        self.assertResponse('translate fr en Chef-d\'œuvre', 'masterpiece')
+        self.assertRegexp('translate fr en Chef-d\'œuvre', 'masterpiece')
         try:
             self.assertRegexp('translate en fr Masterpiece', 'chef-d\'œuvre')
             self.assertRegexp('translate en fr The Master',
@@ -61,13 +61,13 @@ class WikiTransTestCase(PluginTestCase):
         self.assertError('translate fr en pogjoeregml')
 
     def testWikidataTranslate(self):
-        self.assertResponse('wikidata en be IRC', 'IRC')
+        self.assertRegexp('wikidata en be IRC', 'IRC')
         self.assertRegexp('wikidata en fr IRC', 'Internet Relay Chat')
 
-        self.assertResponse('wikidata en fr IRC bot', 'Robot IRC')
+        self.assertResponse('wikidata en fr IRC bot', 'robot IRC')
         self.assertResponse('wikidata fr en robot IRC', 'IRC bot')
 
-        self.assertResponse('wikidata fr en Chef-d\'œuvre', 'masterpiece')
+        self.assertRegexp('wikidata fr en Chef-d\'œuvre', 'masterpiece')
         try:
             self.assertRegexp('wikidata en fr Masterpiece', 'chef-d\'œuvre')
             self.assertRegexp('wikidata en fr The Master',
