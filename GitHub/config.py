@@ -142,10 +142,52 @@ conf.registerChannelValue(GitHub.format, 'pull_request_review_comment',
         individual review comments, you probably only want to use the
         pull_request_review event to avoid clutter.""")))
 
-for event_type in ('create', 'delete', 'deployment', 'label',
-        'deployment_status', 'download', 'follow', 'fork', 'fork_apply',
-        'gist', 'gollum', 'member', 'membership', 'organization', 'public',
-        'release', 'repository', 'team', 'team_add', 'watch', 'page_build'):
+# BEGIN AUTOGEN
+EVENT_TYPES = (
+    'check_suite',
+    'content_reference',
+    'create',
+    'delete',
+    'deploy_key',
+    'deployment',
+    'deployment_status',
+    'download',
+    'follow',
+    'fork',
+    'fork_apply',
+    'github_app_authorization',
+    'gist',
+    'gollum',
+    'installation',
+    'installation_repositories',
+    'label',
+    'member',
+    'membership',
+    'meta',
+    'milestone',
+    'organization',
+    'org_block',
+    'page_build',
+    'project_card',
+    'project_column',
+    'project',
+    'public',
+    'registry_package',
+    'release',
+    'repository_dispatch',
+    'repository',
+    'repository_import',
+    'repository_vulnerability_alert',
+    'security_advisory',
+    'star',
+    'team',
+    'team_add',
+    'watch',
+)
+# END EUTOGEN
+
+
+for event_type in EVENT_TYPES:
     conf.registerChannelValue(GitHub.format, event_type,
             registry.String('', _("""Format for %s events.""") % event_type))
 
