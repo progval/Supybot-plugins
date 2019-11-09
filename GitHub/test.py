@@ -54,5 +54,13 @@ class GitHubTestCase(PluginTestCase):
                             'ProgVal Supybot-plugins')
         self.assertResponse('config supybot.plugins.GitHub.announces', ' ')
 
+    def testAnnounceList(self):
+        self.assertNotError('config supybot.plugins.GitHub.announces '
+                            'abc/def | test | #foo || '
+                            'abc/def | test | #bar || '
+                            'def/ghi | test | #bar')
+        self.assertRegexp('github announce list #foo', 'The following .*abc/def')
+        self.assertRegexp('github announce list #bar', 'The following .*(abc/def.*def/ghi|def/ghi.*abc/def)')
+        self.assertRegexp('github announce list #baz', 'No repositories')
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

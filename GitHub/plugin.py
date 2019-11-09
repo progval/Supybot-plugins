@@ -418,7 +418,25 @@ class GitHub(callbacks.Plugin):
                         'channel.'))
         remove = wrap(remove, ['channel', 'something', 'something'])
 
+        def list(self, irc, msg, args, channel):
+            """[<channel>]
 
+            Lists all GitHub repositories announced to the given channel.
+            <channel> defaults to the current channel.
+            """
+            announces = self._load()
+            results = []
+            for annc in announces:
+                if (annc[1] == '' or annc[1] == irc.network) and \
+                        ircutils.strEqual(annc[2], channel):
+                    results.append(annc[0])
+
+            if results:
+                irc.reply(format(_('The following repositories announce to %s: %L'),
+                          channel, results))
+            else:
+                irc.reply('No repositories announce to %s.' % channel)
+        list = wrap(list, ['channel'])
 
     class repo(callbacks.Commands):
         def _url(self):
