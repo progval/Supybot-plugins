@@ -1,5 +1,10 @@
 Provides read access to APT repositories.
 
+This plugin is a rewrite of PackageInfo using the `python-apt` library instead
+of parsing `apt-cache`'s console output.
+
+## Usage
+
 To use it, you must set `$DATADIR/aptdir/etc/sources.list` (where $DATADIR is
 configured with `supybot.directories.data`, which defaults to $BOTDIR/data`)
 to the list of sources you want to use. See `man sources.list` for supported
