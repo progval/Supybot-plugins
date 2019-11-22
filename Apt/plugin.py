@@ -397,18 +397,27 @@ class Apt(callbacks.Plugin):
             getopts({
                 **FILTERS_OPTLIST,
                 'with-version': '',
+                'description': '',
             }),
             'somethingWithoutSpaces'
         ])
         @add_filters_doc
         def search(self, irc, msg, args, optlist, package_pattern):
-            """%s <package>
+            """%s [--with-version] [--description] <package>
 
-            Shows generic information about a package. %s"""
+            Shows generic information about a package. --with-version also
+            returns matching version numbers. --description searches in package
+            description instead of name. %s"""
             opts = dict(optlist)
+            search_description = 'description' in opts
             cache = self.plugin(irc)._get_cache()
-            pattern = re.compile(utils.python.glob2re(package_pattern))
-            packages = [pkg for pkg in cache if pattern.match(pkg.shortname)]
+            pattern = re.compile(utils.python.glob2re(package_pattern),
+                    re.DOTALL)
+
+            packages = list(cache)
+
+            if not search_description:
+                packages = [pkg for pkg in cache if pattern.match(pkg.shortname)]
 
             if not packages:
                 irc.error(_('No package found.'), Raise=True)
@@ -416,6 +425,11 @@ class Apt(callbacks.Plugin):
             versions = [version
                         for pkg in packages
                         for version in pkg.versions]
+
+            if search_description:
+                versions = [version
+                            for version in versions
+                            if pattern.match(version.description)]
 
             versions = filter_versions(
                 self.plugin(irc), irc, msg.channel, opts, versions)

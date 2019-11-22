@@ -253,6 +253,10 @@ class AptTestCase(PluginTestCase):
             'package search limnori*',
             'limnoria')
 
+        self.assertRegexp(
+            'package search --description *upybot*',
+            '(supybot and limnoria|limnoria and supybot)')
+
         self.assertResponse(
             'package search e2fsprogs*',
             'e2fsprogs and e2fsprogs-l10n')
