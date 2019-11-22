@@ -31,6 +31,7 @@
 import os
 import re
 import time
+import itertools
 import threading
 
 import apt
@@ -414,22 +415,32 @@ class Apt(callbacks.Plugin):
             pattern = re.compile(utils.python.glob2re(package_pattern),
                     re.DOTALL)
 
-            packages = list(cache)
+            packages = iter(cache)
 
             if not search_description:
-                packages = [pkg for pkg in cache if pattern.match(pkg.shortname)]
+                packages = (pkg for pkg in cache if pattern.match(pkg.shortname))
 
-            if not packages:
-                irc.error(_('No package found.'), Raise=True)
+                # Dirty trick to check if the iterator is empty without
+                # consuming it entirely
+                (packages, peek_packages) = itertools.tee(packages)
+                if not next(peek_packages, None):
+                    irc.error(_('No package found.'), Raise=True)
 
-            versions = [version
+            versions = (version
                         for pkg in packages
-                        for version in pkg.versions]
+                        for version in pkg.versions)
 
             if search_description:
-                versions = [version
+                versions = (version
                             for version in versions
-                            if pattern.match(version.description)]
+                            if pattern.match(version.description))
+
+            # filter_versions is rather slow, so we're putting this guard
+            # before running it.
+            versions = list(itertools.islice(versions, 10000))
+            if len(versions) >= 10000:
+                irc.error(_('Too many packages match this search.'),
+                        Raise=True)
 
             versions = filter_versions(
                 self.plugin(irc), irc, msg.channel, opts, versions)

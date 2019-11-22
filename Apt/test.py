@@ -261,6 +261,11 @@ class AptTestCase(PluginTestCase):
             'package search e2fsprogs*',
             'e2fsprogs and e2fsprogs-l10n')
 
+    def testPackageSearchTooMany(self):
+        self.assertResponse(
+            'package search *',
+            'Error: Too many packages match this search.')
+
     def testPackageSearchWithVersion(self):
         self.assertResponse(
             'package search --with-version limnoria',
