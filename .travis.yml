@@ -11,12 +11,13 @@ install:
     - travis_retry pip install -vr https://raw.githubusercontent.com/ProgVal/Limnoria/testing/requirements.txt > /dev/null
     - travis_retry pip install -v git+https://github.com/ProgVal/Limnoria.git@testing > /dev/null
     - travis_retry pip install -vr requirements.txt
+    - sudo apt install python3-apt
 # command to run tests, e.g. python setup.py test
 script:
   - echo $TRAVIS_PYTHON_VERSION
   - export PYTHON_MAJOR_VERSION=$(python -c "import sys;print(sys.version_info[0])")
   - echo $PYTHON_MAJOR_VERSION
-  - if [ "$PYTHON_MAJOR_VERSION" = "3" ]; then export DISABLED_PLUGINS="--exclude ./Twitter --exclude ./TwitterStream --exclude ./MegaHAL --exclude ./GUI --exclude ./WebStats"; else export DISABLED_PLUGINS="--exclude ./Bitoduc --exclude ./PypySandbox --exclude ./PPP --exclude ./Bitoduc --exclude ./Markovgen --exclude ./Trivia --exclude ./WebStats"; fi
+  - if [ "$PYTHON_MAJOR_VERSION" = "3" ]; then export DISABLED_PLUGINS="--exclude ./Twitter --exclude ./TwitterStream --exclude ./MegaHAL --exclude ./GUI --exclude ./WebStats"; else export DISABLED_PLUGINS="--exclude Apt --exclude ./Bitoduc --exclude ./PypySandbox --exclude ./PPP --exclude ./Bitoduc --exclude ./Markovgen --exclude ./Trivia --exclude ./WebStats"; fi
   - supybot-test --plugins-dir=. --no-network --exclude=./NoLatin1 --exclude ./AlternativeTo --exclude ./Json --exclude ./PypySandbox --exclude ./Untiny --exclude ./CrousLyon --exclude ./PackageInfo --exclude ./Supysandbox $DISABLED_PLUGINS
 notifications:
     email: false
