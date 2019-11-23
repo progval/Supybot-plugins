@@ -1,0 +1,87 @@
+# French translations for PACKAGE package.
+# Copyright (C) 2019 ORGANIZATION
+# Automatically generated, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2019-11-23 11:03+CET\n"
+"PO-Revision-Date: 2019-11-23 11:03+CET\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: Apt/config.py:54
+msgid ""
+"Minimum interval before an\n"
+"    automatic update of the cache, in seconds. Set to 0 to disable "
+"automatic\n"
+"    updates."
+msgstr "Intervalle minimum avant une mise à jour automatique du cache, en seconde. Définir à 0 pour désactiver les mises à jour automatiques."
+
+#: Apt/config.py:60
+msgid ""
+"Default value of --archs\n"
+"    for commands that accept it. Comma-separated list of CPU architectures \n"
+"    (\"arm64\", \"amd64\", \"i386\", ...). "
+msgstr "Valeur par défaut de --arch pour les commandes qui l'acceptent. Liste séparée par des virgules d'architectures CPU (\"arm64\", \"amd64\", \"i386\", ...)"
+
+#: Apt/config.py:64
+msgid ""
+"Default value of --distribs\n"
+"    for commands that accept it. Comma-separated list of distributions\n"
+"    (\"Ubuntu\", \"Debian\", \"Debian Backports\", ...). "
+msgstr "Valeur par défaut de --distribs pour les commandes qui l'acceptent. Liste séparée par des virgules de distributions (\"Ubuntu\", \"Debian\", \"Debian Backports\", ...)"
+
+#: Apt/config.py:68
+msgid ""
+"Default value of --releases\n"
+"    for commands that accept it. Comma-separated list of releases (\"buster"
+"\",\n"
+"    \"bionic\", \"stretch\", \"stretch-backports\", ...). "
+msgstr "Valeur par défaut de --releases pour les commandes qui l'acceptent. Liste séparée par des virgules de releases (\"bionic\", \"stretch\", \"stretch-backports\", ...)"
+
+#: Apt/plugin.py:63
+msgid "Cannot open lz4 file, python3-lz4 0.23.1 or higher is required."
+msgstr "Impossible d'ouvrir le fichier lz4, python3-lz4 0.23.1 ou plus récent est nécessaire"
+
+#: Apt/plugin.py:196
+msgid "Package exists, but no version is found."
+msgstr "Le paquet existe, mais aucune version n'a pû être trouvée."
+
+#: Apt/plugin.py:305 Apt/plugin.py:436
+msgid "No package found."
+msgstr "Aucun paquet trouvé."
+
+#: Apt/plugin.py:316
+msgid "Package not found."
+msgstr "Paquet inconnu."
+
+#: Apt/plugin.py:345
+msgid "%s: %L"
+msgstr "%s : %L"
+
+#: Apt/plugin.py:369
+msgid "%s %s: %s"
+msgstr "%s %s : %s"
+
+#: Apt/plugin.py:394
+msgid "%s (source: %s) is %s and in section \"%s\"."
+msgstr "%s (source : %s) est %s et est dans la section \"%s\"."
+
+#: Apt/plugin.py:399
+msgid "Version %s package is %S and takes %S when installed."
+msgstr "Le paquet de la version %s fait %S et prend %S après installation."
+
+#: Apt/plugin.py:403
+msgid "%s %s Description: %s"
+msgstr "%s %s Description : %s"
+
+#: Apt/plugin.py:451
+msgid "Too many packages match this search."
+msgstr "Trop de paquets correspondent à cette recherche."
