@@ -35,7 +35,10 @@ import itertools
 import threading
 
 import apt
-import lz4.frame
+try:
+    import lz4.frame
+except ImportError:
+    lz4 = None
 
 from supybot import callbacks, utils
 from supybot.commands import wrap, commalist, getopts
@@ -53,7 +56,12 @@ DEPENDENCY_TYPES = [
 
 def get_file_opener(extension):
     if extension == 'lz4':
-        return lz4.frame.open
+        try:
+            return lz4.frame.open
+        except AttributeError:
+            raise callbacks.Error(
+                _('Cannot open lz4 file, python3-lz4 0.23.1 or higher '
+                  'is required.'))
 
 
 def read_chunk(fd, remainder):
