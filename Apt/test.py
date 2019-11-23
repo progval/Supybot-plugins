@@ -93,6 +93,9 @@ class AptTestCase(PluginTestCase):
                       '[--types <type>,<type>,...] '
                       '<package>\x02) -- Lists'))
 
+    def testUpdate(self):
+        self.assertResponse('apt update', 'The operation succeeded.')
+
     def testFilePackages(self):
         self.assertRegexp(
             'file packages plugins/Owner/plugin.py',

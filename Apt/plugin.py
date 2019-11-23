@@ -245,12 +245,13 @@ class Apt(callbacks.Plugin):
                 self._cache = apt.Cache(rootdir=self._get_cache_dir())
                 self._cache.open()
 
-    @wrap([])
+    @wrap([('checkCapability', 'trusted')])
     def update(self, irc, msg, args):
         """takes no arguments
 
         Updates the APT cache from repositories."""
         self._update_cache()
+        irc.replySuccess()
 
     class file(callbacks.Commands):
         def plugin(self, irc):
