@@ -274,6 +274,7 @@ class Apt(callbacks.Plugin):
                 self._cache.open()
             else:
                 self._cache = apt.Cache(rootdir=self._get_cache_dir())
+                self._cache.update()
                 self._cache.open()
 
     @wrap([('checkCapability', 'trusted')])
