@@ -129,6 +129,18 @@ class AptTestCase(PluginTestCase):
             'package depends --types breaks,replaces,conflicts limnoria',
             'limnoria=2019.02.23-1: supybot')
 
+    def testPackageDependsTranslation(self):
+        with conf.supybot.language.context('fr'):
+            self.assertResponse(
+                'package depends limnoria',
+                'limnoria=2019.02.23-1 : python3:any')
+            self.assertResponse(
+                'package depends --types Casse,Remplace,Conflicte limnoria',
+                'limnoria=2019.02.23-1 : supybot')
+            self.assertResponse(
+                'package depends --types casse,remplace,conflicte limnoria',
+                'limnoria=2019.02.23-1 : supybot')
+
     def testPackageInfo(self):
         self.assertResponse(
             'package info limnoria',
@@ -136,6 +148,16 @@ class AptTestCase(PluginTestCase):
             'Version 2019.02.23-1 package is 558KB and takes 4MB when '
             'installed. '
             'Description: robust and user-friendly Python IRC bot')
+
+    def testPackageInfoTranslation(self):
+        with conf.supybot.language.context('fr'):
+            self.assertResponse(
+                'package info limnoria',
+                'limnoria (source : limnoria) est optionnel et est dans la '
+                'section "net". '
+                'Le paquet de la version 2019.02.23-1 fait 558KB et prend '
+                '4MB après installation. '
+                'Description : robust and user-friendly Python IRC bot')
 
     def testPackageInfoFilterDistributions(self):
         self.assertResponse(

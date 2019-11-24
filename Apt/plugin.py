@@ -49,9 +49,32 @@ import supybot.conf as conf
 _ = PluginInternationalization('Apt')
 
 
-DEPENDENCY_TYPES = [
-    'Breaks', 'Conflicts', 'Depends', 'Enhances',
-    'PreDepends', 'Recommends', 'Replaces', 'Suggests']
+def get_dependency_translations():
+    return utils.InsensitivePreservingDict({
+        'Breaks': _('Breaks'),
+        'Conflicts': _('Conflicts'),
+        'Depends': _('Depends'),
+        'Enhances': _('Enhances'),
+        'PreDepends': _('PreDepends'),
+        'Recommends': _('Recommends'),
+        'Replaces': _('Replaces'),
+        'Suggests': _('Suggests'),
+    })
+
+
+def get_dependency_reverse_translations():
+    return utils.InsensitivePreservingDict(
+        {v: k for (k, v) in get_dependency_translations().items()})
+
+
+def get_priority_translations():
+    return {
+        'required': _('required'),
+        'important': _('important'),
+        'standard': _('standard'),
+        'optional': _('optional'),
+        'extra': _('extra'),
+    }
 
 
 def get_file_opener(extension):
@@ -335,7 +358,10 @@ class Apt(callbacks.Plugin):
             pkg = self._get_package(irc, package_name)
 
             dep_types = opts.get('types', ['Depends', 'PreDepends'])
-            dep_types = [dep_type.capitalize() for dep_type in dep_types]
+            dep_types = [dep_type for dep_type in dep_types]
+            translations = get_dependency_reverse_translations()
+            dep_types = [translations.get(dep_type, dep_type)
+                         for dep_type in dep_types]
 
             # TODO: better version selection
             pkg_version = filter_versions(
@@ -390,10 +416,12 @@ class Apt(callbacks.Plugin):
 
             # source_name and priority shouldn't change too often, so I assume
             # it's safe to call it a "generic info" in a UI
+            priority = get_priority_translations().get(
+                pkg_version.priority, pkg_version.priority)
             generic_info = format(
                 _('%s (source: %s) is %s and in section "%s".'),
                 pkg.shortname, pkg_version.source_name,
-                pkg_version.priority, pkg.section)
+                priority, pkg.section)
 
             version_info = format(
                 _('Version %s package is %S and takes %S when installed.'),

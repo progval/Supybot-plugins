@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2019-11-23 11:03+CET\n"
+"POT-Creation-Date: 2019-11-24 10:48+CET\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,43 +43,193 @@ msgid ""
 "    \"bionic\", \"stretch\", \"stretch-backports\", ...). "
 msgstr ""
 
-#: Apt/plugin.py:63
+#: Apt/plugin.py:54
+msgid "Breaks"
+msgstr ""
+
+#: Apt/plugin.py:55
+msgid "Conflicts"
+msgstr ""
+
+#: Apt/plugin.py:56
+msgid "Depends"
+msgstr ""
+
+#: Apt/plugin.py:57
+msgid "Enhances"
+msgstr ""
+
+#: Apt/plugin.py:58
+msgid "PreDepends"
+msgstr ""
+
+#: Apt/plugin.py:59
+msgid "Recommends"
+msgstr ""
+
+#: Apt/plugin.py:60
+msgid "Replaces"
+msgstr ""
+
+#: Apt/plugin.py:61
+msgid "Suggests"
+msgstr ""
+
+#: Apt/plugin.py:72
+msgid "required"
+msgstr ""
+
+#: Apt/plugin.py:73
+msgid "important"
+msgstr ""
+
+#: Apt/plugin.py:74
+msgid "standard"
+msgstr ""
+
+#: Apt/plugin.py:75
+msgid "optional"
+msgstr ""
+
+#: Apt/plugin.py:76
+msgid "extra"
+msgstr ""
+
+#: Apt/plugin.py:86
 msgid "Cannot open lz4 file, python3-lz4 0.23.1 or higher is required."
 msgstr ""
 
-#: Apt/plugin.py:196
+#: Apt/plugin.py:101
+#, docstring
+msgid ""
+"Reads the fd un chunks of lines, and runs pattern.finditer on each of\n"
+"    the chunks."
+msgstr ""
+
+#: Apt/plugin.py:116
+#, docstring
+msgid ""
+"Returns a list of '/var/lib/apt/lists/*_Content-*' and functions\n"
+"    suitable to open them"
+msgstr ""
+
+#: Apt/plugin.py:181
+#, docstring
+msgid ""
+"Takes a list of apt.Version objects, and returns another list, by\n"
+"    running filters on it.\n"
+"    Filters choosen based on the channel's config (see config.py) and the\n"
+"    command's optlist (which overrides the config)."
+msgstr ""
+
+#: Apt/plugin.py:219
 msgid "Package exists, but no version is found."
 msgstr ""
 
-#: Apt/plugin.py:305 Apt/plugin.py:436
+#: Apt/plugin.py:226
+#, docstring
+msgid "Provides read access to APT repositories."
+msgstr ""
+
+#: Apt/plugin.py:241
+#, docstring
+msgid "Is the cache older than the configured interval?"
+msgstr ""
+
+#: Apt/plugin.py:248
+#, docstring
+msgid ""
+"Get the current cache if any, else open it. Also performs an update\n"
+"        if the cache is expired (wrt. the updateInterval)."
+msgstr ""
+
+#: Apt/plugin.py:269
+#, docstring
+msgid "Equivalent to 'apt-get update'"
+msgstr ""
+
+#: Apt/plugin.py:281
+#, docstring
+msgid ""
+"takes no arguments\n"
+"\n"
+"        Updates the APT cache from repositories."
+msgstr ""
+
+#: Apt/plugin.py:298
+#, docstring
+msgid ""
+"<filename>\n"
+"\n"
+"            Lists packages that contain the given filename."
+msgstr ""
+
+#: Apt/plugin.py:328 Apt/plugin.py:464
 msgid "No package found."
 msgstr ""
 
-#: Apt/plugin.py:316
+#: Apt/plugin.py:339
 msgid "Package not found."
 msgstr ""
 
-#: Apt/plugin.py:345
+#: Apt/plugin.py:351
+#, docstring
+msgid ""
+"%s [--types <type>,<type>,...] <package>\n"
+"\n"
+"            Lists dependencies of a package. <type>s are types of dependencies\n"
+"            that will be shown. Valid types are: Breaks, Conflicts, Depends,\n"
+"            Enhances, PreDepends, Recommends, Replaces, Suggests. %s\n"
+"            "
+msgstr ""
+
+#: Apt/plugin.py:371
 msgid "%s: %L"
 msgstr ""
 
-#: Apt/plugin.py:369
+#: Apt/plugin.py:383
+#, docstring
+msgid ""
+"%s <package>\n"
+"\n"
+"            Shows the long description of a package. %s"
+msgstr ""
+
+#: Apt/plugin.py:395
 msgid "%s %s: %s"
 msgstr ""
 
-#: Apt/plugin.py:394
+#: Apt/plugin.py:407
+#, docstring
+msgid ""
+"%s <package>\n"
+"\n"
+"            Shows generic information about a package. %s"
+msgstr ""
+
+#: Apt/plugin.py:422
 msgid "%s (source: %s) is %s and in section \"%s\"."
 msgstr ""
 
-#: Apt/plugin.py:399
+#: Apt/plugin.py:427
 msgid "Version %s package is %S and takes %S when installed."
 msgstr ""
 
-#: Apt/plugin.py:403
+#: Apt/plugin.py:431
 msgid "%s %s Description: %s"
 msgstr ""
 
-#: Apt/plugin.py:451
+#: Apt/plugin.py:444
+#, docstring
+msgid ""
+"%s [--with-version] [--description] <package>\n"
+"\n"
+"            Shows generic information about a package. --with-version also\n"
+"            returns matching version numbers. --description searches in package\n"
+"            description instead of name. %s"
+msgstr ""
+
+#: Apt/plugin.py:479
 msgid "Too many packages match this search."
 msgstr ""
 
