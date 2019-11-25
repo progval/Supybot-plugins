@@ -16,12 +16,12 @@ store yourself.
 Example:
 
 ```
-deb [allow-insecure=yes] http://archive.ubuntu.com/ubuntu bionic main universe
-deb-src [allow-insecure=yes] http://archive.ubuntu.com/ubuntu bionic main universe
-deb [allow-insecure=yes] http://deb.debian.org/debian buster main
-deb-src [allow-insecure=yes] http://deb.debian.org/debian buster main
-deb [allow-insecure=yes] http://deb.debian.org/debian stretch-backports main
-deb-src [allow-insecure=yes] http://deb.debian.org/debian stretch-backports main
+deb [trusted=yes] http://archive.ubuntu.com/ubuntu bionic main universe
+deb-src [trusted=yes] http://archive.ubuntu.com/ubuntu bionic main universe
+deb [trusted=yes] http://deb.debian.org/debian buster main
+deb-src [trusted=yes] http://deb.debian.org/debian buster main
+deb [trusted=yes] http://deb.debian.org/debian stretch-backports main
+deb-src [trusted=yes] http://deb.debian.org/debian stretch-backports main
 ```
 
 The bot will then take care of updating these sources, based on the value of

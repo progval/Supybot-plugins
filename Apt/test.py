@@ -38,12 +38,12 @@ import supybot.conf as conf
 from .plugin import Apt
 
 SOURCES_LIST = '''
-deb [allow-insecure=yes] http://archive.ubuntu.com/ubuntu bionic main universe
-deb-src [allow-insecure=yes] http://archive.ubuntu.com/ubuntu bionic main universe
-deb [allow-insecure=yes arch=amd64,armel] http://deb.debian.org/debian buster main
-deb-src [allow-insecure=yes] http://deb.debian.org/debian buster main
-deb [allow-insecure=yes] http://deb.debian.org/debian stretch-backports main
-deb-src [allow-insecure=yes] http://deb.debian.org/debian stretch-backports main
+deb [trusted=yes] http://archive.ubuntu.com/ubuntu bionic main universe
+deb-src [trusted=yes] http://archive.ubuntu.com/ubuntu bionic main universe
+deb [trusted=yes arch=amd64,armel] http://deb.debian.org/debian buster main
+deb-src [trusted=yes] http://deb.debian.org/debian buster main
+deb [trusted=yes] http://deb.debian.org/debian stretch-backports main
+deb-src [trusted=yes] http://deb.debian.org/debian stretch-backports main
 '''
 
 
