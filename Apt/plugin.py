@@ -30,6 +30,7 @@
 
 import os
 import re
+import glob
 import time
 import itertools
 import threading
@@ -85,6 +86,9 @@ def get_file_opener(extension):
             raise callbacks.Error(
                 _('Cannot open lz4 file, python3-lz4 0.23.1 or higher '
                   'is required.'))
+    else:
+        raise ValueError(
+            'Cannot open .%s files, unknown extension' % extension)
 
 
 def read_chunk(fd, remainder):
@@ -108,26 +112,51 @@ def search_lines(pattern, fd):
             break
 
 
-_content_lists_filename_re = re.compile(
-    r'^.*_Contents-(?P<arch>[a-z0-9])+\.(?P<ext>[a-z0-9]+)$')
+_packages_lists_filename_re = re.compile(
+    r'(?P<beginning>.*)_binary-(?P<arch>[^_-]+)_Packages')
 
 
 def list_content_lists(plugin, irc, channel, filters, rootdir):
     """Returns a list of '/var/lib/apt/lists/*_Content-*' and functions
     suitable to open them"""
     archs = get_filter_config(plugin, irc, channel, filters, 'archs')
+    if archs:
+        archs = [arch.lower() for arch in archs]
 
-    lists_dir = rootdir + '/var/lib/apt/lists/'
-    list_filenames = os.listdir(lists_dir)
+    distribs = get_filter_config(plugin, irc, channel, filters, 'distribs')
+    if distribs:
+        distribs = [distrib.lower() for distrib in distribs]
+
+    releases = get_filter_config(plugin, irc, channel, filters, 'releases')
+    if releases:
+        releases = [release.lower() for release in releases]
+
+    list_filenames = []
+    for file in plugin._get_cache()._cache.file_list:
+        # TODO: add support for 'all' arch; which would check that the file is
+        # indeed available in all architecture.
+        if archs and file.architecture not in archs:
+            continue
+
+        if distribs and file.label not in distribs:
+            continue
+
+        if releases \
+                and file.archive.lower() not in releases \
+                and file.codename not in releases:
+            continue
+
+        match = _packages_lists_filename_re.match(file.filename)
+        if not match:
+            continue
+
+        list_filenames.extend(glob.glob(
+            '%(beginning)s_Contents-%(arch)s*' % match.groupdict()))
+
     for list_filename in list_filenames:
-        match = _content_lists_filename_re.match(list_filename)
-        if match:
-            if archs and 'all' not in archs \
-                    and match.group('arch') not in archs:
-                continue
-            extension = list_filename.rsplit('.', 1)[1]
-            file_opener = get_file_opener(extension)
-            yield (lists_dir + list_filename, file_opener)
+        (_, extension) = os.path.splitext(list_filename)
+        file_opener = get_file_opener(extension.strip('.'))
+        yield (list_filename, file_opener)
 
 
 def get_filter_config(plugin, irc, channel, filters, filter_name):
@@ -291,14 +320,15 @@ class Apt(callbacks.Plugin):
 
         @wrap([
             getopts({
-                'archs': commalist('something'),
+                **FILTERS_OPTLIST,
             }),
             'something',
         ])
+        @add_filters_doc
         def packages(self, irc, msg, args, opts, filename):
-            """<filename>
+            """%s <filename>
 
-            Lists packages that contain the given filename."""
+            Lists packages that contain the given filename. %s"""
             opts = dict(opts)
             plugin = self.plugin(irc)
             plugin._get_cache()  # open the cache

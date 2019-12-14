@@ -115,8 +115,19 @@ class AptTestCase(PluginTestCase):
             'file packages --archs armel doc/linux-image-amd64/changelog',
             'Error: No package found.')
         self.assertResponse(
-            'file packages --archs all doc/linux-image-amd64/changelog',
+            'file packages --archs * doc/linux-image-amd64/changelog',
             'linux-image-amd64')
+
+    def testFilePackagesFilterReleases(self):
+        self.assertResponse(
+            'file packages supybot/plugins/Hashes',
+            'limnoria')
+        self.assertResponse(
+            'file packages --releases bionic supybot/plugins/Hashes',
+            'Error: No package found.')
+        self.assertResponse(
+            'file packages --releases * supybot/plugins/Hashes',
+            'limnoria')
 
     def testPackageDepends(self):
         self.assertResponse(
