@@ -254,8 +254,9 @@ class LinkRelay(callbacks.Plugin):
     def doNick(self, irc, msg):
         args = {'oldnick': msg.nick, 'network': irc.network,
                 'newnick': msg.args[0], 'color': ''}
-        if self.registryValue('color', msg.args[0]):
-            args['color'] = '\x03%s' % self.registryValue('colors.nick', msg.args[0])
+        if self.registryValue('color'):
+            # TODO: this should use the channel-specific value
+            args['color'] = '\x03%s' % self.registryValue('colors.nick')
         s = _('*/* %(oldnick)s (%(network)s) changed their nickname to '
                 '%(newnick)s')
         for (channel, c) in irc.state.channels.items():
@@ -266,7 +267,8 @@ class LinkRelay(callbacks.Plugin):
         args = {'nick': msg.nick, 'network': irc.network,
                 'message': msg.args[0], 'color': ''}
         if self.registryValue('color'):
-            args['color'] = '\x03%s' % self.registryValue('colors.quit', msg.args[0])
+            # TODO: this should use the channel-specific value
+            args['color'] = '\x03%s' % self.registryValue('colors.quit')
         s = _('<-- %(nick)s has quit on %(network)s (%(message)s)')
         self.sendToOthers(irc, None, s, args, msg.nick)
 
