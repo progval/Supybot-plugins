@@ -1,11 +1,9 @@
 language: python
 sudo: false
 python:
-  - "2.7"
   - "3.5"
   - "3.6"
   - "3.7"
-  - "pypy"
   - "pypy3"
 install:
     - travis_retry pip install -vr https://raw.githubusercontent.com/ProgVal/Limnoria/testing/requirements.txt > /dev/null
@@ -17,7 +15,7 @@ script:
   - echo $TRAVIS_PYTHON_VERSION
   - export PYTHON_MAJOR_VERSION=$(python -c "import sys;print(sys.version_info[0])")
   - echo $PYTHON_MAJOR_VERSION
-  - if [ "$PYTHON_MAJOR_VERSION" = "3" ]; then export DISABLED_PLUGINS="--exclude ./Twitter --exclude ./TwitterStream --exclude ./MegaHAL --exclude ./GUI --exclude ./WebStats"; else export DISABLED_PLUGINS="--exclude ./Apt --exclude ./Bitoduc --exclude ./PypySandbox --exclude ./PPP --exclude ./Bitoduc --exclude ./Markovgen --exclude ./Trivia --exclude ./WebStats"; fi
+  - export DISABLED_PLUGINS="--exclude ./Twitter --exclude ./TwitterStream --exclude ./MegaHAL --exclude ./GUI --exclude ./WebStats"  # py2-only plugins
   - supybot-test --plugins-dir=. --no-network --exclude=./NoLatin1 --exclude ./AlternativeTo --exclude ./Json --exclude ./PypySandbox --exclude ./Untiny --exclude ./CrousLyon --exclude ./PackageInfo --exclude ./Supysandbox $DISABLED_PLUGINS
 notifications:
     email: false
