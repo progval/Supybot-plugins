@@ -9,4 +9,4 @@ oauth2
 python-oauth2
 unicode_tex
 markovgen
-lz4
+lz4-cffi
