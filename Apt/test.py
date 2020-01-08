@@ -212,6 +212,14 @@ class AptTestCase(PluginTestCase):
             'package info --releases buster --archs armel firefox-esr',
             'Error: Package exists, but no version is found.')
 
+        # Checks packages in other archs than the native one can be selected:
+        self.assertRegexp(
+            'package info --releases buster --archs armel libc6',
+            r'^libc6 \(source: glibc\) is optional and in section "libs"')
+        self.assertRegexp(
+            'package info --releases buster --archs amd64 libc6',
+            r'^libc6 \(source: glibc\) is optional and in section "libs"')
+
     def testPackageInfoFilterReleases(self):
         # codenames
         self.assertResponse(

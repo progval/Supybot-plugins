@@ -36,6 +36,7 @@ import itertools
 import threading
 
 import apt
+import apt_pkg
 try:
     import lz4.frame
 except ImportError:
@@ -362,13 +363,26 @@ class Apt(callbacks.Plugin):
         def plugin(self, irc):
             return irc.getCallback('Apt')
 
-        def _get_package(self, irc, package_name):
+        def _get_package_versions(self, irc, package_name):
             # TODO: add support for selecting the version
             cache = self.plugin(irc)._get_cache()
-            pkg = cache.get(package_name)
-            if not pkg:
+
+            versions = []
+            try:
+                # TODO: when python3-apt is released with support for groups,
+                # (probably via a Cache.find_grp method), use that instead
+                # of hacking around with apt_pkg
+                group = apt_pkg.Group(cache._cache, package_name)
+            except KeyError:
                 irc.error(_('Package not found.'), Raise=True)
-            return pkg
+
+            for pkg in group:
+                # get an apt.Package instance, using the data from the
+                # apt_pkg.Package instance:
+                pkg = apt.Package(cache, pkg)
+                versions.extend(pkg.versions)
+
+            return versions
 
         @wrap([
             getopts({
@@ -386,7 +400,6 @@ class Apt(callbacks.Plugin):
             Enhances, PreDepends, Recommends, Replaces, Suggests. %s
             """
             opts = dict(optlist)
-            pkg = self._get_package(irc, package_name)
 
             dep_types = opts.get('types', ['Depends', 'PreDepends'])
             dep_types = [dep_type for dep_type in dep_types]
@@ -395,8 +408,9 @@ class Apt(callbacks.Plugin):
                          for dep_type in dep_types]
 
             # TODO: better version selection
+            pkg_versions = self._get_package_versions(irc, package_name)
             pkg_version = filter_versions(
-                self.plugin(irc), irc, msg.channel, opts, pkg.versions)[0]
+                self.plugin(irc), irc, msg.channel, opts, pkg_versions)[0]
 
             deps = pkg_version.get_dependencies(*dep_types)
             irc.reply(format(_('%s: %L'),
@@ -415,17 +429,17 @@ class Apt(callbacks.Plugin):
 
             Shows the long description of a package. %s"""
             opts = dict(optlist)
-            pkg = self._get_package(irc, package_name)
 
             # TODO: better version selection
+            pkg_versions = self._get_package_versions(irc, package_name)
             pkg_version = filter_versions(
-                self.plugin(irc), irc, msg.channel, opts, pkg.versions)[0]
+                self.plugin(irc), irc, msg.channel, opts, pkg_versions)[0]
 
             description = utils.str.normalizeWhitespace(
                 pkg_version.description)
             irc.reply(format(_('%s %s: %s'),
-                             pkg.shortname, pkg_version.version,
-                             description))
+                             pkg_version.package.shortname,
+                             pkg_version.version, description))
 
         @wrap([
             getopts({
@@ -439,11 +453,11 @@ class Apt(callbacks.Plugin):
 
             Shows generic information about a package. %s"""
             opts = dict(optlist)
-            pkg = self._get_package(irc, package_name)
 
             # TODO: better version selection
+            pkg_versions = self._get_package_versions(irc, package_name)
             pkg_version = filter_versions(
-                self.plugin(irc), irc, msg.channel, opts, pkg.versions)[0]
+                self.plugin(irc), irc, msg.channel, opts, pkg_versions)[0]
 
             # source_name and priority shouldn't change too often, so I assume
             # it's safe to call it a "generic info" in a UI
@@ -451,8 +465,8 @@ class Apt(callbacks.Plugin):
                 pkg_version.priority, pkg_version.priority)
             generic_info = format(
                 _('%s (source: %s) is %s and in section "%s".'),
-                pkg.shortname, pkg_version.source_name,
-                priority, pkg.section)
+                pkg_version.package.shortname, pkg_version.source_name,
+                priority, pkg_version.package.section)
 
             version_info = format(
                 _('Version %s package is %S and takes %S when installed.'),
