@@ -466,7 +466,7 @@ class Apt(callbacks.Plugin):
             generic_info = format(
                 _('%s (source: %s) is %s and in section "%s".'),
                 pkg_version.package.shortname, pkg_version.source_name,
-                priority, pkg_version.package.section)
+                priority, pkg_version.section)
 
             version_info = format(
                 _('Version %s package is %S and takes %S when installed.'),

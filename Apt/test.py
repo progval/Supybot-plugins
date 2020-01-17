@@ -179,7 +179,8 @@ class AptTestCase(PluginTestCase):
             'Description: robust and user-friendly Python IRC bot')
         self.assertResponse(
             'package info --distribs ubuntu limnoria',
-            'limnoria (source: limnoria) is optional and in section "net". '
+            'limnoria (source: limnoria) is optional and in section '
+            '"universe/net". '
             'Version 2018.01.25-1 package is 555KB and takes 4MB when '
             'installed. '
             'Description: robust and user-friendly Python IRC bot')
@@ -230,7 +231,8 @@ class AptTestCase(PluginTestCase):
             'Description: robust and user-friendly Python IRC bot')
         self.assertResponse(
             'package info --releases bionic limnoria',
-            'limnoria (source: limnoria) is optional and in section "net". '
+            'limnoria (source: limnoria) is optional and in section '
+            '"universe/net". '
             'Version 2018.01.25-1 package is 555KB and takes 4MB when '
             'installed. '
             'Description: robust and user-friendly Python IRC bot')
@@ -257,7 +259,8 @@ class AptTestCase(PluginTestCase):
             # Config is overridden by the command caller
             self.assertResponse(
                 'package info --distribs ubuntu limnoria',
-                'limnoria (source: limnoria) is optional and in section "net". '
+                'limnoria (source: limnoria) is optional and in section '
+                '"universe/net". '
                 'Version 2018.01.25-1 package is 555KB and takes 4MB when '
                 'installed. '
                 'Description: robust and user-friendly Python IRC bot')
