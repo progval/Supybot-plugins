@@ -497,10 +497,17 @@ class Apt(callbacks.Plugin):
             pattern = re.compile(utils.python.glob2re(package_pattern),
                     re.DOTALL)
 
-            packages = iter(cache)
 
-            if not search_description:
-                packages = (pkg for pkg in cache if pattern.match(pkg.shortname))
+            if search_description:
+                packages = iter(cache)
+            else:
+                # The next line is equivalent to:
+                # packages = (pkg for pkg in cache if pattern.match(pkg.shortname))
+                # but is much much faster, because Cache.__iter__ takes a lot
+                # of time to build Package instances and update its weakref
+                # cache dictionary
+                packages = (cache[pkgname] for pkgname in cache.keys()
+                            if pattern.match(pkgname))
 
                 # Dirty trick to check if the iterator is empty without
                 # consuming it entirely
