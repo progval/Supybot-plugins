@@ -220,6 +220,22 @@ FILTERS_OPTLIST = {
 }
 
 
+def origins_with_version(pkg_version):
+    """Same as the pkg_version.origins property, but adds a 'version'
+    attribute to origins"""
+    origins = []
+    for (packagefile, _unused) in pkg_version._cand.file_list:
+        if hasattr(pkg_version.package._pcache, '_origins'):
+            # python-apt >= 1.9.3:
+            origin = pkg_version.package._pcache._origins[packagefile.id]
+        else:
+            # python-apt <= 1.9.0:
+            origin = apt.package.Origin(pkg_version.package, packagefile)
+        origin.version = packagefile.version
+        origins.append(origin)
+    return origins
+
+
 def filter_versions(plugin, irc, channel, filters, versions):
     """Takes a list of apt.Version objects, and returns another list, by
     running filters on it.
@@ -233,7 +249,7 @@ def filter_versions(plugin, irc, channel, filters, versions):
                     if version.architecture in archs]
 
     # Spare round-trips to the C code to build the origin list:
-    versions = [(version, version.origins) for version in versions]
+    versions = [(version, origins_with_version(version)) for version in versions]
 
     def filter_on_origins(pred):
         nonlocal versions
@@ -256,7 +272,8 @@ def filter_versions(plugin, irc, channel, filters, versions):
         # stable/testing/...
         filter_on_origins(lambda origin: (
             origin.archive.lower() in releases
-            or origin.codename.lower() in releases))
+            or origin.codename.lower() in releases
+            or origin.version.lower() in releases))
 
     if not versions:
         irc.error(_('Package exists, but no version is found.'),

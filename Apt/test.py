@@ -245,6 +245,15 @@ class AptTestCase(PluginTestCase):
             'installed. '
             'Description: robust and user-friendly Python IRC bot')
 
+        # version
+        self.assertResponse(
+            'package info --releases 18.04 limnoria',
+            'limnoria (source: limnoria) is optional and in section '
+            '"universe/net". '
+            'Version 2018.01.25-1 package is 555KB and takes 4MB when '
+            'installed. '
+            'Description: robust and user-friendly Python IRC bot')
+
     def testPackageInfoConfiguredFilter(self):
         with conf.supybot.plugins.Apt.defaults.distribs.context(['Debian Backports']):
             # The configured default, "Debian Backports" should be used as
