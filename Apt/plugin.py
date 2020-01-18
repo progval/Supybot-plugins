@@ -87,6 +87,8 @@ def get_file_opener(extension):
             raise callbacks.Error(
                 _('Cannot open lz4 file, python3-lz4 0.23.1 or higher '
                   'is required.'))
+    elif extension == 'diff_Index':
+        return None
     else:
         raise ValueError(
             'Cannot open .%s files, unknown extension' % extension)
@@ -118,7 +120,7 @@ _packages_lists_filename_re = re.compile(
 
 
 def list_content_lists(plugin, irc, channel, filters, rootdir):
-    """Returns a list of '/var/lib/apt/lists/*_Content-*' and functions
+    """Returns a list of '/var/lib/apt/lists/*_Contents-*' and functions
     suitable to open them"""
     archs = get_filter_config(plugin, irc, channel, filters, 'archs')
     if archs:
@@ -157,7 +159,8 @@ def list_content_lists(plugin, irc, channel, filters, rootdir):
     for list_filename in list_filenames:
         (_, extension) = os.path.splitext(list_filename)
         file_opener = get_file_opener(extension.strip('.'))
-        yield (list_filename, file_opener)
+        if file_opener:
+            yield (list_filename, file_opener)
 
 
 def get_filter_config(plugin, irc, channel, filters, filter_name):
