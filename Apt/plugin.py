@@ -34,6 +34,7 @@ import time
 import itertools
 import threading
 import subprocess
+import multiprocessing
 
 import apt
 import apt_pkg
@@ -124,6 +125,14 @@ def search_lines(pattern, fd):
         yield from pattern.findall(chunk)
         if not new_data:
             break
+
+def search_file(args):
+    results = set()
+    (pattern, list_filename, file_opener) = args
+    with file_opener(list_filename) as fd:
+        for match in search_lines(pattern, fd):
+            results.add(match[1].decode())
+    return results
 
 
 def list_content_lists(plugin, irc, channel, filters, rootdir):
@@ -379,23 +388,26 @@ class Apt(callbacks.Plugin):
             # don't do that because the regexp then becomes much slower (6s for
             # a 500MB list, instead of 0.3s).
             # Given that we're matching end of lines, a line can't be matched
-            # anyway because matches can't overlap.
-            line_entry_re = re.compile(
+            # twice anyway because matches can't overlap.
+            pattern = re.compile(
                 rb'%s.*\s+(\S+)/(\S+)$' % re.escape(filename),
                 re.MULTILINE)
-            results = set()
+            packages = set()
 
             # I can't find a way to do this with python-apt, so let's open and
             # parse the files directly
             rootdir = self.plugin(irc)._get_cache_dir()
             lists = list_content_lists(plugin, irc, msg.channel, opts, rootdir)
-            for (list_filename, file_opener) in lists:
-                with file_opener(list_filename) as fd:
-                    for match in search_lines(line_entry_re, fd):
-                        results.add(match[1].decode())
+            with multiprocessing.Pool() as pool:
+                results = pool.imap_unordered(
+                    search_file,
+                    [(pattern, filename, opener)
+                     for (filename, opener) in lists])
+                for result in results:
+                    packages.update(result)
 
-            if results:
-                irc.reply(format('%L', sorted(results)))
+            if packages:
+                irc.reply(format('%L', sorted(packages)))
             else:
                 irc.error(_('No package found.'))
 
