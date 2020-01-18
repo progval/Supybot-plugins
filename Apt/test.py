@@ -124,7 +124,13 @@ class AptTestCase(PluginTestCase):
             'limnoria')
         self.assertResponse(
             'file packages --releases bionic supybot/plugins/Hashes',
+            'limnoria')
+        self.assertResponse(
+            'file packages --releases bionic supybot/plugins/SedRegex',
             'Error: No package found.')
+        #self.assertResponse(
+        #    'file packages --releases buster-backports supybot/plugins/SedRegex',
+        #    'limnoria')
         self.assertResponse(
             'file packages --releases * supybot/plugins/Hashes',
             'limnoria')

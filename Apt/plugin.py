@@ -30,13 +30,14 @@
 
 import os
 import re
-import glob
 import time
 import itertools
 import threading
+import subprocess
 
 import apt
 import apt_pkg
+import debian.deb822
 try:
     import lz4.frame
 except ImportError:
@@ -125,13 +126,12 @@ def search_lines(pattern, fd):
             break
 
 
-_packages_lists_filename_re = re.compile(
-    r'(?P<beginning>.*)_binary-(?P<arch>[^_-]+)_Packages')
-
-
 def list_content_lists(plugin, irc, channel, filters, rootdir):
     """Returns a list of '/var/lib/apt/lists/*_Contents-*' and functions
     suitable to open them"""
+    index_targets = plugin._call_apt_get(['indextargets'])
+    entries = list(debian.deb822.Deb822.iter_paragraphs(index_targets))
+
     archs = get_filter_config(plugin, irc, channel, filters, 'archs')
     if archs:
         archs = [arch.lower() for arch in archs]
@@ -145,30 +145,33 @@ def list_content_lists(plugin, irc, channel, filters, rootdir):
         releases = [release.lower() for release in releases]
 
     list_filenames = []
-    for file in plugin._get_cache()._cache.file_list:
-        # TODO: add support for 'all' arch; which would check that the file is
-        # indeed available in all architecture.
-        if archs and file.architecture not in archs:
+    for entry in entries:
+        if entry['Identifier'] != 'Contents-deb':
             continue
 
-        if distribs and file.label not in distribs:
+        # TODO: add support for 'all' arch; which would check that the entry is
+        # indeed available in all architecture.
+        if archs and entry['Architecture'] not in archs:
+            continue
+
+        if distribs and entry['Label'] not in distribs:
             continue
 
         if releases \
-                and file.archive.lower() not in releases \
-                and file.codename not in releases:
+                and entry['Suite'].lower() not in releases \
+                and entry['Release'].lower() not in releases \
+                and entry['Codename'] not in releases:
             continue
 
-        match = _packages_lists_filename_re.match(file.filename)
-        if not match:
-            continue
-
-        list_filenames.extend(glob.glob(
-            '%(beginning)s_Contents-%(arch)s*' % match.groupdict()))
+        list_filenames.append(entry['Filename'])
 
     for list_filename in list_filenames:
         (_, extension) = os.path.splitext(list_filename)
-        file_opener = get_file_opener(extension.strip('.'))
+        try:
+            file_opener = get_file_opener(extension.strip('.'))
+        except ValueError:
+            raise ValueError(
+                'Could not find opener for file %s' % list_filename)
         if file_opener:
             yield (list_filename, file_opener)
 
@@ -336,6 +339,13 @@ class Apt(callbacks.Plugin):
                 self._cache = apt.Cache(rootdir=self._get_cache_dir())
                 self._cache.update()
                 self._cache.open()
+
+    def _call_apt_get(self, args):
+        self._get_cache()
+        p = subprocess.run(
+            ['apt-get', '-o', 'Dir=%s' % apt_pkg.config.get('Dir')] + args,
+            capture_output=True)
+        return p.stdout
 
     @wrap([('checkCapability', 'trusted')])
     def update(self, irc, msg, args):
