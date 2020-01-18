@@ -52,6 +52,8 @@ _ = PluginInternationalization('Apt')
 
 
 def get_dependency_translations():
+    """Returns a map from English names to locale names of dependency types.
+    """
     return utils.InsensitivePreservingDict({
         'Breaks': _('Breaks'),
         'Conflicts': _('Conflicts'),
@@ -65,11 +67,15 @@ def get_dependency_translations():
 
 
 def get_dependency_reverse_translations():
+    """Returns the reverse map of get_dependency_translations."""
     return utils.InsensitivePreservingDict(
         {v: k for (k, v) in get_dependency_translations().items()})
 
 
 def get_priority_translations():
+    """Returns a map from English names to locale names of package
+    priority types.
+    """
     return {
         'required': _('required'),
         'important': _('important'),
@@ -80,6 +86,8 @@ def get_priority_translations():
 
 
 def get_file_opener(extension):
+    """Returns a callable suitable for opening a file with the provided
+    extension."""
     if extension == 'lz4':
         try:
             return lz4.frame.open
@@ -95,6 +103,8 @@ def get_file_opener(extension):
 
 
 def read_chunk(fd, remainder):
+    """Reads chunks of a large file such that lines are not split between
+    chunks."""
     new_data = fd.read(1024*1024)
     chunk = remainder + new_data
     if new_data:
