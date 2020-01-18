@@ -167,7 +167,7 @@ def list_content_lists(plugin, irc, channel, filters, rootdir):
             continue
 
         if releases \
-                and entry['Version'].lower() not in releases \
+                and entry.get('Version', '').lower() not in releases \
                 and entry['Suite'].lower() not in releases \
                 and entry['Release'].lower() not in releases \
                 and entry['Codename'] not in releases:
