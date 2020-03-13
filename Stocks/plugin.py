@@ -1,67 +1,77 @@
-# coding=utf-8
+###
+# Copyright (c) 2017 Rusty Bower
+# Copyright (c) 2020 Valentin Lorentz
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+###
+
 import re
 import requests
 from datetime import datetime, timedelta
-from sopel.config.types import NO_DEFAULT, StaticSection, ValidatedAttribute
-from sopel.formatting import color, colors
-from sopel.logger import get_logger
-from sopel.module import commands, example, NOLIMIT
 
-logger = get_logger(__name__)
-
-
-# Define our sopel stocks configuration
-class StocksSection(StaticSection):
-    api_key = ValidatedAttribute('api_key', default=NO_DEFAULT)
-
-
-def setup(bot):
-    bot.config.define_section('stocks', StocksSection)
+from supybot import utils, plugins, ircutils, callbacks
+from supybot.commands import *
+try:
+    from supybot.i18n import PluginInternationalization
+    _ = PluginInternationalization('Stocks')
+except ImportError:
+    # Placeholder that allows to run the plugin on a bot
+    # without the i18n module
+    _ = lambda x: x
 
 
-# Walk the user through defining variables required
-def configure(config):
-    config.define_section('stocks', StocksSection, validate=False)
-    config.stocks.configure_setting(
-        'api_key',
-        'Enter AlphaVantage API Key:'
-    )
+class Stocks(callbacks.Plugin):
+    """Provides access to stocks data"""
+    threaded = True
+
+    def get_symbol(self, irc, symbol):
+        api_key = self.registryValue('alphavantage.api.key')
+        if not api_key:
+            irc.error('Missing API key, ask the admin to get one and set '
+                      'supybot.plugins.alphavantage.api.key', Raise=True)
+        data = None
+        try:
+            data = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={api_key}'.format(symbol=symbol,
+                api_key=api_key)).json()
+            return data
+        except Exception:
+            raise
 
 
-def get_symbol(bot, symbol):
-    data = None
-    try:
-        data = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={api_key}'.format(symbol=symbol, api_key=bot.config.stocks.api_key)).json()
-        return data
-    except Exception:
-        raise
+    @wrap(['somethingWithoutSpaces'])
+    def stock(self, irc, msg, args, symbol):
+        """<symbol>
 
-
-@commands('stock')
-@example('.stock msft')
-def stock(bot, trigger):
-    # If the user types .stock with no arguments, let them know proper usage
-    if not trigger.group(2):
-        return
-    else:
-        # Get symbol
-        symbol = trigger.group(2)
-
+        Returns stock data for <symbol>."""
         # Do regex checking on symbol to ensure it's valid
         if not re.match('^[a-zA-Z]{1,5}$', symbol):
-            bot.say('Invalid Symbol')
-            return
+            irc.errorInvalid('symbol', symbol, Raise=True)
 
         # Get data from API
-        data = get_symbol(bot, symbol)
+        data = self.get_symbol(irc, symbol)
 
         if not data:
-            bot.say("An error occurred.")
-            return
+            irc.error("An error occurred.", Raise=True)
 
         if 'Error Message' in data.keys():
-            logger.error(data['Error Message'])
-            return
+            irc.error(data['Error Message'], Raise=True)
 
         days = sorted(data['Time Series (Daily)'].keys(), reverse=True)
 
@@ -96,11 +106,9 @@ def stock(bot, trigger):
         )
 
         if change >= 0:
-            message += color('{change:g} ({percentchange:.2f}%)', colors.GREEN)
-            message += color(u'\u2b06', colors.GREEN)
+            message += ircutils.mircColor('{change:g} ({percentchange:.2f}%) \u2b06', 'green')
         else:
-            message += color('{change:g} ({percentchange:.2f}%)', colors.RED)
-            message += color(u'\u2b07', colors.RED)
+            message += ircutils.mircColor('{change:g} ({percentchange:.2f}%) \u2b07', 'red')
 
         message = message.format(
             symbol=data['Meta Data']['2. Symbol'].upper(),
@@ -110,4 +118,10 @@ def stock(bot, trigger):
         )
 
         # Print results to channel
-        bot.say(message)
+        irc.reply(message)
+
+
+Class = Stocks
+
+
+# vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
