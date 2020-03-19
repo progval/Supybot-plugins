@@ -45,10 +45,10 @@ class Stocks(callbacks.Plugin):
         api_key = self.registryValue('alphavantage.api.key')
         if not api_key:
             irc.error('Missing API key, ask the admin to get one and set '
-                      'supybot.plugins.alphavantage.api.key', Raise=True)
+                      'supybot.plugins.Stocks.alphavantage.api.key', Raise=True)
         data = None
         try:
-            data = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={api_key}'.format(symbol=symbol,
+            data = requests.get('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={api_key}'.format(symbol=symbol,
                 api_key=api_key)).json()
             return data
         except Exception:
@@ -61,7 +61,7 @@ class Stocks(callbacks.Plugin):
 
         Returns stock data for <symbol>."""
         # Do regex checking on symbol to ensure it's valid
-        if not re.match('^[a-zA-Z]{1,5}$', symbol):
+        if not re.match('^[a-zA-Z]{1,6}$', symbol):
             irc.errorInvalid('symbol', symbol, Raise=True)
 
         # Get data from API
@@ -73,48 +73,31 @@ class Stocks(callbacks.Plugin):
         if 'Error Message' in data.keys():
             irc.error(data['Error Message'], Raise=True)
 
-        days = sorted(data['Time Series (Daily)'].keys(), reverse=True)
-
-        # Only 1 day of history, likely this is a new stock on the market
-        if len(days) == 1:
-            today = days[0]
-            close = data['Time Series (Daily)'][today]['4. close']
-            prevclose = data['Time Series (Daily)'][today]['1. open']
-        else:
-            # Get today's entry
-            today = days[0]
-            prevdate = days[1]
-
-            # dict_keys(['1. open', '2. high', '3. low', '4. close', '5. volume'])
-            # open = data['Time Series (Daily)'][today]['1. open']
-            # high = data['Time Series (Daily)'][today]['2. high']
-            # low = data['Time Series (Daily)'][today]['3. low']
-            close = data['Time Series (Daily)'][today]['4. close']
-            # volume = data['Time Series (Daily)'][today]['5. volume']
-
-            # Get yesterday's close
-            prevclose = data['Time Series (Daily)'][prevdate]['4. close']
-
-        # Calculate change
-        change = float(close) - float(prevclose)
-
-        # Calculate percentage change
-        percentchange = float(change) / float(prevclose) * 100
+        symbol = data['Global Quote']['01. symbol']
+        # open = data['Global Quote']['02. open']
+        # high = data['Global Quote']['03. high']
+        # low = data['Global Quote']['04. low']
+        price = float(data['Global Quote']['05. price'])
+        # volume = data['Global Quote']['06. volume']
+        # latest_trading_day = data['Global Quote']['07. latest trading day']
+        # previous_close = data['Global Quote']['08. previous close']
+        change = float(data['Global Quote']['09. change'])
+        change_percent = data['Global Quote']['10. change percent']
 
         message = (
-            '{symbol} ${close:g} '
+            '{symbol} {price:g} '
         )
 
-        if change >= 0:
-            message += ircutils.mircColor('{change:g} ({percentchange:.2f}%) \u2b06', 'green')
+        if change >= 0.0:
+            message += ircutils.mircColor('{change:g} ({change_percent}) \u25b2', 'green')
         else:
-            message += ircutils.mircColor('{change:g} ({percentchange:.2f}%) \u2b07', 'red')
+            message += ircutils.mircColor('{change:g} ({change_percent}) \u25bc', 'red')
 
         message = message.format(
-            symbol=data['Meta Data']['2. Symbol'].upper(),
-            close=float(close),
-            change=float(change),
-            percentchange=float(percentchange),
+            symbol=ircutils.bold(symbol),
+            price=price,
+            change=change,
+            change_percent=change_percent,
         )
 
         # Print results to channel
