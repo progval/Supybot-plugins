@@ -36,7 +36,6 @@ except ImportError:
     # without the i18n module
     _ = lambda x: x
 
-
 class Stocks(callbacks.Plugin):
     """Provides access to stocks data"""
     threaded = True
@@ -99,7 +98,7 @@ class Stocks(callbacks.Plugin):
 
     @wrap([many('something')])
     def stock(self, irc, msg, args, symbols):
-        """<symbol> [<symbol>, <symbol>, ...]
+        """<symbol> [<symbol> [<symbol> ...]]
 
         Returns stock data for single or multiple symbols"""
 
@@ -111,7 +110,7 @@ class Stocks(callbacks.Plugin):
 
         messages = map(lambda symbol: self.get_message(irc, symbol), symbols)
 
-        irc.reply(' | '.join(messages))
+        irc.replies(messages, joiner=' | ')
 
 Class = Stocks
 
