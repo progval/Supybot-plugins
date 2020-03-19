@@ -36,7 +36,6 @@ except ImportError:
     # without the i18n module
     _ = lambda x: x
 
-
 class Stocks(callbacks.Plugin):
     """Provides access to stocks data"""
     threaded = True
@@ -54,12 +53,7 @@ class Stocks(callbacks.Plugin):
         except Exception:
             raise
 
-
-    @wrap(['somethingWithoutSpaces'])
-    def stock(self, irc, msg, args, symbol):
-        """<symbol>
-
-        Returns stock data for <symbol>."""
+    def get_message(self, irc, symbol):
         # Do regex checking on symbol to ensure it's valid
         if not re.match('^[a-zA-Z]{1,6}$', symbol):
             irc.errorInvalid('symbol', symbol, Raise=True)
@@ -68,10 +62,10 @@ class Stocks(callbacks.Plugin):
         data = self.get_symbol(irc, symbol)
 
         if not data:
-            irc.error("An error occurred.", Raise=True)
+            irc.error("{symbol}: An error occurred.".format(symbol=symbol), Raise=True)
 
         if 'Error Message' in data.keys():
-            irc.error(data['Error Message'], Raise=True)
+            irc.error("{symbol}: {message}".format(symbol=symbol, message=data['Error Message']), Raise=True)
 
         symbol = data['Global Quote']['01. symbol']
         # open = data['Global Quote']['02. open']
@@ -82,16 +76,16 @@ class Stocks(callbacks.Plugin):
         # latest_trading_day = data['Global Quote']['07. latest trading day']
         # previous_close = data['Global Quote']['08. previous close']
         change = float(data['Global Quote']['09. change'])
-        change_percent = data['Global Quote']['10. change percent']
+        change_percent = float(data['Global Quote']['10. change percent'].strip('%'))
 
         message = (
             '{symbol} {price:g} '
         )
 
         if change >= 0.0:
-            message += ircutils.mircColor('{change:g} ({change_percent}) \u25b2', 'green')
+            message += ircutils.mircColor('\u25b2 {change:g} ({change_percent:g}%)', 'green')
         else:
-            message += ircutils.mircColor('{change:g} ({change_percent}) \u25bc', 'red')
+            message += ircutils.mircColor('\u25bc {change:g} ({change_percent:g}%)', 'red')
 
         message = message.format(
             symbol=ircutils.bold(symbol),
@@ -100,9 +94,23 @@ class Stocks(callbacks.Plugin):
             change_percent=change_percent,
         )
 
-        # Print results to channel
-        irc.reply(message)
+        return message
 
+    @wrap([many('something')])
+    def stock(self, irc, msg, args, symbols):
+        """<symbol> [<symbol> [<symbol> ...]]
+
+        Returns stock data for single or multiple symbols"""
+
+        max_symbols = self.registryValue('alphavantage.maxsymbols')
+        count_symbols = len(symbols)
+
+        if count_symbols > max_symbols:
+            irc.error("Too many symbols. Maximum count {}. Your count: {}".format(max_symbols, count_symbols), Raise=True)
+
+        messages = map(lambda symbol: self.get_message(irc, symbol), symbols)
+
+        irc.replies(messages, joiner=' | ')
 
 Class = Stocks
 
