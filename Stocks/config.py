@@ -50,6 +50,7 @@ conf.registerGroup(Stocks.alphavantage, 'api')
 conf.registerGlobalValue(Stocks.alphavantage.api, 'key',
     registry.String('', _("""API key for alphavantage.co."""),
                     private=True))
-
+conf.registerGlobalValue(Stocks.alphavantage, 'maxsymbols',
+    registry.Integer(10, _("""Maximum number of symbols for single request""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
