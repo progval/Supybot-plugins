@@ -40,26 +40,26 @@ class Stocks(callbacks.Plugin):
     """Provides access to stocks data"""
     threaded = True
 
-    def get_symbol(self, irc, symbol):
+    def get_symbol(self, irc, session, symbol):
         api_key = self.registryValue('alphavantage.api.key')
         if not api_key:
             irc.error('Missing API key, ask the admin to get one and set '
                       'supybot.plugins.Stocks.alphavantage.api.key', Raise=True)
-        data = None
+
         try:
-            data = requests.get('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={api_key}'.format(symbol=symbol,
+            return session.get('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={api_key}'.format(symbol=symbol,
                 api_key=api_key)).json()
-            return data
         except Exception:
             raise
 
-    def get_message(self, irc, symbol):
+
+    def get_message(self, irc, session, symbol):
         # Do regex checking on symbol to ensure it's valid
-        if not re.match('^[a-zA-Z]{1,6}$', symbol):
+        if not re.match(r'^[\w^=:.\-]{1,10}$', symbol):
             irc.errorInvalid('symbol', symbol, Raise=True)
 
         # Get data from API
-        data = self.get_symbol(irc, symbol)
+        data = self.get_symbol(irc, session, symbol)
 
         if not data:
             irc.error("{symbol}: An error occurred.".format(symbol=symbol), Raise=True)
@@ -108,7 +108,8 @@ class Stocks(callbacks.Plugin):
         if count_symbols > max_symbols:
             irc.error("Too many symbols. Maximum count {}. Your count: {}".format(max_symbols, count_symbols), Raise=True)
 
-        messages = map(lambda symbol: self.get_message(irc, symbol), symbols)
+        with requests.Session() as session:
+            messages = map(lambda symbol: self.get_message(irc, session, symbol), symbols)
 
         irc.replies(messages, joiner=' | ')
 
