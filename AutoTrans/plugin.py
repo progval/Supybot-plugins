@@ -70,6 +70,9 @@ class AutoTrans(callbacks.Plugin):
 
         for lang in set(map(operator.itemgetter(1), targets)):
             (text, language) = cb._translate('auto', lang, msg.args[1])
+            if text.lower() == msg.args[1].lower():
+                # No meaningful translation, it's pointless to send it.
+                return
             text = '<%s@%s> %s' % (msg.nick, channel, text)
             for (nick, user_lang) in targets:
                 if user_lang != language and user_lang == lang:
