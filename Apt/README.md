@@ -43,7 +43,7 @@ There are however two cases where you care about this:
    or you're running your bot on a Raspberry Pi and the distribution
    doesn't support ARM).
 2. You want to see specific information about packages on foreign
-   architectures, using the `--arch` option.
+   architectures, using the `--archs` option.
 
 There are [many ways to enable foreign architecture](https://wiki.debian.org/Multiarch/HOWTO),
 but the easiest for you is probably just to add them to `sources.list`.
