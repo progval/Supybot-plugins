@@ -215,7 +215,7 @@ class Trivia(callbacks.Plugin):
                 schedule.addEvent(event, eventTime, 'next_%s' % self.channel)
 
         def skip(self):
-          self.reply(_("Question skipped. The answer was: %s" % self.a[0]))
+          self.reply(_("Question skipped. The answer was: %s") % self.a[0])
           
           self.unanswered = 0
           try:
