@@ -214,11 +214,30 @@ class Trivia(callbacks.Plugin):
             if self.active:
                 schedule.addEvent(event, eventTime, 'next_%s' % self.channel)
 
-
+        def skip(self):
+          self.reply("Question skipped. The answer was: %s" % self.a[0])         
+          
+          self.unanswered = 0
+          try:
+              schedule.removeEvent('next_%s' % self.channel)
+          except KeyError:
+              pass
+          self.newquestion()
+        
+        def hintcommand(self):
+            if self.hints >= self.registryValue('numHints', self.channel):
+                self.reply(_("Sorry, you're out of hints for this question."))
+            else:
+                try:
+                    schedule.removeEvent('next_%s' % self.channel)
+                except KeyError:
+                    pass
+                self.hint()
+                
         def answer(self, msg):
             correct = False
             for ans in self.a:
-                dist = self.DL(str.lower(msg.args[1]), str.lower(ans))
+                dist = self.DL(ircutils.stripFormatting(str.lower(msg.args[1])), str.lower(ans))
                 flexibility = self.registryValue('flexibility', self.channel)
                 if dist <= len(ans) / flexibility:
                     correct = True
@@ -300,6 +319,30 @@ class Trivia(callbacks.Plugin):
             self.games[channel] = self.Game(irc, channel, num, self)
         irc.noReply()
     start = wrap(start, ['channel', optional('positiveInt')])
+
+    @internationalizeDocstring
+    def hint(self, irc, msg, args, channel):
+        """[<channel>]
+        
+        Invokes the next hint for the current question"""
+        channel = ircutils.toLower(channel)
+        if channel in self.games:
+            self.games[channel].hintcommand()
+        else:    
+            irc.reply(_("Trivia is currently not active in this channel."))
+    hint = wrap(hint, ['channel'])
+
+    @internationalizeDocstring
+    def next(self, irc, msg, args, channel):
+        """[<channel>]
+        
+        Moves onto the next question."""
+        channel = ircutils.toLower(channel)
+        if channel in self.games:
+            self.games[channel].skip()
+        else:    
+            irc.reply(_("Trivia is currently not active in this channel."))
+    next = wrap(next, ['channel'])
 
     @internationalizeDocstring
     def stop(self, irc, msg, args, channel):
