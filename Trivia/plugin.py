@@ -226,7 +226,7 @@ class Trivia(callbacks.Plugin):
         
         def hintcommand(self):
             if self.hints >= self.registryValue('numHints', self.channel):
-                self.reply("Sorry, you're out of hints for this question.")
+                self.reply(_("Sorry, you're out of hints for this question."))
             else:
                 try:
                     schedule.removeEvent('next_%s' % self.channel)
@@ -322,26 +322,26 @@ class Trivia(callbacks.Plugin):
 
     @internationalizeDocstring
     def hint(self, irc, msg, args, channel):
-        """
+        """[<channel>]
         
         Invokes the next hint for the current question"""
         channel = ircutils.toLower(channel)
         if channel in self.games:
             self.games[channel].hintcommand()
         else:    
-            irc.reply("Trivia is currently not active in this channel.")
+            irc.reply(_("Trivia is currently not active in this channel."))
     hint = wrap(hint, ['channel'])
 
     @internationalizeDocstring
     def next(self, irc, msg, args, channel):
-        """
+        """[<channel>]
         
         Moves onto the next question."""
         channel = ircutils.toLower(channel)
         if channel in self.games:
             self.games[channel].skip()
         else:    
-            irc.reply("Trivia is currently not active in this channel.")
+            irc.reply(_("Trivia is currently not active in this channel."))
     next = wrap(next, ['channel'])
 
     @internationalizeDocstring
