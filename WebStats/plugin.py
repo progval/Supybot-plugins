@@ -689,8 +689,7 @@ class WebStatsDB:
         """Takes a temporary cache list, its type, and write it in the cache
         database."""
         cursor = self._conn.cursor()
-        for index in tmpCache:
-            data = tmpCache[index]
+        for (index, data) in tmpCache.items():
             values = index + tuple(data)
             cursor.execute("""INSERT INTO %ss_cache
                     VALUES(%s)""" % (type_, ('?,'*len(values))[0:-1]), values)
