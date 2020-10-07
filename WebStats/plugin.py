@@ -64,6 +64,7 @@ try:
     from supybot.i18n import _PluginInternationalization
     class WebStatsInternationalization(_PluginInternationalization):
         def __init__(self):
+            super().__init__()
             self.name = 'WebStats'
             try:
                 self.loadLocale(conf.supybot.language())
