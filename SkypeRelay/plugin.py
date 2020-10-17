@@ -281,27 +281,33 @@ class SkypeRelay(callbacks.Plugin):
 
         self.__parent.__call__(irc, msg)
 
-    def _chatsFromChannel(self, network, channel):
+    def _sendToSkype(self, irc, channel, s):
         for relay in self._getRelays():
-            if relay.network == network and relay.channel == channel:
-                yield self._getChat(relay.skype_chat_id)
+            if relay.network == irc.network and relay.channel == channel:
+                chat = self._getChat(relay.skype_chat_id)
+                try:
+                    chat.sendMsg(s)
+                except skpy.core.SkypeApiException as e:
+                    irc.error(_("Failed to relay message: %s") % e)
 
     def doPrivmsg(self, irc, msg):
         if msg.tagged("relayedMsg"):
             # That message was sent by myself; don't relay it (or it will echo all
             # messages from the Skype chat back to the Skype chat)
             return
-        for chat in self._chatsFromChannel(irc.network, msg.channel):
-            chat.sendMsg(f"<{msg.nick}> {msg.args[1]}")
+        if ircmsgs.isAction(msg):
+            self._sendToSkype(
+                irc, msg.channel, f"* {msg.nick} {ircmsgs.unAction(msg)}"
+            )
+        else:
+            self._sendToSkype(irc, msg.channel, f"<{msg.nick}> {msg.args[1]}")
 
     doNotice = doPrivmsg
 
     def doTopic(self, irc, msg):
-        for chat in self._chatsFromChannel(irc.network, msg.channel):
-            chat.sendMsg(f"--- {msg.nick} changed the topic to: {msg.args[1]}")
+        self._sendToSkype(
+            irc, msg.channel, f"--- {msg.nick} changed the topic to: {msg.args[1]}"
+        )
 
 
 Class = SkypeRelay
-
-
-# vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=88:
