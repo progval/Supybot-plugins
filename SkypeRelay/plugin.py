@@ -113,6 +113,14 @@ class SkypeRelay(callbacks.Plugin):
         if self._skype is None:
             username = self.registryValue("auth.username")
             password = self.registryValue("auth.password")
+            if not username or not password:
+                raise callbacks.Error(
+                    _(
+                        "Missing Skype username and/or password. "
+                        "Configure them in supybot.plugins.SkypeRelay.auth.username "
+                        "supybot.plugins.SkypeRelay.auth.password."
+                    )
+                )
             self._skype = Skype()
             self._skype.conn.liveLogin(username, password)
         return self._skype
