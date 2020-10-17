@@ -141,7 +141,7 @@ class SkypeRelay(callbacks.Plugin):
             recent" command.
             <network> and <channel> default to the current network and
             channel."""
-            if not re.match("[0-9]+:[0-9a-f]+@.+", skype_chat_id):
+            if not re.match("[0-9]+:[^@ ]+@.+", skype_chat_id):
                 irc.errorInvalid(_("skype chat id"), Raise=True)
             relays = self.getPlugin(irc)._getRelays()
             relays.append(Relay(network.network, channel, skype_chat_id))
