@@ -211,6 +211,11 @@ class SkypeRelay(callbacks.Plugin):
         msg.tag("relayedMsg")
         world.getIrc(relay.network).queueMsg(msg)
 
+    def _relaysFromChatId(self, chat_id):
+        for relay in self._getRelays():
+            if relay.skype_chat_id == chat_id:
+                yield relay
+
     def _handleSkypeEvent(self, event):
         if isinstance(event, skpy.event.SkypeNewMessageEvent):
             if event.msg.userId == self._getSkype().userId:
@@ -219,16 +224,25 @@ class SkypeRelay(callbacks.Plugin):
                 return
             chat_id = event.msg.chatId
             content = utils.web.htmlToText(event.msg.content)
-            for relay in self._getRelays():
-                if relay.skype_chat_id != chat_id:
-                    continue
+            for relay in self._relaysFromChatId(chat_id):
                 self._queueRelayedMsg(
                     relay, format("<%s> %s", event.msg.userId, content)
+                )
+        elif isinstance(event, skpy.event.SkypeEditMessageEvent):
+            if event.msg.userId == self._getSkype().userId:
+                # That message was sent by myself; don't relay it (or it will echo all
+                # messages from the IRC channel back to the IRC channel)
+                return
+            chat_id = event.msg.chatId
+            content = utils.web.htmlToText(event.msg.content)
+            for relay in self._relaysFromChatId(chat_id):
+                self._queueRelayedMsg(
+                    relay, format("<%s (edited)> %s", event.msg.userId, content)
                 )
         elif isinstance(event, skpy.event.SkypeTypingEvent):
             pass
         else:
-            self.log.warning("Unknown event: %s", event)
+            self.log.warning("Unknown event: %r", event)
 
     def __call__(self, irc, msg):
         # first check so we don't acquire the lock needlessly. If we need it, then
