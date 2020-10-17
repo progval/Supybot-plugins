@@ -54,6 +54,40 @@ class Relay:
     skype_chat_id: str
 
 
+class SkypeHtmlToText(utils.web.HtmlToText):
+    def __init__(self):
+        self.stack = []
+        super().__init__()
+
+    def handle_starttag(self, tag, attrs):
+        attrs_dict = dict(attrs)
+        if "raw_pre" in attrs_dict:
+            assert "raw_post" in attrs_dict
+            self.append(attrs_dict["raw_pre"])
+            self.stack.append((tag, attrs_dict["raw_post"]))
+        else:
+            self.stack.append((tag, None))
+            super().handle_starttag(tag, attrs)
+
+    def handle_endtag(self, tag):
+        expected_tag = None
+        while self.stack and expected_tag != tag:
+            (expected_tag, raw_post) = self.stack.pop()
+        if tag != expected_tag:
+            raw_post = None
+        if raw_post:
+            self.append(raw_post)
+        else:
+            super().handle_endtag(tag)
+
+
+def htmlToText(s):
+    x = SkypeHtmlToText()
+    x.feed(s)
+    x.close()
+    return x.getText()
+
+
 class SkypeRelay(callbacks.Plugin):
     """Relays between IRC channels and Skype group chats"""
 
@@ -223,7 +257,7 @@ class SkypeRelay(callbacks.Plugin):
                 # messages from the IRC channel back to the IRC channel)
                 return
             chat_id = event.msg.chatId
-            content = utils.web.htmlToText(event.msg.content)
+            content = htmlToText(event.msg.content)
             for relay in self._relaysFromChatId(chat_id):
                 self._queueRelayedMsg(
                     relay, format("<%s> %s", event.msg.userId, content)
@@ -234,7 +268,7 @@ class SkypeRelay(callbacks.Plugin):
                 # messages from the IRC channel back to the IRC channel)
                 return
             chat_id = event.msg.chatId
-            content = utils.web.htmlToText(event.msg.content)
+            content = htmlToText(event.msg.content)
             for relay in self._relaysFromChatId(chat_id):
                 self._queueRelayedMsg(
                     relay, format("<%s (edited)> %s", event.msg.userId, content)
