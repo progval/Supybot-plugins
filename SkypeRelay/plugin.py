@@ -218,11 +218,12 @@ class SkypeRelay(callbacks.Plugin):
                 # messages from the IRC channel back to the IRC channel)
                 return
             chat_id = event.msg.chatId
+            content = utils.web.htmlToText(event.msg.content)
             for relay in self._getRelays():
                 if relay.skype_chat_id != chat_id:
                     continue
                 self._queueRelayedMsg(
-                    relay, format("<%s> %s", event.msg.userId, event.msg.content)
+                    relay, format("<%s> %s", event.msg.userId, content)
                 )
         elif isinstance(event, skpy.event.SkypeTypingEvent):
             pass
