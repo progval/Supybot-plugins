@@ -241,6 +241,25 @@ class SkypeRelay(callbacks.Plugin):
                 )
         elif isinstance(event, skpy.event.SkypeTypingEvent):
             pass
+        elif isinstance(event, skpy.event.SkypeMessageEvent):
+            chat_id = event.msg.chatId
+            msg_type = event.msg.type
+            if msg_type == "ThreadActivity/TopicUpdate":
+                for relay in self._relaysFromChatId(chat_id):
+                    self._queueRelayedMsg(
+                        relay,
+                        format(
+                            "--- %s changed the topic to: %s",
+                            event.msg.userId,
+                            event.msg.topic,
+                        ),
+                    )
+            else:
+                self.log.warning("Unknown event message type: %s", msg_type)
+        elif isinstance(event, skpy.event.SkypeChatMemberEvent):
+            chat_id = event.chatId
+            for relay in self._relaysFromChatId(chat_id):
+                self._queueRelayedMsg(relay, "[chat group update]")
         else:
             self.log.warning("Unknown event: %r", event)
 
@@ -274,6 +293,12 @@ class SkypeRelay(callbacks.Plugin):
             return
         for chat in self._chatsFromChannel(irc.network, msg.channel):
             chat.sendMsg(f"<{msg.nick}> {msg.args[1]}")
+
+    doNotice = doPrivmsg
+
+    def doTopic(self, irc, msg):
+        for chat in self._chatsFromChannel(irc.network, msg.channel):
+            chat.sendMsg(f"--- {msg.nick} changed the topic to: {msg.args[1]}")
 
 
 Class = SkypeRelay
