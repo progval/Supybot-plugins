@@ -29,6 +29,7 @@
 ###
 
 import dataclasses
+import functools
 import os.path
 import re
 import threading
@@ -86,6 +87,12 @@ def htmlToText(s):
     x.feed(s)
     x.close()
     return x.getText()
+
+
+@functools.lru_cache()
+def _formatUserId(user_id):
+    (fg, bg) = ircutils.canonicalColor(user_id)
+    return ircutils.mircColor(user_id, fg, bg)
 
 
 class SkypeRelay(callbacks.Plugin):
@@ -260,7 +267,7 @@ class SkypeRelay(callbacks.Plugin):
             content = htmlToText(event.msg.content)
             for relay in self._relaysFromChatId(chat_id):
                 self._queueRelayedMsg(
-                    relay, format("<%s> %s", event.msg.userId, content)
+                    relay, format("<%s> %s", _formatUserId(event.msg.userId), content)
                 )
         elif isinstance(event, skpy.event.SkypeEditMessageEvent):
             if event.msg.userId == self._getSkype().userId:
@@ -271,7 +278,10 @@ class SkypeRelay(callbacks.Plugin):
             content = htmlToText(event.msg.content)
             for relay in self._relaysFromChatId(chat_id):
                 self._queueRelayedMsg(
-                    relay, format("<%s (edited)> %s", event.msg.userId, content)
+                    relay,
+                    format(
+                        "<%s (edited)> %s", _formatUserId(event.msg.userId), content
+                    ),
                 )
         elif isinstance(event, skpy.event.SkypeTypingEvent):
             pass
@@ -284,7 +294,7 @@ class SkypeRelay(callbacks.Plugin):
                         relay,
                         format(
                             "--- %s changed the topic to: %s",
-                            event.msg.userId,
+                            _formatUserId(event.msg.userId),
                             event.msg.topic,
                         ),
                     )
@@ -330,9 +340,7 @@ class SkypeRelay(callbacks.Plugin):
             # messages from the Skype chat back to the Skype chat)
             return
         if ircmsgs.isAction(msg):
-            self._sendToSkype(
-                irc, msg.channel, f"* {msg.nick} {ircmsgs.unAction(msg)}"
-            )
+            self._sendToSkype(irc, msg.channel, f"* {msg.nick} {ircmsgs.unAction(msg)}")
         else:
             self._sendToSkype(irc, msg.channel, f"<{msg.nick}> {msg.args[1]}")
 
