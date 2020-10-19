@@ -36,6 +36,7 @@ import threading
 
 import skpy
 from skpy import Skype, SkypeGroupChat
+from skpy.msg import SkypeMsg
 
 from supybot import conf, utils, plugins, ircutils, callbacks, world, ircmsgs
 from supybot.commands import *
@@ -325,12 +326,24 @@ class SkypeRelay(callbacks.Plugin):
 
         self.__parent.__call__(irc, msg)
 
+    @functools.lru_cache(1)
+    def _ircToSkype(self, s):
+        """Converts mIRC format chars to Skype HTML"""
+        s = re.sub("\x02(.*?)(\x02|\x0f|$)", lambda m: SkypeMsg.bold(m.group(1)), s)
+        s = re.sub("\x1d(.*?)(\x1d|\x0f|$)", lambda m: SkypeMsg.italic(m.group(1)), s)
+
+        # remove other formatting
+        s = ircutils.stripFormatting(s)
+
+        return s
+
     def _sendToSkype(self, irc, channel, s):
         for relay in self._getRelays():
             if relay.network == irc.network and relay.channel == channel:
+                skype_msg = self._ircToSkype(s)
                 chat = self._getChat(relay.skype_chat_id)
                 try:
-                    chat.sendMsg(s)
+                    chat.sendRaw(content=skype_msg, messagetype="RichText")
                 except skpy.core.SkypeApiException as e:
                     irc.error(_("Failed to relay message: %s") % e)
 
