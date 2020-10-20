@@ -244,7 +244,14 @@ class SkypeRelay(callbacks.Plugin):
                 )
 
     def _skypeLoop(self):
-        while not self._skype_loop_stop:
+        # self._skype_loop_stop is set when die()ing, but sometime it's missed for some
+        # reason (when reloading?).
+        # Checking the SkypeRelay is self makes sure the plugin wasn't reloaded after
+        # the loop started.
+        while (
+            not self._skype_loop_stop
+            and world.ircs[0].getCallback("SkypeRelay") is self
+        ):
             events = self._getSkype().getEvents()
             for event in events:
                 self._handleSkypeEvent(event)
