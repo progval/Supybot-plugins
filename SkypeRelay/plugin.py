@@ -30,6 +30,7 @@
 
 import dataclasses
 import functools
+import html
 import os.path
 import re
 import threading
@@ -329,6 +330,7 @@ class SkypeRelay(callbacks.Plugin):
     @functools.lru_cache(1)
     def _ircToSkype(self, s):
         """Converts mIRC format chars to Skype HTML"""
+        s = html.escape(s)
         s = re.sub("\x02(.*?)(\x02|\x0f|$)", lambda m: SkypeMsg.bold(m.group(1)), s)
         s = re.sub("\x1d(.*?)(\x1d|\x0f|$)", lambda m: SkypeMsg.italic(m.group(1)), s)
 
