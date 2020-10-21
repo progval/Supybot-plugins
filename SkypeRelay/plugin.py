@@ -34,6 +34,7 @@ import html
 import os.path
 import re
 import threading
+import time
 
 import skpy
 from skpy import Skype, SkypeGroupChat
@@ -248,11 +249,27 @@ class SkypeRelay(callbacks.Plugin):
         # reason (when reloading?).
         # Checking the SkypeRelay is self makes sure the plugin wasn't reloaded after
         # the loop started.
+        last_reload = time.time()
         while (
             not self._skype_loop_stop
             and world.ircs[0].getCallback("SkypeRelay") is self
         ):
-            events = self._getSkype().getEvents()
+            old_skype = self._getSkype()
+
+            now = time.time()
+            if last_reload + 3600 < now:
+                # If left alive long enough, the skype session stop sending events.
+                # To avoid that, every hour, we recreate the session.
+                # In order not to drop messages arriving while reloading, we first
+                # create a new session, then discard its events, then do one last pull
+                # on the old session's events.
+                # TODO: This has a low probability of duplicating events, if they arrive
+                # between the calls to new_skype.getEvents and old_skype.getEvents.
+                self._skype = None
+                new_skype = self._getSkype()
+                threading.Thread(target=new_skype.getEvents).start()  # discard them
+                last_reload = now
+            events = old_skype.getEvents()
             for event in events:
                 self._handleSkypeEvent(event)
 
