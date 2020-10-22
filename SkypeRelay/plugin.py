@@ -378,16 +378,18 @@ class SkypeRelay(callbacks.Plugin):
             # That message was sent by myself; don't relay it (or it will echo all
             # messages from the Skype chat back to the Skype chat)
             return
+        # msg.nick is None if this is a simulated echo message
+        nick = msg.nick or irc.nick
         if ircmsgs.isAction(msg):
-            self._sendToSkype(irc, msg.channel, f"* {msg.nick} {ircmsgs.unAction(msg)}")
+            self._sendToSkype(irc, msg.channel, f"* {nick} {ircmsgs.unAction(msg)}")
         else:
-            self._sendToSkype(irc, msg.channel, f"<{msg.nick}> {msg.args[1]}")
+            self._sendToSkype(irc, msg.channel, f"<{nick}> {msg.args[1]}")
 
     doNotice = doPrivmsg
 
     def doTopic(self, irc, msg):
         self._sendToSkype(
-            irc, msg.channel, f"--- {msg.nick} changed the topic to: {msg.args[1]}"
+            irc, msg.channel, f"--- {nick} changed the topic to: {msg.args[1]}"
         )
 
 
