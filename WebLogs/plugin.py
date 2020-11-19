@@ -31,7 +31,7 @@
 import re
 import os
 import sys
-import cgi
+import html
 import time
 import urllib
 
@@ -141,19 +141,19 @@ def format_logs(logs):
                     nick_delimiters[1]
             new_line = _('%(formatted_nick)s %(message)s') % {
                     'formatted_nick': formatted_nick,
-                    'message': cgi.escape(' '.join(words[3:]))}
+                    'message': html.escape(' '.join(words[3:]))}
         elif command == 'PRIVMSG-ACTION':
             new_line = _('* %(nick)s %(message)s') % {
                     'nick': format_nick(words[2]),
-                    'message': cgi.escape(' '.join(words[3:]))}
+                    'message': html.escape(' '.join(words[3:]))}
         elif command == 'PART':
             new_line = _('<-- %(nick)s has left the channel (%(reason)s)') % \
                     {'nick': format_nick(words[2]),
-                    'reason': cgi.escape(' '.join(words[3:]))}
+                    'reason': html.escape(' '.join(words[3:]))}
         elif command == 'QUIT':
             new_line = _('<-- %(nick)s has quit the network (%(reason)s)') % \
                     {'nick': format_nick(words[2]),
-                    'reason': cgi.escape(' '.join(words[3:]))}
+                    'reason': html.escape(' '.join(words[3:]))}
         elif command == 'JOIN':
             new_line = _('--> %(nick)s has joined the channel') % \
                     {'nick': format_nick(words[2])}
@@ -165,7 +165,7 @@ def format_logs(logs):
             new_line = _('<-- %(kicked)s has been kicked by %(kicker)s (%(reason)s)') % \
                     {'kicked': format_nick(words[3]),
                     'kicker': format_nick(words[2]),
-                    'reason': cgi.escape(' '.join(words[4:]))}
+                    'reason': html.escape(' '.join(words[4:]))}
         if new_line is not None:
             template = """
                 <div class="line command-%(command)s">
