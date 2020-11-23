@@ -389,7 +389,7 @@ class SkypeRelay(callbacks.Plugin):
 
     def doTopic(self, irc, msg):
         self._sendToSkype(
-            irc, msg.channel, f"--- {nick} changed the topic to: {msg.args[1]}"
+            irc, msg.channel, f"--- {msg.nick} changed the topic to: {msg.args[1]}"
         )
 
 
