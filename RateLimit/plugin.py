@@ -156,7 +156,7 @@ class RateLimit(callbacks.Plugin):
         If <user> is not given, the rate limit will be enforced globally,
         and if * is given as the <user>, the rate limit will be enforced
         for everyone."""
-        command = callbacks.canonicalName(command)
+        command = callbacks.canonicalName(command, preserve_spaces=True)
         if user is None:
             user = 'global'
         elif user != '*':
@@ -173,7 +173,7 @@ class RateLimit(callbacks.Plugin):
         If <user> is not given, the rate limit will be enforced globally,
         and if * is given as the <user>, the rate limit will be enforced
         for everyone."""
-        command = callbacks.canonicalName(command)
+        command = callbacks.canonicalName(command, preserve_spaces=True)
         if user is None:
             user = 'global'
         elif user != '*':
@@ -190,7 +190,7 @@ class RateLimit(callbacks.Plugin):
         """<command>
 
         Return rate limits set for the given <command>."""
-        command = callbacks.canonicalName(command)
+        command = callbacks.canonicalName(command, preserve_spaces=True)
         records = self.db.get_limits(command)
         global_ = 'none'
         star = 'none'
