@@ -148,7 +148,7 @@ class RateLimit(callbacks.Plugin):
             return False
 
     @wrap([optional(first('otherUser', ('literal', '*'))),
-        'nonNegativeInt', 'nonNegativeInt', 'commandName', 'admin'])
+        'nonNegativeInt', 'nonNegativeInt', 'something', 'admin'])
     def set(self, irc, msg, args, user, count, interval, command):
         """[<user>] <how many in interval> <interval length> <command>
 
@@ -156,6 +156,7 @@ class RateLimit(callbacks.Plugin):
         If <user> is not given, the rate limit will be enforced globally,
         and if * is given as the <user>, the rate limit will be enforced
         for everyone."""
+        command = callbacks.canonicalName(command)
         if user is None:
             user = 'global'
         elif user != '*':
@@ -164,7 +165,7 @@ class RateLimit(callbacks.Plugin):
         irc.replySuccess()
 
     @wrap([optional(first('otherUser', ('literal', '*'))),
-        'commandName', 'admin'])
+        'something', 'admin'])
     def unset(self, irc, msg, args, user, command):
         """[<user>] <command>
 
@@ -172,6 +173,7 @@ class RateLimit(callbacks.Plugin):
         If <user> is not given, the rate limit will be enforced globally,
         and if * is given as the <user>, the rate limit will be enforced
         for everyone."""
+        command = callbacks.canonicalName(command)
         if user is None:
             user = 'global'
         elif user != '*':
@@ -183,11 +185,12 @@ class RateLimit(callbacks.Plugin):
         else:
             irc.replySuccess()
 
-    @wrap(['commandName'])
+    @wrap(['something'])
     def get(self, irc, msg, args, command):
         """<command>
 
         Return rate limits set for the given <command>."""
+        command = callbacks.canonicalName(command)
         records = self.db.get_limits(command)
         global_ = 'none'
         star = 'none'

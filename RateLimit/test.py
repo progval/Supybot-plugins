@@ -93,5 +93,22 @@ class RateLimitTestCase(PluginTestCase):
         self.assertResponse('echo spam', 'spam', frm='baz!a@a')
         self.assertNoResponse('echo spam', frm='foo!a@a')
 
+    def testGlobalSpace(self):
+        self.assertResponse('ratelimit get "hostmask add"',
+                'global: none, *: none')
+        self.assertNotError('ratelimit set 3 1 "hostmask add"')
+        self.assertResponse('ratelimit get "hostmask add"',
+                'global: 3 per 1 sec, *: none')
+        self.assertResponse(
+            'hostmask add foo a1!b@c', 'The operation succeeded.',
+            frm='foo!a@a')
+        self.assertResponse(
+            'hostmask add foo a2!b@c', 'The operation succeeded.',
+            frm='bar!a@a')
+        self.assertResponse(
+            'hostmask add foo a3!b@c', 'The operation succeeded.',
+            frm='baz!a@a')
+        self.assertNoResponse('hostmask add foo a4!b@c', frm='foo!a@a')
+
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
