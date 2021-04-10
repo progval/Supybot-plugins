@@ -427,6 +427,7 @@ class GitHub(callbacks.Plugin):
             announces = self._load()
             results = []
             print(repr(announces))
+            print(irc.network, channel)
             for annc in announces:
                 if (annc[1] == '' or annc[1] == irc.network) and \
                         ircutils.strEqual(annc[2], channel):
