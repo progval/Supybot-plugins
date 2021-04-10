@@ -427,11 +427,15 @@ class GitHub(callbacks.Plugin):
             announces = self._load()
             results = []
             print(repr(announces))
-            print(irc.network, channel)
+            print(repr(irc.network), repr(channel))
+            print("announces:")
             for annc in announces:
+                print(repr(annc))
+                print(ircutils.strEqual(annc[2], channel))
                 if (annc[1] == '' or annc[1] == irc.network) and \
                         ircutils.strEqual(annc[2], channel):
                     results.append(annc[0])
+            print("results:", repr(results))
 
             if results:
                 irc.reply(format(_('The following repositories announce to %s: %L'),
