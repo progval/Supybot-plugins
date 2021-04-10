@@ -39,15 +39,20 @@ if sys.version_info[0] < 3:
 else:
     from io import StringIO
 
-# Disable Admin protection against giving the 'owner' capability.
-strEqual = ircutils.strEqual
-def fakeStrEqual(first, second):
-    if first == 'owner' and second == 'owner':
-        return False
-ircutils.strEqual = fakeStrEqual
-
 class SudoTestCase(PluginTestCase):
     plugins = ('Sudo', 'User', 'Admin', 'Alias', 'Utilities')
+    def setUp(self):
+        super(SudoTestCase, self).setUp()
+        # Disable Admin protection against giving the 'owner' capability.
+        self._strEqual = ircutils.strEqual
+        def fakeStrEqual(first, second):
+            if first == 'owner' and second == 'owner':
+                return False
+        ircutils.strEqual = fakeStrEqual
+
+    def tearDown(self):
+        ircutils.strEqual = self._strEqual
+        super(SudoTestCase, self).tearDown()
 
     def testAllow(self):
         self.assertNotError('register Prog Val')
