@@ -312,6 +312,9 @@ class LinkRelay(callbacks.Plugin):
                 for s in [head] + tail:
                     msg = f(relay.targetChannel, s)
                     msg.tag('relayedMsg')
+                    if 'message-tags' in targetIRC.state.capabilities_ack \
+                            and conf.supybot.protocols.irc.experimentalExtensions():
+                        msg.server_tags['+draft/display-name'] = args['nick']
                     targetIRC.sendMsg(msg)
 
         if channel is None:
