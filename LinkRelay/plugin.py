@@ -314,7 +314,9 @@ class LinkRelay(callbacks.Plugin):
                     msg.tag('relayedMsg')
                     if 'message-tags' in targetIRC.state.capabilities_ack \
                             and conf.supybot.protocols.irc.experimentalExtensions():
-                        msg.server_tags['+draft/display-name'] = args['nick']
+                        # note: args['network'] is set in format_()
+                        msg.server_tags['+draft/display-name'] = \
+                            args['nick'] + args['network']
                     targetIRC.sendMsg(msg)
 
         if channel is None:
