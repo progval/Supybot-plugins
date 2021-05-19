@@ -102,6 +102,11 @@ conf.registerGlobalValue(LinkRelay, 'substitutes',
     registry.String('', _("""You shouldn't edit this configuration variable
     yourself unless you know what you do. Use @LinkRelay (no)substitute instead.""")))
 
+conf.registerGlobalValue(LinkRelay, 'nickSplitter',
+    registry.String('\u200b', _(r"""String inserted in the middle of relayed
+    nicks, prevent highlights.
+    Can be "\u200b" (zero-width spaces), "\x01\x01" (bold + unbold), etc.""")))
+
 conf.registerGroup(LinkRelay, 'colors')
 for name, color in {'info': '02',
                     'truncated': '14',

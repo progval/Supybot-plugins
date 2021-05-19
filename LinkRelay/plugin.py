@@ -135,17 +135,17 @@ class LinkRelay(callbacks.Plugin):
             text = text.strip('\x01')
             text = text[ 7 : ]
             if colored:
-                return ('* \x03%(color)s%(nick)s%(network)s\017 %(text)s',
+                return ('* \x03%(color)s%(escapedNick)s%(network)s\017 %(text)s',
                         {'nick': nick, 'color': color, 'text': text})
             else:
-                return ('* %(nick)s%(network)s %(text)s',
+                return ('* %(escapedNick)s%(network)s %(text)s',
                         {'nick': nick, 'text': text})
         else:
             if colored:
-                return ('<\x03%(color)s%(nick)s%(network)s\017> %(text)s',
+                return ('<\x03%(color)s%(escapedNick)s%(network)s\017> %(text)s',
                         {'color': color, 'nick': nick, 'text': text})
             else:
-                return ('<%(nick)s%(network)s> %(text)s',
+                return ('<%(escapedNick)s%(network)s> %(text)s',
                         {'nick': nick, 'text': text})
         return s
 
@@ -220,7 +220,7 @@ class LinkRelay(callbacks.Plugin):
                 'mode': ' '.join(msg.args[1:]), 'color': ''}
         if self.registryValue('color', msg.args[0]):
             args['color'] = '\x03%s' % self.registryValue('colors.mode', msg.args[0])
-        s = '%(color)s' + _('*/* %(nick)s changed mode on '
+        s = '%(color)s' + _('*/* %(escapedNick)s changed mode on '
                 '%(channel)s%(network)s to %(mode)s')
         self.sendToOthers(irc, msg.args[0], s, args)
 
@@ -230,7 +230,7 @@ class LinkRelay(callbacks.Plugin):
             args['color'] = '\x03%s' % self.registryValue('colors.join', msg.args[0])
         if self.registryValue('hostmasks', msg.args[0]):
             args['nick'] = msg.prefix
-        s = '%(color)s' + _('--> %(nick)s has joined %(channel)s%(network)s')
+        s = '%(color)s' + _('--> %(escapedNick)s has joined %(channel)s%(network)s')
         self.sendToOthers(irc, msg.args[0], s, args)
 
     def doPart(self, irc, msg):
@@ -239,7 +239,7 @@ class LinkRelay(callbacks.Plugin):
             args['color'] = '\x03%s' % self.registryValue('colors.part', msg.args[0])
         if self.registryValue('hostmasks', msg.args[0]):
             args['nick'] = msg.prefix
-        s = '%(color)s' + _('<-- %(nick)s has left %(channel)s%(network)s')
+        s = '%(color)s' + _('<-- %(escapedNick)s has left %(channel)s%(network)s')
         self.sendToOthers(irc, msg.args[0], s, args)
 
     def doKick(self, irc, msg):
@@ -270,7 +270,7 @@ class LinkRelay(callbacks.Plugin):
         if self.registryValue('color'):
             # TODO: this should use the channel-specific value
             args['color'] = '\x03%s' % self.registryValue('colors.quit')
-        s = _('<-- %(nick)s has quit on %(network)s (%(message)s)')
+        s = _('<-- %(escapedNick)s has quit on %(network)s (%(message)s)')
         self.sendToOthers(irc, None, s, args, msg.nick)
 
     def sendToOthers(self, irc, channel, s, args, nick=None, isPrivmsg=False):
@@ -281,7 +281,13 @@ class LinkRelay(callbacks.Plugin):
                     args['network'] = '@' + irc.network
                 else:
                     args['network'] = ''
+
+            nickSplitter = self.registryValue('nickSplitter')
+            args['escapedNick'] = \
+                args['nick'][0] + nickSplitter + args['nick'][1:]
+
             return s % args
+
         def send(s):
             targetIRC = world.getIrc(relay.targetNetwork)
             if not targetIRC:
