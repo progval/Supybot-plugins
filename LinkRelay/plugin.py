@@ -282,9 +282,10 @@ class LinkRelay(callbacks.Plugin):
                 else:
                     args['network'] = ''
 
-            nickSplitter = self.registryValue('nickSplitter')
-            args['escapedNick'] = \
-                args['nick'][0] + nickSplitter + args['nick'][1:]
+            if 'nick' in args:
+                nickSplitter = self.registryValue('nickSplitter')
+                args['escapedNick'] = \
+                    args['nick'][0] + nickSplitter + args['nick'][1:]
 
             return s % args
 
