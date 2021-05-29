@@ -28,8 +28,8 @@
 
 ###
 
-import cgi
 import sys
+import html
 import supybot.conf as conf
 import supybot.utils as utils
 from supybot.commands import *
@@ -132,9 +132,9 @@ class WebDocServerCallback(httpserver.SupyHTTPServerCallback):
                         s = '%s %s %s' % (name, ' '.join(command), doclines.pop(0))
                     else:
                         s = doclines.pop(0)
-                    s = cgi.escape(s)
+                    s = html.escape(s)
                     if doclines:
-                        help_ = cgi.escape('\n'.join(doclines))
+                        help_ = html.escape('\n'.join(doclines))
                         s = '<strong>%s</strong><br />%s' % \
                                 (s, help_)
                     return '<tr><td>%s</td><td>%s</td></tr>' % \
