@@ -98,7 +98,7 @@ class Trigger(callbacks.Plugin):
             if msg.args[0] in c.users:
                 self._run(irc, msg, 'nick', channel)
     def do376(self, irc, msg):
-        command = self.registryValue('triggers.connect')
+        command = self.registryValue('triggers.connect', network=irc.network)
         if command != '':
             irc.queueMsg(ircmsgs.IrcMsg(command))
 

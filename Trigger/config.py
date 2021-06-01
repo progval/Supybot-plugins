@@ -60,7 +60,7 @@ for trigger in 'join part privmsg notice highlight nick quit kick'.split(' '):
         registry.String('', _("""Command triggered by %ss""" % trigger),
             private=True))
 
-conf.registerGlobalValue(Trigger.triggers, 'connect',
+conf.registerNetworkValue(Trigger.triggers, 'connect',
     registry.String('', _("""Command triggered on connect. This shouldn't be
     a Supybot command, but an IRC command (as given to ircquote)."""),
     private=True))
