@@ -97,10 +97,13 @@ class Trigger(callbacks.Plugin):
         for (channel, c) in irc.state.channels.items():
             if msg.args[0] in c.users:
                 self._run(irc, msg, 'nick', channel)
+
     def do376(self, irc, msg):
+        # End of MOTD
         command = self.registryValue('triggers.connect', network=irc.network)
         if command != '':
             irc.queueMsg(ircmsgs.IrcMsg(command))
+    do422 = do376  # No MOTD
 
 
 Class = Trigger
