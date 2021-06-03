@@ -4,7 +4,8 @@ This plugin announces events GitHub repositories to IRC.
 
 To use this plugin you must forward/open the port which is specified by 
 the configuration variable `supybot.servers.http.port` (8080 is the 
-default value).
+default value). For more information, see 
+[Using the HTTP server in Limnoria's documentation](https://docs.limnoria.net/use/httpserver.html).
 
 To add announces use the command `github announce add <owner> <repo>` 
 `Owner` means the owner of the repository (GitHub username) 
