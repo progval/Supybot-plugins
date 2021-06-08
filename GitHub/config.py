@@ -142,49 +142,63 @@ conf.registerChannelValue(GitHub.format, 'pull_request_review_comment',
         individual review comments, you probably only want to use the
         pull_request_review event to avoid clutter.""")))
 
-# BEGIN AUTOGEN
-EVENT_TYPES = (
-    'check_suite',
-    'content_reference',
-    'create',
-    'delete',
-    'deploy_key',
-    'deployment',
-    'deployment_status',
-    'download',
-    'follow',
-    'fork',
-    'fork_apply',
-    'github_app_authorization',
-    'gist',
-    'gollum',
-    'installation',
-    'installation_repositories',
-    'label',
-    'member',
-    'membership',
-    'meta',
-    'milestone',
-    'organization',
-    'org_block',
-    'page_build',
-    'project_card',
-    'project_column',
-    'project',
-    'public',
-    'registry_package',
-    'release',
-    'repository_dispatch',
-    'repository',
-    'repository_import',
-    'repository_vulnerability_alert',
-    'security_advisory',
-    'star',
-    'team',
-    'team_add',
-    'watch',
-)
-# END EUTOGEN
+# Copy-paste this from the table of contents here:
+# https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads
+EVENT_TYPES = """
+check_run
+check_suite
+code_scanning_alert
+commit_comment
+content_reference
+create
+delete
+deploy_key
+deployment
+deployment_status
+discussion
+discussion_comment
+fork
+github_app_authorization
+gollum
+installation
+installation_repositories
+issue_comment
+issues
+label
+marketplace_purchase
+member
+membership
+meta
+milestone
+organization
+org_block
+package
+page_build
+ping
+project_card
+project_column
+project
+public
+pull_request
+pull_request_review
+pull_request_review_comment
+push
+release
+repository_dispatch
+repository
+repository_import
+repository_vulnerability_alert
+secret_scanning_alert
+security_advisory
+sponsorship
+star
+status
+team
+team_add
+watch
+workflow_dispatch
+workflow_run
+""".strip().split()
 
 
 for event_type in EVENT_TYPES:
