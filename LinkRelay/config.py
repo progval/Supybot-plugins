@@ -90,6 +90,15 @@ conf.registerChannelValue(LinkRelay, 'relayNotices',
     registry.Boolean(False, _("""Determines whether the bot will relay NOTICE
     messages.""")))
 
+conf.registerChannelValue(LinkRelay, 'spoofNicknames',
+    registry.Boolean(False, _("""Use IRCv3 RELAYMSG if supported to use 
+    spoofed nicknames to relay messages transparently. Note that
+    the current implementation of RELAYMSG in some IRCds may use the same
+    user@host (like ergo) and account-tag of the bot, which may lead to 
+    impersonation of the bot where only user@host or account-tag is checked. 
+    supybot.protocols.irc.experimentalExtensions also needs to be enabled for
+    RELAYMSG to work.""")))
+
 conf.registerChannelValue(LinkRelay, 'relayOutgoing',
     registry.Boolean(True, _("""Determines whether the bot will relay messages
     from itself.""")))
