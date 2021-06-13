@@ -31,6 +31,7 @@
 import re
 import copy
 import string
+import functools
 import supybot.log as log
 import supybot.conf as conf
 import supybot.utils as utils
@@ -50,6 +51,17 @@ except:
     # without the i18n plugin
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
+
+def relaymsg(recipient, spoofed_nick, s, prefix='', msg=None):
+    """Returns a RELAYMSG to recipient with the message s."""
+    if conf.supybot.protocols.irc.strictRfc():
+        assert (ircmsgs.areReceivers(recipient)), repr(recipient)
+        assert s, 's must not be empty.'
+    assert isinstance(s, str)
+    if msg and not prefix:
+        prefix = msg.prefix
+    return ircmsgs.IrcMsg(prefix=prefix, command='RELAYMSG',
+                  args=(recipient, spoofed_nick, s), msg=msg)
 
 @internationalizeDocstring
 class LinkRelay(callbacks.Plugin):
@@ -136,17 +148,17 @@ class LinkRelay(callbacks.Plugin):
             text = text[ 7 : ]
             if colored:
                 return ('* \x03%(color)s%(escapedNick)s%(network)s\017 %(text)s',
-                        {'nick': nick, 'color': color, 'text': text})
+                        {'nick': nick, 'color': color, 'text': text, 'action': True})
             else:
                 return ('* %(escapedNick)s%(network)s %(text)s',
-                        {'nick': nick, 'text': text})
+                        {'nick': nick, 'text': text, 'action': True})
         else:
             if colored:
                 return ('<\x03%(color)s%(escapedNick)s%(network)s\017> %(text)s',
-                        {'color': color, 'nick': nick, 'text': text})
+                        {'color': color, 'nick': nick, 'text': text, 'action': False})
             else:
                 return ('<%(escapedNick)s%(network)s> %(text)s',
-                        {'nick': nick, 'text': text})
+                        {'nick': nick, 'text': text, 'action': False})
         return s
 
 
@@ -303,11 +315,20 @@ class LinkRelay(callbacks.Plugin):
                 self.log.info('LinkRelay:  I\'m not in in %s on %s' %
                               (relay.targetChannel, relay.targetNetwork))
             else:
-                if isPrivmsg or \
+                if isPrivmsg and 'draft/relaymsg' in targetIRC.state.capabilities_ls \
+                        and self.registryValue('spoofNicknames', relay.targetChannel, relay.targetNetwork) \
+                        and conf.supybot.protocols.irc.experimentalExtensions() \
+                        and targetIRC.state.channels[relay.targetChannel].isOp(targetIRC.nick):
+                    separator = targetIRC.state.capabilities_ls['draft/relaymsg']
+                    spoofed_nick = ''.join([args['nick'], separator, irc.network])
+                    f = functools.partial(relaymsg, relay.targetChannel, spoofed_nick)
+                    args['draft/relaymsg'] = True
+                    s = args['text']
+                elif isPrivmsg or \
                         self.registryValue('nonPrivmsgs', channel) == 'privmsg':
-                    f = ircmsgs.privmsg
+                    f = functools.partial(ircmsgs.privmsg, relay.targetChannel)
                 elif self.registryValue('nonPrivmsgs', channel) == 'notice':
-                    f = ircmsgs.notice
+                    f = functools.partial(ircmsgs.notice, relay.targetChannel)
                 else:
                     return
                 allowedLength = conf.get(conf.supybot.reply.mores.length,
@@ -318,10 +339,13 @@ class LinkRelay(callbacks.Plugin):
                 tail = [cont + ' ' + s[i:i+remainingLength] for i in
                         range(allowedLength, len(s), remainingLength)]
                 for s in [head] + tail:
-                    msg = f(relay.targetChannel, s)
+                    if args.get('draft/relaymsg') and args.get('action'):
+                        s = '\x01ACTION %s\x01' %s 
+                    msg = f(s)
                     msg.tag('relayedMsg')
                     if 'message-tags' in targetIRC.state.capabilities_ack \
-                            and conf.supybot.protocols.irc.experimentalExtensions():
+                            and conf.supybot.protocols.irc.experimentalExtensions() \
+                            and not args.get('draft/relaymsg'):
                         # note: args['network'] is set in format_()
                         msg.server_tags['+draft/display-name'] = \
                             args['nick'] + args['network']
