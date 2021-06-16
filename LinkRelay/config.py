@@ -112,7 +112,7 @@ conf.registerGlobalValue(LinkRelay, 'substitutes',
     yourself unless you know what you do. Use @LinkRelay (no)substitute instead.""")))
 
 conf.registerGlobalValue(LinkRelay, 'nickSplitter',
-    registry.String('\u200b', _(r"""String inserted in the middle of relayed
+    registry.String('', _(r"""String inserted in the middle of relayed
     nicks, prevent highlights.
     Can be "\u200b" (zero-width spaces), "\x01\x01" (bold + unbold), etc.""")))
 
