@@ -92,8 +92,8 @@ conf.registerChannelValue(LinkRelay, 'relayNotices',
 
 conf.registerChannelValue(LinkRelay, 'spoofNicknames',
     registry.Boolean(False, _("""Uses RELAYMSG to spoof nicknames in relayed
-    messages transparently, if it is supported by the network (use
-    ``@network capabilities`` to check). Note that
+    messages transparently, if it is supported by the network (to check, see
+    if ``@network capabilities`` mentions ``relaymsg``). Note that
     the current implementation of RELAYMSG in some IRCds may use the same
     user@host (like ergo) and account-tag of the bot, which may lead to 
     impersonation of the bot where only user@host or account-tag is checked. 
