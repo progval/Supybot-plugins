@@ -126,12 +126,13 @@ conf.registerChannelValue(GitHub.format, 'pull_request',
         .replace('\n        ', ' '),
         _("""Format for pull request events.""")))
 
-PR_REVIEW_FORMAT = 'echo ' +
+PR_REVIEW_FORMAT = ('echo ' +
     _('$repository__owner__login/\x02$repository__name\x02: '
     '\x02$user__login\x02 reviewed pull request #$pull_request__number '
     '(to \x02$pull_request__base__ref\x02): \x02$pull_request__title\x02 '
     '$pull_request__html_url__tiny') \
     .replace('\n        ', ' ')
+)
 conf.registerChannelValue(GitHub.format, 'pull_request_review',
         registry.String(PR_REVIEW_FORMAT,
         _("""Format for pull request review events. This is triggered when
