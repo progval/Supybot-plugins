@@ -129,7 +129,7 @@ class EchoTyping(callbacks.Plugin):
 
     def doQuit(self, irc, msg):
         for channel in msg.tagged("channels"):
-            self._user_stopped_typing(irc.network, channel, msg.nick)
+            self._user_stopped_typing(irc, channel, msg.nick)
 
     def _refresh_typing(self, irc, channel, status):
         now = time.time()
