@@ -34,9 +34,9 @@ _ = PluginInternationalization("NickTracker")
 
 
 JOIN_REGEXP = re.compile(
-    "(?P<date>[^ ]+)  \*\*\* "
-    "(?P<nick1>[^ !]+) <(?P<nick2>[^ !]+)!(?P<user>[^@]+)@(?P<host>[^ ]+)> "
-    "has joined (?P<channel>[^ ]+)\n$"
+    r"(?P<date>[^ ]+)  \*\*\* "
+    r"(?P<nick1>[^ !]+) <(?P<nick2>[^ !]+)!(?P<user>[^@]+)@(?P<host>[^ ]+)> "
+    r"has joined (?P<channel>[^ ]+)\n$"
 )
 
 
@@ -97,20 +97,26 @@ class NickTracker(callbacks.Plugin):
                     user=sys.intern(m["user"]),
                     host=sys.intern(m["host"]),
                 ),
-                channel=m["channel"],
+                channel=ircutils.IrcString(m["channel"]),
                 network=irc.network,
             )
 
     def doJoin(self, irc, msg):
         if msg.channel is not None:
             self._handle_new_nick(
-                irc, msg.channel, msg.nick, msg.user, msg.host
+                irc,
+                ircutils.IrcString(msg.channel),
+                msg.nick,
+                msg.user,
+                msg.host,
             )
 
     def doNick(self, irc, msg):
         new_nick = msg.args[0]
         for channel in msg.tagged("channels"):
-            self._handle_new_nick(irc, channel, new_nick, msg.user, msg.host)
+            self._handle_new_nick(
+                irc, ircutils.IrcString(channel), new_nick, msg.user, msg.host
+            )
 
     def _handle_new_nick(self, irc, channel, new_nick, user, host):
         if channel not in self._records and new_nick != irc.nick:
