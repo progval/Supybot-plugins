@@ -102,29 +102,36 @@ class NickTracker(callbacks.Plugin):
             )
 
     def doJoin(self, irc, msg):
-        if (
-            msg.channel is not None
-            and msg.channel not in self._records
-            and msg.nick != irc.nick
-        ):
-            self._load_from_channellogger(irc, msg.channel)
-        self._announce_join(irc, msg)
+        if msg.channel is not None:
+            self._handle_new_nick(
+                irc, msg.channel, msg.nick, msg.user, msg.host
+            )
+
+    def doNick(self, irc, msg):
+        new_nick = msg.args[0]
+        for channel in msg.tagged("channels"):
+            self._handle_new_nick(irc, channel, new_nick, msg.user, msg.host)
+
+    def _handle_new_nick(self, irc, channel, new_nick, user, host):
+        if channel not in self._records and new_nick != irc.nick:
+            self._load_from_channellogger(irc, channel)
+        self._announce(irc, channel, new_nick, user, host)
         self._add_record(
             Record(
                 date=datetime.datetime.now(),
-                nick=msg.nick,
-                user=msg.user,
-                host=msg.host,
+                nick=new_nick,
+                user=user,
+                host=host,
             ),
-            channel=msg.channel,
+            channel=channel,
             network=irc.network,
         )
 
-    def _announce_join(self, irc, msg):
+    def _announce(self, irc, channel, new_nick, user, host):
         """Finds matching records, then calls _announce_join_to_target with the
         result for each target."""
-        targets = self.registryValue("targets", msg.channel, irc.network)
-        patterns = self.registryValue("patterns", msg.channel, irc.network)
+        targets = self.registryValue("targets", channel, irc.network)
+        patterns = self.registryValue("patterns", channel, irc.network)
 
         # Discard any pattern that has no variable at all.
         patterns = [
@@ -139,15 +146,13 @@ class NickTracker(callbacks.Plugin):
         patterns = [string.Template(pattern) for pattern in patterns]
 
         search_terms = {
-            pattern.safe_substitute(
-                nick=msg.nick, user=msg.user, host=msg.host
-            )
+            pattern.safe_substitute(nick=new_nick, user=user, host=host)
             for pattern in patterns
         }
 
         matching_records = [
             record
-            for record in self._records[irc.network][msg.channel]
+            for record in self._records[irc.network][channel]
             if {
                 pattern.safe_substitute(dataclasses.asdict(record))
                 for pattern in patterns
@@ -170,15 +175,17 @@ class NickTracker(callbacks.Plugin):
         ]
 
         for target in targets:
-            self._announce_join_to_target(irc, msg, target, msg.channel, nicks)
+            self._announce_join_to_target(
+                irc, new_nick, target, channel, nicks
+            )
 
-    def _announce_join_to_target(self, irc, msg, target, source, nicks):
+    def _announce_join_to_target(self, irc, new_nick, target, source, nicks):
         """Announce the given list of nicks (in reverse chronological order)."""
         separator = self.registryValue(
             "announce.nicks.separator", target, irc.network
         )
         nick_string = separator.join(nicks)
-        prefix = f"[{source}] {msg.nick} also used nicks: "
+        prefix = f"[{source}] {new_nick} also used nicks: "
 
         # Roughly wrap to make sure it doesn't exceed 512 byte lines.
         # Assuming a reasonable no multi-byte character in the nicks,
