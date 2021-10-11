@@ -70,34 +70,31 @@ class NickTracker(callbacks.Plugin):
             for filename in glob.glob(cb.getLogDir(irc, channel) + "/*.log"):
                 with open(filename, "rb") as fd:
                     for line in fd:
-                        m = JOIN_REGEXP.match(line.decode(errors="replace"))
-                        if m:
-                            groups = m.groupdict()
-                            assert m["nick1"] == m["nick2"]
-                            try:
-                                date = datetime.datetime.strptime(
-                                    m["date"], timestampFormat
-                                )
-                            except ValueError:
-                                try:
-                                    date = datetime.datetime.fromisoformat(
-                                        m["date"]
-                                    )
-                                except ValueError:
-                                    self.log.error(
-                                        "Could not parse date: %s", m["date"]
-                                    )
-                                    continue
-                            self._add_record(
-                                Record(
-                                    date=date,
-                                    nick=sys.intern(m["nick1"]),
-                                    user=sys.intern(m["user"]),
-                                    host=sys.intern(m["host"]),
-                                ),
-                                channel=m["channel"],
-                                network=irc.network,
-                            )
+                        self._add_line(irc, timestampFormat, line)
+
+    def _add_line(self, irc, timestampFormat, line):
+        m = JOIN_REGEXP.match(line.decode(errors="replace"))
+        if m:
+            groups = m.groupdict()
+            assert m["nick1"] == m["nick2"]
+            try:
+                date = datetime.datetime.strptime(m["date"], timestampFormat)
+            except ValueError:
+                try:
+                    date = datetime.datetime.fromisoformat(m["date"])
+                except ValueError:
+                    self.log.error("Could not parse date: %s", m["date"])
+                    return
+            self._add_record(
+                Record(
+                    date=date,
+                    nick=sys.intern(m["nick1"]),
+                    user=sys.intern(m["user"]),
+                    host=sys.intern(m["host"]),
+                ),
+                channel=m["channel"],
+                network=irc.network,
+            )
 
     def doJoin(self, irc, msg):
         if (
