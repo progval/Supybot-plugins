@@ -26,7 +26,7 @@ import string
 import sys
 import textwrap
 
-from supybot import utils, callbacks, plugins, ircmsgs, ircutils, world
+from supybot import conf, callbacks, ircmsgs, ircutils, plugins, utils, world
 
 from supybot.i18n import PluginInternationalization
 
@@ -65,6 +65,7 @@ class NickTracker(callbacks.Plugin):
         cb = irc.getCallback("ChannelLogger")
         if not cb:
             return
+        timestampFormat = conf.supybot.log.timestampFormat()
         for irc in world.ircs:
             for filename in glob.glob(cb.getLogDir(irc, channel) + "/*.log"):
                 with open(filename, "rb") as fd:
@@ -73,11 +74,23 @@ class NickTracker(callbacks.Plugin):
                         if m:
                             groups = m.groupdict()
                             assert m["nick1"] == m["nick2"]
+                            try:
+                                date = datetime.datetime.strptime(
+                                    m["date"], timestampFormat
+                                )
+                            except ValueError:
+                                try:
+                                    date = datetime.datetime.fromisoformat(
+                                        m["date"]
+                                    )
+                                except ValueError:
+                                    self.log.error(
+                                        "Could not parse date: %s", m["date"]
+                                    )
+                                    continue
                             self._add_record(
                                 Record(
-                                    date=datetime.datetime.fromisoformat(
-                                        m["date"]
-                                    ),
+                                    date=date,
                                     nick=sys.intern(m["nick1"]),
                                     user=sys.intern(m["user"]),
                                     host=sys.intern(m["host"]),
@@ -85,9 +98,6 @@ class NickTracker(callbacks.Plugin):
                                 channel=m["channel"],
                                 network=irc.network,
                             )
-
-    def __call__(self, irc, msg):
-        super().__call__(irc, msg)
 
     def doJoin(self, irc, msg):
         if (
