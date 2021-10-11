@@ -53,6 +53,11 @@ class Record:
 class NickTracker(callbacks.Plugin):
     """Keeps trace of the nicknames used by people connecting from the same hosts"""
 
+    # When handling an incoming JOIN, we want to load the logs *before*
+    # ChannelLogger writes them, so the current JOIN does not show up in the
+    # list of past nicks.
+    callBefore = ["ChannelLogger"]
+
     def __init__(self, irc):
         # {network: {channel: [record]}}
         super().__init__(irc)
