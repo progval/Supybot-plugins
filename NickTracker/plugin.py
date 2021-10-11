@@ -111,7 +111,7 @@ class NickTracker(callbacks.Plugin):
         self._announce_join(irc, msg)
         self._add_record(
             Record(
-                date=datetime.datetime.now(tz=datetime.timezone.utc),
+                date=datetime.datetime.now(),
                 nick=msg.nick,
                 user=msg.user,
                 host=msg.host,
