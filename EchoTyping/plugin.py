@@ -106,7 +106,7 @@ class EchoTyping(callbacks.Plugin):
         now = time.time()
         typing_users = self._typing_users[network][channel]
         for (nick, expiry) in list(typing_users.items()):
-            if expiry > now:
+            if expiry < now:
                 del typing_users[nick]
 
     def doPrivmsg(self, irc, msg):
