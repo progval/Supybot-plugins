@@ -68,7 +68,7 @@ class EchoTyping(callbacks.Plugin):
         if their_typing_status == "done" or "draft/bot" in msg.server_tags:
             self._user_stopped_typing(irc, msg.channel, msg.nick)
         elif their_typing_status in ("paused", "active"):
-            self._typing_users[irc.network][msg.nick] = (
+            self._typing_users[irc.network][msg.channel][msg.nick] = (
                 time.time() + LIFETIMES[their_typing_status]
             )
             self._refresh_typing(irc, msg.channel, their_typing_status)
