@@ -157,7 +157,7 @@ class SupyMLParser:
         log.info("SupyML: node statement: %s"%(str(output)))
         value = self._run(output, nested)
         if type(value) is ircmsgs.IrcMsg :
-            log.warn("SupyML: resulting msg "+str(value)+" is an irc command. Sending to network.")
+            log.warning("SupyML: resulting msg "+str(value)+" is an irc command. Sending to network.")
             self._irc.sendMsg(value)
             return '" "' # avoid empty return because of echo in loop
         return value
