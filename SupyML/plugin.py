@@ -33,11 +33,13 @@ import sys
 import copy
 import time
 import supybot.conf as conf
+import supybot.log as log
 from xml.dom import minidom
 import supybot.world as world
 import supybot.utils as utils
 from supybot.commands import *
 from supybot.irclib import IrcMsgQueue
+import supybot.ircmsgs as ircmsgs
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
@@ -99,7 +101,8 @@ class SupyMLParser:
         self.warnings = []
         self._maxNodes = maxNodes
         self.nodesCount = 0
-        self.data = self._parse(code)
+        self.rawData = None
+        self.data = self._parse(code,variables={})
 
     def _startNode(self):
         self.nodesCount += 1
@@ -136,22 +139,27 @@ class SupyMLParser:
 
         if isinstance(node, minidom.Text):
             return node.data
+        if node.nodeName=='loop':
+                return self._processLoop(node, variables)
+        if node.nodeName=='var':
+                return self._processVar(node, variables)
+        if node.nodeName=='set':
+                return self._processSet(node, variables)
+        if node.nodeName=='if':
+                return self._processIf(node, variables)
+
         output = node.nodeName + ' '
         for childNode in node.childNodes:
             self._startNode()
             if not repr(node) == repr(childNode.parentNode):
                 continue
-            if childNode.nodeName == 'loop':
-                output += self._processLoop(childNode, variables)
-            elif childNode.nodeName == 'if':
-                output += self._processId(childNode, variables)
-            elif childNode.nodeName == 'var':
-                output += self._processVar(childNode, variables)
-            elif childNode.nodeName == 'set':
-                output += self._processSet(childNode, variables)
-            else:
-                output += self._processNode(childNode, variables) or ''
+            output += self._processNode(childNode, variables) or ''
+        log.info("SupyML: node statement: %s"%(str(output)))
         value = self._run(output, nested)
+        if type(value) is ircmsgs.IrcMsg :
+            log.warn("SupyML: resulting msg "+str(value)+" is an irc command. Sending to network.")
+            self._irc.sendMsg(value)
+            return '" "' # avoid empty return because of echo in loop
         return value
 
     def _processSet(self, node, variables):
@@ -168,7 +176,7 @@ class SupyMLParser:
         variableName = node.attributes['name'].value
         self._checkVariableName(variableName)
         try:
-            return variables[variableName]
+            return str(variables[variableName])
         except KeyError:
             self.warnings.append('Access to non-existing variable: %s' %
                                  variableName)
@@ -181,26 +189,54 @@ class SupyMLParser:
         loopContent = ''
         output = ''
         for childNode in node.childNodes:
-            if loopType is None and childNode.nodeName not in ('while'):
+            if loopType is None and childNode.nodeName not in ('while','foreach','range','onceif'):
                 raise LoopTypeIsMissing(node.toxml())
             elif loopType is None:
                 loopType = childNode.nodeName
                 loopCond = childNode.toxml()
-                loopCond = loopCond[len(loopType+'<>'):-len(loopType+'</>')]
+                loopCond = '<echo>" "'+loopCond[len(loopType+'<>'):-len(loopType+'</>')]+'</echo>' # echo needed in case loopCond is empty
             else:
                 loopContent += childNode.toxml()
-        if loopType == 'while':
+        loopContent = '<echo>%s</echo>' % loopContent
+        if loopType == 'onceif':
             try:
-                while utils.str.toBool(self._parse(loopCond, variables,
+                if utils.str.toBool(self._parse(loopCond, variables
                                                   ).split(': ')[-1]):
-                    loopContent = '<echo>%s</echo>' % loopContent
-                    output += self._parse(loopContent) or ''
+                    output += self._parse(loopContent, variables) or ''
             except AttributeError: # toBool() failed
                 pass
             except ValueError: # toBool() failed
                 pass
+        if loopType == 'while':
+            try:
+                while utils.str.toBool(self._parse(loopCond, variables
+                                                  ).split(': ')[-1]):
+                    output += self._parse(loopContent, variables) or ''
+            except AttributeError: # toBool() failed
+                pass
+            except ValueError: # toBool() failed
+                pass
+        if loopType == 'foreach':
+            try:
+                tokens = callbacks.tokenize(self._parse(loopCond, variables).split(': ')[-1])
+                for token in tokens:
+                    variables.update({'loop': token})
+                    output += self._parse(loopContent, variables) or ''
+            except AttributeError:
+                pass
+            except ValueError:
+                pass
+        if loopType == 'range':
+            try:
+                left = int(self._parse(loopCond, variables).split(': ')[-1])
+                for token in range(left):
+                    variables.update({'loop': str(token)})
+                    output += self._parse(loopContent, variables) or ''
+            except AttributeError: # int() failed
+                pass
+            except ValueError: # int() failed
+                pass
         return output
-
 
     def _checkVariableName(self, variableName):
         if len(variableName) == 0:

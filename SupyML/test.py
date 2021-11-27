@@ -137,16 +137,102 @@ class SupyMLTestCase(ChannelPluginTestCase):
                             '</echo>',
                             '45')
 
+    def testIf(self):
+        self.assertResponse('SupyML eval '
+                            '<echo>'
+                                '<set name="foo">4</set>'
+                                '<echo>'
+                                    'foo'
+                                '</echo>'
+                                '<loop>'
+                                    '<onceif>'
+                                        '<lt>'
+                                            '<var name="foo" /> 5'
+                                        '</lt>'
+                                    '</onceif>'
+                                    '<echo>'
+                                        'bar'
+                                    '</echo>'
+                                '</loop>'
+                            '</echo>',
+                            'foobar')
+        self.assertResponse('SupyML eval '
+                            '<echo>'
+                                '<set name="foo">6</set>'
+                                '<echo>'
+                                    'foo'
+                                '</echo>'
+                                '<loop>'
+                                    '<onceif>'
+                                        '<lt>'
+                                            '<var name="foo" /> 5'
+                                        '</lt>'
+                                    '</onceif>'
+                                    '<echo>'
+                                        'bar'
+                                    '</echo>'
+                                '</loop>'
+                            '</echo>',
+                            'foo')
+
+    def testRange(self):
+        self.assertResponse('SupyML eval '
+                            '<echo>'
+                                '<loop>'
+                                    '<range>'
+                                        '<echo>'
+                                            '3'
+                                        '</echo>'
+                                    '</range>'
+                                    '<echo>'
+                                        'foo'
+                                    '</echo>'
+                                    '<var name="loop"/>'
+                                '</loop>'
+                            '</echo>',
+                            'foo0foo1foo2')
+
+    def testEach(self):
+        self.assertResponse('SupyML eval '
+                            '<echo>'
+                                '<loop>'
+                                    '<foreach>'
+                                        'bar baz '
+                                        '<echo>'
+                                            'bat'
+                                        '</echo>'
+                                    '</foreach>'
+                                    '<echo>'
+                                        'foo'
+                                    '</echo>'
+                                    '<var name="loop"/>'
+                                '</loop>'
+                            '</echo>',
+                            'foobarfoobazfoobat')
+
+    def testRecursive(self):
+        self.assertResponse('SupyML eval '
+                         '<echo>'
+                            'foo'
+                            '<SupyML>eval '
+                               '&lt;echo&gt;'
+                                  'bar'
+                               '&lt;/echo&gt;'
+                            '</SupyML>'
+                         '</echo>',
+                         'foobar'
+                        )
+
     def testNesting(self):
         self.assertNotError('SupyML eval ' +
-                         '<echo>'*30+
+                         '<echo>'*50+
                             'foo' +
-                         '</echo>'*30
+                         '</echo>'*50
                         )
         self.assertError('SupyML eval ' +
-                         '<echo>'*31+
+                         '<echo>'*51+
                             'foo' +
-                         '</echo>'*31
+                         '</echo>'*51
                         )
         self.assertResponse('SupyML eval <echo>foo <tell>bar baz</tell></echo>',
                 'foo This command cannot be nested.')
