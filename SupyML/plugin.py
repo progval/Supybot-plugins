@@ -32,12 +32,16 @@ import re
 import sys
 import copy
 import time
+import collections
+import getopt
 import supybot.conf as conf
+import supybot.log as log
 from xml.dom import minidom
 import supybot.world as world
 import supybot.utils as utils
 from supybot.commands import *
 from supybot.irclib import IrcMsgQueue
+import supybot.ircmsgs as ircmsgs
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
@@ -52,9 +56,6 @@ except:
     _ = lambda x:x
     internationalizeDocstring = lambda x:x
 
-class ParseError(Exception):
-    pass
-
 class LoopError(Exception):
     pass
 
@@ -63,32 +64,6 @@ class LoopTypeIsMissing(Exception):
 
 class MaximumNodesNumberExceeded(Exception):
     pass
-
-parseMessage = re.compile('\w+: (?P<content>.*)')
-class FakeIrc():
-    def __init__(self, irc):
-        self._irc = irc
-        self._message = ''
-        self._data = ''
-        self._rawData = None
-    def error(self, message):
-        message = message
-        self._data = message
-    def reply(self, message):
-        self._data = message
-    def queueMsg(self, message):
-        self._rawData = message
-        if message.command in ('PRIVMSG', 'NOTICE'):
-            parsed = parseMessage.match(message.args[1])
-            if parsed is not None:
-                message = parsed.group('content')
-            else:
-                message = message.args[1]
-        self._data = message
-    def __getattr__(self, name):
-        if name == '_data' or name == '_rawData':
-            return self.__dict__[name]
-        return getattr(self.__dict__['_irc'], name)
 
 class SupyMLParser:
     def __init__(self, plugin, irc, msg, code, maxNodes):
@@ -99,67 +74,128 @@ class SupyMLParser:
         self.warnings = []
         self._maxNodes = maxNodes
         self.nodesCount = 0
-        self.data = self._parse(code)
+        self.errors = []
+        self.data = ''
+        self.data += self._parse(code, variables={}, nested=irc.nested)
 
     def _startNode(self):
         self.nodesCount += 1
         if self.nodesCount >= self._maxNodes:
-            raise MaximumNodesNumberExceeded()
+            raise MaximumNodesNumberExceeded('Script attempted to run for more iterations than currently allowed on this bot.')
 
     def _run(self, code, nested):
         """Runs the command using Supybot engine"""
-        tokens = callbacks.tokenize(str(code))
-        fakeIrc = FakeIrc(self._irc)
-        callbacks.NestedCommandsIrcProxy(fakeIrc, self._msg, tokens,
-                nested=(1 if nested else 0))
-        self.rawData = fakeIrc._rawData
-        # TODO : don't wait if the plugin is not threaded
-        time.sleep(0.1)
-        return fakeIrc._data
 
-    def _parse(self, code, variables={}):
+        # New recursive engine inspired by Conditional plugin
+        tokens = callbacks.tokenize(str(code))
+        replies = []
+
+        # silent variation of NestedCommandsIrcProxy
+        class ErrorReportingProxy(self._plugin.Proxy):
+            def reply(self2, s, *args, **kwargs):
+                if ('to' in kwargs.keys()):
+                    super(ErrorReportingProxy,self2).reply(s, *args, **kwargs)
+                else:
+                    replies.append(s)
+            def error(self2, s, Raise=False, *args, **kwargs):
+                if Raise:
+                    raise callbacks.Error(s)
+                else:
+                    self.errors.append(s + ' (' + (' '.join(self2.args)) + ')')
+            def _callInvalidCommands(self2):
+                self.errors.append('Invalid Command (' + (' '.join(self2.args)) + ')')
+            def findCallbacksForArgs(self2, args):
+                # Problem; finalEval() in the proxy catches any ArgumentError exceptions from commands
+                # just after calling the handler, and replies with self.reply() with a very long help string
+                # if they used a self.error() everything would have been fine but like this,
+                # we would end up passing this help string in a recursive context. Not good.
+                # We need to inhibit the exception by overloading the command callback.
+
+                (command, cbs) = super(ErrorReportingProxy,self2).findCallbacksForArgs(args)
+
+                # these errors are handled with self.error() in finalEval() so all fine.
+                if not cbs:
+                    return (command, cbs)
+                if len(cbs) > 1:
+                    return (command, cbs)
+
+                # copy the plugin object and replace the callCommand method with our wrapper.
+                ocb=cbs[0]
+                cb=copy.copy(ocb)
+                class ErrorReportingDummyClass():
+                    def callCommand(self3, command, irc, msg, *args, **kwargs):
+                        try:
+                            return ocb.callCommand(command, irc, msg, *args, **kwargs)
+                        except (getopt.GetoptError, callbacks.ArgumentError) as e:
+                            self.errors.append('Invalid arguments for ' + '.'.join(command) + '.')
+                ncb = ErrorReportingDummyClass()
+                cb.callCommand = ncb.callCommand
+
+                # then return the wrapped handler
+                return (command, [cb])
+            def evalArgs(self2):
+                # We don't want the replies in the nested command to
+                # be stored here.
+                super(ErrorReportingProxy, self2).evalArgs(withClass=self._plugin.Proxy)
+
+        ErrorReportingProxy(self._irc, self._msg, tokens, nested=nested)
+        return ''.join(replies)
+
+    def _parse(self, code, variables, nested):
         """Returns a dom object from the code."""
         self._startNode()
         dom = minidom.parseString(code)
-        output = self._processDocument(dom, variables)
+        output = self._processDocument(dom, variables, nested)
         return output
 
-    def _processDocument(self, dom, variables={}):
+    def _processDocument(self, dom, variables, nested):
         """Handles the root node and call child nodes"""
+        output = ''
         for childNode in dom.childNodes:
             if isinstance(childNode, minidom.Element):
-                output = self._processNode(childNode, variables, nested=False)
+                output += self._processNode(childNode, variables, nested)
         return output
 
-    def _processNode(self, node, variables, nested=True):
-        """Returns the value of an internapreted node."""
+    def _processNode(self, node, variables, nested):
+        """Returns the value of an interpreted node."""
 
         if isinstance(node, minidom.Text):
             return node.data
-        output = node.nodeName + ' '
+        if node.nodeName=='loop':
+            return self._processLoop(node, variables, nested)
+        if node.nodeName=='var':
+            return self._processVar(node, variables)
+        if node.nodeName=='set':
+            return self._processSet(node, variables, nested)
+        if node.nodeName=='catch':
+            return self._processCatch(node, variables, nested)
+
+        arguments = ''
         for childNode in node.childNodes:
             self._startNode()
             if not repr(node) == repr(childNode.parentNode):
                 continue
-            if childNode.nodeName == 'loop':
-                output += self._processLoop(childNode, variables)
-            elif childNode.nodeName == 'if':
-                output += self._processId(childNode, variables)
-            elif childNode.nodeName == 'var':
-                output += self._processVar(childNode, variables)
-            elif childNode.nodeName == 'set':
-                output += self._processSet(childNode, variables)
-            else:
-                output += self._processNode(childNode, variables) or ''
-        value = self._run(output, nested)
+            arguments += self._processNode(childNode, variables, nested + 1) or ''
+        log.info("SupyML: node statement: %s"%(str(arguments)))
+
+        if node.nodeName=='echo':
+            # special handling for echo: utils echo does not like empty strings, so we reimplement
+            value = arguments
+        elif node.nodeName=='raise':
+            # raise an exception within SupyML context
+            value = ''
+            self.errors.append(arguments)
+        else:
+            value = self._run(node.nodeName + ' ' + arguments, nested)
+
         return value
 
-    def _processSet(self, node, variables):
+    def _processSet(self, node, variables, nested):
         """Handles the <set> tag"""
         variableName = str(node.attributes['name'].value)
         value = ''
         for childNode in node.childNodes:
-            value += self._processNode(childNode, variables)
+            value += self._processNode(childNode, variables, nested)
         variables.update({variableName: value})
         return ''
 
@@ -168,39 +204,85 @@ class SupyMLParser:
         variableName = node.attributes['name'].value
         self._checkVariableName(variableName)
         try:
-            return variables[variableName]
+            return str(variables[variableName])
         except KeyError:
-            self.warnings.append('Access to non-existing variable: %s' %
-                                 variableName)
+            self.warnings.append('Access to non-existing variable: %s'%variableName)
             return ''
 
-    def _processLoop(self, node, variables):
+    def _boolExp(self, condition, variables, nested):
+        """Exception safe expression evaluation"""
+        try:
+            return utils.str.toBool(self._parse(condition, variables, nested))  #.split(': ')[-1])
+        except (AttributeError, ValueError):
+            return False
+
+    def _processLoop(self, node, variables, nested):
         """Handles the <loop> tag"""
         loopType = None
         loopCond = 'false'
         loopContent = ''
         output = ''
         for childNode in node.childNodes:
-            if loopType is None and childNode.nodeName not in ('while'):
-                raise LoopTypeIsMissing(node.toxml())
+            if loopType is None and childNode.nodeName not in ('while','foreach','range','onceif'):
+                raise LoopTypeIsMissing('Loop type is missing: '+node.toxml())
             elif loopType is None:
                 loopType = childNode.nodeName
                 loopCond = childNode.toxml()
-                loopCond = loopCond[len(loopType+'<>'):-len(loopType+'</>')]
+                loopCond = '<echo>'+loopCond[len(loopType+'<>'):-len(loopType+'</>')]+'</echo>' # echo needed in case loopCond is empty
             else:
                 loopContent += childNode.toxml()
+        loopContent = '<echo>%s</echo>' % loopContent
+        if loopType == 'onceif':
+            if self._boolExp(loopCond, variables, nested):
+                output += self._parse(loopContent, variables, nested) or ''
         if loopType == 'while':
+            while self._boolExp(loopCond, variables, nested):
+                output += self._parse(loopContent, variables, nested) or ''
+        if loopType == 'foreach':
+            tokens = callbacks.tokenize(self._parse(loopCond, variables, nested))  #.split(': ')[-1])
+            for token in tokens:
+                variables.update({'loop': token})
+                output += self._parse(loopContent, variables, nested) or ''
+        if loopType == 'range':
             try:
-                while utils.str.toBool(self._parse(loopCond, variables,
-                                                  ).split(': ')[-1]):
-                    loopContent = '<echo>%s</echo>' % loopContent
-                    output += self._parse(loopContent) or ''
-            except AttributeError: # toBool() failed
-                pass
-            except ValueError: # toBool() failed
-                pass
+                left = int(self._parse(loopCond, variables, nested))  #.split(': ')[-1])
+            except (AttributeError, ValueError):
+                left = 0
+            for token in range(left):
+                variables.update({'loop': str(token)})
+                output += self._parse(loopContent, variables, nested) or ''
         return output
 
+    def _processCatch(self, node, variables, nested):
+        """Handles the <catch> tag"""
+        catchType = None
+        catchCond = 'false'
+        catchContent = ''
+        for childNode in node.childNodes:
+            if catchType is None and childNode.nodeName not in ('try'):
+                raise LoopTypeIsMissing('<try> tag is missing: '+node.toxml())
+            elif catchType is None:
+                catchType = childNode.nodeName
+                catchCond = childNode.toxml()
+                catchCond = '<echo>'+catchCond[len(catchType+'<>'):-len(catchType+'</>')]+'</echo>' # echo needed in case catchCond is empty
+            else:
+                catchContent += childNode.toxml()
+
+        # we execute the <try> part
+        olderrors = len(self.errors)
+        output = self._parse(catchCond, variables, nested) or ''
+        newerrors = self.errors[olderrors:len(self.errors)]
+        if len(newerrors)==0:
+            return output
+
+        # errors occured, we assign the error message to the catch variable and strip from global exceptions
+        variables.update({'try': output})
+        variables.update({'catch': ' & '.join(newerrors)})
+        self.errors = self.errors[0:olderrors]
+        # then execute the exception handler
+        catchContent = '<echo>%s</echo>' % catchContent
+        output = self._parse(catchContent, variables, nested) or ''
+        return output
 
     def _checkVariableName(self, variableName):
         if len(variableName) == 0:
@@ -214,20 +296,29 @@ class SupyML(callbacks.Plugin):
     This scripts (Supybot Markup Language) are script written in a XML-based
     language."""
     #threaded = True
+
     def eval(self, irc, msg, args, optlist, code):
         """[--warnings] <SupyML script>
 
         Executes the <SupyML script>"""
-        parser = SupyMLParser(self, irc, msg, code,
+        try:
+            parser = SupyMLParser(self, irc, msg, code,
                               self.registryValue('maxnodes')+2)
-        for item in optlist:
-            if ('warnings', True) == item and len(parser.warnings) != 0:
-                irc.error(' & '.join(parser.warnings))
-        if parser.rawData is not None:
-            irc.queueMsg(parser.rawData)
-        else:
-            irc.reply(parser.data)
-
+            errors=False
+            if len(parser.errors):
+                irc.error(' & '.join(parser.errors))
+                errors=True
+            for item in optlist:
+                if ('warnings', True) == item and len(parser.warnings) != 0:
+                    irc.error(' & '.join(parser.warnings))
+                    errors=True
+            if len(parser.data):
+                irc.reply(parser.data)
+            elif errors==False:
+                # avoid empty result - reply success in case of silent operation with no errors
+                irc.replySuccess('')
+        except Exception as e:
+            irc.error('SupyML script error: ' + str(e))
     eval=wrap(eval, [getopts({'warnings':''}), 'text'])
 
 SupyML = internationalizeDocstring(SupyML)
