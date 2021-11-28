@@ -93,10 +93,18 @@ class SupyMLParser:
         # silent variation of NestedCommandsIrcProxy
         class ErrorReportingProxy(self._plugin.Proxy):
             def reply(self2, s, *args, **kwargs):
-                if ('to' in kwargs.keys()):
-                    super(ErrorReportingProxy,self2).reply(s, *args, **kwargs)
+                if ('to' in kwargs.keys()) and kwargs['to'] not in [None,'',0]:
+                    return super(ErrorReportingProxy,self2).reply(s, *args, **kwargs)
                 else:
                     replies.append(s)
+            def replySuccess(self2, s='', **kwargs):
+                v = self2._getConfig(conf.supybot.replies.success)
+                if v:
+                    return super(ErrorReportingProxy,self2).replySuccess(s,**kwargs)
+                else:
+                    # parent replySuccess() returns noReply if config is unset.
+                    # however, we want something that evaluates to true for cif / onceif / while statements
+                    replies.append('1')
             def error(self2, s, Raise=False, *args, **kwargs):
                 if Raise:
                     raise callbacks.Error(s)
@@ -156,6 +164,18 @@ class SupyMLParser:
                 output += self._processNode(childNode, variables, nested)
         return output
 
+    def _quotRecursive(self, string, level):
+        # escpae backslashes and quotes
+        if level>1:
+            string = self._quotRecursive(string,level-1)
+        string=string.replace('\\', '\\\\') #escape backslashes
+        string=string.replace('"', '\\"') #escape quotes
+        string='"'+string+'"' #add new quotes
+        return string
+
+    def _unescape(self, string):
+        return ' '.join(callbacks.tokenize(string))
+
     def _processNode(self, node, variables, nested):
         """Returns the value of an interpreted node."""
 
@@ -180,11 +200,24 @@ class SupyMLParser:
 
         if node.nodeName=='echo':
             # special handling for echo: utils echo does not like empty strings, so we reimplement
-            value = arguments
+            value = self._unescape(arguments)
         elif node.nodeName=='raise':
             # raise an exception within SupyML context
             value = ''
-            self.errors.append(arguments)
+            self.errors.append(self._unescape(arguments))
+        elif node.nodeName=='quot':
+            # quotes the result of the nested expression to be treated as a single token
+            # until a defined number of levels up
+            level = 1
+            if 'l' in node.attributes.keys():
+                try:
+                    level=int(node.attributes['l'].value)
+                except:
+                    pass
+                if level<1: level=1
+                if level>self._maxNodes:
+                    raise MaximumNodesNumberExceeded('Attempted to quote more levels than currently allowed on this bot.')
+            value=self._quotRecursive(self._unescape(arguments),level)
         else:
             value = self._run(node.nodeName + ' ' + arguments, nested)
 
@@ -211,8 +244,23 @@ class SupyMLParser:
 
     def _boolExp(self, condition, variables, nested):
         """Exception safe expression evaluation"""
+
+        # check for errors/exceptions
+        olderrors = len(self.errors)
+        m = self._parse(condition, variables, nested)
+        if len(self.errors)>olderrors:
+            return False
+
+        # check for success message
+        v = conf.get(conf.supybot.replies.success, channel=self._msg.channel, network=self._irc.network)
+        if v:
+            v = ircutils.standardSubstitute(self._irc, self._msg, v)
+            if len(m)>=len(v) and len(v) and (v == m[0:len(v)]):
+                return True
+
+        # check for bool
         try:
-            return utils.str.toBool(self._parse(condition, variables, nested))  #.split(': ')[-1])
+            return utils.str.toBool(m)
         except (AttributeError, ValueError):
             return False
 
@@ -239,13 +287,13 @@ class SupyMLParser:
             while self._boolExp(loopCond, variables, nested):
                 output += self._parse(loopContent, variables, nested) or ''
         if loopType == 'foreach':
-            tokens = callbacks.tokenize(self._parse(loopCond, variables, nested))  #.split(': ')[-1])
+            tokens = callbacks.tokenize(self._parse(loopCond, variables, nested))
             for token in tokens:
                 variables.update({'loop': token})
                 output += self._parse(loopContent, variables, nested) or ''
         if loopType == 'range':
             try:
-                left = int(self._parse(loopCond, variables, nested))  #.split(': ')[-1])
+                left = int(self._parse(loopCond, variables, nested))
             except (AttributeError, ValueError):
                 left = 0
             for token in range(left):
