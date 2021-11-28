@@ -33,17 +33,18 @@ from supybot.test import *
 
 class SupyMLTestCase(ChannelPluginTestCase):
     plugins = ('SupyML', 'Utilities', 'Conditional', 'Math')
+    config = {'commands.nested.maximum':50}
     #################################
     # Utilities
     def _getIfAnswerIsEqual(self, msg):
         time.sleep(0.1)
         m = self.irc.takeMsg()
+        result = False
         while m is not None:
             if repr(m) == repr(msg):
-                return True
+                result=True
             m = self.irc.takeMsg()
-        return False
-
+        return result
 
     def testBasic(self):
         self.assertError('SupyML eval')
@@ -235,7 +236,33 @@ class SupyMLTestCase(ChannelPluginTestCase):
                          '</echo>'*51
                         )
         self.assertResponse('SupyML eval <echo>foo <tell>bar baz</tell></echo>',
-                'foo This command cannot be nested.')
+                'Error: This command cannot be nested. (tell bar baz)')
+
+    def testExceptionHandling(self):
+        self.assertNotError('SupyML eval '
+                            '<echo>foo <catch><try><utilities>echo</utilities></try></catch></echo>'
+                           )
+        self.assertResponse('SupyML eval <echo><catch>'
+                                        '<try><utilities>echo foo</utilities></try>'
+                                        'bar'
+                                    '</catch></echo>',
+                'foo')
+        self.assertResponse('SupyML eval <echo><catch>'
+                                    '<try>bat<utilities>echo</utilities></try>'
+                                    'foo <var name="catch"/> bar <var name="try"/>'
+                                '</catch></echo>',
+                'foo Invalid arguments for utilities.echo. bar bat')
+        # warning, this must be the last test, since it generates a second output, not captured by assertError()
+        self.assertError('SupyML eval '
+                         '<echo>foo <utilities>echo</utilities></echo>'
+                        )
+    def testRaiseException(self):
+        self.assertResponse('SupyML eval <catch>'
+                                        '<try><echo>foo<raise>bar</raise></echo></try>'
+                                        'Caught try:<var name="try"/> catch:<var name="catch"/>'
+                                        '</catch>','Caught try:foo catch:bar')
+        self.assertResponse('SupyML eval <raise>MyError</raise>','Error: MyError')
+        self.assertError('SupyML eval <raise>MyError</raise>')
 
     def testWarnings(self):
         self.assertResponse('SupyML eval <echo>'

@@ -135,6 +135,83 @@ The current tokene during any iteration is accessible through the loop variable.
 <loop><foreach>foo bar baz</foreach>I have <var name="loop"/>.</loop>
 ```
 
+Return value
+============
+
+Notice and Message replies from the script to the user are concatenated without spacing and returned as a single reply() IRC message.
+
+Commands, notices, messages, etc to other users or channels are directly sent to IRC, which allows using voice, op, etc... commands in scripts.
+
+Error replies from commands are string concatenated by ' & ' and returned as a single error() IRC message.
+
+This means, if a script encountered some errors but also produced regular output, two messages are sent to the user.
+
+When nesting the eval statement - as in 'echo [ eval ... ]' only the regular output reply message is interpreted in the nested context,
+while the error is sent separately and directly to the user.
+
+Similarly, within SupyML scripts, only the regular output of nested SupyML commands is evaluated.
+
+It is posible to access the error messages of specific commands using the &lt;catch&gt; directive, see below.
+
+If the eval script creates no output at all (no errors, no reply) a success() response is sent.
+
+
+Exception handling
+==================
+
+Any supybot command could fail with an error. The Conditional plugin allows to test for non-successful execution with the cerror command, which can be used in SupyML scripts. However SupyML allows for more sophisticated exception handling and error suppression with the following syntax.
+
+```
+<catch><try>commands</try>Exception handling <var name="catch"/> <var name="try"/></catch>
+```
+
+The semantics are as follows:
+First the commands in &lt;try&gt; are executed.
+
+If no errors have occurred, then catch behaves like echo.
+
+If errors have occurred, then both the errors and the output of the try block are suppressed and not sent to the user.
+Also errors already caught by inner catch statements are not visible to the outside context.
+Instead, the Exception handling code is executed, and two read-only variables are available:
+
+```
+<var name="catch"/>
+```
+
+This variable holds the error message or error messages produced by the try block. if multiple errors occurred, the messages are concatenated with " & "
+
+```
+<var name="try"/>
+```
+
+This variable holds the regular output produced by the try block, if any.
+
+
+Causing Exceptions
+------------------
+
+
+The following special command tag is available within SupyML to produce an error message on purpose:
+
+```
+<raise>Reason</raise>
+```
+
+It behaves like echo, but instead of a reply() it produces an error()
+
+Example
+
+```
+eval <raise>An error occurred</raise>
+```
+
+produces
+
+```
+Error: An error occurred
+```
+
+
 Quote escaping
 ==============
 
