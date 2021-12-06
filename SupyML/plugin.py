@@ -65,6 +65,9 @@ class LoopTypeIsMissing(Exception):
 class MaximumNodesNumberExceeded(Exception):
     pass
 
+class NotAValidIntNumber(Exception):
+    pass
+
 class SupyMLParser:
     def __init__(self, plugin, irc, msg, code, maxNodes):
         self._plugin = plugin
@@ -213,11 +216,13 @@ class SupyMLParser:
                 try:
                     level=int(node.attributes['l'].value)
                 except:
-                    pass
-                if level<1: level=1
-                if level>self._maxNodes:
-                    raise MaximumNodesNumberExceeded('Attempted to quote more levels than currently allowed on this bot.')
-            value=self._quotRecursive(self._unescape(arguments),level)
+                    raise NotAValidIntNumber('Quot level must be a valid whole number.')
+                if level>10: # hardcoded - due to exponential string growth, bot will crash if much beyond that
+                    raise MaximumNodesNumberExceeded('Attempted to quote more levels than possible. Max 10.')
+            if level>=1:
+                value = self._quotRecursive(self._unescape(arguments),level)
+            else:
+                value = self._unescape(arguments)
         else:
             value = self._run(node.nodeName + ' ' + arguments, nested)
 
