@@ -92,6 +92,11 @@ The syntax of the while loop is:
 
 The statement is repeated while the boolean expression evaluates to true.
 
+Note:
+A "success" message (default text: "The operation succeeded.") always evaluates to true, regardless of the optional text)
+An expression that raises an error always evaluates to false, even if the returned string would be true, even if it's a success message.
+This can be avoided by a nested exception handler that catches the error message, see exception handling below.
+
 OnceIf loop
 ----------
 
@@ -101,7 +106,8 @@ The syntax of the onceif statement is:
 <loop><onceif>boolean expression</onceif>statement</loop>
 ```
 
-The statement is expressed exactly once iff the boolean expression evaluates to true.
+The statement is expressed exactly once iff the boolean expression evaluates to true. (See above)
+
 
 Range loop
 ----------
@@ -129,7 +135,7 @@ The syntax of the foreach loop is:
 ```
 
 The statement is repeated once for each token in the token expression, or never if the expression is empty.
-The current tokene during any iteration is accessible through the loop variable. Example:
+The current token during any iteration is accessible through the loop variable. Example:
 
 ```
 <loop><foreach>foo bar baz</foreach>I have <var name="loop"/>.</loop>
@@ -252,10 +258,19 @@ eval <utilities>last <echo><loop><range>3</range>"\"\\\"<echo>This is iteration 
 
 which outputs 'This is iteration 2'.
 
+To make this easier, SupyML utilizes the &lt;quot&gt; command. It accepts a parameter **l**, which describes the desired nesting level.
+The above expressions can such be written as:
+
+```
+eval <utilities>last <loop><range>3</range><quot l="2">This is iteration <var name="loop"/></quot></loop></utilities>
+eval <utilities>last <echo><loop><range>3</range><quot l="3">This is iteration <var name="loop"/></quot></loop></echo></utilities>
+```
+
+
 This needs to be taken in mind also in combination with the Alias or Aka or other modules, for example in:
 
 ```
-aka add repeat "eval <utilities>last <loop><range>$1</range>\"\\\"<echo>This is iteration <var name=\"loop\"/></echo>\\\"\"</loop></utilities>"
+aka add repeat "eval <utilities>last <loop><range>$1</range><quot l=\"2\"><echo>This is iteration <var name=\"loop\"/></echo></quot></loop></utilities>"
 repeat 3
 ``` 
 

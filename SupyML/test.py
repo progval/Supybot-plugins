@@ -264,6 +264,23 @@ class SupyMLTestCase(ChannelPluginTestCase):
         self.assertResponse('SupyML eval <raise>MyError</raise>','Error: MyError')
         self.assertError('SupyML eval <raise>MyError</raise>')
 
+    def testSuccessAndError(self):
+        self.assertResponse('SupyML eval <loop><onceif><success /></onceif>foo</loop>','foo')
+        self.assertResponse('SupyML eval <loop><onceif><success>This stuff succeeded</success></onceif>foo</loop>','foo')
+        self.assertResponse('SupyML eval <echo><loop><onceif><echo>This stuff succeeded</echo></onceif>foo</loop>bar</echo>','bar')
+        self.assertResponse('SupyML eval <loop><onceif>1</onceif>foo</loop>','foo')
+        self.assertResponse('SupyML eval <loop><onceif>true</onceif>foo</loop>','foo')
+        self.assertResponse('SupyML eval <catch><try>'
+                                             '<loop><onceif><raise>true</raise></onceif>foo</loop>'
+                                             '</try>try:<var name="try"/> catch:<var name="catch"/></catch>'
+                                ,'try: catch:true')
+
+    def testQuotation(self):
+        self.assertResponse('SupyML eval <quot><echo>foo</echo></quot>','"foo"')
+        self.assertResponse('SupyML eval <echo>foo <quot><echo>bar baz</echo></quot></echo>','foo bar baz')
+        self.assertResponse('SupyML eval <echo>foo <quot l="2"><echo>bar baz</echo></quot></echo>','foo "bar baz"')
+        self.assertResponse('SupyML eval <utilities>last <echo>foo <quot l="2"><echo>bar baz</echo></quot></echo></utilities>','bar baz')
+
     def testWarnings(self):
         self.assertResponse('SupyML eval <echo>'
                                 '<set name="">'
