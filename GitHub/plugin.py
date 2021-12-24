@@ -253,7 +253,8 @@ class GitHub(callbacks.Plugin):
                         pass
                 elif isinstance(value, str) or \
                         (sys.version_info[0] < 3 and isinstance(value, unicode)):
-                    repl[key + '__firstline'] = value.split('\n', 1)[0]
+                    repl[key + '__firstline'] = \
+                            value.split('\n', 1)[0].strip('\r')
             tokens = callbacks.tokenize(format_)
             if not tokens:
                 return
