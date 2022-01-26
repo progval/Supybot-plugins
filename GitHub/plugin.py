@@ -203,21 +203,9 @@ class GitHub(callbacks.Plugin):
 
     class announce(callbacks.Commands):
         def _shorten_url(self, url):
-            try:
-                data = urlencode({'url': url})
-                if sys.version_info[0] >= 3:
-                    data = data.encode()
-                    f = utils.web.getUrlFd('https://git.io/', data=data)
-                    url = list(filter(lambda x:x[0] == 'Location',
-                        f.headers._headers))[0][1].strip()
-                else:
-                    f = utils.web.getUrlFd('https://git.io/', data=data)
-                    url = filter(lambda x:x.startswith('Location: '),
-                            f.headers.headers)[0].split(': ', 1)[1].strip()
-            except Exception as e:
-                log.error('Cannot connect to git.io: %s (%s)' % (e, url))
-                return None
-            return url
+            # rip git.io
+            # https://github.blog/changelog/2022-01-11-git-io-no-longer-accepts-new-urls/
+            return None
         def _createPrivmsg(self, irc, channel, payload, event):
             bold = ircutils.bold
 
