@@ -1,4 +1,4 @@
 [tool.black]
 line-length = 79
 
-include = '(EchoTyping|NickTracker)/.*\.pyi?$'
+include = '(Dnsbl|EchoTyping|NickTracker)/.*\.pyi?$'

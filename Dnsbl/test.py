@@ -1,5 +1,5 @@
 ###
-# Copyright (c) 2013, Valentin Lorentz
+# Copyright (c) 2022, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,26 +30,46 @@
 
 from supybot.test import *
 
-class RblsTestCase(ChannelPluginTestCase):
-    plugins = ('Rbls',)
-    config = {'supybot.plugins.Rbls.enable': 'True'}
+
+class _BaseDnsblTestCase:
+    plugins = ("Dnsbl",)
 
     if network:
+
         def testBan(self):
-            self.irc.feedMsg(ircmsgs.join(self.channel,
-                                          prefix='foo!bar@166.205.64.165'))
-            m = self.irc.takeMsg()
+            # https://datatracker.ietf.org/doc/html/draft-irtf-asrg-dnsbl#section-5
+            self.irc.feedMsg(
+                ircmsgs.join(self.channel, prefix="foo!bar@127.0.0.2")
+            )
+            m = self._feedMsg(" ", timeout=1)
             self.assertNotEqual(m, None)
-            self.assertEqual(m.command, 'MODE')
-            m = self.irc.takeMsg()
+            self.assertEqual(m.command, "MODE")
+            m = self._feedMsg(" ")
             self.assertNotEqual(m, None)
-            self.assertEqual(m.command, 'KICK')
+            self.assertEqual(m.command, "KICK")
+
         def testNoban(self):
-            self.irc.feedMsg(ircmsgs.join(self.channel,
-                                          prefix='foo!bar@88.175.48.15'))
-            self.assertEqual(self.irc.takeMsg(), None)
+            # https://datatracker.ietf.org/doc/html/draft-irtf-asrg-dnsbl#section-5
+            self.irc.feedMsg(
+                ircmsgs.join(self.channel, prefix="foo!bar@127.0.0.1")
+            )
+            m = self._feedMsg(" ", timeout=1)
+            self.assertEqual(m, None)
+
+class DnsblTestCase(_BaseDnsblTestCase, ChannelPluginTestCase):
+    config = {"supybot.plugins.Dnsbl.enable": "True"}
+
+class MultiProviderDnsblTestCase(_BaseDnsblTestCase, ChannelPluginTestCase):
+    config = {
+        "supybot.plugins.Dnsbl.enable": "True",
+        "supybot.plugins.Dnsbl.providers": {
+            "dnsbl.dronebl.org",
+            "dnsbl.dronebl.org",
+            "dnsbl.dronebl.org",
+            "dnsbl.dronebl.org",
+            "dnsbl.dronebl.org",
+        },
+    }
 
 
-
-
-# vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
+# vim:set shiftwidth=4 tabstop=4 expandtab textwidth=88:

@@ -1,5 +1,5 @@
 ###
-# Copyright (c) 2013, Valentin Lorentz
+# Copyright (c) 2022, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,15 +29,14 @@
 ###
 
 """
-Add a description of the plugin (to be presented to the user inside the wizard)
-here.  This should describe *what* the plugin does.
+Dnsbl: Bans clients connecting from hosts listed in DNS blacklists
 """
 
+import sys
 import supybot
-import supybot.world as world
+from supybot import world
 
-# Use this for the version of this plugin.  You may wish to put a CVS keyword
-# in here if you're keeping the plugin in CVS or some similar system.
+# Use this for the version of this plugin.
 __version__ = ""
 
 # XXX Replace this with an appropriate author or supybot.Author instance.
@@ -48,11 +47,12 @@ __author__ = supybot.authors.unknown
 __contributors__ = {}
 
 # This is a url where the most recent plugin package can be downloaded.
-__url__ = '' # 'http://supybot.com/Members/yourname/Rbls/download'
+__url__ = ""
 
 from . import config
 from . import plugin
-from imp import reload
+from importlib import reload
+
 # In case we're being reloaded.
 reload(config)
 reload(plugin)

@@ -1,5 +1,5 @@
 ###
-# Copyright (c) 2013, Valentin Lorentz
+# Copyright (c) 2022, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,34 +28,8 @@
 
 ###
 
-import supybot.conf as conf
-import supybot.registry as registry
-try:
-    from supybot.i18n import PluginInternationalization
-    from supybot.i18n import internationalizeDocstring
-    _ = PluginInternationalization('Rbls')
-except:
-    # These are useless functions that's allow to run the plugin on a bot
-    # without the i18n plugin
-    _ = lambda x:x
-    internationalizeDocstring = lambda x:x
+from supybot.setup import plugin_setup
 
-def configure(advanced):
-    # This will be called by supybot to configure this module.  advanced is
-    # a bool that specifies whether the user identified himself as an advanced
-    # user or not.  You should effect your configuration by manipulating the
-    # registry as appropriate.
-    from supybot.questions import expect, anything, something, yn
-    conf.registerPlugin('Rbls', True)
-
-
-Rbls = conf.registerPlugin('Rbls')
-# This is where your configuration variables (if any) should go.  For example:
-# conf.registerGlobalValue(Rbls, 'someConfigVariableName',
-#     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
-conf.registerChannelValue(Rbls, 'enable',
-    registry.Boolean(False, _("""Determines whether or not this plugin will
-    kickban users blacklisted with Rbls.""")))
-
-
-# vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
+plugin_setup(
+    "Dnsbl",
+)

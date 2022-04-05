@@ -1,5 +1,5 @@
 ###
-# Copyright (c) 2013, Valentin Lorentz
+# Copyright (c) 2022, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,46 +28,59 @@
 
 ###
 
-import supybot.utils as utils
-from supybot.commands import *
-import supybot.plugins as plugins
-import supybot.ircmsgs as ircmsgs
-import supybot.ircutils as ircutils
-import supybot.callbacks as callbacks
+from supybot import conf, registry
+
 try:
     from supybot.i18n import PluginInternationalization
-    _ = PluginInternationalization('Rbls')
+
+    _ = PluginInternationalization("Dnsbl")
 except:
-    # These are useless functions that's allow to run the plugin on a bot
-    # without the i18n plugin
-    _ = lambda x:x
-
-class Rbls(callbacks.Plugin):
-    """Add the help for "@plugin help Rbls" here
-    This should describe *how* to use this plugin."""
-    threaded = True
-
-    def doJoin(self, irc, msg):
-        channel = msg.args[0]
-        if not self.registryValue('enable', channel):
-            return
-        nick, ident, host = ircutils.splitHostmask(msg.prefix)
-
-        fd = utils.web.getUrlFd('http://rbls.org/%s' % host)
-        line = ' '
-        while line and not line.startswith('<title>'):
-            line = fd.readline()
-        if not line:
-            return
-        if 'is listed in' in line:
-            irc.queueMsg(ircmsgs.ban(channel, '*!*@%s' % host))
-            irc.queueMsg(ircmsgs.kick(channel, nick))
-        else:
-            assert 'is not listed' in line
+    # Placeholder that allows to run the plugin on a bot
+    # without the i18n module
+    _ = lambda x: x
 
 
+def configure(advanced):
+    # This will be called by supybot to configure this module.  advanced is
+    # a bool that specifies whether the user identified themself as an advanced
+    # user or not.  You should effect your configuration by manipulating the
+    # registry as appropriate.
+    from supybot.questions import expect, anything, something, yn
 
-Class = Rbls
+    conf.registerPlugin("Dnsbl", True)
 
 
-# vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
+Dnsbl = conf.registerPlugin("Dnsbl")
+# This is where your configuration variables (if any) should go.  For example:
+# conf.registerGlobalValue(Dnsbl, 'someConfigVariableName',
+#     registry.Boolean(False, _("""Help for someConfigVariableName.""")))
+conf.registerChannelValue(
+    Dnsbl,
+    "enable",
+    registry.Boolean(
+        False,
+        _(
+            """Whether DNSBL providers should be used to ban abusive clients."""
+        ),
+    ),
+)
+conf.registerGlobalValue(
+    Dnsbl,
+    "timeout",
+    registry.PositiveFloat(
+        2.0,
+        _("""Timeout for DNS queries, in seconds"""),
+    ),
+)
+conf.registerChannelValue(
+    Dnsbl,
+    "providers",
+    registry.SpaceSeparatedSetOfStrings(
+        {"dnsbl.dronebl.org"},
+        _("""Space-separated set of of DNSBL providers domains to query"""),
+    ),
+    opSettable=False,  # So it can't be abused by channel ops to DoS DNS servers
+)
+
+
+# vim:set shiftwidth=4 tabstop=4 expandtab textwidth=88:
