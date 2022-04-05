@@ -68,7 +68,7 @@ def query_providers(resolver, providers, address_str):
         local_part = ".".join(octets[::-1])
     else:
         assert address.version == 6, address
-        local_part = address.exploded[::-1].replace(":", "")
+        local_part = ".".join(address.exploded[::-1].replace(":", ""))
 
     return [
         query_provider(resolver, provider, local_part)

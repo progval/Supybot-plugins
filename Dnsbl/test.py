@@ -30,34 +30,54 @@
 
 from supybot.test import *
 
+# See https://datatracker.ietf.org/doc/html/draft-irtf-asrg-dnsbl#section-5
+# which reserves the example addresses and domains used below
+
 
 class _BaseDnsblTestCase:
     plugins = ("Dnsbl",)
 
+    def assertKickBan(self, hostname):
+        m = self._feedMsg(" ", timeout=1)
+        self.assertNotEqual(m, None)
+        self.assertEqual(m.command, "MODE")
+        self.assertEqual(m.args, (self.channel, "+b", "*!*@" + hostname))
+        m = self._feedMsg(" ")
+        self.assertNotEqual(m, None)
+        self.assertEqual(m.command, "KICK")
+
     if network:
 
-        def testBan(self):
-            # https://datatracker.ietf.org/doc/html/draft-irtf-asrg-dnsbl#section-5
+        def testIpv4Ban(self):
             self.irc.feedMsg(
                 ircmsgs.join(self.channel, prefix="foo!bar@127.0.0.2")
             )
-            m = self._feedMsg(" ", timeout=1)
-            self.assertNotEqual(m, None)
-            self.assertEqual(m.command, "MODE")
-            m = self._feedMsg(" ")
-            self.assertNotEqual(m, None)
-            self.assertEqual(m.command, "KICK")
+            self.assertKickBan("127.0.0.2")
 
-        def testNoban(self):
-            # https://datatracker.ietf.org/doc/html/draft-irtf-asrg-dnsbl#section-5
+        def testIpv4Noban(self):
             self.irc.feedMsg(
                 ircmsgs.join(self.channel, prefix="foo!bar@127.0.0.1")
             )
             m = self._feedMsg(" ", timeout=1)
             self.assertEqual(m, None)
 
+        def testIpv6Ban(self):
+            self.irc.feedMsg(
+                ircmsgs.join(self.channel, prefix="foo!bar@::FFFF:7F00:2")
+            )
+            self.assertKickBan("::FFFF:7F00:2")
+
+        def testIpv6Noban(self):
+            self.irc.feedMsg(
+                ircmsgs.join(self.channel, prefix="foo!bar@::FFFF:7F00:1")
+            )
+            m = self._feedMsg(" ", timeout=1)
+            self.assertEqual(m, None)
+
+
 class DnsblTestCase(_BaseDnsblTestCase, ChannelPluginTestCase):
     config = {"supybot.plugins.Dnsbl.enable": "True"}
+
 
 class MultiProviderDnsblTestCase(_BaseDnsblTestCase, ChannelPluginTestCase):
     config = {
