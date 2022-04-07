@@ -463,12 +463,12 @@ class GitHub(callbacks.Plugin):
                                         'language': 'somethingWithoutSpaces'})])
         @internationalizeDocstring
         def info(self, irc, msg, args, owner, name, optlist):
-            """<owner> <repository> [--enable <feature> <feature> ...] \
-            [--disable <feature> <feature>]
+            """<owner> <repository> [--enable <field1> [--enable <field2> ...]] \
+            [--disable <field3> [--disable <field4> ...]]
 
             Displays informations about <owner>'s <repository>.
-            Enable or disable features (ie. displayed data) according to the
-            request)."""
+            Individual fields can be included or excluded using --enable and
+            --disable."""
             enabled = ['watchers', 'forks', 'pushed_at', 'open_issues',
                        'description']
             for mode, features in optlist:
