@@ -65,7 +65,11 @@ class EchoTyping(callbacks.Plugin):
         if their_typing_status is None:
             return
 
-        if their_typing_status == "done" or "draft/bot" in msg.server_tags:
+        if (
+            their_typing_status == "done"
+            or "draft/bot" in msg.server_tags
+            or "bot" in msg.server_tags
+        ):
             self._user_stopped_typing(irc, msg.channel, msg.nick)
         elif their_typing_status in ("paused", "active"):
             self._typing_users[irc.network][msg.channel][msg.nick] = (
