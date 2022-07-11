@@ -241,11 +241,20 @@ class GitHub(callbacks.Plugin):
                         pass
                 elif isinstance(value, str) or \
                         (sys.version_info[0] < 3 and isinstance(value, unicode)):
+
+                    # Skip empty lines or replies at the beginning
+                    for line in value.split('\n'):
+                        line = line.strip('\r')  # sometimes added by Github
+                        if line and not line.startswith('> '):
+                            first_line = line
+                            break
+                    else:
+                        # Could not find any, use the first even if it's a
+                        # quote
+                        first_line = value.split('\n', 1)[0].strip('\r')
+
                     repl[key + '__firstline'] = (
-                        value
-                        .split('\n', 1)[0]  # keep the first line
-                        .strip('\r')  # sometimes added by Github
-                        [0:300]  # prevents "(XX more messages)"
+                        first_line[0:300]  # prevents "(XX more messages)"
                     )
             tokens = callbacks.tokenize(format_)
             if not tokens:
