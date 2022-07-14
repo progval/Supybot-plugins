@@ -67,7 +67,7 @@ class Iwant(callbacks.Plugin):
         if thing in wishlist:
             irc.error(_('This thing is already wanted.'))
             return
-        wishlist.append(thing)
+        wishlist.append(format(_("<%s> %s"), msg.nick, thing))
         self.setRegistryValue('wishlist', serialize(wishlist), channel)
         irc.replySuccess()
     iwant = wrap(iwant, ['channel', 'text'])
