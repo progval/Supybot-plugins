@@ -85,7 +85,10 @@ class Iwant(callbacks.Plugin):
         indexes = range(1, len(wishlist) + 1)
         wishlist_with_index = zip(indexes, wishlist)
         formatted_wishlist = [_('#%i: %s') % x for x in wishlist_with_index]
-        irc.reply(utils.str.format('%L', formatted_wishlist))
+        if formatted_wishlist:
+            irc.reply(utils.str.format('%L', formatted_wishlist))
+        else:
+            irc.reply(_("There are currently no wishes"))
     list = wrap(list, ['channel'])
 
     @internationalizeDocstring
