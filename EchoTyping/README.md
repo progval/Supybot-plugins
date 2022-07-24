@@ -9,6 +9,7 @@ https://ircv3.net/specs/client-tags/typing)
 > haha the bots type when i type... silly
 
 > damn you pinkietest2 and Limnoria
+>
 > always copying when i'm typing
 
 > Who is NickServ_ , and why are they typing?
