@@ -297,8 +297,13 @@ class LinkRelay(callbacks.Plugin):
 
             if 'nick' in args:
                 nickSplitter = self.registryValue('nickSplitter')
-                args['escapedNick'] = \
-                    args['nick'][0] + nickSplitter + args['nick'][1:]
+                if 'nick':
+                    args['escapedNick'] = \
+                        args['nick'][0] + nickSplitter + args['nick'][1:]
+                else:
+                    # When there is no prefix (eg. with QuakeNet's welcome
+                    # NOTICEs, args['nick'] is None.
+                    args['escapedNick'] = args['nick']
 
             return s % args
 
