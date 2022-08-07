@@ -51,7 +51,11 @@ class Record:
 
 
 class NickTracker(callbacks.Plugin):
-    """Keeps trace of the nicknames used by people connecting from the same hosts"""
+    """Keeps track of the nicknames used by people connecting from the same hosts
+
+    This relies on the ChannelLogger plugin being loaded and enabled to
+    remember past nicknames after the bot restarts.
+    """
 
     # When handling an incoming JOIN, we want to load the logs *before*
     # ChannelLogger writes them, so the current JOIN does not show up in the
