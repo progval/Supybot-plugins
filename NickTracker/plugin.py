@@ -120,6 +120,8 @@ class NickTracker(callbacks.Plugin):
 
     def doNick(self, irc, msg):
         new_nick = msg.args[0]
+        if msg.nick == irc.nick or new_nick == irc.nick:
+            return
         for channel in msg.tagged("channels"):
             self._handle_new_nick(
                 irc, ircutils.IrcString(channel), new_nick, msg.user, msg.host
