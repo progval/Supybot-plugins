@@ -153,13 +153,17 @@ class NickTracker(callbacks.Plugin):
         if not targets and not patterns:
             return
 
+        # Compile patterns
         patterns = [string.Template(pattern) for pattern in patterns]
 
+        # What to look for in the history
         search_terms = {
             pattern.safe_substitute(nick=new_nick, user=user, host=host)
             for pattern in patterns
         }
 
+        # Get history records matching one of the patterns above,
+        # in chronological order
         matching_records = [
             record
             for record in self._records[irc.network][channel]
@@ -171,12 +175,19 @@ class NickTracker(callbacks.Plugin):
         ]
         matching_records.sort(key=operator.attrgetter("date"), reverse=True)
 
+        # Get the last occurence of each of the nicks they used
         nicks = {}
         for record in matching_records:
             if record.nick in nicks:
                 continue
             nicks[record.nick] = record.date
 
+        # If there are no nicks at all, exit early as there is nothing
+        # to announce to targets.
+        if not nicks:
+            return
+
+        # Keep only the last nicks
         latest_nicks = [
             nick
             for (_, nick) in sorted(
