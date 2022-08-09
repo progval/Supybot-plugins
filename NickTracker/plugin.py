@@ -106,14 +106,17 @@ class NickTracker(callbacks.Plugin):
             )
 
     def doJoin(self, irc, msg):
-        if msg.channel is not None:
-            self._handle_new_nick(
-                irc,
-                ircutils.IrcString(msg.channel),
-                msg.nick,
-                msg.user,
-                msg.host,
-            )
+        if msg.channel is None:
+            return
+        if msg.nick == irc.nick:
+            return
+        self._handle_new_nick(
+            irc,
+            ircutils.IrcString(msg.channel),
+            msg.nick,
+            msg.user,
+            msg.host,
+        )
 
     def doNick(self, irc, msg):
         new_nick = msg.args[0]
