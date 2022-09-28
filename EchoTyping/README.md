@@ -13,3 +13,5 @@ https://ircv3.net/specs/client-tags/typing)
 > always copying when i'm typing
 
 > Who is NickServ_ , and why are they typing?
+
+> Also who programmed NickServ to echo typing notifications
