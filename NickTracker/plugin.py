@@ -55,6 +55,16 @@ class NickTracker(callbacks.Plugin):
 
     This relies on the ChannelLogger plugin being loaded and enabled to
     remember past nicknames after the bot restarts.
+
+    All common configurations of ChannelLogger are supported, including
+    the default.
+    The only requirements are:
+
+    * ``supybot.plugins.ChannelLogger.showJoinParts`` is ``True``
+    * ``supybot.plugins.ChannelLogger.filenameTimestamp`` contains no ``/``
+    * ``supybot.plugins.ChannelLogger.directories.timestamp.format`` is
+      configured so that the date contains no space, such as ``%B`` (also the
+      default).
     """
 
     # When handling an incoming JOIN, we want to load the logs *before*

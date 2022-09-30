@@ -16,6 +16,16 @@ Keeps track of the nicknames used by people connecting from the same hosts
 This relies on the ChannelLogger plugin being loaded and enabled to
 remember past nicknames after the bot restarts.
 
+All common configurations of ChannelLogger are supported, including
+the default.
+The only requirements are:
+
+* ``supybot.plugins.ChannelLogger.showJoinParts`` is ``True``
+* ``supybot.plugins.ChannelLogger.filenameTimestamp`` contains no ``/``
+* ``supybot.plugins.ChannelLogger.directories.timestamp.format`` is
+  configured so that the date contains no space, such as ``%B`` (also the
+  default).
+
 .. _conf-NickTracker:
 
 Configuration
