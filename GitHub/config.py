@@ -149,13 +149,14 @@ conf.registerChannelValue(GitHub.format, 'pull_request_review_comment',
 # Copy-paste this from the table of contents here:
 # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads
 EVENT_TYPES = """
+branch_protection_rule
 check_run
 check_suite
 code_scanning_alert
 commit_comment
-content_reference
 create
 delete
+dependabot_alert
 deploy_key
 deployment
 deployment_status
@@ -172,6 +173,7 @@ label
 marketplace_purchase
 member
 membership
+merge_group
 meta
 milestone
 organization
@@ -179,21 +181,21 @@ org_block
 package
 page_build
 ping
+project
 project_card
 project_column
-project
+projects_v2_item
 public
 pull_request
 pull_request_review
-pull_request_review_thread
 pull_request_review_comment
+pull_request_review_thread
 push
 release
 repository_dispatch
 repository
 repository_import
 repository_vulnerability_alert
-secret_scanning_alert
 security_advisory
 sponsorship
 star
@@ -202,6 +204,7 @@ team
 team_add
 watch
 workflow_dispatch
+workflow_job
 workflow_run
 """.strip().split()
 
