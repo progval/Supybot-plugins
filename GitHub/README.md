@@ -101,10 +101,16 @@ supybot.plugins.GitHub.format.member: echo "\x0F[\x0302$repository__owner__login
 supybot.plugins.GitHub.format.public: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F made the repository public!
 supybot.plugins.GitHub.format.team_add: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F added the team \x0303$team__name\x0F to the repository!
 supybot.plugins.GitHub.format.status: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" [cif [ceq [echo $status] success] \"echo \x0303$status\x0F." \"echo \x0304$status\x0F.\"] $description - \x0313$target_url\x0F
-supybot.plugins.GitHub.format.check_run: echo "\x0f[\x0302$repository__owner__login/$repository__name\x0f]" Check Run for \x0307$check_run__name\x0f [cif [ceq [echo $check_run__conclusion] success] "echo \x0303$check_run__status\x0f." "cif [ceq [echo $check_run__conclusion] None] \\"echo $check_run__status.\\" \\"echo \x0304$check_run__status\x0f.\\""] [cif [ceq [echo $check_run__conclusion] None] "echo \\"\\"" "echo $check_run__conclusion."] \x0313$check_run__details_url\x0f
 supybot.plugins.GitHub.format.before.push: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" [cif [ceq [echo $pusher__name] none] \"echo \x0307A deploy key\x0F\" \"echo \x0307$pusher__name\x0F\"] pushed [echo $__num_commits] [cif [ceq [echo $__num_commits] 1] \"echo commit\" \"echo commits\"] to \x0303$ref__branch\x0F "[+$__files__added__len/-$__files__removed__len/\u00B1$__files__modified__len]" \x0313$compare\x0F
 supybot.plugins.GitHub.format.push: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$__commit__author__username\x0F \x0303$__commit__id__short\x0F - $__commit__message__firstline
 supybot.plugins.GitHub.format.push.hidden: echo (+$__hidden_commits hidden commits)
+supybot.plugins.GitHub.format.workflow_run: echo "\x0f[\x0302$repository__owner__login/$repository__name\x0f]" Workflow Run for \x0307$workflow_run__name\x0f [cif [ceq [echo $workflow_run__conclusion] success] "echo \x0303$workflow_run__status\x0f." "cif [ceq [echo $workflow_run__conclusion] None] \\"echo $workflow_run__status.\\" \\"echo \x0304$workflow_run__status\x0f.\\""] [cif [ceq [echo $workflow_run__conclusion] None] "echo \\"\\"" "echo $workflow_run__conclusion."] \x0313$workflow_run__html_url\x0f
+```
+
+If you use Continuous Integration external to GitHub (or if you like very noisy CI notifications from GitHub Workflows), use this instead of `check_run`:
+
+```
+supybot.plugins.GitHub.format.check_run: echo "\x0f[\x0302$repository__owner__login/$repository__name\x0f]" Check Run for \x0307$check_run__name\x0f [cif [ceq [echo $check_run__conclusion] success] "echo \x0303$check_run__status\x0f." "cif [ceq [echo $check_run__conclusion] None] \\"echo $check_run__status.\\" \\"echo \x0304$check_run__status\x0f.\\""] [cif [ceq [echo $check_run__conclusion] None] "echo \\"\\"" "echo $check_run__conclusion."] \x0313$check_run__details_url\x0f
 ```
 
 To apply it, either use the Config plugin, or add them to your main `.conf` file.
