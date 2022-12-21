@@ -1,6 +1,10 @@
+# Limnoria GitHub plugin
+
 This plugin announces events GitHub repositories to IRC.
 
 **This plugin requires Limnoria.**
+
+## Webhook Setup
 
 To use this plugin you must forward/open the port which is specified by 
 the configuration variable `supybot.servers.http.port` (8080 is the 
@@ -26,8 +30,14 @@ Let the `Content type` be `application/json`!
 
 **NOTE:** Previous versions of this plugin used `application/x-www-form-urlencoded`!
 
-
 Fill the other fields of the form according to what you want.
+
+## Announce format
+
+This plugin has a default configuration to announce events most people want to
+see announced on IRC, using bold formatting and no colors; but this can be tweaked.
+
+### Syntax description
 
 To announce other events type, you have to set config variables 
 `supybot.plugins.GitHub.format.<type>` (where `type` is a type referenced 
@@ -50,3 +60,51 @@ The plugin can validate if the payload was sent by GitHub with a proper secret i
 is set.
 
 The Utilities plugin is required to be active for this plugin to work.
+
+### Default configuration
+
+Here are the default templates:
+
+```
+supybot.plugins.GitHub.format.issue_comment: echo $repository__owner__login/\x02$repository__name\x02: \x02$sender__login\x02 $action comment on issue #$issue__number: \x02$issue__title\x02 $comment__html_url__tiny
+supybot.plugins.GitHub.format.issues: echo $repository__owner__login/\x02$repository__name\x02: \x02$sender__login\x02 $action issue #$issue__number: \x02$issue__title\x02 $issue__html_url
+supybot.plugins.GitHub.format.pull_request: echo $repository__owner__login/\x02$repository__name\x02: \x02$sender__login\x02 $action pull request #$number (to \x02$pull_request__base__ref\x02): \x02$pull_request__title\x02 $pull_request__html_url__tiny
+supybot.plugins.GitHub.format.pull_request_review: echo $repository__owner__login/\x02$repository__name\x02: \x02$review__user__login\x02 reviewed pull request #$pull_request__number (to \x02$pull_request__base__ref\x02): \x02$pull_request__title\x02 $pull_request__html_url__tiny
+supybot.plugins.GitHub.format.pull_request_review_comment: echo $repository__owner__login/\x02$repository__name\x02: \x02$comment__user__login\x02 reviewed pull request #$pull_request__number (to \x02$pull_request__base__ref\x02): \x02$pull_request__title\x02 $pull_request__html_url__tiny
+supybot.plugins.GitHub.format.pull_request_review_thread:
+supybot.plugins.GitHub.format.push: echo $repository__owner__name/\x02$repository__name\x02 (in \x02$ref__branch\x02): $__commit__author__name committed \x02$__commit__message__firstline\x02 $__commit__url__tiny
+supybot.plugins.GitHub.format.push.hidden: echo (+$__hidden_commits hidden commits)
+supybot.plugins.GitHub.format.status: echo $repository__owner__login/\x02$repository__name\x02: Status for commit "\x02$commit__commit__message__firstline\x02" by \x02$commit__commit__committer__name\x02: \x02$description\x02 $target_url__tiny
+```
+
+everything else, and therefore is not announce
+
+### Notifico-style configuration
+
+Here is an alternative set of configuration values, which are more verbose, use colors and no bold,
+[inspired by Notifico](https://github.com/TkTech/notifico/blob/85a84b28625d36733a2037960970d9443fd8cabc/notifico/contrib/services/github.py#L340).
+They expect the Conditional plugin to be loaded.
+
+```
+supybot.plugins.GitHub.format.ping: echo "\x0F[\x0302GitHub\x0F]" $zen
+supybot.plugins.GitHub.format.issues: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F $action issue \x0303#$issue__number\x0F: $issue__title - \x0313$issue__html_url\x0F
+supybot.plugins.GitHub.format.issue_comment: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F $action a comment on issue \x0303#$issue__number\x0F: $issue__title - \x0313$comment__html_url\x0F
+supybot.plugins.GitHub.format.commit_comment: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$comment__user__login\x0F [utilities last commented $action] on commit \x0303$comment__commit_id\x0F - \x0313$comment__html_url\x0F
+supybot.plugins.GitHub.format.create: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F created $ref_type \x0303$ref\x0F - \x0313$repository__html_url\x0F
+supybot.plugins.GitHub.format.delete: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F deleted $ref_type \x0303$ref\x0F - \x0313$repository__html_url\x0F
+supybot.plugins.GitHub.format.pull_request: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F $action pull request \x0303#$number\x0F: $pull_request__title - \x0313$pull_request__html_url\x0F
+supybot.plugins.GitHub.format.pull_request_review_comment: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$comment__user__login\x0F reviewed pull request \x0303#$pull_request__number\x0F commit - \x0313$comment__html_url\x0F
+supybot.plugins.GitHub.format.watch: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F starred \x0303$repository__owner__login/$repository__name\x0F - \x0313$sender__html_url\x0F
+supybot.plugins.GitHub.format.release: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F $action \x0303$release__tag_name | $pull_request__title\x0F - \x0313$release__html_url\x0F
+supybot.plugins.GitHub.format.fork: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$forkee__owner__login\x0F forked the repository - \x0313$forkee_owner__html_url\x0F
+supybot.plugins.GitHub.format.member: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F $action user \x0303$member__login\x0F - \x0313$member__html_url\x0F
+supybot.plugins.GitHub.format.public: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F made the repository public!
+supybot.plugins.GitHub.format.team_add: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F added the team \x0303$team__name\x0F to the repository!
+supybot.plugins.GitHub.format.status: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" [cif [ceq [echo $status] success] \"echo \x0303$status\x0F." \"echo \x0304$status\x0F.\"] $description - \x0313$target_url\x0F
+supybot.plugins.GitHub.format.check_run: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" Check Run for \x0307$check_run__name\x0F [cif [ceq [echo $status] success] \"echo \x0303$status\x0F." \"echo \x0304$status\x0F.\"] [cif [ceq $check_run__conclusion \"\"] \"echo \\\"\\\"\" \"echo $check_run__conclusion\"]. \x0313$check_run__details_url\x0F
+supybot.plugins.GitHub.format.before.push: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" [cif [ceq [echo $pusher__name] none] \"echo \x0307A deploy key\x0F\" \"echo \x0307$pusher__name\x0F\"] pushed [echo $__num_commits] [cif [ceq [echo $__num_commits] 1] \"echo commit\" \"echo commits\"] to \x0303$ref__branch\x0F "[+$__files__added__len/-$__files__removed__len/\u00B1$__files__modified__len]" \x0313$compare\x0F
+supybot.plugins.GitHub.format.push: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$__commit__author__username\x0F \x0303$__commit__id__short\x0F - $__commit__message__firstline
+supybot.plugins.GitHub.format.push.hidden: echo (+$__hidden_commits hidden commits)
+```
+
+To apply it, either use the Config plugin, or add them to your main `.conf` file.
