@@ -89,7 +89,7 @@ They expect the Conditional plugin to be loaded.
 supybot.plugins.GitHub.format.ping: echo "\x0F[\x0302GitHub\x0F]" $zen
 supybot.plugins.GitHub.format.issues: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F $action issue \x0303#$issue__number\x0F: $issue__title - \x0313$issue__html_url\x0F
 supybot.plugins.GitHub.format.issue_comment: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F $action a comment on issue \x0303#$issue__number\x0F: $issue__title - \x0313$comment__html_url\x0F
-supybot.plugins.GitHub.format.commit_comment: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$comment__user__login\x0F [utilities last commented $action] on commit \x0303$comment__commit_id\x0F - \x0313$comment__html_url\x0F
+supybot.plugins.GitHub.format.commit_comment: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$comment__user__login\x0F $action a comment on commit \x0303$comment__commit_id\x0F - \x0313$comment__html_url\x0F
 supybot.plugins.GitHub.format.create: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F created $ref_type \x0303$ref\x0F - \x0313$repository__html_url\x0F
 supybot.plugins.GitHub.format.delete: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F deleted $ref_type \x0303$ref\x0F - \x0313$repository__html_url\x0F
 supybot.plugins.GitHub.format.pull_request: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F $action pull request \x0303#$number\x0F: $pull_request__title - \x0313$pull_request__html_url\x0F
