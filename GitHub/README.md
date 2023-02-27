@@ -56,6 +56,19 @@ There are also special variables:
 Concerning push events, one line is formatted per commit; it is given extra
  variables: `$__commit__foo` for each `data['commits'][X]['foo']`.
 
+Format of 'issues' and 'pull_request' events can be overridden on a per-action
+basis, with the `supybot.plugins.GitHub.format.<type>.<action>` config variable.
+Note that setting `supybot.plugins.GitHub.format.<type>.<action>` globally overrides
+channel-specific values of `supybot.plugins.GitHub.format.<type>`.
+For example, in order to ignore label-related actions, you can use:
+
+```
+@config supybot.plugins.GitHub.format.issues.labeled ignore
+@config supybot.plugins.GitHub.format.issues.unlabeled ignore
+@config supybot.plugins.GitHub.format.pull_request.labeled ignore
+@config supybot.plugins.GitHub.format.pull_request.unlabeled ignore
+```
+
 The plugin can validate if the payload was sent by GitHub with a proper secret if `supybot.plugins.Github.announces.secret`
 is set.
 

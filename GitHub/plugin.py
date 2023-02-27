@@ -204,7 +204,12 @@ class GitHub(callbacks.Plugin):
         def _createPrivmsg(self, irc, channel, payload, event):
             bold = ircutils.bold
 
-            format_ = self.plugin.registryValue('format.%s' % event, channel)
+            format_ = ''
+            if event in ('issues', 'pull_request'):
+                format_ = self.plugin.registryValue(
+                    'format.%s.%s' % (event, payload['action']), channel)
+            if not format_.strip():
+                format_ = self.plugin.registryValue('format.%s' % event, channel)
             if not format_.strip():
                 return
             repl = flatten_subdicts(payload)

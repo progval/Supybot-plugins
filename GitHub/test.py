@@ -270,8 +270,37 @@ class GitHubTestCase(ChannelPluginTestCase):
                 self.channel)
         try:
             cb = self.irc.getCallback('GitHub')
-            cb.announce.onPayload({'X-GitHub-Event': 'issues'}, ISSUE_EVENT)
+            cb.announce.onPayload(
+                {'X-GitHub-Event': 'issues'},
+                ISSUE_EVENT)
             self.assertResponse(' ', DEFAULT_ISSUE_ANNOUNCE)
+
+            cb.announce.onPayload(
+                {'X-GitHub-Event': 'issues'},
+                {**ISSUE_EVENT, 'action': 'labeled'})
+            self.assertResponse(
+                ' ', DEFAULT_ISSUE_ANNOUNCE.replace('opened', 'labeled'))
+        finally:
+            self.assertNotError(
+                    'github announce remove %s progval Supybot-plugins' %
+                    self.channel)
+
+    def testIgnoreIssueAction(self):
+        self.assertNotError(
+                'github announce add %s progval Supybot-plugins' %
+                self.channel)
+        try:
+            with conf.supybot.plugins.GitHub.format.issues.labeled.context('ignore'):
+                cb = self.irc.getCallback('GitHub')
+                cb.announce.onPayload(
+                    {'X-GitHub-Event': 'issues'},
+                    ISSUE_EVENT)
+                self.assertResponse(' ', DEFAULT_ISSUE_ANNOUNCE)
+
+                cb.announce.onPayload(
+                    {'X-GitHub-Event': 'issues'},
+                    {**ISSUE_EVENT, 'action': 'labeled'})
+                self.assertNoResponse(' ')
         finally:
             self.assertNotError(
                     'github announce remove %s progval Supybot-plugins' %

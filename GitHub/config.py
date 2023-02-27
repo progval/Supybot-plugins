@@ -102,6 +102,16 @@ conf.registerChannelValue(GitHub.format, 'issues',
         '\x02$issue__title\x02 $issue__html_url') \
         .replace('\n        ', ' '),
         _("""Format for issue events.""")))
+
+for action in '''assigned closed deleted demilestoned edited labeled locked
+                 milestoned opened pinned reopened transferred
+                 unassigned unlabeled unlocked unpinned'''.split():
+    conf.registerChannelValue(GitHub.format.issues, action,
+            registry.String('',
+            _("""Format for events of an issue being %s.
+                 If empty, defaults to
+                 supybot.plugins.GitHub.format.issues""" % action)))
+
 conf.registerChannelValue(GitHub.format, 'issue_comment',
         registry.String('echo ' +
         _('$repository__owner__login/\x02$repository__name\x02: '
@@ -117,6 +127,7 @@ conf.registerChannelValue(GitHub.format, 'status',
         '$target_url__tiny') \
         .replace('\n        ', ' '),
         _("""Format for status events.""")))
+
 conf.registerChannelValue(GitHub.format, 'pull_request',
         registry.String('echo ' +
         _('$repository__owner__login/\x02$repository__name\x02: '
@@ -125,6 +136,17 @@ conf.registerChannelValue(GitHub.format, 'pull_request',
         '$pull_request__html_url__tiny') \
         .replace('\n        ', ' '),
         _("""Format for pull request events.""")))
+
+for action in '''assigned auto_merge_disabled auto_merge_enabled closed
+                 converted_to_draft demilestoned dequeued edited enqueued
+                 labeled locked milestoned opened ready_for_review
+                 reopened review_request_removed review_requested
+                 synchronize unassigned unlabeled unlocked'''.split():
+    conf.registerChannelValue(GitHub.format.pull_request, action,
+            registry.String('',
+            _("""Format for events of a pull request being %s.
+                 If empty, defaults to
+                 supybot.plugins.GitHub.format.pull_request""" % action)))
 
 conf.registerChannelValue(GitHub.format, 'pull_request_review',
         registry.String('echo ' +
