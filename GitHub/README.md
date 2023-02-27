@@ -96,7 +96,7 @@ supybot.plugins.GitHub.format.pull_request: echo "\x0F[\x0302$repository__owner_
 supybot.plugins.GitHub.format.pull_request_review_comment: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$comment__user__login\x0F reviewed pull request \x0303#$pull_request__number\x0F commit - \x0313$comment__html_url\x0F
 supybot.plugins.GitHub.format.watch: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F starred \x0303$repository__owner__login/$repository__name\x0F - \x0313$sender__html_url\x0F
 supybot.plugins.GitHub.format.release: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F $action \x0303$release__tag_name "|" $release__name\x0F - \x0313$release__html_url\x0F
-supybot.plugins.GitHub.format.fork: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$forkee__owner__login\x0F forked the repository - \x0313$forkee_owner__html_url\x0F
+supybot.plugins.GitHub.format.fork: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$forkee__owner__login\x0F forked the repository - \x0313$forkee__owner__html_url\x0F
 supybot.plugins.GitHub.format.member: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F $action user \x0303$member__login\x0F - \x0313$member__html_url\x0F
 supybot.plugins.GitHub.format.public: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F made the repository public!
 supybot.plugins.GitHub.format.team_add: echo "\x0F[\x0302$repository__owner__login/$repository__name\x0F]" \x0307$sender__login\x0F added the team \x0303$team__name\x0F to the repository!
