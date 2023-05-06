@@ -32,9 +32,8 @@
 
 import re
 import sys
+import json
 import urllib
-import lxml.html
-from lxml import etree
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
@@ -52,8 +51,10 @@ except:
 
 if sys.version_info[0] >= 3:
     quote_plus = urllib.parse.quote_plus
+    urlencode = urllib.parse.urlencode
 else:
     quote_plus = urllib.quote_plus
+    urlencode = urllib.urlencode
 
 
 class Wikipedia(callbacks.Plugin):
@@ -61,130 +62,101 @@ class Wikipedia(callbacks.Plugin):
     This should describe *how* to use this plugin."""
     threaded = True
 
+    def queryApi(self, network, channel, params):
+        params = params.copy()
+        params["format"] = "json"
+        addr = 'https://%s/w/api.php?%s' % \
+                    (self.registryValue('url', channel=channel, network=network),
+                     urlencode(params))
+        resp = utils.web.getUrl(addr)
+        if sys.version_info[0] >= 3:
+            resp = resp.decode()
+        return json.loads(resp)
+
+    def getExtract(self, network, channel, title):
+        """Returns (redirect_target, extract); either may be None."""
+        params = dict(
+            action="query",
+            prop="extracts",
+            exchars=700,  # should fit with a single @more
+            titles=title,
+            explaintext="true",  # get result in plain text instead of HTML
+            exsectionformat="plain",  # don't get wikitext
+            redirects="",  # resolve redirects
+        )
+        resp = self.queryApi(network, channel, params)
+        if "-1" in resp["query"]["pages"]:
+            return (None, None)
+        if "redirects" in resp["query"]:
+            redirect = resp["query"]["redirects"][-1]["to"]
+        else:
+            redirect = None
+        pages = resp["query"]["pages"]
+        return (redirect, next(iter(pages.values()))["extract"])
+
+    def searchPage(self, network, channel, search, titleOnly):
+        if titleOnly:
+            search = "intitle:" + search
+
+        params = dict(
+            action="query",
+            list="search",
+            redirects="",  # resolve redirect
+            srsearch=search,
+        )
+        resp = self.queryApi(network, channel, params)
+        if "suggestion" in resp["query"]["searchinfo"]:
+            return resp["query"]["searchinfo"]["suggestion"]
+        if resp["query"]["search"]:
+            return resp["query"]["search"][0]["title"]
+        return None
 
     @internationalizeDocstring
     def wiki(self, irc, msg, args, search):
         """<search term>
 
         Returns the first paragraph of a Wikipedia article"""
-        reply = ''
-        # first, we get the page
-        addr = 'https://%s/wiki/Special:Search?search=%s' % \
-                    (self.registryValue('url', msg.args[0]),
-                     quote_plus(search))
-        article = utils.web.getUrl(addr)
-        if sys.version_info[0] >= 3:
-            article = article.decode()
-        # parse the page
-        tree = lxml.html.document_fromstring(article)
-        # check if it gives a "Did you mean..." redirect
-        didyoumean = tree.xpath('//div[@class="searchdidyoumean"]/a'
-                                '[@title="Special:Search"]')
-        if didyoumean:
-            redirect = didyoumean[0].text_content().strip()
-            if sys.version_info[0] < 3:
-                if isinstance(redirect, unicode):
-                    redirect = redirect.encode('utf-8','replace')
-                if isinstance(search, unicode):
-                    search = search.encode('utf-8','replace')
-            if self.registryValue('showRedirects', msg.args[0]):
-                reply += _('I didn\'t find anything for "%s". '
-                           'Did you mean "%s"? ') % (search, redirect)
-            addr = self.registryValue('url', msg.args[0]) + \
-                   didyoumean[0].get('href')
-            if not article.startswith('http'):
-                article = utils.web.getUrl('https://' + addr)
-            if sys.version_info[0] >= 3:
-                article = article.decode()
-            tree = lxml.html.document_fromstring(article)
-            search = redirect
-        # check if it's a page of search results (rather than an article), and
-        # if so, retrieve the first result
-        searchresults = tree.xpath('//div[@class="searchresults"]/ul/li/a')
-        if searchresults:
-            redirect = searchresults[0].text_content().strip()
-            if self.registryValue('showRedirects', msg.args[0]):
-                reply += _('I didn\'t find anything for "%s", but here\'s the '
-                           'result for "%s": ') % (search, redirect)
-            addr = self.registryValue('url', msg.args[0]) + \
-                   searchresults[0].get('href')
-            article = utils.web.getUrl(addr)
-            if sys.version_info[0] >= 3:
-                article = article.decode()
+        network = irc.network
+        channel = msg.channel
+        showRedirects = self.registryValue(
+                'showRedirects', channel=channel, network=network)
+        title = None
+        prefixes = ""
 
-            tree = lxml.html.document_fromstring(article)
-            search = redirect
-        # otherwise, simply return the title and whether it redirected
-        elif self.registryValue('showRedirects', msg.args[0]):
-            redirect = re.search('\(%s <a href=[^>]*>([^<]*)</a>\)' %
-                                 _('Redirected from'), article)
-            if redirect:
-                redirect = tree.xpath('//span[@class="mw-redirectedfrom"]/a')[0]
-                redirect = redirect.text_content().strip()
-                title = tree.xpath('//*[@class="firstHeading"]')
-                title = title[0].text_content().strip()
-                if sys.version_info[0] < 3:
-                    if isinstance(title, unicode):
-                        title = title.encode('utf-8','replace')
-                    if isinstance(redirect, unicode):
-                        redirect = redirect.encode('utf-8','replace')
-                reply += '"%s" (Redirected from "%s"): ' % (title, redirect)
-        # extract the address we got it from
-        addr = tree.find(".//link[@rel='canonical']")
-        addr = addr.attrib['href']
-        try:
-            # force serving HTTPS links
-            addr = 'https://' + addr.split("//")[1]
-        except:
-            pass
-        # check if it's a disambiguation page
-        disambig = tree.xpath('//table[@id="disambigbox"]') or \
-            tree.xpath('//table[@id="setindexbox"]')
-        if disambig:
-            disambig = tree.xpath('//div[@id="bodyContent"]/div/ul/li/a')
-            disambig = disambig[:5]
-            disambig = [item.text_content() for item in disambig]
-            r = utils.str.commaAndify(disambig)
-            reply += format(_('%u is a disambiguation page. '
-                       'Possible results include: %s'), addr, r)
-        # or just as bad, a page listing events in that year
-        elif re.search(_('This article is about the year [\d]*\. '
-                       'For the [a-zA-Z ]* [\d]*, see'), article):
-            reply += _('"%s" is a page full of events that happened in that '
-                      'year.  If you were looking for information about the '
-                      'number itself, try searching for "%s_(number)", but '
-                      'don\'t expect anything useful...') % (search, search)
-        # Catch talk pages
-        elif 'ns-talk' in tree.find("body").attrib['class']:
-            reply += format(_('This article appears to be a talk page: %u'), addr)
-        else:
-            ##### etree!
-            p = tree.xpath("//div[@id='mw-content-text']//p[1]")
-            if len(p) == 0 or addr.endswith('Special:Search'):
-                if 'wikipedia:wikiproject' in addr.lower():
-                    reply += format(_('This page appears to be a WikiProject page, '
-                               'but it is too complex for us to parse: %u'), addr)
-                else:
-                    reply += _('Not found, or page malformed.')
-            else:
-                p = p[0]
-                # Replace <b> tags with IRC-style bold, this has to be
-                # done indirectly because unescaped '\x02' is invalid in XML
-                for b_tag in p.xpath('//b'):
-                    b_tag.text = "&#x02;%s&#x02;" % b_tag.text
-                p = p.text_content()
-                p = p.replace('&#x02;', '\x02')
-                p = p.strip()
-                if sys.version_info[0] < 3:
-                    if isinstance(p, unicode):
-                        p = p.encode('utf-8', 'replace')
-                    if isinstance(reply, unicode):
-                        reply = reply.encode('utf-8','replace')
-                reply += format('%s %s %u', p, _('Retrieved from'), addr)
-        reply = reply.replace('&amp;','&')
-        # Remove inline citations (text[1][2][3], etc.)
-        reply = re.sub('\[\d+\]', '', reply)
-        irc.reply(reply)
+        (redirect, extract) = self.getExtract(network, channel, search)
+
+        if redirect and showRedirects:
+            prefixes += _('"%s" (Redirected from "%s"): ') % (redirect, search)
+
+        if not extract:
+            # No exact (or redirected) match: use the search
+            title = self.searchPage(network, channel, search, True)
+
+            if not title:
+                # No results on titles only, search harder and always point it
+                # out
+                title = self.searchPage(network, channel, search, False)
+                showRedirects = True
+
+            (redirect, extract) = self.getExtract(network, channel, title)
+            redirect = redirect or title
+
+            if not redirect:
+                irc.error(_('Not found, or page malformed.*'))
+
+            if showRedirects:
+                prefixes += _('I didn\'t find anything for "%s". '
+                              'Did you mean "%s"? ') % (search, redirect)
+
+        addr = "https://%s/wiki/%s" % (
+            self.registryValue('url', channel=channel, network=network),
+            quote_plus(redirect or title or search)
+        )
+
+        extract = utils.str.normalizeWhitespace(extract)
+
+        irc.reply(format(_("%s%s - Retrieved from %u"),
+                  prefixes, extract, addr))
     wiki = wrap(wiki, ['text'])
 
 

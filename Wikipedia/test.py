@@ -30,6 +30,7 @@
 ###
 
 from supybot.test import *
+import supybot.conf as conf
 
 class WikipediaTestCase(PluginTestCase):
     plugins = ('Wikipedia',)
@@ -37,10 +38,27 @@ class WikipediaTestCase(PluginTestCase):
     if network:
         def testWiki(self):
             self.assertRegexp('wiki Monty Python',
-                              '^Monty Python \(sometimes known as The Pythons\).*')
-            self.assertRegexp('wiki Python', '.*is a disambiguation page.*')
-            self.assertRegexp('wiki Foo', '"Foobar" \(Redirect from "Foo"\): '
-                                          'The terms foobar.*')
+                              '^Monty Python \(.* known as The Pythons\).*')
+
+        def testWikiDisambiguation(self):
+            self.assertRegexp('wiki Python', 'Python may refer to: Snakes.*')
+
+        def testWikiRedirect(self):
+            self.assertRegexp(
+                'wiki Foo',
+                r'^"Foobar" \(Redirected from "Foo"\): The terms foobar.*')
+            with conf.supybot.plugins.Wikipedia.showRedirects.context(False):
+                self.assertRegexp(
+                    'wiki Foo',
+                    r'^The terms foobar.*')
+
+        def testRedirect2(self):
+            self.assertRegexp(
+                'wiki The Pythons',
+                r'^"Monty Python" \(Redirected from "The Pythons"\): '
+                r'Monty Python \(.* known as The Pythons\).*')
+
+        def testWikiNotFound(self):
             self.assertRegexp('wiki roegdfjpoepo',
                               'Not found, or page malformed.*')
 
