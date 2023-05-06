@@ -1,6 +1,6 @@
 ###
 # Copyright (c) 2010, quantumlemur
-# Copyright (c) 2011, Valentin Lorentz
+# Copyright (c) 2011-2023, Valentin Lorentz
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
