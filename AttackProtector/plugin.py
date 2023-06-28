@@ -188,6 +188,9 @@ class AttackProtector(callbacks.Plugin):
         if not self.registryValue('enable', channel):
             return
 
+        if kind == 'nick':
+            nick = msg.args[0]
+
         try:
             ircdb.users.getUser(msg.prefix) # May raise KeyError
             capability = self.registryValue('exempt')
