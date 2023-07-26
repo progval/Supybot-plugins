@@ -234,8 +234,10 @@ class GitHub(callbacks.Plugin):
                 elif key == 'commits':
                     repl['__num_commits'] = len(value)
                     for key in ("added", "removed", "modified"):
+                        # 'or []' for Gitea, which sets them to null instead of
+                        # [] when the list would be empty.
                         repl['__files__' + key + '__len'] = sum(
-                            len(commit[key]) for commit in value)
+                            len(commit[key] or []) for commit in value)
                 elif key.endswith('ref'):
                     try:
                         repl[key + '__branch'] = value.split('/', 2)[2] \
