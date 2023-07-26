@@ -32,6 +32,16 @@ Let the `Content type` be `application/json`!
 
 Fill the other fields of the form according to what you want.
 
+## Other forges
+
+Gitea webhooks should be supported too, but isn't as well tested. You need to replace
+the following variables in your announce format configuration:
+
+* replace `$pusher__name` with `$pusher__login` in `supybot.plugins.GitHub.format.push`
+* replace `$compare` with `$compare_url` in `supybot.plugins.GitHub.format.push`
+
+Gitlab webhooks may work too. Please [open an issue](https://github.com/progval/Supybot-plugins/issues/new) (or a pull-request) if you have problems with either.
+
 ## Announce format
 
 This plugin has a default configuration to announce events most people want to
