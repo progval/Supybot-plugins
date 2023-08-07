@@ -112,7 +112,7 @@ conf.registerGlobalValue(LinkRelay, 'substitutes',
     registry.String('', _("""You shouldn't edit this configuration variable
     yourself unless you know what you do. Use @LinkRelay (no)substitute instead.""")))
 
-conf.registerGlobalValue(LinkRelay, 'nickSplitter',
+conf.registerChannelValue(LinkRelay, 'nickSplitter',
     registry.String('', _(r"""String inserted in the middle of relayed
     nicks, prevent highlights.
     Can be "\u200b" (zero-width spaces), "\x01\x01" (bold + unbold), etc.""")))

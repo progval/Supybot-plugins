@@ -296,7 +296,9 @@ class LinkRelay(callbacks.Plugin):
                     args['network'] = ''
 
             if 'nick' in args:
-                nickSplitter = self.registryValue('nickSplitter')
+                nickSplitter = self.registryValue('nickSplitter',
+                                                  relay.targetChannel,
+                                                  relay.targetNetwork)
                 if 'nick':
                     args['escapedNick'] = \
                         args['nick'][0] + nickSplitter + args['nick'][1:]
