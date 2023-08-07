@@ -115,7 +115,7 @@ conf.registerGlobalValue(LinkRelay, 'substitutes',
 conf.registerChannelValue(LinkRelay, 'nickSplitter',
     registry.String('', _(r"""String inserted in the middle of relayed
     nicks, prevent highlights.
-    Can be "\u200b" (zero-width spaces), "\x01\x01" (bold + unbold), etc.""")))
+    Can be "\u200b" (zero-width spaces), "\x02\x02" (bold + unbold), etc.""")))
 
 conf.registerGroup(LinkRelay, 'colors')
 for name, color in {'info': '02',
