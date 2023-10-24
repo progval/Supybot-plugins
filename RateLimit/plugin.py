@@ -201,8 +201,11 @@ class RateLimit(callbacks.Plugin):
             elif record.user == '*':
                 star = format_ratelimit(record)
             else:
-                users.append('%s: %s' % (ircdb.users.getUser(record.user).name,
-                                         format_ratelimit(record)))
+                try:
+                    users.append('%s: %s' % (ircdb.users.getUser(record.user).name,
+                                             format_ratelimit(record)))
+                except KeyError:  # nonexistent user
+                    continue
         irc.reply(', '.join([_('global: %s') % global_,
                              _('*: %s') % star] +
                             users))
