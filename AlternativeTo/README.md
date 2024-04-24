@@ -1,1 +1,0 @@
-Access to alternativeto.net
