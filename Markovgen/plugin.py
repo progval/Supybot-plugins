@@ -57,7 +57,7 @@ except ImportError:
     raise callbacks.Error('Cannot load markovgen library. Make sure you '
                           'installed it (%s -m pip install markovgen).'
                           % sys.executable)
-from imp import reload as r
+from importlib import reload as r
 r(markovgen)
 
 MATCH_MESSAGE_STRIPNICK = re.compile('^(<[^ ]+> )?(?P<message>.*)$')

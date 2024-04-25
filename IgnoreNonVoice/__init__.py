@@ -54,7 +54,7 @@ __url__ = '' # 'http://supybot.com/Members/yourname/IgnoreNonVoice/download'
 
 from . import config
 from . import plugin
-from imp import reload
+from importlib import reload
 # In case we're being reloaded.
 reload(config)
 reload(plugin)

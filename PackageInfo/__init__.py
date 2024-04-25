@@ -17,7 +17,7 @@
 Display information on packages using apt-cache and search for files in packages with apt-file.
 """
 
-from imp import reload
+from importlib import reload
 import supybot
 import supybot.world as world
 

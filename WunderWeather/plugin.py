@@ -38,7 +38,7 @@ import supybot.callbacks as callbacks
 from . import shortforms
 
 # Name 'reload' is used by Supybot
-from imp import reload as reload_
+from importlib import reload as reload_
 reload_(shortforms)
 
 if sys.version_info[0] >= 3:
