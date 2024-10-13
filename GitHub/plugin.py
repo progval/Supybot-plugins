@@ -311,7 +311,7 @@ class GitHub(callbacks.Plugin):
                         log.warning('Received GitHub payload with announcing '
                                     'enabled in %s on unloaded network %s.',
                                     channel, network)
-                        return
+                        continue
                 if channel not in irc.state.channels:
                     log.info(('Cannot announce event for repo '
                              '%s in %s on %s because I\'m not in %s.') %
