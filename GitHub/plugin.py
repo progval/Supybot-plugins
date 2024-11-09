@@ -205,6 +205,11 @@ class GitHub(callbacks.Plugin):
             bold = ircutils.bold
 
             format_ = ''
+            if event == 'pull_request' and payload['action'] == 'closed' \
+                    and payload['pull_request']['merged']:
+                # it's just confusing to call a merged PR "closed", so we
+                # manually change that action.
+                payload['action'] = 'merged'
             if event in ('issues', 'pull_request'):
                 format_ = self.plugin.registryValue(
                     'format.%s.%s' % (event, payload['action']), channel)

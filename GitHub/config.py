@@ -137,11 +137,14 @@ conf.registerChannelValue(GitHub.format, 'pull_request',
         .replace('\n        ', ' '),
         _("""Format for pull request events.""")))
 
+# github's own list of actions, plus "merged" which we substitute ourselves
+# to the "closed" action when the PR is merged, because it's just confusing
+# to call a merged PR "closed"
 for action in '''assigned auto_merge_disabled auto_merge_enabled closed
                  converted_to_draft demilestoned dequeued edited enqueued
                  labeled locked milestoned opened ready_for_review
                  reopened review_request_removed review_requested
-                 synchronize unassigned unlabeled unlocked'''.split():
+                 synchronize unassigned unlabeled unlocked merged'''.split():
     conf.registerChannelValue(GitHub.format.pull_request, action,
             registry.String('',
             _("""Format for events of a pull request being %s.
