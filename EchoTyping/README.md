@@ -23,3 +23,7 @@ A [pissnet](https://wiki.letspiss.net/) user:
 An other pissnet user:
 
 > Also who programmed NickServ to echo typing notifications
+
+A [Matrix2051](https://github.com/progval/matrix2051) user:
+
+> who is Limnoria and why s(he) is typing when i typing?
