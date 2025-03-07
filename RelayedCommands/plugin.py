@@ -43,6 +43,8 @@ REGEXP = re.compile("^<(?P<nick>[^>]+)> (?P<message>.*)?")
 class RelayedCommands(callbacks.Plugin):
     """Recognizes commands sent through a relay bot and runs them"""
 
+    echoMessage = True
+
     def doPrivmsg(self, irc, msg):
         if not (
             msg.nick == irc.nick
