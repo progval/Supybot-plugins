@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-memoryprofiler"
+version = "0.0.0"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+MemoryProfiler = "limnoria_memoryprofiler"
+
+[tool.setuptools.package-dir]
+"limnoria_memoryprofiler" = "."
+"limnoria_memoryprofiler.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_memoryprofiler" = ["locales/*.po"]

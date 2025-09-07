@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-markovgen"
+version = "0.0.0"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+    "markovgen",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+Markovgen = "limnoria_markovgen"
+
+[tool.setuptools.package-dir]
+"limnoria_markovgen" = "."
+"limnoria_markovgen.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_markovgen" = ["locales/*.po"]

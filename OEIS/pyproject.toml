@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-oeis"
+version = "0.0.0"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+OEIS = "limnoria_oeis"
+
+[tool.setuptools.package-dir]
+"limnoria_oeis" = "."
+"limnoria_oeis.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_oeis" = ["locales/*.po"]

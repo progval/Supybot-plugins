@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-linkrelay"
+version = "0.1"
+authors = [
+    { name = "quantumlemur" },
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+LinkRelay = "limnoria_linkrelay"
+
+[tool.setuptools.package-dir]
+"limnoria_linkrelay" = "."
+"limnoria_linkrelay.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_linkrelay" = ["locales/*.po"]

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-apt"
+version = "0.0.0"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+Apt = "limnoria_apt"
+
+[tool.setuptools.package-dir]
+"limnoria_apt" = "."
+"limnoria_apt.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_apt" = ["locales/*.po"]

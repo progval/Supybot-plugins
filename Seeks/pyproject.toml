@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-seeks"
+version = "0.1.1"
+authors = [
+    { name = "Pablo Joubert" },
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+Seeks = "limnoria_seeks"
+
+[tool.setuptools.package-dir]
+"limnoria_seeks" = "."
+"limnoria_seeks.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_seeks" = ["locales/*.po"]

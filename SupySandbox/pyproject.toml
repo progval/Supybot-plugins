@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-supysandbox"
+version = "0.1"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+SupySandbox = "limnoria_supysandbox"
+
+[tool.setuptools.package-dir]
+"limnoria_supysandbox" = "."
+"limnoria_supysandbox.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_supysandbox" = ["locales/*.po"]

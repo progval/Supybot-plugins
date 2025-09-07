@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-attackprotector"
+version = "0.2"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+AttackProtector = "limnoria_attackprotector"
+
+[tool.setuptools.package-dir]
+"limnoria_attackprotector" = "."
+"limnoria_attackprotector.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_attackprotector" = ["locales/*.po"]

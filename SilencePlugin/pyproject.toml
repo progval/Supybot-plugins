@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-silenceplugin"
+version = "0.0.0"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+SilencePlugin = "limnoria_silenceplugin"
+
+[tool.setuptools.package-dir]
+"limnoria_silenceplugin" = "."
+"limnoria_silenceplugin.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_silenceplugin" = ["locales/*.po"]

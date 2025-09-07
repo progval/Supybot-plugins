@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-debian"
+version = "0.1"
+authors = [
+    { name = "James Vega" },
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+Debian = "limnoria_debian"
+
+[tool.setuptools.package-dir]
+"limnoria_debian" = "."
+"limnoria_debian.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_debian" = ["locales/*.po"]
