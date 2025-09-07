@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-weblogs"
+version = "0.0.0"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+WebLogs = "limnoria_weblogs"
+
+[tool.setuptools.package-dir]
+"limnoria_weblogs" = "."
+"limnoria_weblogs.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_weblogs" = ["locales/*.po"]

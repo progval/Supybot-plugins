@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-i18nplaceholder"
+version = "0.0.0"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+I18nPlaceholder = "limnoria_i18nplaceholder"
+
+[tool.setuptools.package-dir]
+"limnoria_i18nplaceholder" = "."
+"limnoria_i18nplaceholder.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_i18nplaceholder" = ["locales/*.po"]

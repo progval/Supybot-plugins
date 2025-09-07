@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-skyperelay"
+version = "0.0.0"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+    "SkPy",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+SkypeRelay = "limnoria_skyperelay"
+
+[tool.setuptools.package-dir]
+"limnoria_skyperelay" = "."
+"limnoria_skyperelay.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_skyperelay" = ["locales/*.po"]

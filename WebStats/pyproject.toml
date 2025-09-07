@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-webstats"
+version = "0.5"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+WebStats = "limnoria_webstats"
+
+[tool.setuptools.package-dir]
+"limnoria_webstats" = "."
+"limnoria_webstats.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_webstats" = ["locales/*.po"]

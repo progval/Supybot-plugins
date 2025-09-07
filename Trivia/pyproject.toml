@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-trivia"
+version = "1.0"
+authors = [
+    { name = "quantumlemur" },
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+Trivia = "limnoria_trivia"
+
+[tool.setuptools.package-dir]
+"limnoria_trivia" = "."
+"limnoria_trivia.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_trivia" = ["locales/*.po"]

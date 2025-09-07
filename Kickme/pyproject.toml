@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-kickme"
+version = "0.0.0"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+Kickme = "limnoria_kickme"
+
+[tool.setuptools.package-dir]
+"limnoria_kickme" = "."
+"limnoria_kickme.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_kickme" = ["locales/*.po"]

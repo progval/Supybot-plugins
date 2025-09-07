@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "limnoria-nicktracker"
+version = "0.0.0"
+authors = [
+    { name = "Valentin Lorentz" },
+]
+readme = "README.md"
+dependencies = [
+    "limnoria",
+]
+classifiers = [
+    'Environment :: Plugins',
+    'Programming Language :: Python :: 3',
+    'Topic :: Communications :: Chat',
+]
+
+[project.entry-points.'limnoria.plugins']
+NickTracker = "limnoria_nicktracker"
+
+[tool.setuptools.package-dir]
+"limnoria_nicktracker" = "."
+"limnoria_nicktracker.local" = "local/"
+
+[tool.setuptools.package-data]
+"limnoria_nicktracker" = ["locales/*.po"]
