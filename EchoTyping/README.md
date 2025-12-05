@@ -27,3 +27,9 @@ An other pissnet user:
 A [Matrix2051](https://github.com/progval/matrix2051) user:
 
 > who is Limnoria and why s(he) is typing when i typing?
+
+A user of a network that just migrated from Elemental-IRCd to InspIRCd 4:
+
+> does Limnoria by any chance have a plugin which sends typing status whenever anyone else sends typing status?
+>
+> i can confirm it is as irritating as intended
