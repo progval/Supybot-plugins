@@ -54,7 +54,11 @@ class RelayedCommands(callbacks.Plugin):
         ):
             return
 
-        match = REGEXP.match(msg.args[1])
+        # Relays often use color codes and other formatting to make the nicks
+        # more readable and may also insert a zero-width space into the
+        # relayed nick to avoid pinging someone on IRC with the same name.
+        # It is needed to strip both so the regular expression below matches.
+        match = REGEXP.match(ircutils.stripFormatting(msg.args[1].replace("\u200b", "", 1)))
         if match is None:
             return
 
