@@ -43,10 +43,9 @@ except ImportError:
     # without the i18n module
     _ = lambda x: x
 try:
-    import pyjq
+    import jq
 except ImportError:
-    raise callbacks.Error('You have to install pyjq (not to be confused '
-                          'with "jq" or "python-jq").')
+    raise callbacks.Error('You have to install python-jq.')
 
 
 class Json(callbacks.Plugin):
@@ -59,7 +58,7 @@ class Json(callbacks.Plugin):
         value.
         See http://stedolan.github.io/jq/tutorial/ to learn about the
         selector syntax."""
-        irc.reply(pyjq.first(selector, json.loads(data)))
+        irc.reply(jq.compile(selector).input_value(json.loads(data)).first())
     get = wrap(get, ['something', 'text'])
 
 
