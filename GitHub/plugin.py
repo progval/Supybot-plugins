@@ -321,6 +321,11 @@ class GitHub(callbacks.Plugin):
                     log.info(('Cannot announce event for repo '
                              '%s in %s on %s because I\'m not in %s.') %
                              (repo, channel, irc.network, channel))
+
+                if self.plugin.registryValue('ignoreBots', channel):
+                    if payload.get("sender", {}).get("type") == "Bot":
+                        continue
+
                 if event == 'push':
                     commits = payload['commits']
                     hidden = None

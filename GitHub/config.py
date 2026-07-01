@@ -70,6 +70,9 @@ conf.registerChannelValue(GitHub, 'max_announce_commits',
         will be announced for a single push. Note that if the number of commits
         is only one over the limit, it will be announced anyway instead of
         saying "1 more commit".""")))
+conf.registerChannelValue(GitHub, 'ignoreBots',
+        registry.Boolean(False, _("""Whether to ignore webhook events that were
+        triggered by bots like dependabot""")))
 
 conf.registerGroup(GitHub, 'format')
 conf.registerGroup(GitHub.format, 'before')
