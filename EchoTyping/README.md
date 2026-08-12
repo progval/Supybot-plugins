@@ -33,3 +33,7 @@ A user of a network that just migrated from Elemental-IRCd to InspIRCd 4:
 > does Limnoria by any chance have a plugin which sends typing status whenever anyone else sends typing status?
 >
 > i can confirm it is as irritating as intended
+
+A cat enjoyer on Libera.Chat, after a Solanum update:
+
+> why does Limnoria always come up as "typing" in IRCloud when I type
