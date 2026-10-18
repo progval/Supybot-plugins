@@ -37,3 +37,17 @@ A user of a network that just migrated from Elemental-IRCd to InspIRCd 4:
 A cat enjoyer on Libera.Chat, after a Solanum update:
 
 > why does Limnoria always come up as "typing" in IRCloud when I type
+
+Someone who just switched to client with more IRCv3:
+
+> hmm is there some kind of weird protocol that my client is using to communicate that i'm typing?
+>
+> because Limnoria is either parroting it back at me or the client's bugged and thinks i'm limnoria
+>
+> im gonna restart anyway maybe that will change something
+>
+> it doesn't seem to be something i can shut off either
+>
+> [someone else explains 5 min later]
+>
+> oh my god that's hilarious
